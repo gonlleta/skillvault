@@ -2182,6 +2182,881 @@ Armé un prototipo rápido de 60 segundos entrenado con los servicios reales de 
         }
       ]
     }
+  },
+  {
+    id: 'nocode-n8n-whatsapp',
+    title: 'Automatización con n8n / Make & Creación de Bots de WhatsApp con IA',
+    category: 'Inteligencia Artificial',
+    priceUSD: 17.99,
+    pointsReward: 290,
+    vipPointsReward: 90,
+    xp: 350,
+    duration: 50,
+    secretCourse: false,
+    description: 'Crea flujos automatizados profesionales: Webhooks en tiempo real, WhatsApp Cloud API, memoria conversacional, sincronización con CRM y manejo de errores.',
+    lessons: [
+      {
+        heading: 'Módulo 1: Arquitectura de Automatización: Webhooks en Tiempo Real vs. Polling',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'En plataformas de orquestación visual como n8n o Make, todo flujo comienza con un Disparador (Trigger). Existen dos paradigmas de comunicación entre aplicaciones: Polling (consultar periódicamente "¿hay datos nuevos?" cada 5 o 15 minutos) y Webhooks (la aplicación origen envía una petición HTTP POST instantánea a tu URL apenas ocurre el evento).',
+          'Para bots de atención al cliente, pagos o reservas, los Webhooks son obligatorios: consumen cero operaciones mientras no hay actividad y disparan el flujo en menos de 100 milisegundos.'
+        ],
+        keyPoints: [
+          'Polling desperdicia recursos consultando APIs vacías y añade latencia de varios minutos.',
+          'Un Webhook recibe un Payload JSON en el cuerpo (Body) y cabeceras (Headers) de autenticación.',
+          'Verifica siempre la firma HMAC (ej. X-Hub-Signature-256) del Webhook para asegurar que el mensaje proviene realmente de Meta o Stripe.'
+        ],
+        code: `// Estructura de Payload JSON recibido en un Webhook de n8n / Make
+{
+  "event": "whatsapp.message.received",
+  "timestamp": 1761580000,
+  "data": {
+    "from": "+5491122334455",
+    "contact_name": "Martín Gómez",
+    "message_id": "wamid.HBgNNTQ5MTEyMjMzNDQ1NRUCABIYFDNB",
+    "text": "Hola, quiero agendar una demostración del plan corporativo"
+  }
+}`,
+        warning: '⚠️ Tu nodo de Webhook debe responder un código HTTP 200 OK en menos de 3 a 5 segundos; si el flujo tarda más, responde 200 inmediatamente y procesa la IA en segundo plano.',
+        checkpoint: {
+          question: '¿Por qué es crítico que tu endpoint de Webhook responda `200 OK` rápidamente antes de ejecutar tareas lentas (como generar un PDF o esperar 20 segundos a un modelo de IA)?',
+          options: [
+            'Porque los navegadores no soportan respuestas que contengan formato JSON.',
+            'Porque si el servidor emisor (ej. Meta WhatsApp API o Stripe) no recibe confirmación 200 OK antes de su timeout (3-5s), asumirá que la entrega falló y reenviará el mismo evento múltiples veces generando respuestas duplicadas.',
+            'Porque responder 200 OK apaga automáticamente el servidor de n8n.',
+            'Porque el protocolo HTTP prohíbe que una conexión dure más de 50 milisegundos.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: WhatsApp Business Cloud API, Ventana de 24h y Plantillas HSM',
+        readTime: '13 min de lectura',
+        paragraphs: [
+          'Para conectar un bot empresarial sin riesgo de bloqueo de número se utiliza la API Oficial de WhatsApp Cloud (Meta for Developers). Meta aplica una regla técnica estricta llamada "Ventana de Conversación de 24 Horas": cuando un usuario te escribe por primera vez, se abre una ventana de 24 horas durante la cual el bot puede responder con mensajes de texto libre sin límite.',
+          'Una vez transcurridas 24 horas desde el último mensaje del cliente, la ventana se cierra y solo puedes volver a iniciar contacto enviando una Plantilla Pre-aprobada (Template Message) con variables dinámicas.'
+        ],
+        keyPoints: [
+          'Mensajes iniciados por el usuario (Service Conversations): permiten respuestas libres del Agente IA durante 24 horas.',
+          'Mensajes fuera de la ventana de 24h (Marketing / Utility Templates): requieren plantilla aprobada por Meta.',
+          'Usa un buffer/acumulador de 4 a 6 segundos en n8n (con Redis) para agrupar cuando un usuario envía 4 mensajes cortos seguidos ("Hola", "Quiero saber", "el precio", "del curso").'
+        ],
+        code: `Lógica de Debounce / Buffer de Mensajes en WhatsApp con Redis:
+1. Llega mensaje "Hola" de +54911... -> Guardar en lista Redis [key: chat_54911].
+2. Esperar 5 segundos.
+3. ¿Llegó otro mensaje ("precio por favor") en esos 5s?
+   - SÍ -> Concatenar en un solo bloque: "Hola precio por favor" y enviar 1 sola vez al Agente IA.
+   - NO -> Procesar y responder.`,
+        warning: '⚠️ Si no implementas un buffer de agrupación de segundos, cuando un usuario escriba 3 líneas separadas tu bot le responderá 3 veces seguidas de forma robótica y gastará el triple de tokens.',
+        checkpoint: {
+          question: '¿Qué problema técnico resuelve implementar un "Buffer de agrupación de 5 segundos en Redis" antes de pasar los mensajes de WhatsApp al Agente de IA?',
+          options: [
+            'Permite enviar mensajes gratuitos fuera de la ventana de 24 horas sin usar plantillas.',
+            'Concatena las ráfagas de varios mensajes cortos consecutivos que envía una persona en una única consulta unificada hacia el LLM, evitando respuestas triplicadas y ahorrando tokens.',
+            'Cambia el número de teléfono del usuario en la base de datos.',
+            'Elimina la necesidad de tener un token de acceso en Meta Cloud API.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 3: Memoria Conversacional por `session_id` y Sincronización con CRM',
+        readTime: '13 min de lectura',
+        paragraphs: [
+          'Las APIs de modelos de lenguaje son "Stateless" (sin estado): no recuerdan qué hablaste hace 10 segundos a menos que le envíes el historial reciente de esa conversación. En n8n o Make, utilizamos el número de teléfono del cliente como `session_id` único en una base de datos (PostgreSQL / Redis) para recuperar los últimos 6 a 10 mensajes.',
+          'Además, cuando el Agente detecta que el usuario ya entregó los datos clave (Nombre, Email, Presupuesto y Fecha deseada), invoca automáticamente una herramienta para crear o actualizar el trato en el CRM (HubSpot, Pipedrive, Google Sheets o Airtable) usando "Upsert" por teléfono o email.'
+        ],
+        keyPoints: [
+          'Usa una ventana deslizante (Window Buffer Memory) de los últimos 8-10 mensajes para no agotar tokens con historiales eternos.',
+          'La operación "Upsert" (Update or Insert) actualiza el contacto si ya existe en el CRM o lo crea si es nuevo, evitando duplicados.',
+          'Incluye una herramienta de "Derivar a Humano" cuando el cliente pide hablar con un asesor o tiene un reclamo complejo.'
+        ],
+        code: `Flujo del Nodo AI Agent en n8n:
+[Input]: Mensaje unificado del usuario + Teléfono como Session ID
+  ├─ 🧠 Memory: Postgres Chat Memory (Últimos 10 mensajes de ese teléfono)
+  ├─ 📚 Tool 1: Consultar_Disponibilidad_Calendario(fecha)
+  ├─ 📝 Tool 2: Guardar_Lead_CRM(nombre, telefono, interes)
+  └─ 🚨 Tool 3: Pausar_Bot_Y_Notificar_Humano(motivo)`,
+        warning: '⚠️ Si olvidas pausar el flag `bot_activo = false` en la base de datos cuando derivas la conversación a un vendedor humano, el bot seguirá metiéndose en la charla encima del vendedor.',
+        checkpoint: {
+          question: 'Al sincronizar prospectos desde un bot hacia un CRM, ¿por qué se debe utilizar una operación `Upsert` basada en el teléfono o email en lugar de un `Create / Insert` simple?',
+          options: [
+            'Porque Insert borra todos los contactos anteriores de la tabla.',
+            'Porque Upsert verifica primero si ese teléfono/email ya existe para actualizar su estado o historial sin generar múltiples fichas de cliente duplicadas cada vez que vuelve a escribir.',
+            'Porque Upsert no requiere conexión a internet.',
+            'Porque los CRMs no permiten guardar números de teléfono con código de país.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 4: Idempotencia, Reintentos con Exponential Backoff y Flujos de Error',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'En automatizaciones empresariales las APIs externas a veces sufren micro-cortes (error 502, 503 o 429). Un flujo frágil pierde la venta cuando eso pasa; una arquitectura resiliente configura reintentos automáticos con "Exponential Backoff" (esperar 2s en el primer fallo, 4s en el segundo, 8s en el tercero) y un "Error Workflow" que alerta por Slack/Telegram.',
+          'Asimismo, guardar el `message_id` único de cada evento procesado garantiza la "Idempotencia": si por un fallo de red llega dos veces el mismo webhook de pago o mensaje, el sistema comprueba que ese ID ya fue ejecutado y lo ignora limpiamente.'
+        ],
+        keyPoints: [
+          'Idempotencia: Registrar el `event_id` o `message_id` en base de datos antes de ejecutar cobros o envíos.',
+          'Exponential Backoff: Evita saturar una API caída espaciando progresivamente los reintentos.',
+          'Dead Letter Queue (DLQ): Guarda en una tabla de respaldo cualquier evento que haya fallado tras 3 reintentos para reprocesarlo con 1 clic.'
+        ],
+        code: `Verificación de Idempotencia antes de Procesar un Webhook:
+1. Leer header o campo único: event_id = payload.message_id
+2. Consultar DB: SELECT 1 FROM processed_events WHERE id = event_id
+   - Si YA EXISTE -> Detener flujo y devolver 200 OK (Evita cobro o envío duplicado).
+   - Si NO EXISTE -> INSERT INTO processed_events (id) VALUES (event_id) y continuar flujo.`,
+        warning: '⚠️ Nunca pongas reintentos inmediatos infinitos sin pausa cuando recibes un error 429 (Rate Limit): solo lograrás que el proveedor bloquee tu API Key permanentemente.',
+        checkpoint: {
+          question: '¿Cómo garantiza una clave de idempotencia (`message_id` o `event_id`) que un flujo de automatización no ejecute dos veces la misma factura o respuesta ante reenvíos de red?',
+          options: [
+            'Apagando el webhook después de cada mensaje recibido.',
+            'Registrando el identificador único del evento entrante en una tabla de control y descartando cualquier petición futura que traiga un ID ya procesado previamente.',
+            'Borrando el historial de mensajes cada 60 segundos.',
+            'Cambiando la dirección IP del servidor en cada petición.'
+          ],
+          correctIndex: 1
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. ¿Cuál es la ventaja técnica y económica de utilizar un `Webhook` frente a un sistema de `Polling` en automatizaciones en tiempo real?',
+          options: [
+            'El Polling es instantáneo (0ms) mientras que el Webhook tarda 15 minutos en activarse.',
+            'El Webhook se dispara únicamente cuando ocurre el evento en el servidor origen enviando los datos al instante por HTTP POST, ahorrando miles de peticiones vacías e innecesarias.',
+            'El Webhook no necesita que el servidor receptor esté conectado a internet.',
+            'El Polling es la única forma permitida por la API oficial de WhatsApp.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '2. Según las reglas de la API Oficial de WhatsApp Cloud, ¿qué ocurre cuando pasan más de 24 horas desde el último mensaje enviado por el cliente?',
+          options: [
+            'El número de teléfono de la empresa se elimina para siempre.',
+            'Se cierra la ventana de atención libre y la empresa solo puede reiniciar la conversación enviando una Plantilla de Mensaje (Template) previamente aprobada.',
+            'El bot puede seguir enviando textos libres ilimitados sin ninguna restricción.',
+            'Se borran todos los mensajes del teléfono del usuario.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '3. ¿Por qué se utiliza una memoria de ventana deslizante (`Window Buffer` de los últimos N mensajes) asociada al `session_id` en lugar de enviar los 5,000 mensajes históricos de todo el año al LLM?',
+          options: [
+            'Porque las bases de datos SQL solo pueden guardar hasta 10 filas en total.',
+            'Para mantener el contexto relevante de la conversación actual controlando la latencia, el costo por tokens de entrada y evitando degradar la atención del modelo con temas antiguos ya cerrados.',
+            'Porque los modelos de lenguaje solo aceptan números y no letras en el historial.',
+            'Porque enviar menos de 5,000 mensajes produce un error de sintaxis.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '4. ¿Qué estrategia de recuperación aplica un flujo profesional cuando una API externa devuelve un error temporal `503 Service Unavailable` o `429 Too Many Requests`?',
+          options: [
+            'Enviar 1,000 peticiones por segundo inmediatamente hasta que el servidor responda.',
+            'Borrar los datos del cliente y cerrar la cuenta.',
+            'Aplicar reintentos limitados con espera progresiva (`Exponential Backoff`) y, si persiste el fallo, derivar el payload a una cola de respaldo (Error Workflow) avisando al equipo técnico.',
+            'Ignorar el error y marcar la factura como pagada sin verificar.'
+          ],
+          correctIndex: 2
+        }
+      ]
+    }
+  },
+  {
+    id: 'viral-video-retention',
+    title: 'Edición de Video Viral (Reels, TikTok & Shorts) e Ingeniería de Retención',
+    category: 'Diseño & Marketing',
+    priceUSD: 14.99,
+    pointsReward: 260,
+    vipPointsReward: 80,
+    xp: 310,
+    duration: 45,
+    secretCourse: false,
+    description: 'Domina la psicología de los primeros 3 segundos, curvas de retención algorítmica, cortes de patrón (Pattern Interrupts), diseño sonoro SFX y guiones virales.',
+    lessons: [
+      {
+        heading: 'Módulo 1: La Regla de los 3 Segundos y el Triple Gancho (Visual, Auditivo y Textual)',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'En plataformas de video corto vertical (TikTok, Instagram Reels, YouTube Shorts), el algoritmo mide una métrica inicial crítica llamada "Hook Rate" (o Thumbstop Ratio): qué porcentaje de usuarios que pasa por tu video se queda mirando más allá de los primeros 3 segundos en vez de deslizar hacia arriba (Swipe Away).',
+          'Para superar el 75% de retención en los primeros 3 segundos nunca empieces diciendo "Hola amigos, hoy les voy a hablar de...". Debes sincronizar un Triple Gancho en el segundo 0.1: Gancho Verbal (una afirmación contraintuitiva o promesa específica), Gancho Visual (movimiento en cámara o prueba en pantalla) y Gancho Textual (titular corto en el centro superior).'
+        ],
+        keyPoints: [
+          'Elimina todos los silencios iniciales: el primer fotograma ya debe tener voz y movimiento.',
+          'Abre un "Bucle Abierto" (Open Loop) de curiosidad que solo se resuelve al final del video.',
+          'Un buen Hook Rate en contenido educativo vertical se ubica por encima del 70% a 80%.'
+        ],
+        code: `Comparativa de Apertura en los Primeros 3 Segundos:
+❌ Apertura Débil (32% retención): "Hola a todos, mi nombre es Juan y hoy veremos 3 tips de finanzas..."
+✅ Triple Gancho Viral (81% retención):
+   - [Voz 0.0s]: "Este error silencioso en tu tarjeta te está quitando $400 dólares al año..."
+   - [Visual]: Zoom rápido + Resumen bancario subrayado en rojo en pantalla.
+   - [Texto en pantalla]: EL ERROR DE LOS $400 USD 💳`,
+        warning: '⚠️ Si el titular en pantalla repite exactamente las mismas 15 palabras que estás diciendo en voz alta, saturas la lectura; usa en pantalla un resumen visual de 4 a 5 palabras de alto impacto.',
+        checkpoint: {
+          question: '¿Qué mide exactamente el indicador "Hook Rate" (o porcentaje de vistos frente a deslizados) en las analíticas de Reels, TikTok y Shorts?',
+          options: [
+            'La cantidad de personas que hicieron clic en el enlace de la biografía.',
+            'El porcentaje de impresiones que superó la barrera de los primeros 3 segundos sin deslizar el dedo para pasar al siguiente video.',
+            'La resolución en píxeles con la que se exportó el archivo MP4.',
+            'La duración total del archivo de música de fondo.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Curvas de Retención, Pacing y "Pattern Interrupts" cada 3 a 5 Segundos',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'Una vez que capturaste la atención en los primeros 3 segundos, tu enemigo es la habituación visual: si el plano queda fijo e inmóvil durante 12 segundos seguidos, el cerebro del espectador entra en piloto automático y desliza.',
+          'La edición de alta retención introduce un "Pattern Interrupt" (interrupción de patrón visual o auditivo) cada 3 a 5 segundos: un cambio de escala (zoom in 115% / zoom out 100%), un B-Roll (video o captura superpuesta que ilustra lo que dices), un gráfico animado o un cambio de ángulo.'
+        ],
+        keyPoints: [
+          'Recorta las respiraciones y pausas muertas entre frases (Jump Cuts limpios o corte en J-Cut).',
+          'J-Cut: Hacer que el audio de la siguiente escena entre 0.2 segundos antes de que cambie la imagen suaviza el ritmo y mantiene al cerebro enganchado.',
+          'No abuses de efectos caóticos sin sentido: cada elemento visual debe reforzar la comprensión de la idea.'
+        ],
+        code: `Línea de Tiempo de Edición de Alta Retención (0s a 15s):
+- 00s - 03s: Plano medio con zoom progresivo + Gancho visual en pantalla.
+- 03s - 07s: [Pattern Interrupt #1] Captura de pantalla real con resaltador animado.
+- 07s - 11s: [Pattern Interrupt #2] Vuelta al hablante en encuadre 115% + Icono flotante.
+- 11s - 15s: [Pattern Interrupt #3] Demostración del resultado final en vivo.`,
+        warning: '⚠️ Poner 20 transiciones giratorias mareantes en 10 segundos agota al espectador; alterna cortes limpios de escala (100% -> 115%) con B-Rolls demostrativos.',
+        checkpoint: {
+          question: 'En edición profesional de video, ¿en qué consiste la técnica `J-Cut` y por qué mejora la retención entre escenas?',
+          options: [
+            'En cortar el video exactamente a la mitad y borrar la segunda parte.',
+            'En adelantar unas décimas de segundo la entrada del audio de la escena siguiente antes de que ocurra el corte visual, creando una transición fluida que evita pausas muertas.',
+            'En exportar el video sin pista de audio para que pese menos.',
+            'En aplicar un filtro blanco y negro a todos los subtítulos.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 3: Diseño Sonoro (SFX, Risers, Hits) y Subtitulado Dinámico Inteligente',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'El 50% de la percepción de calidad de un video proviene del audio. Una voz grabada con eco o tapada por la música de fondo hace que la gente abandone de inmediato, mientras que un buen diseño sonoro guía la atención de forma subconsciente.',
+          'Asimismo, dado que más del 35% de los usuarios consume contenido con el volumen bajo o en lugares públicos, los subtítulos dinámicos ubicados en la "Zona Segura" (centro-medio de la pantalla, lejos de los botones de la interfaz de TikTok/Reels) son obligatorios.'
+        ],
+        keyPoints: [
+          'Voz principal entre -6 dB y -3 dB; música de fondo entre -24 dB y -30 dB (que acompañe sin competir con la voz).',
+          'Efectos de sonido (SFX) sutiles a -15 dB: "Whoosh" en transiciones, "Pop" al aparecer texto y "Riser" antes de revelar el dato clave.',
+          'Resalta en color (amarillo, verde esmeralda o cian) solo las palabras clave de alto impacto dentro del subtítulo.'
+        ],
+        code: `Mezcla de Niveles de Audio Estándar para Reels / Shorts / TikTok:
+🎙️ Voz Principal (Limpiada y comprimida):  -6 dB a -3 dB
+🔊 Efectos SFX (Whoosh, Pops, Clicks):     -14 dB a -18 dB
+🎵 Música Instrumental de Fondo (Ducking): -26 dB a -30 dB`,
+        warning: '⚠️ Nunca coloques los subtítulos pegados al borde inferior ni al margen derecho: quedarán tapados por la descripción del video y por los iconos de "Me gusta / Compartir".',
+        checkpoint: {
+          question: '¿Por qué los subtítulos dinámicos nunca deben colocarse en el 20% inferior ni en el margen derecho extremo de un video vertical 9:16?',
+          options: [
+            'Porque las cámaras de teléfono no graban píxeles en esa zona.',
+            'Porque quedan fuera de la "Zona Segura" (Safe Zone) y resultan tapados por la interfaz nativa de la plataforma (nombre de cuenta, descripción y botonera de interacción).',
+            'Porque el algoritmo penaliza los videos que tienen letras en la mitad inferior.',
+            'Porque el color blanco no se reproduce en los bordes de las pantallas OLED.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 4: Algoritmo de Distribución, Estructura de Guion y Loop Infinito',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'El algoritmo de recomendación funciona por lotes (Batch Testing): primero muestra tu video a 300-500 personas y evalúa 3 señales ponderadas: 1) Porcentaje medio reproducido y tasa de finalización (Completion Rate), 2) Veces que se comparte por mensaje directo o se guarda (Shares & Saves), y 3) Reproducciones repetidas (Re-watches).',
+          'Para disparar la tasa de finalización al >100%, el cierre del video no debe sonar a despedida ("Bueno, eso fue todo, síganme"): si anuncias que el video ya terminó, el espectador se va 5 segundos antes. Entrega el punto más valioso al final y conecta la última frase con la primera (Seamless Loop).'
+        ],
+        keyPoints: [
+          'Estructura ganadora de 45s: Gancho (0-3s) -> Agitación/Contexto (3-10s) -> Desarrollo en 3 pasos rápidos (10-38s) -> Remate + CTA integrado sin pausa (38-45s).',
+          'Los "Guardados" (Saves) y "Compartidos" (Shares) valen mucho más para el alcance viral que un simple "Like".',
+          'Diseña contenido "Guarda esto para cuando..." o comparativas prácticas que la audiencia quiera reenviar a un colega.'
+        ],
+        code: `Técnica de Bucle Infinito (Seamless Loop) entre el Final y el Inicio:
+- Final del guion (seg 44): "...y esa es la única razón por la que..."
+- Inicio del guion (seg 00): "...el 90% pierde dinero al configurar su campaña."
+(Mientras el espectador procesa el corte, el video ya volvió a empezar sumando +110% de retención).`,
+        warning: '⚠️ Decir "Antes de terminar el video, no olvides suscribirte..." provoca una caída vertical del 60% en la gráfica de retención en los últimos 5 segundos.',
+        checkpoint: {
+          question: '¿Por qué anunciar explícitamente "Bueno, para ir terminando el video..." en los últimos segundos perjudica el alcance algorítmico?',
+          options: [
+            'Porque las plataformas silencian el micrófono cuando detectan la palabra "terminando".',
+            'Porque le avisa al cerebro del espectador que ya no queda información nueva por revelar, provocando un abandono masivo antes del segundo final y desplomando la tasa de finalización (Completion Rate).',
+            'Porque duplica el peso del archivo de video.',
+            'Porque desactiva los comentarios de la publicación.'
+          ],
+          correctIndex: 1
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. ¿Qué combinación conforma el "Triple Gancho" en los primeros 3 segundos de un video viral?',
+          options: [
+            'Tres canciones distintas sonando al mismo tiempo sin voz.',
+            'Una cortina musical de 8 segundos con el logotipo girando.',
+            'Un estímulo visual en movimiento/prueba en pantalla + una frase hablada que abre un bucle de curiosidad + un titular corto legible en la zona segura.',
+            'Pedirle al usuario que dé me gusta, comente y comparta antes de decir de qué trata el video.'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '2. ¿Cuál es la relación de decibelios recomendada entre la voz principal y la música de fondo para garantizar claridad profesional?',
+          options: [
+            'Ambas pistas exactamente a 0 dB para que suenen con la misma potencia.',
+            'La música a -3 dB y la voz a -25 dB.',
+            'La voz principal clara entre -6 dB y -3 dB, y la música de fondo atenuada entre -24 dB y -30 dB para acompañar sin tapar las frecuencias vocales.',
+            'La voz a +12 dB saturando el compresor.'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '3. ¿Por qué insertar "Pattern Interrupts" (cambios de escala, B-Rolls o gráficos) cada 3 a 5 segundos eleva el tiempo medio de visualización?',
+          options: [
+            'Porque obliga al teléfono a cargar el video más despacio.',
+            'Porque reinicia el ciclo de atención visual del espectador evitando la monotonía de un plano estático prolongado.',
+            'Porque oculta los errores de ortografía del guion.',
+            'Porque reduce los cuadros por segundo de 60 fps a 10 fps.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '4. Además del porcentaje de retención, ¿qué dos interacciones del usuario tienen mayor peso algorítmico para que un Reel o TikTok escale a nuevas audiencias?',
+          options: [
+            'Hacer clic en la foto de perfil y cerrar la aplicación.',
+            'Los Guardados (Saves) y los Compartidos por mensaje directo (Shares), ya que demuestran alta utilidad o valor digno de recomendar.',
+            'Silenciar el audio del teléfono.',
+            'Ver solo el primer segundo del video.'
+          ],
+          correctIndex: 1
+        }
+      ]
+    }
+  },
+  {
+    id: 'meta-ads-roas',
+    title: 'Tráfico Pago con Meta Ads & TikTok Ads: Píxel, API de Conversiones y ROAS',
+    category: 'Diseño & Marketing',
+    priceUSD: 18.50,
+    pointsReward: 300,
+    vipPointsReward: 95,
+    xp: 360,
+    duration: 50,
+    secretCourse: false,
+    description: 'Domina la atribución con Píxel + CAPI Server-Side, campañas CBO vs. ABO, lectura de métricas (CPM, CTR, CPA, ROAS) y escalado rentable de anuncios.',
+    lessons: [
+      {
+        heading: 'Módulo 1: El Píxel de Seguimiento, API de Conversiones (CAPI) y Deduplicación',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'Lanzar anuncios de conversión sin medir qué anuncio generó cada venta es tirar dinero a ciegas. El Píxel de Meta/TikTok es un script que corre en el navegador del usuario y reporta eventos (PageView, InitiateCheckout, Purchase). Sin embargo, debido a los bloqueadores de anuncios y las restricciones de cookies en iOS/Safari, el Píxel del navegador pierde entre un 20% y un 35% de las conversiones reales.',
+          'La solución profesional es implementar en paralelo la API de Conversiones (CAPI) desde el servidor backend, enviando un identificador único de evento (`event_id`) en ambos canales para que Meta deduplique y registre el 100% de las ventas sin contarlas doble.'
+        ],
+        keyPoints: [
+          'Eventos estándar del embudo: ViewContent -> AddToCart -> InitiateCheckout -> Purchase (con valor y moneda).',
+          'Sin `event_id` compartido entre Píxel y CAPI, cada compra se contabilizaría dos veces en el administrador de anuncios.',
+          'Optimiza siempre tus campañas de venta por el evento final "Purchase" (Compra), nunca por "Clics en el enlace".'
+        ],
+        code: `// Envío de Evento Purchase con event_id para Deduplicación (Píxel + CAPI)
+const uniqueEventId = "ord_" + order.id;
+
+// 1. En el Navegador (Píxel):
+fbq('track', 'Purchase', { value: 29.00, currency: 'USD' }, { eventID: uniqueEventId });
+
+// 2. En el Servidor (CAPI):
+sendServerEvent({ event_name: 'Purchase', event_id: uniqueEventId, value: 29.00 });`,
+        warning: '⚠️ Si optimizas una campaña pidiendo "Tráfico / Clics baratos", el algoritmo buscará usuarios que hacen clic en todo pero jamás compran nada. Si quieres ventas, optimiza por Conversiones (Purchase).',
+        checkpoint: {
+          question: '¿Qué función cumple enviar exactamente el mismo parámetro `event_id` tanto desde el Píxel del navegador como desde la API de Conversiones del servidor (CAPI)?',
+          options: [
+            'Cobrarle dos veces el mismo producto a la tarjeta del comprador.',
+            'Permitir que la plataforma publicitaria realice la "Deduplicación": si recibe el evento por ambos canales conserva uno solo, y si el navegador fue bloqueado por un AdBlocker registra el del servidor sin perder la atribución.',
+            'Ocultar el precio de la venta para que no aparezca en los reportes.',
+            'Reducir el presupuesto diario de la campaña a la mitad.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Estructura de Campañas (ABO vs. CBO) y Segmentación por el Creativo',
+        readTime: '13 min de lectura',
+        paragraphs: [
+          'En los algoritmos publicitarios modernos con IA (Advantage+ / Broad Targeting), la hiper-segmentación manual de intereses pequeños quedó obsoleta: es el propio anuncio (el video, el titular y el mensaje) quien segmenta y filtra a tu comprador ideal según quién se detiene a mirarlo.',
+          'Para testear nuevos anuncios usamos ABO (presupuesto a nivel de conjunto de anuncios) para forzar que cada variante reciba una inversión equitativa; para escalar a los anuncios ganadores usamos CBO / Advantage+ (presupuesto a nivel de campaña) para que el algoritmo distribuya el dinero dinámicamente hacia el mejor rendimiento.'
+        ],
+        keyPoints: [
+          'Fase de Testeo (ABO): Asegura que un anuncio nuevo tenga suficientes impresiones antes de juzgarlo.',
+          'Fase de Escalado (CBO): El algoritmo asigna automáticamente más presupuesto al conjunto que consigue compras más baratas.',
+          'Prueba al menos 3 ángulos de venta distintos (ej. Ahorro de tiempo, Status/Certificación, Miedo a quedarse atrás).'
+        ],
+        code: `Arquitectura Limpia de Cuenta Publicitaria:
+📁 Campaña 1: TESTEO DE CREATIVOS (Modo ABO)
+   ├─ Conjunto A (Ángulo Dolor/Tiempo):   3 videos con ganchos distintos ($10/día)
+   └─ Conjunto B (Ángulo Caso de Éxito):  3 videos demostrativos ($10/día)
+📁 Campaña 2: ESCALADO GANADORES (Modo CBO)
+   └─ Solo entran los anuncios que lograron CPA rentable y ROAS > 2.5x`,
+        warning: '⚠️ Si metes un anuncio nuevo de cero junto a un anuncio que ya lleva 50,000 impresiones dentro de un mismo conjunto, el algoritmo gastará el 95% del presupuesto en el viejo y no dejará despegar al nuevo.',
+        checkpoint: {
+          question: '¿Por qué en las plataformas publicitarias actuales se dice que "el Creativo es la nueva segmentación" al usar audiencias amplias (Broad)?',
+          options: [
+            'Porque las plataformas eliminaron el botón de publicar anuncios de texto.',
+            'Porque el motor de IA analiza quiénes consumen los primeros segundos de tu video e interactúan con ese ángulo específico, construyendo dinámicamente el perfil de compradores ideales a partir de la respuesta real al anuncio.',
+            'Porque ya no importa qué se diga en el video sino únicamente el horario de publicación.',
+            'Porque los anuncios en audiencia amplia son gratuitos.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 3: Lectura Quirúrgica de Métricas: CPM, CTR Único, CPC, CPA y ROAS',
+        readTime: '13 min de lectura',
+        paragraphs: [
+          'Cuando una campaña no es rentable, un comprador de medios profesional no "apaga todo y empieza de nuevo": lee las métricas en cascada para diagnosticar en qué eslabón exacto está el problema (¿es el anuncio o es la página web?).',
+          'Si el CTR (porcentaje de clics salientes) es bajo (<0.8%), el problema está en el anuncio (el gancho o la oferta en el video no despiertan interés). En cambio, si el CTR es excelente (>2.0%) y el CPC es barato, pero nadie compra en la web (CPA altísimo), el anuncio está haciendo bien su trabajo y el problema está en la Landing Page o en el Checkout.'
+        ],
+        keyPoints: [
+          'CPM (Costo por 1,000 impresiones): Mide cuán cara está la subasta en ese público.',
+          'CTR Saliente Único (Outbound CTR): Porcentaje de personas que vieron el anuncio e hicieron clic hacia tu web (meta saludable >1.2% - 1.5%).',
+          'ROAS (Return On Ad Spend) = Ingresos por Ventas atribuidas / Inversión Publicitaria (ej. gastar $100 y facturar $350 = ROAS 3.5x).'
+        ],
+        code: `Diagnóstico Rápido de Embudo Publicitario:
+Caso 1: CTR Saliente = 0.4% | CPC = $2.80 USD -> ❌ El anuncio no engancha. Cambiar los primeros 3s del video.
+Caso 2: CTR Saliente = 2.6% | CPC = $0.25 USD | 0 Ventas -> ❌ La Landing Page no convierte o el Checkout falla.`,
+        warning: '⚠️ No confundas "CTR (Todos)" con "CTR de clics en el enlace saliente": el primero cuenta también a quienes tocaron para leer comentarios o pausar el video.',
+        checkpoint: {
+          question: 'Si un anuncio tiene un `CTR de clics en el enlace saliente` muy alto (`2.8%`) y un costo por clic muy bajo (`$0.20 USD`), pero tras 300 visitas a la web generó `0 ventas`, ¿cuál es el diagnóstico correcto?',
+          options: [
+            'El video del anuncio es malo y nadie lo está mirando.',
+            'El anuncio es altamente efectivo atrayendo tráfico calificado y barato; la fuga se encuentra dentro de la página de ventas, en la oferta o en un fallo técnico de la pasarela de pagos.',
+            'Debes subir el presupuesto diario a $5,000 USD sin cambiar nada.',
+            'El CPM de la subasta está bloqueando el navegador.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 4: Cálculo de ROAS de Equilibrio (Break-Even ROAS) y Escalado sin Romper el Algoritmo',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'Un ROAS de 2.0x puede hacer rico a un creador de cursos digitales (con 90% de margen) y llevar a la quiebra a una tienda física (con 25% de margen). Tu ROAS de Equilibrio se calcula como: Break-Even ROAS = 1 / Margen de Contribución Porcentual.',
+          'Cuando encuentras una campaña ganadora muy por encima de tu ROAS de equilibrio, para escalar el presupuesto verticalmente sin reiniciar la "Fase de Aprendizaje" del algoritmo debes aumentar el presupuesto de forma gradual (un 20% a 25% cada 48-72 horas) o duplicar hacia nuevos ángulos creativos (escalado horizontal).'
+        ],
+        keyPoints: [
+          'Si tu margen es del 50% (0.50), tu ROAS de equilibrio es 1 / 0.50 = 2.0x.',
+          'Si tu margen en cursos digitales es del 80% (0.80), tu ROAS de equilibrio es 1 / 0.80 = 1.25x (todo lo superior a 1.25x es ganancia neta).',
+          'Vigila la métrica "Frecuencia": cuando supera 3.0 - 4.0 en público frío y el CPA empieza a subir, el anuncio entró en Fatiga Creativa.'
+        ],
+        code: `Cálculo de ROAS de Equilibrio (Break-Even ROAS):
+- Producto de $50 USD con $10 USD de costo variable -> Margen = $40 USD (80% = 0.80).
+- ROAS de Equilibrio = 1 / 0.80 = 1.25x.
+- Si tu campaña logra ROAS 3.0x: Por cada $100 en anuncios facturas $300 -> Te quedan $140 USD limpios de ganancia.`,
+        warning: '⚠️ Multiplicar de golpe el presupuesto diario de una campaña por 10 (de $20/día a $200/día en un minuto) rompe la optimización algorítmica y dispara el costo por compra.',
+        checkpoint: {
+          question: 'Si vendes un producto de $100 USD cuyo margen de contribución (después de costos variables) es del 40% ($40 USD), ¿cuál es tu `ROAS de Equilibrio` (Break-Even ROAS) mínimo para no perder dinero en publicidad?',
+          options: [
+            'ROAS de 1.0x.',
+            'ROAS de 4.0x.',
+            'ROAS de 2.5x (1 dividido 0.40: necesitas facturar $100 USD con un máximo de $40 USD de gasto publicitario para quedar empatado).',
+            'ROAS de 0.4x.'
+          ],
+          correctIndex: 2
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. ¿Por qué hoy es indispensable combinar el Píxel del navegador con la API de Conversiones (CAPI) en el servidor?',
+          options: [
+            'Porque la API de Conversiones hace que los anuncios no cuesten dinero.',
+            'Para recuperar la medición del 20%-35% de conversiones que se pierden en el navegador por bloqueadores de anuncios y restricciones de cookies (iOS), alimentando al algoritmo con datos completos.',
+            'Para enviar correos de spam a quienes visitan la página.',
+            'Porque el Píxel del navegador solo funciona en computadoras de escritorio.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '2. ¿Qué error estratégico comete quien configura el objetivo de su campaña en "Maximizar Clics / Tráfico" cuando su meta real es vender un curso en su web?',
+          options: [
+            'Ninguno, porque más clics siempre garantizan más ventas en la misma proporción.',
+            'Le ordena al algoritmo buscar al subgrupo de usuarios propensos a hacer clic compulsivamente pero que rara vez ingresan su tarjeta de crédito, en lugar de buscar perfiles con historial de compra (Purchase).',
+            'Hace que los anuncios solo se muestren de madrugada.',
+            'Impide usar videos verticales en el anuncio.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '3. ¿Qué diferencia existe entre mirar el `CTR (Todos)` y el `CTR de clics en el enlace saliente` (Outbound CTR) en Meta Ads?',
+          options: [
+            '`CTR (Todos)` incluye clics en "Ver más", comentarios, foto de perfil o pausar el video; `Outbound CTR` mide estrictamente qué porcentaje hizo clic para salir hacia tu página de ventas.',
+            'Son dos nombres para el mismo número exacto.',
+            '`Outbound CTR` mide únicamente las personas que cerraron la aplicación.',
+            '`CTR (Todos)` solo cuenta las compras confirmadas.'
+          ],
+          correctIndex: 0
+        },
+        {
+          question: '4. ¿Qué síntoma en las métricas indica que un anuncio ganador ha entrado en "Fatiga Creativa" dentro de una audiencia?',
+          options: [
+            'La Frecuencia se mantiene en 1.0 y el costo por compra baja todos los días.',
+            'La Frecuencia promedio sube (ej. >3.5 en tráfico frío), el CTR saliente cae progresivamente semana tras semana y el Costo por Adquisición (CPA) se encarece.',
+            'El ROAS sube de 2.0x a 5.0x.',
+            'El video cambia de resolución por sí solo.'
+          ],
+          correctIndex: 1
+        }
+      ]
+    }
+  },
+  {
+    id: 'closer-high-ticket-sales',
+    title: 'Appointment Setting & Cierre de Ventas High-Ticket por Chat y Llamada',
+    category: 'Finanzas',
+    priceUSD: 16.50,
+    pointsReward: 280,
+    vipPointsReward: 85,
+    xp: 330,
+    duration: 45,
+    secretCourse: false,
+    description: 'Domina la prospección por chat (Social Selling), calificación BANT, psicología de cierre consultivo, resolución de objeciones y seguimiento de alto valor.',
+    lessons: [
+      {
+        heading: 'Módulo 1: El Rol del Appointment Setter y Calificación por Chat (Método BANT)',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'En negocios digitales de alto ticket (mentorías, agencias, software B2B), el embudo comercial se divide en dos roles especializados: el Appointment Setter (que gestiona las bandejas de entrada de Instagram, WhatsApp o LinkedIn para detectar oportunidades y agendar llamadas calificadas) y el Closer (que conduce la reunión de diagnóstico y cierra el pago).',
+          'Un Setter profesional jamás envía un link de pago ni explica todo el programa por texto: aplica el filtro B-A-N-T (Budget / Presupuesto, Authority / Poder de decisión, Need / Necesidad real, Timing / Urgencia) en 4 a 6 mensajes conversacionales para llenar el calendario solo con prospectos calificados.'
+        ],
+        keyPoints: [
+          'Regla de oro del chat: Haz 1 sola pregunta abierta por mensaje (los bloques largos de texto matan la respuesta).',
+          'Flujo de 4 pasos: 1) Abrir contexto por su interacción -> 2) Situación actual -> 3) Meta deseada y obstáculo -> 4) Propuesta de llamada de 15 min.',
+          'Descalifica con elegancia a quien no tiene el problema o no busca resolverlo ahora para no saturar la agenda del Closer.'
+        ],
+        code: `Secuencia de Chat de un Setter Profesional (Instagram / WhatsApp):
+1. [Apertura]: "¡Hola Diego! Vi que descargaste la guía de automatización. ¿La buscabas para aplicarla en tu propio negocio o para clientes?"
+2. [Dolor]: "Entiendo, hoy en tu agencia ¿cuántas horas por semana se les van en reportes manuales?"
+3. [Impacto]: "Uf, 15 hs semanales es muchísimo. ¿Qué te frenó hasta ahora de automatizarlo?"
+4. [Transición a Llamada]: "Justo armamos ese flujo para otras agencias. ¿Te queda bien mañana a las 15h o las 17h para verlo en 15 min por Zoom?"`,
+        warning: '⚠️ Enviar el enlace de Calendly en el primer mensaje sin haber diagnosticado ninguna necesidad tiene una tasa de inasistencia (No-Show) superior al 70%.',
+        checkpoint: {
+          question: '¿Por qué un Appointment Setter nunca debe pegar el link de la agenda en el primer mensaje sin haber conversado antes sobre la situación y el dolor del prospecto?',
+          options: [
+            'Porque las redes sociales bloquean cualquier cuenta que use enlaces de calendario.',
+            'Porque sin haber generado antes consciencia del problema ni valor percibido, el prospecto no siente compromiso real y la tasa de inasistencia a la llamada (No-Show) se dispara.',
+            'Porque el link de calendario cobra una comisión por cada clic.',
+            'Porque en ventas por chat hay que enviar primero un contrato de 20 páginas.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Estructura de la Llamada Consultiva y Establecimiento del Marco (Framing)',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'Quien hace las preguntas tiene el control de la conversación. Si al empezar la llamada el prospecto dice "Contame rápido qué hacen y cuánto sale", y tú empiezas a recitar características durante 20 minutos, perdiste el marco de autoridad y te convertiste en un vendedor desesperado.',
+          'En los primeros 90 segundos el Closer establece el "Marco de la Llamada" (Call Frame): explica que primero le hará unas preguntas para entender su escenario exacto y ver si realmente califica para la solución, y al final, si hace sentido para ambos, verán los detalles de implementación.'
+        ],
+        keyPoints: [
+          'Divide la llamada de 30 min en: 70% Diagnóstico profundo del cliente y solo 30% Presentación y Cierre.',
+          'Identifica la "Brecha" (The Gap): la distancia entre su Situación Actual (Punto A) y su Meta a 90 días (Punto B).',
+          'Si no hay brecha ni urgencia, no hay venta de alto ticket.'
+        ],
+        code: `Guion de Establecimiento de Marco (Primeros 60 segundos):
+"Genial Martín. Para aprovechar al máximo estos 25 minutos, primero quiero hacerte unas preguntas sobre cómo están manejando hoy su adquisición y dónde sienten el cuello de botella.
+Con eso claro, si veo que realmente podemos ayudarlos a llegar a [Meta], te muestro paso a paso cómo funciona el sistema y vemos cómo avanzar. ¿Te parece bien?"`,
+        warning: '⚠️ Nunca presentes tu oferta antes de que el prospecto haya admitido que su método actual no le está funcionando y que necesita resolverlo ahora.',
+        checkpoint: {
+          question: 'En psicología de ventas consultivas, ¿en qué consiste definir "La Brecha" (The Gap) durante la fase de descubrimiento?',
+          options: [
+            'En dejar un silencio incómodo de 5 minutos sin hablar al inicio de la llamada.',
+            'En clarificar y cuantificar la distancia exacta entre el Punto A (situación actual con su dolor y costo) y el Punto B (meta deseada), demostrando que no puede cruzar ese puente solo con sus herramientas actuales.',
+            'En comparar el precio más caro contra el precio más barato de la competencia.',
+            'En hablar durante el 90% de la llamada sin dejar que el cliente participe.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 3: Cortinas de Humo vs. Objeciones Reales ("Lo tengo que pensar")',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'Cuando al final de una llamada el cliente dice "Suena muy bien, déjame pensarlo y te aviso la semana que viene", el 95% de las veces NO es una objeción real: es una "Cortina de Humo" educada para terminar la llamada sin decirte qué es lo que realmente le genera miedo o duda.',
+          'Un Closer profesional no presiona con agresividad ni tampoco dice "Dale, avísame": empatiza, valida y aísla la objeción real preguntando con calma qué parte específica del sistema o de la inversión le genera incertidumbre.'
+        ],
+        keyPoints: [
+          'Las 3 objeciones reales detrás del "lo quiero pensar": 1) Dinero / Flujo de caja, 2) Desconfianza en si le funcionará a él, 3) Necesita consultarlo con un socio/pareja.',
+          'Si el problema es Flujo de Caja (quiere hacerlo pero no tiene los $1,500 hoy juntos), se resuelve con estructura de pagos (ej. 2 o 3 cuotas), no bajando el valor.',
+          'Si el problema es Confianza en el método, se resuelve mostrando la garantía o un caso idéntico al suyo.'
+        ],
+        code: `Cómo Desactivar la Cortina de Humo "Lo tengo que pensar":
+"Totalmente entendible, Diego, las buenas decisiones se toman con claridad.
+Suele pasar que cuando alguien me dice que quiere pensarlo, en realidad es por una de dos cosas:
+o bien tiene alguna duda sobre si el sistema se adapta a su caso técnico, o bien es un tema de cómo acomodar los números de la inversión hoy.
+Siendo 100% sinceros entre nosotros, ¿cuál de las dos sientes que pesa más ahora?"`,
+        warning: '⚠️ Si intentas rebatir el precio cuando en realidad la duda del cliente era técnica (o viceversa), solo aumentarás su resistencia.',
+        checkpoint: {
+          question: 'Cuando un prospecto dice "Déjame pensarlo y te escribo el mes que viene", ¿por qué se considera técnicamente una "Cortina de Humo" y cómo debe actuar el Closer?',
+          options: [
+            'Porque significa que ya compró el producto en otra pestaña; el Closer debe cortar la llamada de inmediato.',
+            'Porque es una respuesta refleja de cortesía que oculta la objeción verdadera (incertidumbre sobre el retorno, falta de liquidez inmediata o falta de autoridad de decisión), por lo que el Closer debe aislar con empatía cuál es la duda real.',
+            'Porque el cliente quiere que le leas nuevamente todas las diapositivas desde el principio.',
+            'Porque en ventas B2B nadie toma decisiones en menos de 6 meses.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 4: Seguimiento de Valor (Follow-Up) y KPIs de un Equipo Comercial',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'El 50% de las ventas de alto ticket se cierra en la llamada #1 y el otro 50% se cierra en el seguimiento (Follow-Up) durante los 7 a 14 días posteriores. Sin embargo, hacer seguimiento escribiendo "¿Hola, pudiste ver lo nuestro?" posiciona al vendedor como necesitado y destruye la autoridad.',
+          'El "Seguimiento de Valor" consiste en contactar aportando un recurso útil nuevo (un caso de estudio de su mismo rubro, una respuesta a la duda que planteó en la llamada o una invitación a un taller en vivo) manteniendo viva la conversación sin rogar.'
+        ],
+        keyPoints: [
+          'KPIs de un Setter: Conversaciones iniciadas -> Tasa de Agenda (>10-15%) -> Show-Up Rate / Asistencia (>75%).',
+          'KPIs de un Closer: Llamadas asistidas -> Tasa de Cierre (Close Rate saludable: 25% a 35%) -> Cash Collected (efectivo cobrado hoy).',
+          'Para subir el Show-Up Rate: envía confirmación en WhatsApp + un video corto de 60s antes de la llamada.'
+        ],
+        code: `Ejemplo de Seguimiento de Valor (Día 3 post-llamada) vs. Seguimiento Vacío:
+❌ Vacío: "Hola Martín, ¿cómo vas? ¿Lo pudiste pensar?"
+✅ De Valor: "Hola Martín, hoy terminamos de conectar para otro estudio contable el módulo de lectura automática de facturas del que hablamos el martes (les bajó el tiempo de carga un 80%). Te dejo captura de cómo quedó por si te sirve de referencia."`,
+        warning: '⚠️ Un calendario lleno de llamadas donde solo asiste el 30% (Show-Up Rate bajo) quema al equipo; confirma siempre por WhatsApp 4 horas antes de cada reunión.',
+        checkpoint: {
+          question: 'En la gestión de un equipo de ventas High-Ticket, ¿cuál es la diferencia financiera entre `Revenue Contracted` (Facturación cerrada) y `Cash Collected` (Efectivo cobrado)?',
+          options: [
+            'Son exactamente la misma métrica expresada en distinta moneda.',
+            '`Revenue` es el valor total de los acuerdos firmados (incluyendo cuotas futuras), mientras que `Cash Collected` es el dinero líquido real que ingresó efectivamente a la cuenta en el día de hoy.',
+            '`Cash Collected` solo cuenta los pagos en billetes físicos por correo.',
+            '`Revenue` descuenta los impuestos y `Cash Collected` no.'
+          ],
+          correctIndex: 1
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. ¿Qué significan las siglas del filtro de calificación `B-A-N-T` que aplican los Setters y Closers profesionales?',
+          options: [
+            'Bot, Automatización, Navegador y Tráfico.',
+            'Budget (Presupuesto/Capacidad), Authority (Autoridad de decisión), Need (Necesidad/Dolor real) y Timing (Urgencia temporal).',
+            'Banco, Ahorro, Nómina y Transferencia.',
+            'Búsqueda, Anuncio, Notificación y Test.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '2. ¿Por qué en una llamada de ventas consultiva el cliente debe hablar aproximadamente el 70% del tiempo durante la primera mitad de la reunión?',
+          options: [
+            'Porque el Closer no conoce las características de su propio producto.',
+            'Porque a través de preguntas dirigidas el cliente verbaliza sus propios cuellos de botella, cuantifica su pérdida actual y se convence con sus propios argumentos de la urgencia de cambiar.',
+            'Para gastar los minutos de la videollamada sin mostrar el precio.',
+            'Porque está prohibido usar presentaciones visuales en llamadas B2B.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '3. Si un prospecto está 100% convencido de que tu programa es la solución ideal y quiere empezar hoy, pero genuinamente no tiene el 100% del monto en su tarjeta en un solo pago, ¿qué tipo de objeción es y cómo se resuelve?',
+          options: [
+            'Es una objeción de desconfianza técnica y se resuelve enviándole un PDF.',
+            'Es una objeción logística de flujo de caja (liquidez) y se resuelve ofreciendo un plan de pagos desdoblado (ej. 2 o 3 cuotas) sin devaluar el producto.',
+            'Es una cortina de humo falsa y hay que colgarle la llamada.',
+            'Se resuelve regalándole el servicio completo sin cobrarle nada.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '4. ¿Qué acción concreta previa a la reunión tiene mayor impacto para elevar el `Show-Up Rate` (porcentaje de asistencia a las llamadas agendadas) por encima del 80%?',
+          options: [
+            'No enviarle ningún mensaje desde que agenda hasta el día de la llamada para no molestarlo.',
+            'Ocultar el enlace de Zoom hasta 10 minutos después de la hora pactada.',
+            'Calificar bien en el chat antes de dar el link, enviar un activo de valor corto (caso de éxito de 90s) y pedir confirmación activa por WhatsApp unas horas antes de la sesión.',
+            'Agendar la llamada para dentro de 45 días.'
+          ],
+          correctIndex: 2
+        }
+      ]
+    }
+  },
+  {
+    id: 'english-remote-tech',
+    title: 'Inglés para Trabajo Remoto en USD, Entrevistas STAR & Negociación Contractor',
+    category: 'Programación',
+    priceUSD: 13.99,
+    pointsReward: 240,
+    vipPointsReward: 75,
+    xp: 290,
+    duration: 40,
+    secretCourse: false,
+    description: 'Consigue clientes y puestos remotos en EE.UU./Europa: CV formato ATS en inglés, respuestas con método STAR, comunicación en Slack/PRs y negociación salarial en USD.',
+    lessons: [
+      {
+        heading: 'Módulo 1: CV en Formato Harvard/ATS y Optimización de LinkedIn en Inglés',
+        readTime: '10 min de lectura',
+        paragraphs: [
+          'El 85% de las empresas remotas de Estados Unidos y Europa filtra los currículums con software ATS (Applicant Tracking Systems) antes de que los vea un humano. Si tu CV está diseñado en Canva con dos columnas, barras de porcentaje de habilidades ("Python 80%") y fotos, el parser del ATS leerá las líneas mezcladas y te descartará automáticamente.',
+          'Además, en el mercado anglosajón no se listan "tareas pasivas" ("Responsible for writing code"), sino "Logros Cuantificados con Verbos de Acción" usando la fórmula de Google (XYZ): "Logré [X resultado] medido por [Y métrica] mediante la implementación de [Z tecnología/acción]".'
+        ],
+        keyPoints: [
+          'Diseño ATS-Friendly: 1 sola columna limpia, sin fotos ni tablas gráficas, exportado en PDF con texto seleccionable.',
+          'Usa verbos de impacto en pasado: Engineered, Automated, Reduced, Scaled, Spearheaded.',
+          'Configura tu perfil de LinkedIn en inglés con palabras clave exactas del puesto en el Headline.'
+        ],
+        code: `Transformación de Bullet Point para CV Internacional (Fórmula XYZ):
+❌ Débil (Orientado a tareas):
+"Worked on the backend API and fixed database queries."
+
+✅ Alto Impacto (Orientado a resultados medibles):
+"Optimized PostgreSQL queries and implemented Redis caching, reducing average API response time by 62% (from 480ms to 180ms) for +50k daily users."`,
+        warning: '⚠️ En currículums para EE.UU., Reino Unido y Canadá NUNCA incluyas foto de rostro, fecha de nacimiento, DNI ni estado civil (las empresas los descartan por leyes anti-discriminación laboral).',
+        checkpoint: {
+          question: '¿Por qué las empresas de Estados Unidos suelen descartar automáticamente los currículums diseñados con múltiples columnas gráficas, barras de porcentaje e imagen de perfil?',
+          options: [
+            'Porque los reclutadores estadounidenses solo aceptan currículums impresos en papel por correo postal.',
+            'Porque los sistemas de filtrado automático (ATS) fallan al parsear tablas/columnas complejas, las barras subjetivas no aportan evidencia técnica y las fotos violan las políticas corporativas anti-sesgo (EEOC).',
+            'Porque el idioma inglés no permite usar verbos en tiempo pasado.',
+            'Porque el formato PDF está bloqueado en los servidores de recursos humanos.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Cómo Superar Entrevistas en Inglés con la Estructura S-T-A-R',
+        readTime: '10 min de lectura',
+        paragraphs: [
+          'No necesitas tener acento nativo ni vocabulario literario para aprobar entrevistas remotas en dólares; necesitas estructura y claridad. Cuando el entrevistador pregunta "Tell me about a time you faced a difficult technical problem or deadline", los candidatos sin preparación divagan y se traban con la gramática.',
+          'El estándar de Amazon, Google y startups de Silicon Valley es responder en 90 segundos siguiendo las 4 etapas S-T-A-R: Situation (Contexto en 1 frase), Task (Cuál era tu misión/desafío), Action (Qué hiciste TÚ específicamente) y Result (Qué impacto numérico lograste).'
+        ],
+        keyPoints: [
+          'Prepara y memoriza 5 historias comodín en formato STAR antes de la entrevista (un bug crítico, un desacuerdo técnico, un plazo ajustado, una automatización y un logro de liderazgo).',
+          'En la etapa "Action", habla en primera persona ("I designed...", "I debugged...") en lugar de diluir tu aporte diciendo solo "We".',
+          'Cierra siempre con la etapa "Result" dando un dato concreto.'
+        ],
+        code: `Estructura S-T-A-R Lista para Usar en Entrevistas (90 segundos):
+- [S - Situation]: "In my previous project, our checkout webhook was failing under high traffic peaks."
+- [T - Task]: "My goal was to eliminate lost orders before the Black Friday campaign."
+- [A - Action]: "I implemented an asynchronous queue with retry logic and idempotency keys."
+- [R - Result]: "As a result, we processed 100% of orders with zero downtime, saving ~$12,000 in revenue."`,
+        warning: '⚠️ No memorices párrafos palabra por palabra como un robot; memoriza los 4 puntos clave (S-T-A-R) de tus 5 historias para sonar natural y seguro.',
+        checkpoint: {
+          question: 'Al responder una pregunta conductual ("Tell me about a time...") con el método `S-T-A-R`, ¿en cuál de las 4 letras debes concentrar el 60% del tiempo de tu respuesta y hablar en primera persona (`"I..."`)?',
+          options: [
+            'En Situation, describiendo durante 5 minutos la historia de la empresa anterior.',
+            'En Action y Result, detallando las decisiones técnicas concretas que tomaste tú y el impacto medible obtenido.',
+            'En pedir disculpas por tu nivel de inglés antes de empezar a hablar.',
+            'En hablar únicamente en tercera persona sobre lo que hicieron otros departamentos.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 3: Comunicación Asíncrona en Equipos Remotos (Daily Standups, Slack y PRs)',
+        readTime: '10 min de lectura',
+        paragraphs: [
+          'Una vez contratado en un equipo internacional, el 80% de tu trabajo diario ocurre mediante comunicación asíncrona escrita (Slack, Jira, GitHub Pull Requests) y una reunión diaria de 10 minutos (Daily Standup).',
+          'Los equipos de EE.UU. valoran la comunicación directa, concisa y proactiva: si tienes un bloqueo (Blocker), nunca esperes 3 días en silencio hasta la fecha de entrega; avisa temprano mostrando qué intentaste ya y qué necesitas para destrabarte.'
+        ],
+        keyPoints: [
+          'Fórmula Daily Standup (45s): 1) What I completed yesterday, 2) What I am focusing on today, 3) Any blockers.',
+          'Regla "No Hello" en Slack: Nunca escribas solo "Hi" y esperes 2 horas a que respondan; escribe el saludo junto con el contexto completo y tu pregunta en un solo mensaje.',
+          'Usa verbos modales corteses pero directos en revisiones de código ("Could we extract this into a helper to avoid duplication?").'
+        ],
+        code: `Comunicación Asíncrona Profesional en Slack (Regla "No Hello"):
+❌ Mal hábito:
+"Hi Sarah" (y esperar a que conteste para recién decirle qué necesitas).
+
+✅ Estándar Remoto Senior:
+"Hi Sarah! Quick update on the Stripe webhook (#PR-142): I finished the signature validation, but I need the staging API secret to run the integration tests. Could you share it in 1Password when you have a moment? Thanks!"`,
+        warning: '⚠️ Quedarse callado cuando no entendiste un requerimiento por vergüenza a preguntar en inglés es la causa #1 de despido en el primer mes remoto. Parafrasea siempre: "Just to make sure we are aligned, do you mean X or Y?".',
+        checkpoint: {
+          question: '¿En qué consiste la regla de etiqueta remota conocida como "No Hello" en herramientas asíncronas como Slack o Teams?',
+          options: [
+            'En que está prohibido saludar a los compañeros de trabajo.',
+            'En enviar en un único mensaje completo el saludo, el contexto del tema, lo que ya probaste y la pregunta concreta, en vez de enviar solo "Hello" y dejar a la otra persona esperando en suspenso.',
+            'En comunicarse únicamente mediante llamadas de video sin previo aviso.',
+            'En responder todos los mensajes con un solo emoji.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 4: Modalidad Contractor (Formulario W-8BEN) y Negociación de Sueldo en USD',
+        readTime: '10 min de lectura',
+        paragraphs: [
+          'Las empresas de EE.UU. contratan talento en Latinoamérica y España principalmente bajo la figura de "Independent Contractor" (prestador de servicios independiente) a través de plataformas como Deel, Remote o Plane, firmando el formulario W-8BEN (que certifica que no resides fiscalmente en EE.UU. y evita retenciones allí).',
+          'En la negociación salarial, nunca des un número único cerrado ni aceptes la primera oferta sin preguntar si hay flexibilidad: investiga el rango del puesto, expresa entusiasmo por el rol y ancla tu expectativa con un rango cuyo piso sea tu número objetivo.'
+        ],
+        keyPoints: [
+          'Si cuando te preguntan "¿Cuál es tu expectativa salarial?" aún no conoces las responsabilidades completas, pregunta primero: "What is the approved budget range for this role?".',
+          'Si tu objetivo es ganar $3,500 USD/mes, presenta un rango de "$3,500 to $4,200 USD/month depending on responsibilities and PTO".',
+          'Negocia también beneficios Contractor: días libres pagos (Paid Time Off / PTO), bono de equipamiento y revisiones semestrales.'
+        ],
+        code: `Guion en Inglés para Negociar un +15% sobre la Oferta Inicial:
+"Thank you so much for the offer! I'm really excited about the team and the technical challenges we discussed.
+Based on my experience automating these workflows and the market range for this role, I was targeting closer to $3,800 USD/month.
+If we can bridge the gap to $3,600 USD/month with 15 days of PTO, I would be thrilled to sign the contract today."`,
+        warning: '⚠️ Nunca mientas sobre ofertas falsas para presionar; argumenta siempre tu contraoferta desde el valor técnico que aportarás en los primeros 90 días y haz que sea fácil decirte que sí.',
+        checkpoint: {
+          question: '¿Para qué sirve el formulario `W-8BEN` que firman los profesionales remotos (Contractors) fuera de Estados Unidos al ser contratados por una empresa estadounidense?',
+          options: [
+            'Es una visa de residencia permanente para mudarse a California.',
+            'Declara formalmente que el profesional es extranjero no residente en EE.UU. y realiza su trabajo desde el exterior, eximiendo a la empresa estadounidense de aplicarle la retención del 30% del IRS sobre sus pagos.',
+            'Sirve para abrir una hipoteca inmobiliaria en dólares.',
+            'Obliga al trabajador a pagar impuestos dobles dentro de Estados Unidos.'
+          ],
+          correctIndex: 1
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. Según la fórmula `XYZ` de Google para redactar puntos de experiencia en un CV en inglés, ¿cuál de estas opciones es la más efectiva?',
+          options: [
+            '"I was in charge of coding in JavaScript and attending meetings."',
+            '"Hardworking developer with 100% passion for technology."',
+            '"Automated the client onboarding pipeline using Python and n8n, reducing manual processing time by 75% (saving 20 hours/week)."',
+            '"Knowledge of HTML, CSS, SQL and Microsoft Word."'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '2. ¿Qué debes hacer en una entrevista en inglés si no comprendiste bien una pregunta técnica o el entrevistador habló muy rápido?',
+          options: [
+            'Responder cualquier cosa al azar esperando adivinar qué preguntó.',
+            'Quedarte en silencio absoluto hasta que cambie de pregunta.',
+            'Pedir aclaración con naturalidad profesional parafraseando lo que entendiste: "Could you clarify if you are referring to X, or would you like me to focus on Y?".',
+            'Cortar la videollamada fingiendo que se cayó internet.'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '3. ¿Cuáles son las 3 preguntas breves que estructuran una actualización diaria (`Daily Standup`) efectiva en un equipo ágil remoto?',
+          options: [
+            'Dónde naciste, qué estudiaste y cuáles son tus metas a 10 años.',
+            'Qué completaste ayer, en qué te enfocarás hoy y si tienes algún bloqueo técnico o de negocio (Blocker) que requiera ayuda.',
+            'Cuánto cobras por mes, cuántos días de vacaciones tienes y qué hora es en tu país.',
+            'Leer línea por línea todo el código que escribiste durante las últimas 8 horas.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '4. Cuando un reclutador te pregunta en la primera llamada "¿What are your salary expectations?" antes de explicarte el alcance del puesto, ¿cuál es la estrategia de negociación recomendada?',
+          options: [
+            'Decir el número más bajo posible por miedo a quedar descartado.',
+            'Negarte a hablar de dinero hasta después de haber trabajado 3 meses gratis.',
+            'Preguntar primero cuál es la banda presupuestaria asignada para la posición ("Could you share the budgeted range for this role?") o dar un rango bien investigado cuyo piso sea tu objetivo real.',
+            'Exigir el triple del valor de mercado sin justificación técnica.'
+          ],
+          correctIndex: 2
+        }
+      ]
+    }
   }
 ];
 
