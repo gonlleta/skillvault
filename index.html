@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillVault — Academia Interactiva & Club VIP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Notificación Toast -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <div class="app-layout">
+    <!-- Barra Lateral -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">⚡</div>
+        <div>
+          <span class="brand-name">Skill<span class="accent">Vault</span></span>
+          <span class="brand-tag">ACADEMIA & PUNTOS VIP</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="explore">
+          <span class="nav-icon">🎓</span>
+          <span>Catálogo de Cursos</span>
+        </button>
+        <button class="nav-item" data-tab="rewards">
+          <span class="nav-icon">💎</span>
+          <span>Bóveda de Canje</span>
+          <span class="badge-pill" id="vault-badge">9</span>
+        </button>
+        <button class="nav-item" data-tab="plans">
+          <span class="nav-icon">👑</span>
+          <span>Hacerse VIP (Planes)</span>
+        </button>
+        <button class="nav-item" data-tab="certificates">
+          <span class="nav-icon">📜</span>
+          <span>Mis Certificados & VIP</span>
+        </button>
+        <div class="nav-divider-label">PANEL DEL DUEÑO (TÚ)</div>
+        <button class="nav-item owner-nav" data-tab="owner">
+          <span class="nav-icon">💰</span>
+          <span>Mis Ingresos & Ventas</span>
+          <span class="badge-pill owner-pill" id="owner-revenue-pill">$348</span>
+        </button>
+        <button class="nav-item owner-nav" data-tab="create">
+          <span class="nav-icon">➕</span>
+          <span>Publicar Nuevo Curso</span>
+        </button>
+      </nav>
+
+      <!-- Tarjeta de Nivel del Alumno -->
+      <div class="level-card">
+        <div class="level-header">
+          <div>
+            <span class="level-label">RANGO ALUMNO • NIVEL <span id="user-level">1</span></span>
+            <h4 id="user-rank-title">Estudiante Bronce</h4>
+          </div>
+          <div class="streak-pill" title="Racha de estudio">
+            🔥 <span id="user-streak">4</span>d
+          </div>
+        </div>
+        <div class="xp-bar-bg">
+          <div class="xp-bar-fill" id="xp-bar-fill" style="width: 40%;"></div>
+        </div>
+        <div class="xp-meta">
+          <span><b id="user-xp">200</b> / <span id="user-next-xp">500</span> XP</span>
+          <span class="bonus-rate" id="vip-status-tag">Cuenta Estándar</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+      <!-- Barra Superior -->
+      <header class="topbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Buscar cursos (Python, IA, Finanzas, Diseño, Cursos Secretos...)" />
+        </div>
+
+        <div class="wallet-summary">
+          <div class="balance-chip points-chip" id="top-points-btn" title="Puntos estándar ganados al aprobar cursos">
+            <span class="chip-label">Puntos Estándar</span>
+            <span class="chip-amount" id="user-points">450 <small>PTS</small></span>
+          </div>
+          <div class="balance-chip vip-points-chip" id="top-vip-points-btn" title="Puntos Exclusivos VIP: Solo los miembros VIP ganan y usan estos puntos">
+            <span class="chip-label">👑 Puntos Exclusivos VIP</span>
+            <span class="chip-amount" id="user-vip-points">0 <small>VP</small></span>
+          </div>
+          <div class="balance-chip owner-chip" id="top-owner-btn" title="Dinero que te pagan los alumnos a ti">
+            <span class="chip-label">Tus Ganancias (Dueño)</span>
+            <span class="chip-amount" id="top-owner-usd">$348.00 <small>USD</small></span>
+          </div>
+          <button class="btn-withdraw-quick" id="go-rewards-btn">🎁 Canjear Puntos</button>
+        </div>
+      </header>
+
+      <!-- VISTA 1: CATÁLOGO DE CURSOS -->
+      <section class="tab-view active" id="view-explore">
+        <div class="hero-banner">
+          <div class="hero-text">
+            <span class="hero-kicker">👑 NUEVO: PUNTOS EXCLUSIVOS VIP (VP) ACTIVADOS</span>
+            <h1>Aprende habilidades, suma Puntos y desbloquea la Bóveda Élite.</h1>
+            <p>Todos los alumnos ganan <strong>Puntos Estándar (PTS)</strong> al aprobar cursos, pero solo los miembros con <strong>Pase VIP PRO</strong> ganan además <strong>Puntos Exclusivos VIP (👑 VP)</strong> para desbloquear cursos secretos, código fuente y certificados Black-Gold.</p>
+            <div class="hero-stats">
+              <div class="h-stat">
+                <strong id="stat-completed">0</strong>
+                <span>Cursos completados</span>
+              </div>
+              <div class="h-stat">
+                <strong id="stat-total-points">450 PTS</strong>
+                <span>Puntos estándar</span>
+              </div>
+              <div class="h-stat">
+                <strong id="stat-vip-points" style="color: #fbbf24;">0 VP</strong>
+                <span>Puntos Exclusivos VIP</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-featured-card" id="featured-skill-box"></div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="category-bar">
+          <div class="categories" id="category-filters">
+            <button class="cat-btn active" data-cat="all">Todos</button>
+            <button class="cat-btn" data-cat="Programación">💻 Programación</button>
+            <button class="cat-btn" data-cat="Inteligencia Artificial">🤖 IA & Prompts</button>
+            <button class="cat-btn" data-cat="Finanzas">📈 Finanzas</button>
+            <button class="cat-btn" data-cat="Diseño & Marketing">🎨 Diseño & Growth</button>
+            <button class="cat-btn" data-cat="Curso Secreto VIP">🔒 Cursos Secretos</button>
+          </div>
+          <div class="sort-box">
+            <label for="sort-select">Ordenar por:</label>
+            <select id="sort-select">
+              <option value="points-desc">Más Puntos (PTS + VP)</option>
+              <option value="price-asc">Menor Precio ($)</option>
+              <option value="time-asc">Más Rápidos (min)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Grid de Cursos -->
+        <div class="skills-grid" id="skills-grid"></div>
+      </section>
+
+      <!-- VISTA 2: BÓVEDA DE CANJE DE PUNTOS (ESTÁNDAR + EXCLUSIVOS VIP) -->
+      <section class="tab-view" id="view-rewards">
+        <div class="section-header">
+          <div>
+            <h2>👑 Recompensas Exclusivas para Miembros VIP (Solo con 👑 VP)</h2>
+            <p>Estos cofres, cursos secretos y certificados Black-Gold solo pueden desbloquearse con <strong>Puntos Exclusivos VIP (VP)</strong> obtenidos siendo miembro VIP.</p>
+          </div>
+        </div>
+        <div class="skills-grid" id="vip-exclusive-rewards-grid" style="margin-bottom: 38px;"></div>
+
+        <div class="section-header">
+          <div>
+            <h2>💎 Bóveda Estándar (Canjeable con Puntos Normales PTS)</h2>
+            <p>Usa tus puntos de estudio regulares (PTS) para desbloquear herramientas, plantillas y certificados básicos.</p>
+          </div>
+        </div>
+        <div class="skills-grid" id="rewards-grid"></div>
+      </section>
+
+      <!-- VISTA 3: PLANES Y MEMBRESÍAS (LOS ALUMNOS TE PAGAN A TI) -->
+      <section class="tab-view" id="view-plans">
+        <div class="section-header">
+          <div>
+            <h2>👑 Membresía VIP — Desbloquea los Puntos Exclusivos VIP (VP)</h2>
+            <p>Cuando un alumno paga la membresía VIP o compra un curso, el dinero en dólares va directo a tu cuenta de dueño.</p>
+          </div>
+        </div>
+
+        <div class="plans-grid">
+          <div class="plan-card">
+            <span class="plan-tag">CUENTA ESTÁNDAR</span>
+            <h3>Compra por Curso</h3>
+            <div class="plan-price">Desde $12.00 <small>USD / curso</small></div>
+            <p>Compra cursos sueltos. Ganarás Puntos Estándar (PTS), pero no recibirás Puntos Exclusivos VIP (VP).</p>
+            <ul class="plan-features">
+              <li>✅ Acceso al curso individual comprado</li>
+              <li>✅ Gana el 100% de Puntos Estándar (PTS)</li>
+              <li>❌ <strong>No gana Puntos Exclusivos VIP (👑 VP)</strong></li>
+              <li>❌ Sin acceso a los cofres exclusivos VIP</li>
+            </ul>
+            <button class="btn-secondary" style="width:100%" onclick="document.querySelector('[data-tab=explore]').click()">Ver Cursos Individuales</button>
+          </div>
+
+          <div class="plan-card featured-plan">
+            <span class="plan-tag highlight">👑 ACCESO A PUNTOS EXCLUSIVOS VIP</span>
+            <h3>Pase VIP PRO</h3>
+            <div class="plan-price">$29.00 <small>USD / mes</small></div>
+            <p>Activa la recolección de <strong>Puntos Exclusivos VIP (👑 VP)</strong> en todos los cursos + todos los cursos pagos desbloqueados.</p>
+            <ul class="plan-features">
+              <li>👑 <strong>Habilita los Puntos Exclusivos VIP (VP)</strong> al aprobar cada curso</li>
+              <li>🎁 <strong>+150 VP Exclusivos + 500 PTS de regalo inmediato</strong> al suscribirte</li>
+              <li>🔥 <strong>Todos los cursos pagos desbloqueados</strong> sin pagar extra</li>
+              <li>⚡ Multiplicador <strong>x1.5 en Puntos Estándar (PTS)</strong></li>
+            </ul>
+            <button class="btn-primary-full" id="buy-pro-btn" onclick="purchaseProMembership()">👑 Activar Pase VIP PRO por $29.00 USD (Pagar al Creador)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA 4: MIS CERTIFICADOS, HERRAMIENTAS Y ACCESOS VIP -->
+      <section class="tab-view" id="view-certificates">
+        <div class="section-header">
+          <div>
+            <h2>📜 Mis Recompensas, Herramientas y Certificados Desbloqueados</h2>
+            <p>Aquí tienes todos los premios tanto de la Bóveda Estándar (PTS) como de la Bóveda Exclusiva VIP (VP).</p>
+          </div>
+        </div>
+        <div class="unlocked-list" id="unlocked-list"></div>
+      </section>
+
+      <!-- VISTA 5: PANEL DEL DUEÑO (TUS INGRESOS REALES POR ENSEÑAR) -->
+      <section class="tab-view" id="view-owner">
+        <div class="section-header">
+          <div>
+            <h2>💰 Panel del Creador — Tus Ingresos por Enseñar</h2>
+            <p>Aquí recibes el dinero cada vez que un usuario compra una habilidad o paga la Membresía VIP PRO para ganar Puntos VIP.</p>
+          </div>
+        </div>
+
+        <div class="wallet-grid">
+          <div class="wallet-card-main">
+            <div class="w-card-top">
+              <div>
+                <span class="w-subtitle">GANANCIAS ACUMULADAS (TU BILLETERA DE DUEÑO)</span>
+                <h2 class="w-big-balance" id="owner-main-usd">$348.00 <span>USD</span></h2>
+              </div>
+              <div class="w-badge">⚡ Pagos Activos</div>
+            </div>
+
+            <div class="w-Breakdown">
+              <div>
+                <span>Ventas de Cursos</span>
+                <strong id="owner-sales-count">14 ventas</strong>
+              </div>
+              <div>
+                <span>Miembros VIP Activos</span>
+                <strong id="owner-subs-count">8 miembros</strong>
+              </div>
+              <div>
+                <span>Comisión Plataforma</span>
+                <strong>0% (100% Tuyo)</strong>
+              </div>
+            </div>
+
+            <div class="w-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn-secondary" onclick="simulateStudentPurchase()">🔔 Simular Compra / Suscripción VIP de un Alumno (+$$$)</button>
+            </div>
+
+            <hr class="divider" />
+
+            <h3>Retirar Tus Ganancias a tu Cuenta Bancaria / PayPal</h3>
+            <p class="muted-text">Transfiere el dinero que te pagaron tus estudiantes directamente a tu cuenta.</p>
+
+            <form id="owner-withdraw-form" class="withdraw-form">
+              <div class="method-selector">
+                <label class="method-option active">
+                  <input type="radio" name="payout-method" value="MercadoPago / Transferencia CBU-CVU" checked />
+                  <span>🏦 MercadoPago / Banco</span>
+                </label>
+                <label class="method-option">
+                  <input type="radio" name="payout-method" value="PayPal Comercial" />
+                  <span>🅿️ PayPal</span>
+                </label>
+                <label class="method-option">
+                  <input type="radio" name="payout-method" value="USDT (Binance Pay)" />
+                  <span>💎 USDT Crypto</span>
+                </label>
+                <label class="method-option">
+                  <input type="radio" name="payout-method" value="Stripe Direct" />
+                  <span>💳 Stripe</span>
+                </label>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Monto a retirar (USD)</label>
+                  <input type="number" id="owner-withdraw-amount" step="1" min="10" value="100" required />
+                </div>
+                <div class="form-group">
+                  <label>Tu Alias, CVU, Email de PayPal o Wallet</label>
+                  <input type="text" id="owner-withdraw-dest" placeholder="tu.alias.mp o tu@correo.com" required />
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary-full">💸 Retirar Mis Ganancias Ahora</button>
+            </form>
+          </div>
+
+          <div class="wallet-history-card">
+            <h3>📊 Últimos Pagos Recibidos de Alumnos</h3>
+            <div class="tx-list" id="owner-tx-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA 6: CREAR NUEVO CURSO PARA VENDER -->
+      <section class="tab-view" id="view-create">
+        <div class="section-header">
+          <div>
+            <h2>➕ Publicar Nuevo Curso en tu Academia</h2>
+            <p>Define cuánto te pagan por el curso, cuántos Puntos Estándar (PTS) da y cuántos Puntos Exclusivos VIP (👑 VP) otorga a los miembros VIP.</p>
+          </div>
+        </div>
+
+        <form id="create-skill-form" class="create-skill-card">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Título del Curso / Habilidad</label>
+              <input type="text" id="custom-title" placeholder="Ej: Creación de Bots con Inteligencia Artificial" required />
+            </div>
+            <div class="form-group">
+              <label>Categoría</label>
+              <select id="custom-category">
+                <option value="Programación">💻 Programación</option>
+                <option value="Inteligencia Artificial">🤖 IA & Prompts</option>
+                <option value="Finanzas">📈 Finanzas</option>
+                <option value="Diseño & Marketing">🎨 Diseño & Growth</option>
+                <option value="Curso Secreto VIP">🔒 Curso Secreto VIP</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="form-group">
+              <label>Precio para ti (USD)</label>
+              <input type="number" id="custom-price" step="0.5" min="0" max="500" value="14.99" required />
+            </div>
+            <div class="form-group">
+              <label>Puntos Estándar (PTS)</label>
+              <input type="number" id="custom-points" step="50" min="50" max="5000" value="350" required />
+            </div>
+            <div class="form-group">
+              <label>👑 Puntos Exclusivos VIP (VP)</label>
+              <input type="number" id="custom-vip-points" step="10" min="10" max="2000" value="100" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Contenido de la Lección</label>
+            <textarea id="custom-content" rows="4" placeholder="Explica paso a paso la habilidad que van a aprender..." required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pregunta de Examen</label>
+              <input type="text" id="custom-question" placeholder="Pregunta para verificar que aprendieron..." required />
+            </div>
+            <div class="form-group">
+              <label>Respuesta Correcta</label>
+              <input type="text" id="custom-answer" placeholder="Escribe la opción correcta..." required />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary-full">🚀 Publicar Curso en Venta</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL DE AULA INTERACTIVA Y EXAMEN -->
+  <div class="modal-overlay" id="lesson-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="modal-cat-badge" id="modal-category">Categoría</span>
+          <span class="modal-reward-badge" id="modal-points">+300 PTS</span>
+          <span class="vip-points-pill" id="modal-vip-points">👑 +80 VP</span>
+        </div>
+        <button class="modal-close" id="close-modal-btn">✕</button>
+      </div>
+
+      <h2 id="modal-title">Título del Curso</h2>
+      <p class="modal-sponsor" id="modal-subtitle">Completa las lecciones y aprueba el examen para ganar los puntos</p>
+
+      <div class="lesson-stepper" id="lesson-stepper"></div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
