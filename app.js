@@ -111,12 +111,12 @@ print(f"Total pendiente de cobro: \${total_por_cobrar} USD")`,
         checkpoint: {
           question: '¿Por qué es más seguro usar factura.get("descuento", 0) en lugar de factura["descuento"]?',
           options: [
-            'Porque si la clave "descuento" no existe en el diccionario, devuelve 0 en vez de detener el programa con KeyError',
             'Porque borra el diccionario automáticamente',
             'Porque convierte todos los números en texto',
+            'Porque si la clave "descuento" no existe en el diccionario, devuelve 0 en vez de detener el programa con KeyError',
             'No hay ninguna diferencia'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       },
       {
@@ -181,12 +181,12 @@ print(calcular_ticket_promedio(1500, 0))  # No rompe el programa: devuelve 0.0`,
         {
           question: '3. ¿Qué devuelve la comprensión `[x * 2 for x in [1, 2, 3, 4] if x > 2]`?',
           options: [
-            '[6, 8]',
             '[2, 4, 6, 8]',
             '[3, 4]',
-            '[8]'
+            '[8]',
+            '[6, 8]'
           ],
-          correctIndex: 0
+          correctIndex: 3
         },
         {
           question: '4. ¿Por qué es fundamental usar bloques `try / except` en scripts de automatización?',
@@ -245,12 +245,12 @@ Tabla Markdown con columnas: [Severidad | Línea | Vulnerabilidad | Parche de C�
         checkpoint: {
           question: '¿Para qué sirven las etiquetas tipo XML como `<contexto>` o `<datos_usuario>` dentro de un prompt profesional?',
           options: [
-            'Para separar claramente las instrucciones del sistema de los datos a procesar y prevenir confusiones o inyecciones de prompt',
             'Para cambiar el color de la fuente en la pantalla',
             'Porque los modelos solo entienden código HTML',
+            'Para separar claramente las instrucciones del sistema de los datos a procesar y prevenir confusiones o inyecciones de prompt',
             'Para reducir el costo de internet'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       },
       {
@@ -346,12 +346,12 @@ const tools = [{
         checkpoint: {
           question: '¿Qué parámetro de configuración del modelo conviene usar (ej. 0.0 - 0.2) cuando necesitamos respuestas deterministas en formato JSON para un agente?',
           options: [
-            'Temperatura baja (0.0 a 0.2) para minimizar la aleatoriedad y asegurar precisión estructural',
             'Temperatura máxima (2.0) para que invente campos creativos',
             'Sin límite de temperatura',
-            'Modo poético activado'
+            'Modo poético activado',
+            'Temperatura baja (0.0 a 0.2) para minimizar la aleatoriedad y asegurar precisión estructural'
           ],
-          correctIndex: 0
+          correctIndex: 3
         }
       }
     ],
@@ -360,12 +360,12 @@ const tools = [{
         {
           question: '1. ¿Cuáles son los 5 componentes del framework R-C-T-R-F en Ingeniería de Prompts?',
           options: [
-            'Rol, Contexto, Tarea, Restricciones y Formato de Salida',
             'Red, Código, Texto, Resumen y Final',
             'Rápido, Corto, Técnico, Real y Fácil',
+            'Rol, Contexto, Tarea, Restricciones y Formato de Salida',
             'Respuesta, Consulta, Tiempo, Regla y Función'
           ],
-          correctIndex: 0
+          correctIndex: 2
         },
         {
           question: '2. ¿Por qué ocurre un fallo lógico si le pides a un LLM que dé primero la respuesta numérica y recién al final explique el procedimiento?',
@@ -390,12 +390,12 @@ const tools = [{
         {
           question: '4. ¿Qué medida de seguridad es indispensable al integrar un Agente con herramientas que modifican bases de datos o pagos?',
           options: [
-            'Validar estrictamente el esquema de parámetros (JSON Schema) y exigir confirmación (Human-in-the-Loop) en acciones críticas',
             'Darle permisos de superadministrador sin restricciones a la base de datos',
             'Subir la temperatura del modelo a 1.9',
-            'Confiar ciegamente en cualquier texto enviado por el usuario'
+            'Confiar ciegamente en cualquier texto enviado por el usuario',
+            'Validar estrictamente el esquema de parámetros (JSON Schema) y exigir confirmación (Human-in-the-Loop) en acciones críticas'
           ],
-          correctIndex: 0
+          correctIndex: 3
         }
       ]
     }
@@ -432,12 +432,12 @@ const tools = [{
         checkpoint: {
           question: 'Según el principio de "pagarte a ti mismo primero", ¿en qué momento debe separarse el porcentaje destinado a inversión?',
           options: [
-            'El mismo día en que ingresa el dinero, antes de gastar en estilo de vida',
             'El último día del mes si quedó algún sobrante',
             'Solo una vez cada 5 años',
+            'El mismo día en que ingresa el dinero, antes de gastar en estilo de vida',
             'Después de pagar intereses de tarjetas de crédito atrasadas'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       },
       {
@@ -460,12 +460,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
         checkpoint: {
           question: '¿Cuál es la función principal del Fondo de Emergencia de 3 a 6 meses?',
           options: [
-            'Dar liquidez inmediata ante imprevistos para no tener que endeudarse ni malvender inversiones de largo plazo en pérdidas',
             'Multiplicar el dinero por 10 en una semana apostando en activos de alto riesgo',
+            'Dar liquidez inmediata ante imprevistos para no tener que endeudarse ni malvender inversiones de largo plazo en pérdidas',
             'Comprar bienes de lujo a crédito',
             'Pagar comisiones bancarias innecesarias'
           ],
-          correctIndex: 0
+          correctIndex: 1
         }
       },
       {
@@ -488,12 +488,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
         checkpoint: {
           question: 'Aplicando la Regla del 72, ¿cuántos años tardará aproximadamente en duplicarse un capital invertido al 9% anual compuesto?',
           options: [
-            '8 años (72 dividido 9)',
             '72 años',
             '2 años',
-            '18 años'
+            '18 años',
+            '8 años (72 dividido 9)'
           ],
-          correctIndex: 0
+          correctIndex: 3
         }
       },
       {
@@ -517,12 +517,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
         checkpoint: {
           question: 'Si una inversión de $1,000 USD cae un 50% (quedando en $500 USD), ¿qué porcentaje de ganancia necesita lograr desde esos $500 para volver a $1,000 USD?',
           options: [
-            '+100% de ganancia (duplicar de $500 a $1,000)',
             '+50% de ganancia ($750)',
             '+25% de ganancia',
+            '+100% de ganancia (duplicar de $500 a $1,000)',
             '+10% de ganancia'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       }
     ],
@@ -531,42 +531,42 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
         {
           question: '1. En la regla presupuestaria 50/30/20, ¿a qué se destina el 20% prioritario?',
           options: [
-            'A ahorro estratégico, fondo de liquidez e inversión de largo plazo separado apenas se cobra',
             'A pagar multas por mora de tarjetas',
+            'A ahorro estratégico, fondo de liquidez e inversión de largo plazo separado apenas se cobra',
             'A compras impulsivas de fin de semana',
             'A gastos fijos de alquiler'
           ],
-          correctIndex: 0
+          correctIndex: 1
         },
         {
           question: '2. ¿Para qué sirve aplicar la estrategia DCA (Dollar-Cost Averaging)?',
           options: [
-            'Para invertir un monto fijo de forma periódica, promediando el precio de compra y eliminando las decisiones emocionales por euforia o pánico',
             'Para pedir préstamos bancarios todos los días',
             'Para vender todas las inversiones cada vez que sale una noticia negativa',
-            'Para operar únicamente con apalancamiento 100x'
+            'Para operar únicamente con apalancamiento 100x',
+            'Para invertir un monto fijo de forma periódica, promediando el precio de compra y eliminando las decisiones emocionales por euforia o pánico'
           ],
-          correctIndex: 0
+          correctIndex: 3
         },
         {
           question: '3. Según la Regla del 72, si una inversión rinde un 12% anual compuesto, ¿en cuántos años duplicará su valor?',
           options: [
-            'En 6 años (72 / 12 = 6)',
             'En 12 años',
             'En 24 años',
+            'En 6 años (72 / 12 = 6)',
             'En 1 año'
           ],
-          correctIndex: 0
+          correctIndex: 2
         },
         {
           question: '4. En una cartera con estructura "Núcleo-Satélite" (Core-Satellite), ¿qué activos componen el 80% del Núcleo?',
           options: [
-            'Activos diversificados y sólidos de largo plazo (ej. ETFs indexados como S&P 500, bonos y reserva líquida)',
             'Monedas meme creadas hace 24 horas',
+            'Activos diversificados y sólidos de largo plazo (ej. ETFs indexados como S&P 500, bonos y reserva líquida)',
             'Billetes de lotería',
             'Únicamente una sola acción de una empresa endeudada'
           ],
-          correctIndex: 0
+          correctIndex: 1
         }
       ]
     }
@@ -602,12 +602,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
         checkpoint: {
           question: '¿Qué explica la Ley de Hick aplicada a una página de precios o registro?',
           options: [
-            'Que cuantas más opciones y distracciones simultáneas le presentes al usuario, más tardará en decidir y mayor será la probabilidad de que abandone sin comprar',
             'Que mientras más pequeño sea un botón, más clics recibe',
+            'Que cuantas más opciones y distracciones simultáneas le presentes al usuario, más tardará en decidir y mayor será la probabilidad de que abandone sin comprar',
             'Que los usuarios leen absolutamente todas las palabras de una página web',
             'Que el color negro está prohibido en internet'
           ],
-          correctIndex: 0
+          correctIndex: 1
         }
       },
       {
@@ -632,12 +632,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
         checkpoint: {
           question: '¿Cuál de los siguientes textos de botón CTA aplica mejor la psicología de conversión?',
           options: [
-            '"🚀 Desbloquear mi Acceso Instantáneo"',
             '"Enviar datos"',
             '"Botón 1"',
+            '"🚀 Desbloquear mi Acceso Instantáneo"',
             '"Procesar solicitud de formulario"'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       },
       {
@@ -659,12 +659,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
         checkpoint: {
           question: '¿Qué impacto tiene eliminar campos innecesarios (como dirección física o teléfono fijo) al vender un producto 100% digital?',
           options: [
-            'Reduce la fricción cognitiva y el abandono del carrito, aumentando significativamente el porcentaje de ventas completadas',
             'Hace que los usuarios compren menos',
             'Bloquea las tarjetas de crédito',
-            'No cambia absolutamente nada'
+            'No cambia absolutamente nada',
+            'Reduce la fricción cognitiva y el abandono del carrito, aumentando significativamente el porcentaje de ventas completadas'
           ],
-          correctIndex: 0
+          correctIndex: 3
         }
       },
       {
@@ -688,12 +688,12 @@ Tráfico mensual: 10,000 visitas | Ticket promedio: $29 USD
         checkpoint: {
           question: 'Si una página con 10,000 visitas mensuales sube su tasa de conversión del 1% al 2% manteniendo el mismo tráfico, ¿qué ocurre con las ventas?',
           options: [
-            'Se duplican (pasan de 100 a 200 ventas mensuales) sin haber tenido que pagar por más tráfico',
             'Suben apenas un 1%',
+            'Se duplican (pasan de 100 a 200 ventas mensuales) sin haber tenido que pagar por más tráfico',
             'Se reducen a la mitad',
             'Quedan exactamente iguales'
           ],
-          correctIndex: 0
+          correctIndex: 1
         }
       }
     ],
@@ -702,42 +702,42 @@ Tráfico mensual: 10,000 visitas | Ticket promedio: $29 USD
         {
           question: '1. ¿Qué establece la Ley de Fitts en el diseño de interfaces interactivas?',
           options: [
-            'Que cuanto más grande y cercano al cursor o pulgar sea un botón interactivo, más rápido y fácil será accionarlo',
             'Que todos los botones deben ser invisibles hasta pasar el mouse',
             'Que una página debe tardar más de 10 segundos en cargar',
+            'Que cuanto más grande y cercano al cursor o pulgar sea un botón interactivo, más rápido y fácil será accionarlo',
             'Que solo se debe usar tipografía cursiva'
           ],
-          correctIndex: 0
+          correctIndex: 2
         },
         {
           question: '2. ¿Qué elementos no pueden faltar en el "Above the Fold" (primera pantalla sin scroll) de una Landing Page?',
           options: [
-            'Propuesta de valor clara orientada al beneficio, subtítulo explicativo, llamado a la acción (CTA) contrastante y prueba social/confianza',
             'La biografía de 40 párrafos de los fundadores sin ningún botón',
+            'Propuesta de valor clara orientada al beneficio, subtítulo explicativo, llamado a la acción (CTA) contrastante y prueba social/confianza',
             'Un formulario de 25 preguntas obligatorias',
             'Cinco videos reproduciéndose con sonido al mismo tiempo'
           ],
-          correctIndex: 0
+          correctIndex: 1
         },
         {
           question: '3. Al realizar un Test A/B para optimizar una página de ventas, ¿cuál es la regla metodológica clave?',
           options: [
-            'Probar una hipótesis aislando el cambio entre la versión Control (A) y la Variante (B) con tráfico simultáneo hasta tener volumen suficiente',
             'Cambiar 15 cosas al azar cada 10 minutos',
             'Mostrar la versión A en enero y la versión B en diciembre',
-            'Guiarse únicamente por la opinión personal sin mirar las métricas'
+            'Guiarse únicamente por la opinión personal sin mirar las métricas',
+            'Probar una hipótesis aislando el cambio entre la versión Control (A) y la Variante (B) con tráfico simultáneo hasta tener volumen suficiente'
           ],
-          correctIndex: 0
+          correctIndex: 3
         },
         {
           question: '4. ¿Dónde está el cuello de botella si tienes un alto porcentaje de clics en "Comprar", pero el 90% abandona en la pantalla final de pago?',
           options: [
-            'En la fricción del checkout (exceso de campos, falta de medios de pago locales, cargos ocultos o falta de garantías visibles)',
             'En el logotipo de la marca',
             'En el pie de página del blog',
+            'En la fricción del checkout (exceso de campos, falta de medios de pago locales, cargos ocultos o falta de garantías visibles)',
             'No existe ningún cuello de botella'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       ]
     }
@@ -779,12 +779,12 @@ app.post('/api/v1/courses', authenticateAdmin, async (req, res) => {
         checkpoint: {
           question: '¿Qué código de estado HTTP debe devolver una API cuando un usuario intenta acceder a una ruta privada sin haber iniciado sesión?',
           options: [
-            '401 Unauthorized',
             '200 OK',
             '500 Internal Server Error',
+            '401 Unauthorized',
             '301 Moved Permanently'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       },
       {
@@ -818,12 +818,12 @@ CREATE INDEX idx_enrollments_user ON enrollments(user_id);`,
         checkpoint: {
           question: '¿Para qué sirve crear un `INDEX` sobre la columna `user_id` o `email` en una base de datos SQL?',
           options: [
-            'Para acelerar drásticamente las búsquedas y filtros sin tener que escanear todas las filas de la tabla una por una',
             'Para borrar la tabla cada medianoche',
+            'Para acelerar drásticamente las búsquedas y filtros sin tener que escanear todas las filas de la tabla una por una',
             'Para permitir contraseñas vacías',
             'Para duplicar los registros automáticamente'
           ],
-          correctIndex: 0
+          correctIndex: 1
         }
       },
       {
@@ -852,12 +852,12 @@ ORDER BY total_invertido_usd DESC;`,
         checkpoint: {
           question: 'Si quieres listar TODOS los usuarios registrados junto con sus compras, incluyendo a los que todavía no compraron nada, ¿qué JOIN debes usar?',
           options: [
-            'LEFT JOIN desde la tabla users hacia enrollments',
             'INNER JOIN',
             'DROP TABLE',
-            'DELETE JOIN'
+            'DELETE JOIN',
+            'LEFT JOIN desde la tabla users hacia enrollments'
           ],
-          correctIndex: 0
+          correctIndex: 3
         }
       },
       {
@@ -885,12 +885,12 @@ const token = jwt.sign(
         checkpoint: {
           question: '¿Qué impide que un usuario malintencionado abra su JWT, cambie `role: "standard"` por `role: "vip"` y el servidor lo acepte?',
           options: [
-            'La firma criptográfica (Signature) del JWT: al alterar el Payload sin poseer la clave secreta del servidor, la firma deja de coincidir y el token es rechazado',
             'Nada lo impide',
+            'La firma criptográfica (Signature) del JWT: al alterar el Payload sin poseer la clave secreta del servidor, la firma deja de coincidir y el token es rechazado',
             'El color del navegador',
             'Que el archivo pesa demasiado'
           ],
-          correctIndex: 0
+          correctIndex: 1
         }
       }
     ],
@@ -899,42 +899,42 @@ const token = jwt.sign(
         {
           question: '1. ¿Qué combinación de verbo HTTP y código de estado corresponde a la creación exitosa de un nuevo recurso en una API REST?',
           options: [
-            'Verbo POST y código de estado 201 Created',
             'Verbo GET y código 404 Not Found',
             'Verbo DELETE y código 500',
+            'Verbo POST y código de estado 201 Created',
             'Verbo GET y código 401'
           ],
-          correctIndex: 0
+          correctIndex: 2
         },
         {
           question: '2. ¿Cómo se previene de forma definitiva un ataque de Inyección SQL (SQL Injection)?',
           options: [
-            'Utilizando consultas parametrizadas (Prepared Statements) donde el motor trata los datos del usuario estrictamente como valores y nunca como comandos ejecutables',
             'Ocultando el botón de login con CSS',
+            'Utilizando consultas parametrizadas (Prepared Statements) donde el motor trata los datos del usuario estrictamente como valores y nunca como comandos ejecutables',
             'Cambiando el nombre de la tabla cada semana',
             'Permitiendo solo contraseñas de 4 letras'
           ],
-          correctIndex: 0
+          correctIndex: 1
         },
         {
           question: '3. ¿Cuál es la diferencia entre `WHERE` y `HAVING` en una consulta SQL?',
           options: [
-            'WHERE filtra filas individuales antes de agrupar, mientras que HAVING filtra los grupos resultantes de funciones de agregación (como SUM o COUNT) después del GROUP BY',
             'Son exactamente sinónimos',
             'HAVING solo sirve para borrar columnas',
-            'WHERE solo funciona los fines de semana'
+            'WHERE solo funciona los fines de semana',
+            'WHERE filtra filas individuales antes de agrupar, mientras que HAVING filtra los grupos resultantes de funciones de agregación (como SUM o COUNT) después del GROUP BY'
           ],
-          correctIndex: 0
+          correctIndex: 3
         },
         {
           question: '4. ¿Por qué se utiliza `Bcrypt` o `Argon2` con Salt para almacenar contraseñas en lugar de guardarlas en texto plano?',
           options: [
-            'Porque generan un hash irreversible y único por usuario, protegiendo las claves incluso si la base de datos llegara a filtrarse',
             'Para poder enviarle su contraseña original por correo al usuario cuando la olvida',
             'Para que el texto ocupe menos caracteres',
+            'Porque generan un hash irreversible y único por usuario, protegiendo las claves incluso si la base de datos llegara a filtrarse',
             'Porque las bases de datos no aceptan letras comunes'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       ]
     }
@@ -972,12 +972,12 @@ const token = jwt.sign(
         checkpoint: {
           question: '¿Por qué los Micro-SaaS orientados a negocios/profesionales (B2B) suelen ser mucho más rentables que los orientados a consumidores gratuitos (B2C)?',
           options: [
-            'Porque las empresas pagan con gusto suscripciones de $29 a $199/mes si el software les ahorra horas de trabajo o les genera más ventas',
             'Porque las empresas no revisan si el software funciona',
+            'Porque las empresas pagan con gusto suscripciones de $29 a $199/mes si el software les ahorra horas de trabajo o les genera más ventas',
             'Porque en B2B no hace falta programar nada',
             'Porque no tienen competencia en el mundo'
           ],
-          correctIndex: 0
+          correctIndex: 1
         }
       },
       {
@@ -999,12 +999,12 @@ const token = jwt.sign(
         checkpoint: {
           question: '¿Qué es el "Momento Aha!" (Time-to-Value) en el onboarding de un SaaS?',
           options: [
-            'El instante exacto en que el usuario nuevo obtiene su primer resultado valioso real dentro de la aplicación',
             'Cuando el usuario cierra su cuenta',
             'La página de términos y condiciones legales',
+            'El instante exacto en que el usuario nuevo obtiene su primer resultado valioso real dentro de la aplicación',
             'El mensaje de error 404'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       },
       {
@@ -1028,12 +1028,12 @@ const token = jwt.sign(
         checkpoint: {
           question: 'Si un SaaS cobra $40 USD al mes y tiene una tasa de cancelación (Churn) del 5% mensual (0.05), ¿cuál es el LTV (Valor de Vida) estimado de cada cliente?',
           options: [
-            '$800 USD ($40 dividido 0.05, equivalente a 20 meses de permanencia promedio)',
             '$40 USD',
             '$2 USD',
-            '$5,000 USD'
+            '$5,000 USD',
+            '$800 USD ($40 dividido 0.05, equivalente a 20 meses de permanencia promedio)'
           ],
-          correctIndex: 0
+          correctIndex: 3
         }
       },
       {
@@ -1056,12 +1056,12 @@ const token = jwt.sign(
         checkpoint: {
           question: '¿En qué consiste la táctica "Engineering as Marketing" para atraer clientes a un SaaS sin pagar publicidad?',
           options: [
-            'En publicar una micro-herramienta, plantilla o calculadora gratuita muy útil para el nicho que capte usuarios y les ofrezca el SaaS completo como siguiente paso natural',
             'En enviar spam masivo sin contexto a millones de correos',
+            'En publicar una micro-herramienta, plantilla o calculadora gratuita muy útil para el nicho que capte usuarios y les ofrezca el SaaS completo como siguiente paso natural',
             'En ocultar el precio del producto',
             'En contratar 50 vendedores telefónicos el primer día'
           ],
-          correctIndex: 0
+          correctIndex: 1
         }
       }
     ],
@@ -1070,42 +1070,42 @@ const token = jwt.sign(
         {
           question: '1. ¿Cuál es el paso correcto antes de dedicar meses a programar un software completo?',
           options: [
-            'Detectar un problema costoso en un nicho específico y validar la intención real de pago mediante una oferta o pre-venta',
             'Diseñar 50 logotipos distintos y alquilar una oficina costosa',
             'Programar primero 30 funciones secundarias y pensar a quién venderle el año que viene',
+            'Detectar un problema costoso en un nicho específico y validar la intención real de pago mediante una oferta o pre-venta',
             'Pedir un préstamo bancario sin tener ningún cliente'
           ],
-          correctIndex: 0
+          correctIndex: 2
         },
         {
           question: '2. ¿Qué mide exactamente el `MRR` en una empresa SaaS?',
           options: [
-            'El Ingreso Recurrente Mensual predecible generado por todas las suscripciones activas',
             'La cantidad de visitas anónimas del blog',
+            'El Ingreso Recurrente Mensual predecible generado por todas las suscripciones activas',
             'El costo del servidor dividido por la memoria RAM',
             'Las ventas únicas que no se vuelven a repetir'
           ],
-          correctIndex: 0
+          correctIndex: 1
         },
         {
           question: '3. ¿Por qué reducir el `Churn` (tasa de cancelación mensual) es tan importante como conseguir clientes nuevos?',
           options: [
-            'Porque si el Churn es alto, pierdes clientes al mismo ritmo que entran y el crecimiento compuesto del MRR se estanca',
             'Porque el Churn no tiene relación con los ingresos',
             'Porque las pasarelas de pago prohíben tener clientes por más de 2 meses',
-            'Solo por una cuestión estética en los gráficos'
+            'Solo por una cuestión estética en los gráficos',
+            'Porque si el Churn es alto, pierdes clientes al mismo ritmo que entran y el crecimiento compuesto del MRR se estanca'
           ],
-          correctIndex: 0
+          correctIndex: 3
         },
         {
           question: '4. ¿Qué ventaja financiera tiene ofrecer un Plan Anual (ej. 2 meses bonificados al pagar el año) desde el lanzamiento?',
           options: [
-            'Adelanta 10-12 meses de flujo de caja en el día 1, elimina el Churn mensual durante todo un año y financia el crecimiento del negocio',
             'Hace que la empresa gane menos dinero',
             'Aumenta las cancelaciones al día siguiente',
+            'Adelanta 10-12 meses de flujo de caja en el día 1, elimina el Churn mensual durante todo un año y financia el crecimiento del negocio',
             'Obliga a cerrar el producto a los 3 meses'
           ],
-          correctIndex: 0
+          correctIndex: 2
         }
       ]
     }
@@ -1538,28 +1538,78 @@ window.simulateStudentPurchase = function () {
   showToast(`🔔 ¡Nuevo pago para ti! ${randomStudent} abonó +$${amount.toFixed(2)} USD.`);
 };
 
+// Mezclador inteligente de opciones para que la respuesta correcta NUNCA sea siempre la primera (A)
+function shuffleQuestionOptions(qObj, avoidIndex = null) {
+  if (!qObj || !Array.isArray(qObj.options) || qObj.options.length < 2) return qObj;
+  const correctText = qObj.options[qObj.correctIndex];
+  const items = [...qObj.options];
+
+  // Mezcla aleatoria Fisher-Yates
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+
+  let newCorrectIdx = items.indexOf(correctText);
+
+  // Si queremos evitar que caiga en el mismo índice que la pregunta anterior o en la primera opción repetidamente
+  if (avoidIndex !== null && newCorrectIdx === avoidIndex && items.length > 1) {
+    const swapTarget = (newCorrectIdx + 1 + Math.floor(Math.random() * (items.length - 1))) % items.length;
+    [items[newCorrectIdx], items[swapTarget]] = [items[swapTarget], items[newCorrectIdx]];
+    newCorrectIdx = swapTarget;
+  }
+
+  return {
+    ...qObj,
+    options: items,
+    correctIndex: newCorrectIdx
+  };
+}
+
 // Aula Interactiva Completa y Examen Multietapa
 window.openSkillModal = function (skillId) {
-  const skill = getAllSkills().find(s => s.id === skillId);
-  if (!skill) return;
+  const baseSkill = getAllSkills().find(s => s.id === skillId);
+  if (!baseSkill) return;
 
-  currentSkill = skill;
+  // Clonamos el curso y mezclamos las opciones de todos los checkpoints y del examen final
+  const skillClone = JSON.parse(JSON.stringify(baseSkill));
+  let lastCheckpointIdx = 0; // Empezamos evitando que la primera sea siempre 0 (A)
+  skillClone.lessons = skillClone.lessons.map(lesson => {
+    if (lesson.checkpoint) {
+      lesson.checkpoint = shuffleQuestionOptions(lesson.checkpoint, lastCheckpointIdx);
+      lastCheckpointIdx = lesson.checkpoint.correctIndex;
+    }
+    return lesson;
+  });
+
+  if (skillClone.quiz && Array.isArray(skillClone.quiz.questions)) {
+    let lastExamIdx = 0; // Evita que la primera pregunta del examen sea siempre A y que dos seguidas tengan la misma letra
+    skillClone.quiz.questions = skillClone.quiz.questions.map(q => {
+      const shuffled = shuffleQuestionOptions(q, lastExamIdx);
+      lastExamIdx = shuffled.correctIndex;
+      return shuffled;
+    });
+  } else if (skillClone.quiz && skillClone.quiz.question) {
+    skillClone.quiz = shuffleQuestionOptions(skillClone.quiz, 0);
+  }
+
+  currentSkill = skillClone;
   currentStepIndex = 0;
   passedCheckpoints = {};
   selectedCheckAnswers = {};
   examAnswers = {};
 
   const mult = getPointsMultiplier();
-  const finalPoints = Math.round(skill.pointsReward * mult);
-  const vpAmount = skill.vipPointsReward || 50;
-  const questions = getSkillQuestions(skill);
+  const finalPoints = Math.round(currentSkill.pointsReward * mult);
+  const vpAmount = currentSkill.vipPointsReward || 50;
+  const questions = getSkillQuestions(currentSkill);
 
-  document.getElementById('modal-category').textContent = `${skill.category} • ${skill.lessons.length} Módulos + Examen (${questions.length} preguntas)`;
+  document.getElementById('modal-category').textContent = `${currentSkill.category} • ${currentSkill.lessons.length} Módulos + Examen (${questions.length} preguntas)`;
   document.getElementById('modal-points').textContent = `💎 +${finalPoints} PTS`;
   document.getElementById('modal-vip-points').textContent = state.isProMember
     ? `👑 +${vpAmount} VP (VIP Activo)`
     : `🔒 +${vpAmount} VP (Solo VIP)`;
-  document.getElementById('modal-title').textContent = skill.title;
+  document.getElementById('modal-title').textContent = currentSkill.title;
   document.getElementById('modal-subtitle').textContent =
     'Debes resolver la comprobación práctica de cada módulo para avanzar y aprobar el 100% del examen final para cobrar los puntos.';
 
