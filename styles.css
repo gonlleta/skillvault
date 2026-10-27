@@ -947,9 +947,9 @@ body {
   background: var(--bg-card);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 20px;
-  max-width: 860px;
+  max-width: 940px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
   padding: 28px;
@@ -959,7 +959,7 @@ body {
 .modal-body {
   overflow-y: auto;
   padding-right: 6px;
-  max-height: 62vh;
+  max-height: 66vh;
 }
 
 .lesson-header-bar {
@@ -1153,18 +1153,126 @@ body {
 .lesson-stepper {
   display: flex;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
 }
 
-.step-dot {
+.step-pill {
   flex: 1;
-  height: 6px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.1);
+  min-width: 95px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.step-dot.active {
-  background: var(--gold);
+.step-pill:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.step-pill.done {
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.step-pill.current {
+  background: linear-gradient(135deg, var(--violet), var(--indigo));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+}
+
+.lesson-steps-guide {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin: 16px 0;
+}
+
+.lesson-steps-guide h5 {
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #93c5fd;
+  margin-bottom: 10px;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step-item {
+  background: rgba(15, 23, 42, 0.65);
+  border-left: 3px solid #3b82f6;
+  padding: 9px 12px;
+  border-radius: 0 8px 8px 0;
+  font-size: 13.5px;
+  color: #f1f5f9;
+  line-height: 1.5;
+}
+
+.lesson-case-study {
+  background: rgba(251, 191, 36, 0.06);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin: 16px 0;
+}
+
+.lesson-case-study h5 {
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.case-study-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.case-col {
+  background: rgba(15, 23, 42, 0.7);
+  padding: 12px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.case-col strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.case-col.problem strong {
+  color: #fda4af;
+}
+
+.case-col.solution strong {
+  color: #6ee7b7;
+}
+
+.code-block-title {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #a7f3d0;
+  margin-top: 16px;
 }
 
 .lesson-box {
