@@ -38,12 +38,12 @@ margen_porcentual = (utilidad_neta / ingresos_brutos) * 100
 print(f"Utilidad Neta: \${utilidad_neta:.2f} USD ({margen_porcentual:.1f}% de margen)")`,
         warning: '⚠️ Error común: Sumar un string "100" con un entero 50 lanzará un TypeError. Convierte siempre entradas de texto con int() o float() antes de operar.',
         checkpoint: {
-          question: '¿Qué sintaxis en Python permite insertar variables directamente dentro de un texto formateado y redondear a 2 decimales?',
+          question: '¿Qué sintaxis de f-string en Python evalúa la variable `utilidad_neta` y formatea su salida numérica exactamente con 2 decimales fijos?',
           options: [
-            '"Total: " + valor.round(2)',
-            'f"Total: {valor:.2f}"',
-            'print(%d valor)',
-            'string.format_auto(valor)'
+            'f"Utilidad: ${round(utilidad_neta, 2):d} USD"',
+            'f"Utilidad: ${utilidad_neta:.2f} USD"',
+            'f"Utilidad: ${utilidad_neta:2.0f} USD"',
+            '"Utilidad: ${utilidad_neta:.2f} USD".format()'
           ],
           correctIndex: 1
         }
@@ -73,12 +73,12 @@ print(f"Utilidad Neta: \${utilidad_neta:.2f} USD ({margen_porcentual:.1f}% de ma
 print(clasificar_cliente(6200, False))`,
         warning: '⚠️ Nunca uses "=" (asignación) dentro de un "if"; para comparar igualdad debes escribir siempre doble signo igual "==".',
         checkpoint: {
-          question: 'En la función anterior, ¿qué devolverá clasificar_cliente(8000, True)?',
+          question: 'En la función `clasificar_cliente(8000, True)`, ¿qué valor se retorna exactamente y por qué?',
           options: [
-            '👑 Cliente Corporativo VIP, porque 8000 es mayor a 5000',
-            'Un error de sintaxis',
-            '⛔ Cuenta suspendida hasta regularizar saldo, porque el primer if evalúa tiene_deuda antes del monto',
-            '👤 Cliente Estándar'
+            '"👑 Cliente Corporativo VIP (20% Descuento)", porque 8000 supera el umbral de 5000 en el primer elif.',
+            'Ambos mensajes ("⛔ Cuenta suspendida..." y "👑 Cliente Corporativo VIP"), ya que ambas condiciones se cumplen.',
+            '"⛔ Cuenta suspendida hasta regularizar saldo", porque el bloque if inicial se evalúa como True y cortocircuita todos los elif siguientes.',
+            'Lanza un ValueError porque no se puede combinar un parámetro entero con un booleano sin usar el operador and.'
           ],
           correctIndex: 2
         }
@@ -109,12 +109,12 @@ for fac in pendientes:
 print(f"Total pendiente de cobro: \${total_por_cobrar} USD")`,
         warning: '⚠️ Modificar el tamaño de una lista mientras la estás recorriendo en el mismo bucle for puede saltar elementos. Crea siempre una lista nueva filtrada.',
         checkpoint: {
-          question: '¿Por qué es más seguro usar factura.get("descuento", 0) en lugar de factura["descuento"]?',
+          question: 'Al procesar diccionarios JSON externos, ¿qué ventaja técnica ofrece `factura.get("descuento", 0)` frente a `factura["descuento"]`?',
           options: [
-            'Porque borra el diccionario automáticamente',
-            'Porque convierte todos los números en texto',
-            'Porque si la clave "descuento" no existe en el diccionario, devuelve 0 en vez de detener el programa con KeyError',
-            'No hay ninguna diferencia'
+            'Modifica el diccionario original insertando permanentemente la clave "descuento" con valor 0 en la base de datos.',
+            'Convierte automáticamente cualquier valor de texto a número flotante antes de realizar la lectura.',
+            'Retorna el valor por defecto 0 si la clave no está presente, evitando que la ejecución aborte con una excepción KeyError.',
+            'Es la única forma permitida por Python para leer claves dentro de una comprensión de listas.'
           ],
           correctIndex: 2
         }
@@ -145,12 +145,12 @@ print(f"Total pendiente de cobro: \${total_por_cobrar} USD")`,
 print(calcular_ticket_promedio(1500, 0))  # No rompe el programa: devuelve 0.0`,
         warning: '⚠️ Evita usar un "except:" vacío sin especificar el error, ya que ocultará errores de programación que deberías detectar.',
         checkpoint: {
-          question: '¿Qué bloque se utiliza en Python para interceptar una división por cero sin que el script se detenga abruptamente?',
+          question: '¿Por qué es una mala práctica usar un bloque `except:` genérico vacío en lugar de capturar `ZeroDivisionError` o `TypeError` explícitamente?',
           options: [
-            'if error == Zero: stop()',
-            'ignore_errors(True)',
-            'catch(DivisionException)',
-            'try: ... except ZeroDivisionError: ...'
+            'Porque en Python 3 un bloque except sin especificar el tipo de excepción produce un SyntaxError al iniciar el script.',
+            'Porque un except genérico solo captura errores aritméticos e ignora por completo los errores de tipos o de claves.',
+            'Porque obliga al intérprete a ejecutar el bloque finally dos veces seguidas consumiendo el doble de memoria.',
+            'Porque silencia errores inesperados de lógica o nombres de variables mal escritos (NameError), dificultando depurar fallos reales.'
           ],
           correctIndex: 3
         }
@@ -159,44 +159,44 @@ print(calcular_ticket_promedio(1500, 0))  # No rompe el programa: devuelve 0.0`,
     quiz: {
       questions: [
         {
-          question: '1. ¿Qué resultado produce la expresión `17 // 5` en Python?',
+          question: '1. ¿Cuál es la diferencia exacta entre los operadores `17 / 5`, `17 // 5` y `17 % 5` en Python?',
           options: [
-            '3.4',
-            '3 (división entera que descarta la parte decimal)',
-            '2 (el resto de la división)',
-            'Error de tipos'
+            '`/` devuelve 3 (entero), `//` devuelve 3.4 (flotante) y `%` calcula el 5% de 17.',
+            '`/` devuelve 3.4 (división flotante), `//` devuelve 3 (cociente entero truncado) y `%` devuelve 2 (el resto de la división).',
+            '`/` y `//` devuelven ambos 3.4, mientras que `%` redondea al entero superior más cercano (4).',
+            '`//` eleva 17 a la quinta potencia y `%` divide el resultado entre 100.'
           ],
           correctIndex: 1
         },
         {
-          question: '2. ¿Cuál es la forma recomendada de acceder a una clave opcional en un diccionario sin arriesgar un `KeyError`?',
+          question: '2. Dado `datos = [{"v": 10}, {"v": 25}, {"v": 40}]`, ¿qué retorna `[d["v"] * 2 for d in datos if d.get("v", 0) >= 25]`?',
           options: [
-            'Usando corchetes directos `diccionario["clave"]`',
-            'Convirtiendo el diccionario en un número entero',
-            'Usando el método `.get("clave", valor_por_defecto)`',
-            'Usando un bucle infinito `while True`'
+            '[20, 50, 80]',
+            '[25, 40]',
+            '[50, 80]',
+            '[{"v": 50}, {"v": 80}]'
           ],
           correctIndex: 2
         },
         {
-          question: '3. ¿Qué devuelve la comprensión `[x * 2 for x in [1, 2, 3, 4] if x > 2]`?',
+          question: '3. ¿Qué ocurre si eliminas elementos de una lista con `.remove()` mientras iteras sobre esa misma lista en un bucle `for`?',
           options: [
-            '[2, 4, 6, 8]',
-            '[3, 4]',
-            '[8]',
-            '[6, 8]'
+            'Python bloquea la lista automáticamente y lanza un RuntimeError antes de borrar el primer elemento.',
+            'Los elementos se borran en orden inverso pero el bucle recorre exactamente todas las posiciones sin inconvenientes.',
+            'El bucle se reinicia automáticamente desde el índice 0 cada vez que se elimina un elemento.',
+            'Los índices restantes se desplazan hacia la izquierda mientras el contador avanza, provocando que el bucle se saltee elementos sin evaluarlos.'
           ],
           correctIndex: 3
         },
         {
-          question: '4. ¿Por qué es fundamental usar bloques `try / except` en scripts de automatización?',
+          question: '4. En una estructura `try / except / finally`, ¿cuándo se ejecuta el código contenido dentro del bloque `finally`?',
           options: [
-            'Para que el código ocupe menos líneas en el archivo',
-            'Porque Python no permite crear funciones sin un bloque try',
-            'Para acelerar la velocidad del procesador un 500%',
-            'Para capturar errores esperables (datos corruptos, divisiones por cero, caídas de red) y permitir que el proceso continúe sin colapsar'
+            'Únicamente cuando se dispara una excepción que no fue capturada por ningún bloque except.',
+            'Solo cuando el bloque try finaliza sin ningún error y no existe sentencia return.',
+            'Siempre al finalizar la estructura, tanto si el bloque try tuvo éxito como si ocurrió una excepción o hubo un return.',
+            'Solamente si el usuario cancela manualmente la ejecución del script por teclado.'
           ],
-          correctIndex: 3
+          correctIndex: 2
         }
       ]
     }
@@ -243,12 +243,12 @@ Tabla Markdown con columnas: [Severidad | Línea | Vulnerabilidad | Parche de C�
 </formato_salida>`,
         warning: '⚠️ Nunca mezcles instrucciones y datos no confiables del usuario en el mismo párrafo sin delimitadores; un usuario podría escribir "Ignora lo anterior" y secuestrar el prompt.',
         checkpoint: {
-          question: '¿Para qué sirven las etiquetas tipo XML como `<contexto>` o `<datos_usuario>` dentro de un prompt profesional?',
+          question: '¿Qué vulnerabilidad específica mitiga el uso de delimitadores estructurales (`<datos_usuario>...</datos_usuario>`) en el prompt del sistema?',
           options: [
-            'Para cambiar el color de la fuente en la pantalla',
-            'Porque los modelos solo entienden código HTML',
-            'Para separar claramente las instrucciones del sistema de los datos a procesar y prevenir confusiones o inyecciones de prompt',
-            'Para reducir el costo de internet'
+            'Evita que el modelo supere el límite máximo de tokens de salida configurado en la API.',
+            'Encripta el contenido en tránsito mediante SHA-256 antes de enviarlo al proveedor del modelo.',
+            'Aísla semánticamente el texto externo no confiable para evitar que instrucciones maliciosas dentro del input sobrescriban las reglas del sistema (Prompt Injection).',
+            'Reduce la latencia de inferencia al comprimir las etiquetas XML en un solo token.'
           ],
           correctIndex: 2
         }
@@ -280,12 +280,12 @@ Entrada: "El cobro de este mes vino duplicado en mi tarjeta Visa terminada en 44
 Salida:`,
         warning: '⚠️ Si tus ejemplos Few-Shot tienen formatos inconsistentes entre sí, el modelo replicará esa misma inconsistencia en producción.',
         checkpoint: {
-          question: '¿En qué consiste el enfoque Few-Shot Prompting frente al Zero-Shot?',
+          question: 'Al diseñar un prompt Few-Shot para producción, ¿cuál es el criterio clave para seleccionar los ejemplos incluidos?',
           options: [
-            'En hacerle 100 preguntas distintas al mismo tiempo',
-            'En proveer ejemplos concretos de Entrada y Salida esperada dentro del prompt para fijar el patrón exacto de respuesta',
-            'En no darle ningún contexto al modelo',
-            'En limitar la respuesta a una sola letra'
+            'Incluir al menos 50 ejemplos idénticos para forzar el ajuste de pesos neuronales (Fine-Tuning) en tiempo real.',
+            'Proveer entre 2 y 5 pares de Entrada/Salida diversos (incluyendo casos borde) que respeten de forma idéntica el esquema de salida esperado.',
+            'Escribir únicamente ejemplos con salidas vacías para que el modelo deduzca por sí mismo los nombres de las claves JSON.',
+            'Alternar distintos formatos de salida (uno en CSV, otro en Markdown y otro en JSON) dentro del mismo prompt para darle flexibilidad.'
           ],
           correctIndex: 1
         }
@@ -308,12 +308,12 @@ Salida:`,
 3. En <resultado_json>, entrega únicamente el objeto JSON final con la utilidad neta.`,
         warning: '⚠️ Si pides primero el resultado JSON y después la explicación, el modelo ya habrá comprometido un número posiblemente erróneo y solo inventará una justificación.',
         checkpoint: {
-          question: '¿Por qué el bloque de razonamiento debe generarse ANTES de la respuesta final en Chain-of-Thought?',
+          question: 'Desde el punto de vista del funcionamiento autorregresivo de un LLM, ¿por qué falla pedir el veredicto JSON primero y la justificación después?',
           options: [
-            'Por una cuestión meramente decorativa',
-            'Porque los servidores leen el texto de abajo hacia arriba',
-            'Porque el modelo genera token por token y necesita procesar los pasos intermedios primero para condicionar correctamente el resultado final',
-            'Para gastar menos memoria RAM'
+            'Porque el analizador sintáctico de JSON rechaza cualquier texto que aparezca después de una llave de cierre.',
+            'Porque el modelo consume el doble de ventana de contexto cuando el bloque JSON se coloca al principio.',
+            'Porque cada token generado condiciona a los siguientes: si emite primero el veredicto sin haber calculado los pasos previos, compromete un valor prematuro y luego solo racionaliza ese error.',
+            'Porque los modelos autorregresivos leen el prompt desde el final hacia el principio antes de generar el primer token.'
           ],
           correctIndex: 2
         }
@@ -344,56 +344,56 @@ const tools = [{
 }];`,
         warning: '⚠️ Nunca permitas que un agente ejecute reembolsos o borrado de datos en producción sin una validación determinista o confirmación humana (Human-in-the-Loop).',
         checkpoint: {
-          question: '¿Qué parámetro de configuración del modelo conviene usar (ej. 0.0 - 0.2) cuando necesitamos respuestas deterministas en formato JSON para un agente?',
+          question: 'En la arquitectura de un Agente con Tool Calling, ¿quién ejecuta realmente el código de la función `consultar_estado_pedido`?',
           options: [
-            'Temperatura máxima (2.0) para que invente campos creativos',
-            'Sin límite de temperatura',
-            'Modo poético activado',
-            'Temperatura baja (0.0 a 0.2) para minimizar la aleatoriedad y asegurar precisión estructural'
+            'El propio modelo de lenguaje ejecuta la consulta SQL dentro de los servidores de la GPU del proveedor de IA.',
+            'El navegador del usuario final ejecuta directamente el acceso a la base de datos sin pasar por el backend.',
+            'El modelo nunca ejecuta código por sí mismo: solo devuelve un objeto estructurado indicando qué herramienta llamar y con qué argumentos, y tu servidor backend ejecuta la función real.',
+            'La base de datos se conecta por su cuenta al modelo para leer la conversación en texto plano.'
           ],
-          correctIndex: 3
+          correctIndex: 2
         }
       }
     ],
     quiz: {
       questions: [
         {
-          question: '1. ¿Cuáles son los 5 componentes del framework R-C-T-R-F en Ingeniería de Prompts?',
+          question: '1. ¿Qué función cumple la capa de "Restricciones" dentro del framework R-C-T-R-F?',
           options: [
-            'Red, Código, Texto, Resumen y Final',
-            'Rápido, Corto, Técnico, Real y Fácil',
-            'Rol, Contexto, Tarea, Restricciones y Formato de Salida',
-            'Respuesta, Consulta, Tiempo, Regla y Función'
+            'Define la personalidad histórica del autor que el modelo debe imitar.',
+            'Limita el tamaño del archivo de código fuente que se puede adjuntar en la petición HTTP.',
+            'Acota explícitamente las conductas prohibidas, supuestos no permitidos y límites de alcance para evitar alucinaciones o relleno.',
+            'Sustituye la necesidad de especificar un formato de salida estructurado.'
           ],
           correctIndex: 2
         },
         {
-          question: '2. ¿Por qué ocurre un fallo lógico si le pides a un LLM que dé primero la respuesta numérica y recién al final explique el procedimiento?',
+          question: '2. ¿Cuándo es preferible usar temperatura `0.0 - 0.2` frente a temperatura `0.8 - 1.0` en una integración con IA?',
           options: [
-            'Porque el modelo no sabe escribir números al principio de una oración',
-            'Porque al predecir el primer token sin haber calculado los pasos intermedios, el modelo adivina el número y luego racionaliza su error',
-            'Porque se borra el historial del navegador',
-            'No ocurre ningún fallo, da exactamente igual el orden'
+            'Cuando buscamos lluvias de ideas publicitarias con alta variedad léxica y metáforas originales.',
+            'Cuando necesitamos extracción determinista de datos, clasificación JSON o invocación precisa de herramientas (Tool Calling).',
+            'Cuando queremos que el modelo responda en menos de 50 milisegundos sin evaluar probabilidades.',
+            'Cuando el prompt no incluye ninguna instrucción de sistema.'
           ],
           correctIndex: 1
         },
         {
-          question: '3. ¿Qué diferencia fundamental tiene un Agente de IA respecto a un prompt conversacional simple?',
+          question: '3. ¿Cómo opera un agente basado en el patrón ReAct (Reason + Act) ante una consulta compleja de múltiples pasos?',
           options: [
-            'El agente solo puede responder con emojis',
-            'El agente no utiliza modelos de lenguaje',
-            'El agente razona en bucle (ReAct), decide qué herramientas externas o APIs invocar y actúa según los resultados obtenidos',
-            'El agente funciona sin electricidad'
+            'Responde toda la consulta en un único paso sin verificar los datos devueltos por las APIs externas.',
+            'Entrena una nueva red neuronal desde cero por cada mensaje que envía el usuario.',
+            'Alterna iterativamente entre razonar sobre el estado actual, solicitar la ejecución de una herramienta, observar el resultado devuelto por el entorno y decidir el siguiente paso.',
+            'Ejecuta simultáneamente todas las herramientas disponibles en el catálogo sin filtrar sus parámetros.'
           ],
           correctIndex: 2
         },
         {
-          question: '4. ¿Qué medida de seguridad es indispensable al integrar un Agente con herramientas que modifican bases de datos o pagos?',
+          question: '4. ¿Qué control de seguridad es crítico antes de que el backend ejecute una herramienta destructiva (ej. emitir un reembolso) solicitada por un Agente?',
           options: [
-            'Darle permisos de superadministrador sin restricciones a la base de datos',
-            'Subir la temperatura del modelo a 1.9',
-            'Confiar ciegamente en cualquier texto enviado por el usuario',
-            'Validar estrictamente el esquema de parámetros (JSON Schema) y exigir confirmación (Human-in-the-Loop) en acciones críticas'
+            'Aumentar el parámetro top_p a 1.0 para que el modelo esté más seguro de su decisión.',
+            'Pedirle al mismo modelo en el prompt que prometa no equivocarse.',
+            'Ocultar el nombre de la función usando un alias de dos letras.',
+            'Validar los argumentos contra un esquema estricto (JSON Schema / reglas de negocio) y exigir confirmación humana (Human-in-the-Loop) si supera cierto umbral.'
           ],
           correctIndex: 3
         }
@@ -430,12 +430,12 @@ const tools = [{
 └─ 🎯 30% Estilo de Vida & Ocio:      $750 USD -> Salidas, Gustos sin endeudarse`,
         warning: '⚠️ Financiar gastos de estilo de vida con tarjeta de crédito pagando solo el "pago mínimo" genera tasas compuestas en tu contra de más del 60% al 120% anual.',
         checkpoint: {
-          question: 'Según el principio de "pagarte a ti mismo primero", ¿en qué momento debe separarse el porcentaje destinado a inversión?',
+          question: 'Si tus ingresos netos son de $2,500 USD/mes y tus costos fijos operativos alcanzan $1,750 USD (70%), ¿qué diagnóstico aplica según la arquitectura 50/30/20?',
           options: [
-            'El último día del mes si quedó algún sobrante',
-            'Solo una vez cada 5 años',
-            'El mismo día en que ingresa el dinero, antes de gastar en estilo de vida',
-            'Después de pagar intereses de tarjetas de crédito atrasadas'
+            'La estructura es óptima siempre y cuando el 30% restante ($750 USD) se destine íntegramente a gastos de ocio.',
+            'Debes apalancarte con deuda rotativa de corto plazo para cubrir el 20% de inversión sin tocar tus costos fijos.',
+            'Tu estructura fija está sobredimensionada (+20% por encima del límite saludable), por lo que debes renegociar costos fijos o expandir ingresos antes de asumir riesgo volátil.',
+            'Debes suspender por completo el fondo de liquidez e invertir el 70% en renta variable de alto riesgo.'
           ],
           correctIndex: 2
         }
@@ -458,12 +458,12 @@ Meta Mínima (3 meses)  = $2,700 USD (En cuenta remunerada disponible 24/7)
 Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
         warning: '⚠️ Mantener el fondo de emergencia en efectivo físico sin rendimiento pierde entre 3% y 5% anual de poder adquisitivo incluso en dólares por la inflación.',
         checkpoint: {
-          question: '¿Cuál es la función principal del Fondo de Emergencia de 3 a 6 meses?',
+          question: '¿Dónde debe alojarse el Fondo de Emergencia de 3 a 6 meses para cumplir su función técnica sin perder poder adquisitivo?',
           options: [
-            'Multiplicar el dinero por 10 en una semana apostando en activos de alto riesgo',
-            'Dar liquidez inmediata ante imprevistos para no tener que endeudarse ni malvender inversiones de largo plazo en pérdidas',
-            'Comprar bienes de lujo a crédito',
-            'Pagar comisiones bancarias innecesarias'
+            'En acciones de crecimiento tecnológico (Growth Stocks) que históricamente rinden más del 15% anual pero tienen alta volatilidad.',
+            'En instrumentos de liquidez inmediata y muy baja volatilidad (Money Market o letras del tesoro a corto plazo) que preserven el capital nominal y devenguen tasa real.',
+            'En un plazo fijo bancario bloqueado a 24 meses sin cláusula de cancelación anticipada para obtener un 1% extra de tasa.',
+            'En efectivo físico guardado en caja de seguridad para evitar cualquier fluctuación de tasas de interés.'
           ],
           correctIndex: 1
         }
@@ -486,12 +486,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
 - Año 25:  Aportado: $90,000  | Valor Cartera: ~$398,050 USD (¡$308,050 son puro interés compuesto!)`,
         warning: '⚠️ Las comisiones anuales de administración superiores al 2% parecen pequeñas, pero en 20 años pueden devorar hasta el 30% de tu beneficio compuesto.',
         checkpoint: {
-          question: 'Aplicando la Regla del 72, ¿cuántos años tardará aproximadamente en duplicarse un capital invertido al 9% anual compuesto?',
+          question: 'Según la Regla del 72, si tienes $10,000 USD invertidos al 9% anual compuesto sin realizar nuevos aportes, ¿cuánto tendrás aproximadamente al cabo de 16 años?',
           options: [
-            '72 años',
-            '2 años',
-            '18 años',
-            '8 años (72 dividido 9)'
+            '~$20,000 USD, ya que al 9% anual el capital tarda 16 años en duplicarse una sola vez.',
+            '~$24,400 USD, porque el 9% anual genera exactamente $900 USD lineales por cada año transcurrido.',
+            '~$30,000 USD, porque el capital suma un 100% del monto original cada 8 años de forma lineal.',
+            '~$40,000 USD, porque al 9% anual se duplica cada 8 años (72/9 = 8): pasa a $20,000 en el año 8 y vuelve a duplicarse a $40,000 en el año 16.'
           ],
           correctIndex: 3
         }
@@ -515,12 +515,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
 - Si pierdes 80% -> Necesitas ganar +400.0% para recuperar tu capital.`,
         warning: '⚠️ Si un proyecto promete "rentabilidades garantizadas del 10% mensual en dólares sin riesgo", aléjate: matemáticamente es un esquema Ponzi.',
         checkpoint: {
-          question: 'Si una inversión de $1,000 USD cae un 50% (quedando en $500 USD), ¿qué porcentaje de ganancia necesita lograr desde esos $500 para volver a $1,000 USD?',
+          question: 'Por la asimetría matemática de las pérdidas, si un activo cae un 25% desde $100 a $75 USD, ¿qué rentabilidad porcentual necesita lograr desde $75 para volver a $100 USD?',
           options: [
-            '+50% de ganancia ($750)',
-            '+25% de ganancia',
-            '+100% de ganancia (duplicar de $500 a $1,000)',
-            '+10% de ganancia'
+            'Necesita subir exactamente un +25.0% para compensar el 25% perdido.',
+            'Necesita subir un +50.0% debido al descuento acumulado de volatilidad.',
+            'Necesita subir un +33.3% (ganar $25 sobre una base reducida de $75 USD).',
+            'Necesita subir un +20.0% si se mantiene durante dos trimestres.'
           ],
           correctIndex: 2
         }
@@ -529,44 +529,44 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
     quiz: {
       questions: [
         {
-          question: '1. En la regla presupuestaria 50/30/20, ¿a qué se destina el 20% prioritario?',
+          question: '1. ¿Cuál es la diferencia patrimonial entre adquirir un Activo Productivo y un Pasivo de Consumo?',
           options: [
-            'A pagar multas por mora de tarjetas',
-            'A ahorro estratégico, fondo de liquidez e inversión de largo plazo separado apenas se cobra',
-            'A compras impulsivas de fin de semana',
-            'A gastos fijos de alquiler'
+            'El Activo exige mantenimiento mensual sin retorno, mientras que el Pasivo se revaloriza siempre por encima de la inflación.',
+            'El Activo genera flujo de caja positivo o apreciación de capital a largo plazo, mientras que el Pasivo deprecia su valor y drena flujo de caja mensual.',
+            'Cualquier compra realizada al contado sin cuotas se considera técnicamente un Activo Productivo.',
+            'Los Pasivos son únicamente las deudas bancarias hipotecarias mayores a 10 años.'
           ],
           correctIndex: 1
         },
         {
-          question: '2. ¿Para qué sirve aplicar la estrategia DCA (Dollar-Cost Averaging)?',
+          question: '2. ¿Qué efecto mecánico produce el DCA (Dollar-Cost Averaging) durante los meses en que el mercado bursátil sufre una corrección bajista?',
           options: [
-            'Para pedir préstamos bancarios todos los días',
-            'Para vender todas las inversiones cada vez que sale una noticia negativa',
-            'Para operar únicamente con apalancamiento 100x',
-            'Para invertir un monto fijo de forma periódica, promediando el precio de compra y eliminando las decisiones emocionales por euforia o pánico'
+            'Suspende automáticamente las compras mensuales hasta que el índice recupere su máximo histórico previo.',
+            'Vende el 20% del portafolio para proteger el capital en efectivo.',
+            'Mantiene constante la cantidad de acciones compradas reduciendo el aporte en dólares de ese mes.',
+            'Con la misma cuota fija en dólares adquiere una mayor cantidad de participaciones/unidades a menor precio, reduciendo el costo promedio ponderado.'
           ],
           correctIndex: 3
         },
         {
-          question: '3. Según la Regla del 72, si una inversión rinde un 12% anual compuesto, ¿en cuántos años duplicará su valor?',
+          question: '3. En la fórmula de interés compuesto `CF = CI * (1 + r)^n`, ¿por qué duplicar el horizonte temporal `n` impacta mucho más que duplicar el capital inicial `CI`?',
           options: [
-            'En 12 años',
-            'En 24 años',
-            'En 6 años (72 / 12 = 6)',
-            'En 1 año'
-          ],
-          correctIndex: 2
-        },
-        {
-          question: '4. En una cartera con estructura "Núcleo-Satélite" (Core-Satellite), ¿qué activos componen el 80% del Núcleo?',
-          options: [
-            'Monedas meme creadas hace 24 horas',
-            'Activos diversificados y sólidos de largo plazo (ej. ETFs indexados como S&P 500, bonos y reserva líquida)',
-            'Billetes de lotería',
-            'Únicamente una sola acción de una empresa endeudada'
+            'Porque `CI` se divide por la inflación anual mientras que `n` está exento de comisiones.',
+            'Porque `CI` actúa como un multiplicador lineal, mientras que `n` es el exponente que multiplica los rendimientos reinvertidos de forma geométrica.',
+            'Porque la tasa `r` se duplica automáticamente cada 5 años de permanencia.',
+            'No hay diferencia: duplicar `CI` o duplicar `n` arroja exactamente el mismo monto final.'
           ],
           correctIndex: 1
+        },
+        {
+          question: '4. Si una cartera sufre una caída severa (Drawdown) del 80% en una posición especulativa, ¿qué retorno necesita generar el capital sobreviviente para recuperar el punto de equilibrio?',
+          options: [
+            '+80% de rentabilidad acumulada.',
+            '+160% de rentabilidad acumulada.',
+            '+400% de rentabilidad (multiplicar por 5 el 20% restante para volver al 100% original).',
+            '+200% de rentabilidad acumulada.'
+          ],
+          correctIndex: 2
         }
       ]
     }
@@ -600,12 +600,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
 ✅ Propuesta clara + 2 planes comparables (1 recomendado) + 1 CTA contrastante -> Alta conversión.`,
         warning: '⚠️ Reinventar la ubicación del botón de cierre o del carrito de compras por "originalidad artística" destruye la tasa de conversión.',
         checkpoint: {
-          question: '¿Qué explica la Ley de Hick aplicada a una página de precios o registro?',
+          question: '¿Cómo se diferencian técnicamente la Ley de Hick y la Ley de Fitts al auditar una interfaz de conversión?',
           options: [
-            'Que mientras más pequeño sea un botón, más clics recibe',
-            'Que cuantas más opciones y distracciones simultáneas le presentes al usuario, más tardará en decidir y mayor será la probabilidad de que abandone sin comprar',
-            'Que los usuarios leen absolutamente todas las palabras de una página web',
-            'Que el color negro está prohibido en internet'
+            'La Ley de Hick mide el contraste cromático del botón y la Ley de Fitts mide la velocidad de carga del servidor.',
+            'La Ley de Hick establece que el tiempo de decisión crece con el número de opciones presentadas; la Ley de Fitts establece que el tiempo para alcanzar un objetivo depende de su tamaño y distancia al cursor/pulgar.',
+            'La Ley de Hick recomienda usar menús de más de 10 categorías y la Ley de Fitts recomienda colocar los botones primarios en el pie de página.',
+            'Ambas leyes se refieren exclusivamente al tamaño de la tipografía en pantallas de escritorio.'
           ],
           correctIndex: 1
         }
@@ -630,12 +630,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
 [Reductor de Fricción]: 🔒 Pago 100% seguro • Acceso vitalicio inmediato`,
         warning: '⚠️ Un botón que dice "Enviar formulario" convierte hasta un 35% menos que un botón orientado al beneficio real del usuario.',
         checkpoint: {
-          question: '¿Cuál de los siguientes textos de botón CTA aplica mejor la psicología de conversión?',
+          question: '¿Cuál es la función psicológica del "micro-copy reductor de fricción" ubicado inmediatamente debajo del botón CTA primario?',
           options: [
-            '"Enviar datos"',
-            '"Botón 1"',
-            '"🚀 Desbloquear mi Acceso Instantáneo"',
-            '"Procesar solicitud de formulario"'
+            'Reemplazar por completo al titular H1 para ahorrar espacio vertical en dispositivos móviles.',
+            'Aumentar la densidad de palabras clave para el posicionamiento SEO orgánico en buscadores.',
+            'Neutralizar la objeción o ansiedad de último segundo (ej. cargos ocultos, permanencia forzosa o demora en el acceso) justo en el punto de clic.',
+            'Obligar al usuario a leer los términos legales completos antes de habilitar el botón.'
           ],
           correctIndex: 2
         }
@@ -657,12 +657,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
 - Checkout Express de 2 pasos (Email + Pago con 1 clic): 6.8% conversión (+223% más ventas con el mismo tráfico).`,
         warning: '⚠️ Nunca uses testimonios falsos ni contadores de escasez que se reinician al refrescar la página: destruyen la confianza de marca de forma irreversible.',
         checkpoint: {
-          question: '¿Qué impacto tiene eliminar campos innecesarios (como dirección física o teléfono fijo) al vender un producto 100% digital?',
+          question: '¿Cómo funciona el "Efecto Anclaje y Señuelo" (Decoy Pricing) en una tabla comparativa de planes?',
           options: [
-            'Hace que los usuarios compren menos',
-            'Bloquea las tarjetas de crédito',
-            'No cambia absolutamente nada',
-            'Reduce la fricción cognitiva y el abandono del carrito, aumentando significativamente el porcentaje de ventas completadas'
+            'Consiste en ocultar los precios de todos los planes hasta que el usuario agende una llamada telefónica de ventas.',
+            'Consiste en ofrecer únicamente un plan gratuito ilimitado y esperar donaciones voluntarias.',
+            'Consiste en cambiar el precio dinámicamente cada 5 minutos según la batería del dispositivo del visitante.',
+            'Establece un punto de referencia de valor que hace que el plan objetivo (ej. Pase VIP completo) luzca significativamente más conveniente frente a comprar elementos sueltos.'
           ],
           correctIndex: 3
         }
@@ -686,12 +686,12 @@ Tráfico mensual: 10,000 visitas | Ticket promedio: $29 USD
 👉 ¡Duplicaste la facturación sin gastar $1 dólar extra en publicidad!`,
         warning: '⚠️ No des por ganador un Test A/B con apenas 20 visitas; necesitas una muestra representativa para que el resultado no sea puro azar.',
         checkpoint: {
-          question: 'Si una página con 10,000 visitas mensuales sube su tasa de conversión del 1% al 2% manteniendo el mismo tráfico, ¿qué ocurre con las ventas?',
+          question: 'En un experimento A/B, ¿por qué es un error metodológico modificar simultáneamente el titular, el precio, el diseño del checkout y el color del botón?',
           options: [
-            'Suben apenas un 1%',
-            'Se duplican (pasan de 100 a 200 ventas mensuales) sin haber tenido que pagar por más tráfico',
-            'Se reducen a la mitad',
-            'Quedan exactamente iguales'
+            'Porque los navegadores modernos bloquean las páginas que cambian más de un elemento CSS.',
+            'Porque al alterar múltiples variables a la vez sin un diseño multivariable controlado, resulta imposible atribuir qué cambio específico causó la subida o caída en las ventas.',
+            'Porque el tráfico siempre debe dividirse 99% a la versión A y 1% a la versión B.',
+            'Porque las pruebas A/B solo permiten evaluar cambios en imágenes y nunca en textos o precios.'
           ],
           correctIndex: 1
         }
@@ -700,44 +700,44 @@ Tráfico mensual: 10,000 visitas | Ticket promedio: $29 USD
     quiz: {
       questions: [
         {
-          question: '1. ¿Qué establece la Ley de Fitts en el diseño de interfaces interactivas?',
+          question: '1. Según la Ley de Jakob en UX, ¿por qué los usuarios prefieren interfaces que respetan convenciones visuales conocidas?',
           options: [
-            'Que todos los botones deben ser invisibles hasta pasar el mouse',
-            'Que una página debe tardar más de 10 segundos en cargar',
-            'Que cuanto más grande y cercano al cursor o pulgar sea un botón interactivo, más rápido y fácil será accionarlo',
-            'Que solo se debe usar tipografía cursiva'
-          ],
-          correctIndex: 2
-        },
-        {
-          question: '2. ¿Qué elementos no pueden faltar en el "Above the Fold" (primera pantalla sin scroll) de una Landing Page?',
-          options: [
-            'La biografía de 40 párrafos de los fundadores sin ningún botón',
-            'Propuesta de valor clara orientada al beneficio, subtítulo explicativo, llamado a la acción (CTA) contrastante y prueba social/confianza',
-            'Un formulario de 25 preguntas obligatorias',
-            'Cinco videos reproduciéndose con sonido al mismo tiempo'
+            'Porque los motores de búsqueda penalizan cualquier sitio que utilice hojas de estilo personalizadas.',
+            'Porque los usuarios pasan la mayor parte del tiempo en otros sitios y transfieren sus modelos mentales previos, esperando que la navegación y el checkout funcionen de forma predecible.',
+            'Porque todos los sitios web están obligados por ley a usar la misma plantilla HTML.',
+            'Porque el ojo humano solo distingue tres colores primarios en pantallas digitales.'
           ],
           correctIndex: 1
         },
         {
-          question: '3. Al realizar un Test A/B para optimizar una página de ventas, ¿cuál es la regla metodológica clave?',
+          question: '2. ¿Por qué un testimonio como "Aumenté mi tasa de cierre del 1.8% al 4.2% en 14 días aplicando el módulo 3" convierte mucho más que "Excelente curso, muy recomendable"?',
           options: [
-            'Cambiar 15 cosas al azar cada 10 minutos',
-            'Mostrar la versión A en enero y la versión B en diciembre',
-            'Guiarse únicamente por la opinión personal sin mirar las métricas',
-            'Probar una hipótesis aislando el cambio entre la versión Control (A) y la Variante (B) con tráfico simultáneo hasta tener volumen suficiente'
-          ],
-          correctIndex: 3
-        },
-        {
-          question: '4. ¿Dónde está el cuello de botella si tienes un alto porcentaje de clics en "Comprar", pero el 90% abandona en la pantalla final de pago?',
-          options: [
-            'En el logotipo de la marca',
-            'En el pie de página del blog',
-            'En la fricción del checkout (exceso de campos, falta de medios de pago locales, cargos ocultos o falta de garantías visibles)',
-            'No existe ningún cuello de botella'
+            'Porque utiliza números decimales que activan el filtro de spam del navegador.',
+            'Porque es más largo y ocupa más píxeles en la tarjeta.',
+            'Porque aporta especificidad cuantificable, plazo temporal concreto y atribuye el resultado a un mecanismo verificable del producto.',
+            'Porque los testimonios breves están prohibidos en páginas de tecnología.'
           ],
           correctIndex: 2
+        },
+        {
+          question: '3. Si una Landing Page recibe 20,000 visitas/mes, tiene un ticket de $25 USD y mejora su conversión del 1.2% al 2.4%, ¿cuál es el impacto en facturación mensual?',
+          options: [
+            'Sube de $2,400 USD a $3,600 USD mensuales (+50%).',
+            'Sube de $4,000 USD a $5,200 USD mensuales (+30%).',
+            'Sube de $6,000 USD (240 ventas) a $12,000 USD (480 ventas) mensuales (+100% de ingresos con el mismo tráfico).',
+            'Se mantiene en $6,000 USD porque el tráfico total no aumentó.'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '4. ¿Qué métrica es más confiable para declarar ganadora a una variante en un Test A/B de comercio electrónico o venta de cursos?',
+          options: [
+            'El tiempo promedio de permanencia en la página de inicio (Time on Page).',
+            'La tasa de clics en el botón superior (CTR) aunque no completen el pago.',
+            'La cantidad de usuarios que hacen scroll hasta el pie de página.',
+            'El Ingreso por Visitante (RPV) y la tasa de conversión a pago efectivo con significancia estadística.'
+          ],
+          correctIndex: 3
         }
       ]
     }
@@ -777,12 +777,12 @@ app.post('/api/v1/courses', authenticateAdmin, async (req, res) => {
 });`,
         warning: '⚠️ Nunca uses una petición GET para borrar datos o realizar cobros; las peticiones GET deben ser idempotentes y de solo lectura.',
         checkpoint: {
-          question: '¿Qué código de estado HTTP debe devolver una API cuando un usuario intenta acceder a una ruta privada sin haber iniciado sesión?',
+          question: '¿Cuál es la diferencia semántica entre los códigos HTTP `401 Unauthorized` y `403 Forbidden` en una API REST?',
           options: [
-            '200 OK',
-            '500 Internal Server Error',
-            '401 Unauthorized',
-            '301 Moved Permanently'
+            '`401` indica que el servidor se cayó por exceso de tráfico; `403` indica que la ruta URL no existe.',
+            '`401` se usa solo en peticiones GET y `403` se usa exclusivamente en peticiones POST o DELETE.',
+            '`401` indica falta de autenticación válida (no inició sesión o token expirado); `403` indica que el usuario sí está autenticado pero su rol no tiene permisos para ese recurso.',
+            'Ambos significan exactamente lo mismo y se eligen según el navegador del cliente.'
           ],
           correctIndex: 2
         }
@@ -816,12 +816,12 @@ CREATE TABLE enrollments (
 CREATE INDEX idx_enrollments_user ON enrollments(user_id);`,
         warning: '⚠️ Jamás concatenes variables del usuario directamente en un string SQL (`"SELECT * FROM users WHERE email = \'" + input + "\'"`); usa siempre parámetros preparados.',
         checkpoint: {
-          question: '¿Para qué sirve crear un `INDEX` sobre la columna `user_id` o `email` en una base de datos SQL?',
+          question: 'En la definición `user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE`, ¿qué efecto tiene la cláusula `ON DELETE CASCADE`?',
           options: [
-            'Para borrar la tabla cada medianoche',
-            'Para acelerar drásticamente las búsquedas y filtros sin tener que escanear todas las filas de la tabla una por una',
-            'Para permitir contraseñas vacías',
-            'Para duplicar los registros automáticamente'
+            'Impide borrar cualquier inscripción (`enrollment`) a menos que antes se elimine toda la tabla `users`.',
+            'Si se elimina un registro padre en la tabla `users`, el motor elimina automáticamente todas las filas hijas asociadas a ese `user_id` en `enrollments`, manteniendo la integridad referencial.',
+            'Si se borra una inscripción en `enrollments`, se borra también la cuenta del usuario en `users`.',
+            'Crea una copia de respaldo automática en otra base de datos antes de ejecutar cualquier `DELETE`.'
           ],
           correctIndex: 1
         }
@@ -850,14 +850,14 @@ GROUP BY u.id, u.email, u.is_vip
 ORDER BY total_invertido_usd DESC;`,
         warning: '⚠️ Hacer un JOIN sin especificar la condición "ON" genera un producto cartesiano que multiplica todas las filas contra todas y puede colgar el servidor.',
         checkpoint: {
-          question: 'Si quieres listar TODOS los usuarios registrados junto con sus compras, incluyendo a los que todavía no compraron nada, ¿qué JOIN debes usar?',
+          question: 'En la consulta anterior, ¿por qué se utiliza `COALESCE(SUM(e.amount_paid), 0)` al hacer un `LEFT JOIN` entre `users` y `enrollments`?',
           options: [
-            'INNER JOIN',
-            'DROP TABLE',
-            'DELETE JOIN',
-            'LEFT JOIN desde la tabla users hacia enrollments'
+            'Porque la función SUM() en SQL devuelve un error de sintaxis si no está envuelta dentro de COALESCE.',
+            'Porque para los usuarios sin compras el LEFT JOIN genera valores NULL en `e.amount_paid`, y COALESCE reemplaza ese NULL resultante por 0.00.',
+            'Para redondear los decimales al número entero más cercano antes de ordenar con ORDER BY.',
+            'Para excluir del reporte a todos los usuarios cuya suma de compras sea igual a cero.'
           ],
-          correctIndex: 3
+          correctIndex: 1
         }
       },
       {
@@ -883,12 +883,12 @@ const token = jwt.sign(
 );`,
         warning: '⚠️ Nunca guardes secretos privados ni contraseñas dentro del Payload de un JWT, porque Base64 NO es cifrado: es solo codificación legible.',
         checkpoint: {
-          question: '¿Qué impide que un usuario malintencionado abra su JWT, cambie `role: "standard"` por `role: "vip"` y el servidor lo acepte?',
+          question: '¿Por qué es peligroso guardar datos sensibles (como una clave privada o número de tarjeta) dentro del Payload de un JWT estándar?',
           options: [
-            'Nada lo impide',
-            'La firma criptográfica (Signature) del JWT: al alterar el Payload sin poseer la clave secreta del servidor, la firma deja de coincidir y el token es rechazado',
-            'El color del navegador',
-            'Que el archivo pesa demasiado'
+            'Porque el navegador borra automáticamente cualquier JWT cuyo tamaño supere los 128 bytes.',
+            'Porque el Payload de un JWT estándar (JWS) solo está codificado en Base64Url para transporte (no está cifrado), por lo que cualquiera que intercepte o lea el token puede decodificar su contenido en texto claro.',
+            'Porque la firma HMAC-SHA256 publica automáticamente el Payload en los encabezados DNS.',
+            'Porque el servidor no puede leer ningún campo incluido dentro del Payload una vez emitido.'
           ],
           correctIndex: 1
         }
@@ -897,42 +897,42 @@ const token = jwt.sign(
     quiz: {
       questions: [
         {
-          question: '1. ¿Qué combinación de verbo HTTP y código de estado corresponde a la creación exitosa de un nuevo recurso en una API REST?',
+          question: '1. ¿Qué propiedad diferencia a los verbos HTTP `PUT` y `GET` (idempotentes) frente al verbo `POST` (no idempotente)?',
           options: [
-            'Verbo GET y código 404 Not Found',
-            'Verbo DELETE y código 500',
-            'Verbo POST y código de estado 201 Created',
-            'Verbo GET y código 401'
+            '`PUT` y `GET` encriptan el cuerpo de la petición, mientras que `POST` envía los datos en texto plano por la URL.',
+            '`POST` solo permite enviar hasta 255 caracteres, mientras que `GET` no tiene límite de tamaño.',
+            'Ejecutar la misma petición `GET` o `PUT` múltiples veces produce el mismo estado en el servidor que ejecutarla una sola vez, mientras que repetir un `POST` suele crear múltiples recursos duplicados.',
+            '`GET` modifica registros en la base de datos y `POST` se utiliza únicamente para consultas de solo lectura.'
           ],
           correctIndex: 2
         },
         {
-          question: '2. ¿Cómo se previene de forma definitiva un ataque de Inyección SQL (SQL Injection)?',
+          question: '2. ¿Qué costo o contrapartida técnica tiene agregar demasiados índices (`CREATE INDEX`) en todas las columnas de una tabla SQL?',
           options: [
-            'Ocultando el botón de login con CSS',
-            'Utilizando consultas parametrizadas (Prepared Statements) donde el motor trata los datos del usuario estrictamente como valores y nunca como comandos ejecutables',
-            'Cambiando el nombre de la tabla cada semana',
-            'Permitiendo solo contraseñas de 4 letras'
+            'Impide realizar consultas con `LEFT JOIN` sobre esa tabla.',
+            'Acelera las lecturas (`SELECT`), pero penaliza el rendimiento de las escrituras (`INSERT`, `UPDATE`, `DELETE`) y consume más espacio en disco porque cada índice B-Tree debe actualizarse en cada cambio.',
+            'Obliga a reiniciar el motor de base de datos cada vez que se inserta una fila nueva.',
+            'Limita la tabla a un máximo de 10,000 registros en total.'
           ],
           correctIndex: 1
         },
         {
-          question: '3. ¿Cuál es la diferencia entre `WHERE` y `HAVING` en una consulta SQL?',
+          question: '3. Si necesitas filtrar una consulta agrupada para mostrar únicamente los alumnos cuya suma total de compras supere los $100 USD (`SUM(e.amount_paid) > 100`), ¿dónde debe ir esa condición?',
           options: [
-            'Son exactamente sinónimos',
-            'HAVING solo sirve para borrar columnas',
-            'WHERE solo funciona los fines de semana',
-            'WHERE filtra filas individuales antes de agrupar, mientras que HAVING filtra los grupos resultantes de funciones de agregación (como SUM o COUNT) después del GROUP BY'
+            'Dentro de la cláusula `WHERE`, antes del `GROUP BY`.',
+            'Dentro de la cláusula `ORDER BY` al final de la consulta.',
+            'Dentro de la cláusula `ON` del `LEFT JOIN`.',
+            'Dentro de la cláusula `HAVING`, después del `GROUP BY`, ya que `WHERE` no puede evaluar funciones de agregación como `SUM()`.'
           ],
           correctIndex: 3
         },
         {
-          question: '4. ¿Por qué se utiliza `Bcrypt` o `Argon2` con Salt para almacenar contraseñas en lugar de guardarlas en texto plano?',
+          question: '4. ¿Qué función específica cumple el "Salt" aleatorio que algoritmos como Bcrypt o Argon2 agregan a cada contraseña antes de hashearla?',
           options: [
-            'Para poder enviarle su contraseña original por correo al usuario cuando la olvida',
-            'Para que el texto ocupe menos caracteres',
-            'Porque generan un hash irreversible y único por usuario, protegiendo las claves incluso si la base de datos llegara a filtrarse',
-            'Porque las bases de datos no aceptan letras comunes'
+            'Permite desencriptar la contraseña más rápido cuando el usuario solicita recuperarla por email.',
+            'Comprime la longitud de la contraseña para que ocupe solo 8 bits en la columna VARCHAR.',
+            'Garantiza que dos usuarios con la misma contraseña produzcan hashes completamente distintos e inutiliza ataques con tablas precalculadas (Rainbow Tables).',
+            'Reemplaza la necesidad de usar conexiones HTTPS/TLS entre el navegador y el servidor.'
           ],
           correctIndex: 2
         }
@@ -970,12 +970,12 @@ const token = jwt.sign(
 3. ¿Existe un canal claro donde encontrar a 100 de estos clientes hoy mismo?   -> SÍ`,
         warning: '⚠️ Que tus amigos te digan "qué buena idea" no es validación. La única validación real en los negocios es una transacción o un compromiso concreto.',
         checkpoint: {
-          question: '¿Por qué los Micro-SaaS orientados a negocios/profesionales (B2B) suelen ser mucho más rentables que los orientados a consumidores gratuitos (B2C)?',
+          question: 'En validación de producto, ¿por qué las encuestas de opinión ("¿Usarías una app que haga X?") suelen dar falsos positivos frente a un test de pre-venta ("Smoke Test")?',
           options: [
-            'Porque las empresas no revisan si el software funciona',
-            'Porque las empresas pagan con gusto suscripciones de $29 a $199/mes si el software les ahorra horas de trabajo o les genera más ventas',
-            'Porque en B2B no hace falta programar nada',
-            'Porque no tienen competencia en el mundo'
+            'Porque las encuestas online tardan más de 6 meses en recolectar 10 respuestas.',
+            'Porque decir "sí, me gusta la idea" no tiene costo para el encuestado (sesgo de cortesía), mientras que intentar comprar o dejar un pago/reserva exige compromiso real ante un dolor prioritario.',
+            'Porque los formularios de encuesta no funcionan en dispositivos móviles.',
+            'Porque en B2B está prohibido entrevistar a potenciales clientes antes de registrar la marca.'
           ],
           correctIndex: 1
         }
@@ -997,12 +997,12 @@ const token = jwt.sign(
 ❌ POSPONER A V2.0: App móvil nativa, API pública, multi-idioma, sub-cuentas de equipo.`,
         warning: '⚠️ Si el usuario tarda más de 3 minutos después de registrarse en experimentar el valor real de tu herramienta, el 80% abandonará y no volverá a entrar.',
         checkpoint: {
-          question: '¿Qué es el "Momento Aha!" (Time-to-Value) en el onboarding de un SaaS?',
+          question: 'Al diseñar el onboarding de un MVP SaaS, ¿cómo impacta reducir el "Time-to-Value" (tiempo hasta el Momento Aha!) de 15 minutos a menos de 90 segundos?',
           options: [
-            'Cuando el usuario cierra su cuenta',
-            'La página de términos y condiciones legales',
-            'El instante exacto en que el usuario nuevo obtiene su primer resultado valioso real dentro de la aplicación',
-            'El mensaje de error 404'
+            'Aumenta el costo de los servidores en un 300% sin afectar la retención.',
+            'Reduce el precio mensual que puedes cobrar por la suscripción.',
+            'Incrementa drásticamente la tasa de activación y retención del día 1, evitando que el usuario abandone antes de experimentar el beneficio central.',
+            'Obliga a eliminar la pasarela de pagos del producto.'
           ],
           correctIndex: 2
         }
@@ -1026,12 +1026,12 @@ const token = jwt.sign(
 - Si tu CAC (costo de adquirir 1 cliente) es $80 USD -> Ratio LTV/CAC = 7.5x (¡Altamente rentable!)`,
         warning: '⚠️ Nunca ofrezcas solo un plan barato de $3/mes: atrae a los clientes que más soporte exigen y más rápido cancelan. Posiciona planes desde $19-$49/mes con opción anual (2 meses gratis).',
         checkpoint: {
-          question: 'Si un SaaS cobra $40 USD al mes y tiene una tasa de cancelación (Churn) del 5% mensual (0.05), ¿cuál es el LTV (Valor de Vida) estimado de cada cliente?',
+          question: 'Si un Micro-SaaS tiene un ARPU de $50 USD/mes, un Churn mensual del 4% (0.04) y un CAC de $250 USD, ¿cuál es su LTV y su ratio LTV/CAC?',
           options: [
-            '$40 USD',
-            '$2 USD',
-            '$5,000 USD',
-            '$800 USD ($40 dividido 0.05, equivalente a 20 meses de permanencia promedio)'
+            'LTV = $200 USD y ratio LTV/CAC = 0.8x (modelo deficitario).',
+            'LTV = $500 USD y ratio LTV/CAC = 2.0x.',
+            'LTV = $2,000 USD y ratio LTV/CAC = 8.0x.',
+            'LTV = $1,250 USD ($50 / 0.04) y ratio LTV/CAC = 5.0x ($1,250 / $250), superando holgadamente el umbral saludable de 3.0x.'
           ],
           correctIndex: 3
         }
@@ -1054,12 +1054,12 @@ const token = jwt.sign(
 - Total MRR = $2,200 USD / mes ($26,400 USD / año de ingreso recurrente con 92% de margen neto)`,
         warning: '⚠️ No gastes miles de dólares en anuncios pagados antes de haber cerrado tus primeros 15 clientes de forma directa y haber pulido las objeciones de venta.',
         checkpoint: {
-          question: '¿En qué consiste la táctica "Engineering as Marketing" para atraer clientes a un SaaS sin pagar publicidad?',
+          question: '¿Por qué es un error escalar campañas de anuncios pagados (Paid Ads) antes de haber cerrado los primeros 15-20 clientes de forma directa?',
           options: [
-            'En enviar spam masivo sin contexto a millones de correos',
-            'En publicar una micro-herramienta, plantilla o calculadora gratuita muy útil para el nicho que capte usuarios y les ofrezca el SaaS completo como siguiente paso natural',
-            'En ocultar el precio del producto',
-            'En contratar 50 vendedores telefónicos el primer día'
+            'Porque las plataformas publicitarias no permiten anunciar productos con menos de 1 año de antigüedad.',
+            'Porque sin haber validado antes el mensaje de ventas, el onboarding y la retención inicial con clientes reales, quemarás presupuesto enviando tráfico caro a un embudo con fugas.',
+            'Porque los clientes que llegan por publicidad pagan únicamente en efectivo.',
+            'Porque el CAC en publicidad pagada siempre es igual a cero.'
           ],
           correctIndex: 1
         }
@@ -1068,42 +1068,42 @@ const token = jwt.sign(
     quiz: {
       questions: [
         {
-          question: '1. ¿Cuál es el paso correcto antes de dedicar meses a programar un software completo?',
+          question: '1. ¿Qué diferencia a un producto "Analgésico" de una "Vitamina" al elegir un nicho para un Micro-SaaS B2B?',
           options: [
-            'Diseñar 50 logotipos distintos y alquilar una oficina costosa',
-            'Programar primero 30 funciones secundarias y pensar a quién venderle el año que viene',
-            'Detectar un problema costoso en un nicho específico y validar la intención real de pago mediante una oferta o pre-venta',
-            'Pedir un préstamo bancario sin tener ningún cliente'
+            'El Analgésico requiere 50 desarrolladores para construirse y la Vitamina solo requiere 1.',
+            'La Vitamina se cobra por suscripción mensual y el Analgésico solo se puede ofrecer gratis.',
+            'El Analgésico resuelve un problema urgente y cuantificable (ahorro directo de horas o dinero hoy), por lo que tiene presupuesto inmediato; la Vitamina es una mejora opcional que las empresas posponen.',
+            'Ambos tienen exactamente la misma velocidad de cierre comercial en frío.'
           ],
           correctIndex: 2
         },
         {
-          question: '2. ¿Qué mide exactamente el `MRR` en una empresa SaaS?',
+          question: '2. Si tu SaaS cuenta con 60 clientes en el plan de $30/mes y este mes se suman 10 clientes nuevos pero cancelan 4 clientes, ¿cuál es tu nuevo MRR neto?',
           options: [
-            'La cantidad de visitas anónimas del blog',
-            'El Ingreso Recurrente Mensual predecible generado por todas las suscripciones activas',
-            'El costo del servidor dividido por la memoria RAM',
-            'Las ventas únicas que no se vuelven a repetir'
+            '$1,800 USD de MRR.',
+            '$1,980 USD de MRR (66 clientes activos × $30 USD, sumando +$180 USD de Net New MRR).',
+            '$2,100 USD de MRR (porque las cancelaciones no se descuentan del MRR hasta fin de año).',
+            '$1,680 USD de MRR.'
           ],
           correctIndex: 1
         },
         {
-          question: '3. ¿Por qué reducir el `Churn` (tasa de cancelación mensual) es tan importante como conseguir clientes nuevos?',
+          question: '3. Si mejoras la retención de tu SaaS reduciendo el Churn mensual del 10% al 2.5% manteniendo el mismo precio mensual, ¿qué ocurre matemáticamente con el LTV de cada cliente?',
           options: [
-            'Porque el Churn no tiene relación con los ingresos',
-            'Porque las pasarelas de pago prohíben tener clientes por más de 2 meses',
-            'Solo por una cuestión estética en los gráficos',
-            'Porque si el Churn es alto, pierdes clientes al mismo ritmo que entran y el crecimiento compuesto del MRR se estanca'
+            'El LTV se reduce una cuarta parte.',
+            'El LTV aumenta apenas un 7.5%.',
+            'El LTV permanece sin cambios porque el precio mensual no subió.',
+            'El LTV se multiplica por 4 (la vida media del cliente pasa de 10 meses a 40 meses).'
           ],
           correctIndex: 3
         },
         {
-          question: '4. ¿Qué ventaja financiera tiene ofrecer un Plan Anual (ej. 2 meses bonificados al pagar el año) desde el lanzamiento?',
+          question: '4. ¿Cómo funciona un "Bucle Viral de Producto" (Product-Led Growth Loop) como el sello "Creado con [Tu SaaS]" en reportes o widgets compartibles?',
           options: [
-            'Hace que la empresa gane menos dinero',
-            'Aumenta las cancelaciones al día siguiente',
-            'Adelanta 10-12 meses de flujo de caja en el día 1, elimina el Churn mensual durante todo un año y financia el crecimiento del negocio',
-            'Obliga a cerrar el producto a los 3 meses'
+            'Obliga a cada usuario a invitar a 10 amigos antes de dejarle iniciar sesión por primera vez.',
+            'Bloquea las funciones del software si el usuario no publica en redes sociales todos los días.',
+            'Convierte el uso normal de cada cliente en un canal de distribución orgánico: cada vez que comparte un entregable con sus propios clientes o colegas, expone la marca a nuevos usuarios calificados a costo CAC $0.',
+            'Reemplaza el servidor backend por almacenamiento local en el navegador.'
           ],
           correctIndex: 2
         }
@@ -1813,7 +1813,7 @@ window.submitFinalExam = function () {
   });
 
   if (correctCount < questions.length) {
-    showToast(`❌ Obtuviste ${correctCount}/${questions.length} aciertos. Revisa la pregunta #${firstWrongNumber} (se requiere 100% para cobrar los puntos).`);
+    showToast(`❌ Obtuviste ${correctCount}/${questions.length} aciertos. Revisa bien tus respuestas: necesitas 100% (${questions.length}/${questions.length}) para aprobar.`);
     return;
   }
 
