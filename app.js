@@ -1109,6 +1109,1079 @@ const token = jwt.sign(
         }
       ]
     }
+  },
+  {
+    id: 'cybersec-ethical-web',
+    title: 'Ciberseguridad Web, OWASP Top 10 & Blindaje de Aplicaciones',
+    category: 'Programación',
+    priceUSD: 18.99,
+    pointsReward: 300,
+    vipPointsReward: 95,
+    xp: 360,
+    duration: 50,
+    secretCourse: false,
+    description: 'Aprende a detectar y mitigar ataques XSS, CSRF, SSRF, configuración de cabeceras CSP, cookies HttpOnly y Rate Limiting en producción.',
+    lessons: [
+      {
+        heading: 'Módulo 1: Cross-Site Scripting (XSS) y Sanitización del DOM',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'El ataque Cross-Site Scripting (XSS) ocurre cuando una aplicación web renderiza datos ingresados por un usuario directamente en el navegador de otros usuarios sin escaparlos ni validarlos. Si un atacante inyecta una etiqueta <script> dentro de un comentario o perfil y tu frontend usa innerHTML, el navegador ejecutará ese código con los permisos de la víctima.',
+          'Existen tres variantes principales: Stored XSS (el payload queda guardado en la base de datos), Reflected XSS (viaja en un parámetro de la URL) y DOM-based XSS (ocurre íntegramente en el cliente al manipular el DOM de forma insegura).'
+        ],
+        keyPoints: [
+          'Usa textContent en lugar de innerHTML siempre que insertes texto proveniente de usuarios.',
+          'Si necesitas renderizar HTML enriquecido, sanitiza antes con librerías auditadas como DOMPurify.',
+          'Configura la cabecera Content-Security-Policy (CSP) para prohibir la ejecución de scripts inline no autorizados.'
+        ],
+        code: `// ❌ VULNERABLE A XSS:
+comentarioDiv.innerHTML = "<p>Usuario dijo: " + inputDelUsuario + "</p>";
+
+// ✅ SEGURO CONTRA XSS:
+const p = document.createElement("p");
+p.textContent = \`Usuario dijo: \${inputDelUsuario}\`;
+comentarioDiv.appendChild(p);`,
+        warning: '⚠️ Validar solo con JavaScript en el formulario del navegador no protege tu servidor: el atacante puede enviar el payload directo por cURL o Postman.',
+        checkpoint: {
+          question: '¿Por qué asignar datos de usuario mediante `elemento.textContent` previene la ejecución de un ataque XSS frente a `elemento.innerHTML`?',
+          options: [
+            'Porque textContent cifra el texto con AES-256 antes de mostrarlo en la pantalla.',
+            'Porque textContent interpreta los caracteres especiales como `<` y `>` estrictamente como nodos de texto literal y nunca los parsea como etiquetas HTML ni ejecuta scripts.',
+            'Porque textContent borra automáticamente cualquier palabra que contenga la sílaba "script".',
+            'Porque textContent solo funciona cuando el usuario tiene permisos de administrador.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Ataques CSRF, Cookies HttpOnly / SameSite y Tokens Anti-CSRF',
+        readTime: '13 min de lectura',
+        paragraphs: [
+          'En un ataque CSRF (Cross-Site Request Forgery), el atacante engaña al navegador de un usuario que ya tiene sesión abierta en tu web (por ejemplo, un banco o panel de pagos) para que envíe una petición oculta hacia tu servidor desde otro sitio malicioso.',
+          'Como los navegadores adjuntan automáticamente las cookies de sesión del dominio destino, si no configuras el atributo SameSite=Strict o SameSite=Lax ni verificas un Token Anti-CSRF único por formulario, el servidor creerá que la acción fue voluntaria.'
+        ],
+        keyPoints: [
+          'HttpOnly impide que scripts en JavaScript (document.cookie) puedan leer o robar la cookie de sesión en caso de XSS.',
+          'Secure obliga a que la cookie viaje únicamente sobre conexiones cifradas HTTPS.',
+          'SameSite=Strict o Lax bloquea el envío automático de cookies en peticiones originadas desde sitios externos.'
+        ],
+        code: `// Configuración blindada de Cookie de Sesión en el Servidor
+res.cookie('session_token', tokenFirmado, {
+  httpOnly: true,     // Invisible para document.cookie (Mitiga robo por XSS)
+  secure: true,       // Solo se transmite por HTTPS
+  sameSite: 'strict', // No se adjunta en peticiones cross-site (Mitiga CSRF)
+  maxAge: 3600000     // Expira en 1 hora
+});`,
+        warning: '⚠️ Guardar tokens de sesión sensibles en localStorage los deja 100% expuestos si ocurre cualquier vulnerabilidad XSS en tu página o en una librería de terceros.',
+        checkpoint: {
+          question: '¿Qué combinación específica de atributos en una cookie de sesión protege simultáneamente contra el robo del token vía JavaScript (XSS) y contra peticiones forjadas desde otros dominios (CSRF)?',
+          options: [
+            '`Domain=*` combinado con `Max-Age=0`.',
+            '`Path=/admin` combinado con codificación Base64.',
+            '`HttpOnly` (bloquea lectura desde `document.cookie`) combinado con `SameSite=Strict` y `Secure`.',
+            'Guardar la cookie en `sessionStorage` sin utilizar encabezados HTTP.'
+          ],
+          correctIndex: 2
+        }
+      },
+      {
+        heading: 'Módulo 3: CORS (Cross-Origin Resource Sharing) y Cabeceras de Seguridad HTTP',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'La Política del Mismo Origen (Same-Origin Policy) de los navegadores impide que un script alojado en un dominio malicioso lea las respuestas de tu API. CORS es el mecanismo mediante el cual tu servidor declara explícitamente qué orígenes externos tienen permiso para consumir sus respuestas.',
+          'Un error crítico en producción es configurar Access-Control-Allow-Origin: * junto con credenciales activas, lo cual expone los endpoints privados de tus usuarios a cualquier web de internet.'
+        ],
+        keyPoints: [
+          'Define una lista blanca (Whitelist) estricta de dominios permitidos en CORS.',
+          'Las peticiones complejas (PUT, DELETE o con JSON) disparan antes una petición Preflight con el verbo OPTIONS.',
+          'Añade X-Content-Type-Options: nosniff y X-Frame-Options: DENY (para evitar Clickjacking con iframes ocultos).'
+        ],
+        code: `// Configuración segura de CORS con lista blanca de orígenes
+const allowedOrigins = ['https://skillvault.app', 'https://admin.skillvault.app'];
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) callback(null, true);
+    else callback(new Error('Origen bloqueado por política CORS'));
+  },
+  credentials: true
+}));`,
+        warning: '⚠️ Recuerda que CORS lo aplica el navegador: no sustituye la autenticación en el backend contra ataques directos desde servidores externos.',
+        checkpoint: {
+          question: '¿Con qué amenaza específica de interfaz gráfica se relaciona la cabecera `X-Frame-Options: DENY` (o `frame-ancestors \'none\'` en CSP)?',
+          options: [
+            'Evita ataques de fuerza bruta sobre el puerto SSH del servidor Linux.',
+            'Comprime las imágenes PNG para reducir el ancho de banda.',
+            'Impide que un sitio externo incruste tu página dentro de un `<iframe>` transparente para engañar al usuario y hacerle pulsar botones sin saberlo (Clickjacking).',
+            'Desactiva el autocompletado de contraseñas del navegador.'
+          ],
+          correctIndex: 2
+        }
+      },
+      {
+        heading: 'Módulo 4: Rate Limiting, Fuerza Bruta y Prevención de SSRF',
+        readTime: '13 min de lectura',
+        paragraphs: [
+          'Sin un limitador de tasa de peticiones (Rate Limiting), un atacante puede probar 50,000 combinaciones de contraseñas por minuto en tu endpoint de login (Credential Stuffing) o agotar el saldo de tu API de Inteligencia Artificial en segundos.',
+          'Asimismo, cuando tu backend recibe una URL proporcionada por el usuario para descargar una imagen o webhook, debes validar que no apunte a direcciones internas privadas (como 127.0.0.1 o 169.254.169.254 de metadatos cloud) para prevenir ataques SSRF (Server-Side Request Forgery).'
+        ],
+        keyPoints: [
+          'Aplica Rate Limiting por IP y por ID de usuario (ej. máximo 5 intentos de login fallidos cada 15 minutos).',
+          'Devuelve el código HTTP 429 Too Many Requests cuando se supere el umbral permitido.',
+          'En SSRF, bloquea rangos de IPs locales/privadas (127.0.0.0/8, 10.0.0.0/8, 192.168.0.0/16, 169.254.169.254).'
+        ],
+        code: `// Rate Limiter para proteger el endpoint de Autenticación
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // Ventana de 15 minutos
+  max: 5,                   // Máximo 5 intentos por IP
+  statusCode: 429,
+  message: { error: "Demasiados intentos. Espera 15 minutos." }
+});
+app.post('/api/v1/auth/login', loginLimiter, loginController);`,
+        warning: '⚠️ Si tu servidor está detrás de Cloudflare o un proxy inverso (Nginx), configura "trust proxy" para leer la IP real del cliente y no bloquear la IP del propio proxy.',
+        checkpoint: {
+          question: '¿Qué ocurre si implementas Rate Limiting por IP detrás de un balanceador de carga o proxy inverso sin configurar correctamente `trust proxy`?',
+          options: [
+            'El limitador se desactiva automáticamente y permite tráfico infinito.',
+            'El servidor verá todas las peticiones de todos los usuarios como provenientes de la misma IP del proxy y terminará bloqueando globalmente a todos los clientes legítimos con error 429.',
+            'Las contraseñas dejarán de hashearse en la base de datos.',
+            'El proxy inverso cambiará el puerto HTTP 80 al puerto 21.'
+          ],
+          correctIndex: 1
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. ¿Cuál es la diferencia fundamental entre un ataque `Stored XSS` y un `Reflected XSS`?',
+          options: [
+            'Stored XSS solo afecta a bases de datos SQL y Reflected XSS solo afecta a bases NoSQL.',
+            'En Stored XSS el script malicioso se persiste en el servidor (ej. en un comentario o perfil) y se ejecuta en cada visitante que carga esa vista; en Reflected XSS el payload viaja en la propia petición/URL y se refleja de inmediato.',
+            'Reflected XSS requiere acceso físico a la computadora de la víctima y Stored XSS no.',
+            'Stored XSS se soluciona únicamente cambiando el puerto del servidor web.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '2. ¿Por qué almacenar un JWT de larga duración en `localStorage` representa un riesgo mayor ante una vulnerabilidad XSS que usar una cookie `HttpOnly`?',
+          options: [
+            'Porque localStorage envía su contenido automáticamente a todos los sitios web que el usuario visita en otras pestañas.',
+            'Porque localStorage tiene un límite de 2 bytes y trunca la firma criptográfica del token.',
+            'Porque cualquier script inyectado (o dependencia NPM comprometida) que corra en el navegador tiene acceso total de lectura a `window.localStorage`, mientras que una cookie `HttpOnly` es inaccesible desde JavaScript.',
+            'Porque localStorage borra los datos cada vez que el usuario recarga la pestaña con F5.'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '3. ¿En qué consiste una vulnerabilidad `SSRF` (Server-Side Request Forgery) y cuál es su objetivo típico en entornos Cloud?',
+          options: [
+            'Consiste en saturar de estilos CSS el navegador del cliente para congelar su tarjeta gráfica.',
+            'Consiste en inducir al servidor backend a realizar peticiones HTTP hacia recursos internos no expuestos a internet (como redes privadas o el endpoint `169.254.169.254` de credenciales IAM en la nube).',
+            'Consiste en adivinar la contraseña del usuario probando palabras del diccionario desde el navegador.',
+            'Consiste en modificar el archivo hosts de la computadora local del visitante.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '4. ¿Qué código de estado HTTP estándar devuelve un servidor cuando un cliente supera el umbral configurado en el `Rate Limiter`?',
+          options: [
+            '400 Bad Request',
+            '403 Forbidden',
+            '502 Bad Gateway',
+            '429 Too Many Requests'
+          ],
+          correctIndex: 3
+        }
+      ]
+    }
+  },
+  {
+    id: 'ai-rag-embeddings',
+    title: 'Sistemas RAG, Bases de Datos Vectoriales & Búsqueda Semántica con IA',
+    category: 'Inteligencia Artificial',
+    priceUSD: 21.00,
+    pointsReward: 330,
+    vipPointsReward: 105,
+    xp: 390,
+    duration: 55,
+    secretCourse: false,
+    description: 'Construye sistemas de IA conectados a documentos privados: Embeddings, similitud coseno, Chunking con solapamiento, búsqueda híbrida y control de alucinaciones.',
+    lessons: [
+      {
+        heading: 'Módulo 1: Qué es RAG (Retrieval-Augmented Generation) vs. Fine-Tuning',
+        readTime: '13 min de lectura',
+        paragraphs: [
+          'Un LLM base no conoce los documentos privados de tu empresa, tus contratos en PDF ni el stock actualizado hace 5 minutos. Muchos principiantes creen que deben reentrenar el modelo (Fine-Tuning) cada vez que cambia un precio, lo cual es lento, costoso y propenso a que el modelo igual invente datos.',
+          'La arquitectura RAG (Generación Aumentada por Recuperación) resuelve esto en dos fases: primero busca los fragmentos relevantes en tu base documental verificada y luego se los inyecta en el prompt al modelo exigiéndole que responda basándose exclusivamente en esa evidencia.'
+        ],
+        keyPoints: [
+          'Fine-Tuning enseña estilo, tono o formato; RAG inyecta hechos dinámicos, privados y actualizables al instante.',
+          'Con RAG puedes controlar permisos por usuario (qué documentos tiene permiso de consultar cada rol) y citar la página exacta de la fuente.',
+          'Si revocas o actualizas un documento en la base vectorial, el cambio se refleja en el próximo segundo sin reentrenar nada.'
+        ],
+        code: `Flujo de una Consulta en Arquitectura RAG:
+1. Usuario pregunta: "¿Cuál es la política de reembolso para planes anuales?"
+2. Retriever busca en Base Vectorial -> Recupera Top 3 fragmentos del Manual Legal 2026.
+3. Prompt Aumentado = [Instrucción: Responde SOLO usando este contexto] + [Top 3 fragmentos] + [Pregunta].
+4. LLM genera respuesta precisa citando el Artículo 4.2 del documento.`,
+        warning: '⚠️ El Fine-Tuning NUNCA debe usarse como reemplazo de una base de datos para hechos que cambian con frecuencia (precios, inventario, normativas).',
+        checkpoint: {
+          question: '¿Por qué la arquitectura RAG es superior al Fine-Tuning cuando un asistente de IA debe responder sobre precios, stock o políticas internas que se actualizan semanalmente?',
+          options: [
+            'Porque el Fine-Tuning no funciona con textos en español.',
+            'Porque RAG permite actualizar, auditar o eliminar documentos en tiempo real en la base de conocimiento y exigir citas textuales, sin costo ni demora de reentrenamiento de pesos neuronales.',
+            'Porque RAG no utiliza ningún modelo de lenguaje para redactar la respuesta final.',
+            'Porque el Fine-Tuning reduce la velocidad del navegador del usuario.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Embeddings Vectoriales y Matemática de Similitud Coseno',
+        readTime: '14 min de lectura',
+        paragraphs: [
+          'La búsqueda tradicional por palabras clave (como LIKE en SQL) falla si el usuario busca "cancelar suscripción" pero el documento dice "baja de membresía". Los modelos de Embeddings transforman cualquier oración o párrafo en un vector numérico de alta dimensión (ej. una lista de 768 o 1536 números flotantes) que captura su significado semántico.',
+          'En ese espacio multidimensional, dos textos que hablan del mismo concepto quedan ubicados muy cerca entre sí (forman un ángulo pequeño), aunque no compartan ni una sola palabra exacta.'
+        ],
+        keyPoints: [
+          'La Similitud Coseno mide el coseno del ángulo entre dos vectores: 1.0 significa dirección idéntica, 0 ortogonal/sin relación.',
+          'Debes usar exactamente el mismo modelo de Embeddings tanto para indexar tus documentos como para vectorizar la pregunta del usuario.',
+          'Bases vectoriales populares: pgvector (en PostgreSQL), Pinecone, Qdrant y Weaviate.'
+        ],
+        code: `-- Consulta de búsqueda semántica con pgvector en PostgreSQL
+-- El operador <=> calcula la distancia coseno entre el vector de la pregunta y los documentos
+SELECT id, titulo, contenido_chunk,
+       1 - (embedding <=> $1::vector) AS similitud_coseno
+FROM documentos_chunks
+WHERE 1 - (embedding <=> $1::vector) > 0.78
+ORDER BY embedding <=> $1::vector ASC
+LIMIT 4;`,
+        warning: '⚠️ Si indexas tus documentos con un modelo de embeddings (ej. 1536 dimensiones) y luego vectorizas las consultas con otro modelo distinto, los vectores serán incompatibles y devolverán basura.',
+        checkpoint: {
+          question: '¿Qué ocurre si cambias el modelo de Embeddings en tu servidor de consultas sin volver a re-indexar los vectores almacenados previamente en tu base de datos vectorial?',
+          options: [
+            'La base de datos traduce automáticamente los vectores antiguos al nuevo espacio geométrico sin pérdida de precisión.',
+            'Los vectores de consulta y los de los documentos pertenecerán a espacios latentes incompatibles (o tendrán distinta dimensión), destruyendo la relevancia de la búsqueda por similitud.',
+            'Solo se perderán los acentos ortográficos de los documentos.',
+            'Las consultas tardarán el doble pero devolverán los mismos resultados.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 3: Estrategias de Chunking (Fragmentación) y Solapamiento (Overlap)',
+        readTime: '14 min de lectura',
+        paragraphs: [
+          'No puedes convertir un libro PDF de 300 páginas en un único vector, porque el significado específico de cada párrafo se diluiría en un promedio general inútil. Tampoco conviene cortar por palabras sueltas porque pierden todo su contexto. El proceso de dividir documentos en bloques semánticos óptimos se denomina "Chunking".',
+          'La práctica profesional consiste en dividir en bloques de entre 300 y 600 tokens respetando límites de párrafos o encabezados Markdown, aplicando un "Chunk Overlap" (solapamiento del 10% al 20% entre el final de un bloque y el comienzo del siguiente) para que ninguna idea quede cortada por la mitad.'
+        ],
+        keyPoints: [
+          'Chunks demasiado grandes -> Introducen ruido en el vector y consumen demasiados tokens en el prompt.',
+          'Chunks demasiado pequeños -> Una frase como "El costo es de $45" queda separada del párrafo anterior que decía a qué producto se refería.',
+          'Enriquece cada Chunk con metadatos (título del documento, sección, fecha) antes de vectorizarlo.'
+        ],
+        code: `// Ejemplo de configuración de Recursive Character Text Splitter
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 500,       // Tamaño objetivo por fragmento
+  chunkOverlap: 80,     // 80 caracteres compartidos con el fragmento contiguo
+  separators: ["\\n## ", "\\n\\n", "\\n", ". ", " "]
+});`,
+        warning: '⚠️ Cortar tablas financieras o bloques de código por conteo fijo de caracteres sin respetar saltos de línea rompe las filas y hace que el LLM lea números cruzados.',
+        checkpoint: {
+          question: '¿Cuál es el propósito técnico del parámetro `chunkOverlap` (solapamiento entre fragmentos consecutivos) al indexar documentos para RAG?',
+          options: [
+            'Duplicar el tamaño de la base de datos para cobrar más almacenamiento.',
+            'Evitar que una oración o idea clave que cae justo en la frontera entre dos fragmentos pierda su contexto antecedente o consecuente al ser recuperada.',
+            'Eliminar todas las vocales repetidas del documento original.',
+            'Cifrar los fragmentos pares con la clave de los fragmentos impares.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 4: Búsqueda Híbrida (BM25 + Vectorial), Re-Ranking y Control de Alucinaciones',
+        readTime: '14 min de lectura',
+        paragraphs: [
+          'La búsqueda puramente vectorial es excelente para conceptos semánticos, pero puede fallar cuando el usuario busca un código de pieza exacto ("SKU-9941-X"), un número de ley o un apellido específico. Por eso los sistemas RAG de nivel industrial implementan Búsqueda Híbrida: combinan búsqueda léxica exacta (BM25 / Full-Text Search) + búsqueda vectorial semántica.',
+          'Finalmente, para reducir las alucinaciones a casi cero, se instruye al modelo con una cláusula de abstención explícita: si la respuesta no se encuentra en los fragmentos recuperados, debe responder "No cuento con información verificada en la documentación sobre ese punto" en lugar de adivinar.'
+        ],
+        keyPoints: [
+          'Reciprocal Rank Fusion (RRF) combina los rankings de BM25 (palabras exactas) y de Embeddings (significado).',
+          'Un modelo Cross-Encoder (Re-Ranker) reordena los Top 15 candidatos para quedarse con los 4 más relevantes.',
+          'Pide siempre que el modelo devuelva el ID del fragmento citado junto a cada afirmación.'
+        ],
+        code: `Prompt de Sistema Anti-Alucinación para RAG:
+"Responde a la consulta del usuario utilizando ÚNICAMENTE los fragmentos provistos en <documentos>.
+- Si los fragmentos no contienen el dato exacto para responder, di explícitamente: 'Esa información no figura en la documentación oficial.'
+- PROHIBIDO extrapolar, asumir o usar conocimiento externo.
+- Al final de cada oración, cita la fuente entre corchetes, ej: [Doc-14]."` ,
+        warning: '⚠️ Pasar 30 fragmentos irrelevantes al prompt empeora la respuesta por el fenómeno "Lost in the Middle" (los modelos prestan menos atención a la mitad de contextos gigantes). Es mejor filtrar los 4 o 5 mejores.',
+        checkpoint: {
+          question: '¿Por qué un sistema RAG en producción combina búsqueda vectorial con búsqueda léxica `BM25` (Búsqueda Híbrida)?',
+          options: [
+            'Porque BM25 es obligatoria para traducir textos del inglés al español.',
+            'Porque los embeddings vectoriales capturan bien el significado conceptual, pero BM25 garantiza precisión exacta al buscar códigos alfanuméricos, SKUs, acrónimos o números de serie.',
+            'Porque la búsqueda vectorial solo funciona con documentos de menos de 10 palabras.',
+            'Para reducir a la mitad el tamaño de la memoria RAM del navegador.'
+          ],
+          correctIndex: 1
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. ¿Qué problema resuelve la arquitectura RAG que el modelo de lenguaje base no puede resolver por sí solo?',
+          options: [
+            'Permite que el modelo funcione sin necesidad de procesadores ni servidores.',
+            'Conecta al modelo en tiempo de consulta con fuentes de datos privadas, actualizadas y verificables, reduciendo las alucinaciones y permitiendo citar la fuente documental.',
+            'Aumenta la velocidad de escritura del teclado del usuario.',
+            'Traduce automáticamente el código fuente de Python a lenguaje ensamblador.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '2. ¿Qué ocurre si divides tus documentos en Chunks extremadamente pequeños (ej. 15 caracteres sin solapamiento)?',
+          options: [
+            'Cada vector tendrá el contexto completo de todo el capítulo y la respuesta será perfecta.',
+            'Los fragmentos recuperados carecerán de contexto semántico suficiente (frases truncadas sin sujeto ni referencia), impidiendo que el LLM construya una respuesta coherente.',
+            'El modelo de lenguaje se reentrenará automáticamente en cada consulta.',
+            'La similitud coseno dará siempre exactamente 1.0 en todos los documentos.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '3. ¿En qué consiste el fenómeno "Lost in the Middle" al construir el prompt de contexto en un sistema RAG?',
+          options: [
+            'En que los paquetes de red TCP/IP se pierden a mitad de camino entre el cliente y el servidor.',
+            'En que cuando inyectas decenas de fragmentos largos y ruidosos, el LLM tiende a prestar mayor atención al inicio y al final del contexto, pasando por alto datos ubicados en el medio.',
+            'En que la base de datos borra la mitad de las tablas cuando llega al 50% de disco.',
+            'En que los vectores pierden sus decimales al dividirse por dos.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '4. ¿Cuál es el mecanismo más efectivo en el prompt de un sistema RAG para impedir que el modelo invente políticas o precios cuando el dato no aparece en los chunks recuperados?',
+          options: [
+            'Subir la temperatura a 1.5 para que busque respuestas alternativas.',
+            'Eliminar todas las restricciones del prompt de sistema.',
+            'Aplicar un umbral mínimo de similitud en el Retriever e incluir una instrucción explícita de abstención que obligue al modelo a declarar que el dato no consta en los documentos provistos.',
+            'Pedirle que responda en menos de 10 palabras.'
+          ],
+          correctIndex: 2
+        }
+      ]
+    }
+  },
+  {
+    id: 'js-react-modern',
+    title: 'JavaScript Asíncrono, Event Loop & Estado en Aplicaciones Web Modernas',
+    category: 'Programación',
+    priceUSD: 15.99,
+    pointsReward: 270,
+    vipPointsReward: 85,
+    xp: 330,
+    duration: 45,
+    secretCourse: false,
+    description: 'Domina el Event Loop, Promesas, concurrencia con Promise.all vs secuencial, Closures, inmutabilidad de estado y optimización de renderizado.',
+    lessons: [
+      {
+        heading: 'Módulo 1: El Event Loop, Call Stack, Microtasks y Macrotasks',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'JavaScript se ejecuta en un único hilo principal (Single-Threaded), pero puede manejar miles de operaciones de red y temporizadores sin congelar la interfaz gracias al Event Loop (Bucle de Eventos) del navegador o de Node.js.',
+          'Cuando el Call Stack (pila de ejecución síncrona) queda vacío, el Event Loop procesa primero TODA la cola de Microtareas (como callbacks de Promesas .then y async/await) antes de pasar a ejecutar la siguiente Macrotarea (como setTimeout o setInterval).'
+        ],
+        keyPoints: [
+          'El código síncrono bloqueante (ej. un bucle while pesado) congela el renderizado de la página.',
+          'Las Microtasks (Promesas) tienen prioridad estricta sobre las Macrotasks (setTimeout, incluso con 0ms).',
+          'Un setTimeout(fn, 0) no se ejecuta en 0ms exactos, sino recién cuando el Call Stack y la cola de Microtasks terminan.'
+        ],
+        code: `console.log("1. Inicio síncrono");
+
+setTimeout(() => {
+  console.log("4. Macrotask (setTimeout 0ms)");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("3. Microtask (Promise.then)");
+});
+
+console.log("2. Fin síncrono");
+// Orden exacto impreso en consola: 1 -> 2 -> 3 -> 4`,
+        warning: '⚠️ Si encolas microtareas recursivas infinitas, bloquearás el hilo principal igual que con un bucle infinito síncrono.',
+        checkpoint: {
+          question: 'En el código anterior, ¿por qué `"3. Microtask (Promise.then)"` se imprime antes que `"4. Macrotask (setTimeout 0ms)"` aunque el timeout tenga 0 milisegundos?',
+          options: [
+            'Porque setTimeout siempre espera un mínimo obligatorio de 10 segundos en todos los navegadores.',
+            'Porque al vaciarse el Call Stack síncrono, el Event Loop vacía primero por completo la cola de Microtareas (Promesas) antes de tomar la primera tarea de la cola de Macrotareas (Timers).',
+            'Porque Promise.resolve() se ejecuta en una tarjeta gráfica separada antes que console.log("1").',
+            'Porque el orden depende de qué línea esté escrita más abajo en el archivo.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Async / Await en Serie vs. Concurrencia Paralela con Promise.all',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'Uno de los cuellos de botella más frecuentes en aplicaciones web es usar múltiples "await" en serie para peticiones HTTP independientes entre sí. Si pides el perfil del usuario (400ms), luego las notificaciones (400ms) y luego el catálogo (400ms) uno detrás de otro, el usuario esperará 1,200ms en blanco.',
+          'Cuando las peticiones no dependen una del resultado de la anterior, dispararlas en paralelo con Promise.all() o Promise.allSettled() reduce el tiempo total al de la petición más lenta (400ms), triplicando la velocidad de carga.'
+        ],
+        keyPoints: [
+          'Promise.all([p1, p2, p3]) resuelve cuando todas terminan, o rechaza inmediatamente si una sola falla.',
+          'Promise.allSettled([p1, p2, p3]) espera a todas y te informa cuáles tuvieron éxito (fulfilled) y cuáles fallaron (rejected) sin abortar las demás.',
+          'Usa await secuencial solo cuando la petición B necesita un dato devuelto por la petición A.'
+        ],
+        code: `// ❌ LENTO (En serie: 400ms + 400ms + 400ms = 1200ms)
+const perfil = await fetchPerfil();
+const cursos = await fetchCursos();
+const avisos = await fetchAvisos();
+
+// ✅ RÁPIDO (En paralelo con Promise.all: ~400ms en total)
+const [perfil, cursos, avisos] = await Promise.all([
+  fetchPerfil(),
+  fetchCursos(),
+  fetchAvisos()
+]);`,
+        warning: '⚠️ Si una de las 3 promesas dentro de Promise.all() falla y no es una función crítica (ej. cargar un banner secundario), usa Promise.allSettled() para no romper toda la pantalla.',
+        checkpoint: {
+          question: '¿Cuándo conviene utilizar `Promise.allSettled()` en lugar de `Promise.all()` al cargar un dashboard con 4 llamadas a distintas APIs?',
+          options: [
+            'Cuando queremos que las 4 llamadas se ejecuten estrictamente una por una en orden secuencial.',
+            'Cuando queremos que si una API secundaria falla, las otras 3 respuestas exitosas se puedan mostrar igualmente sin que todo el bloque salte al catch.',
+            'Cuando necesitamos cancelar automáticamente las 4 peticiones a mitad de camino.',
+            'Cuando las funciones son 100% síncronas y no devuelven promesas.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 3: Inmutabilidad de Estado, Referencias en Memoria y Efectos Secundarios',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'En JavaScript, los tipos primitivos (number, string, boolean) se copian por valor, pero los Objetos y Arrays se asignan y comparan por referencia en memoria. Si haces const copia = estadoOriginal y luego modificas copia.puntos = 900, estarás mutando también el objeto original.',
+          'Los frameworks reactivos modernos detectan si deben actualizar la pantalla comparando referencias (prevState !== nextState). Si mutas un array con .push() sobre la misma referencia en lugar de crear una copia nueva con el operador spread [...items, nuevo], los componentes pueden no enterarse del cambio.'
+        ],
+        keyPoints: [
+          'Para agregar sin mutar: const nuevaLista = [...listaActual, nuevoItem].',
+          'Para eliminar sin mutar: const filtrada = listaActual.filter(item => item.id !== idABorrar).',
+          'El operador spread {...obj} hace una copia superficial (Shallow Copy); para objetos anidados profundos usa structuredClone(obj).'
+        ],
+        code: `// Actualización inmutable de un ítem dentro de un array de estado
+function marcarCursoCompletado(cursos, idCurso) {
+  return cursos.map(curso =>
+    curso.id === idCurso
+      ? { ...curso, completado: true, fechaFin: Date.now() }
+      : curso
+  );
+}`,
+        warning: '⚠️ Hacer `{ ...usuario }` no clona los sub-objetos internos (`usuario.configuracion`); para clonar toda la jerarquía en navegadores modernos usa `structuredClone(usuario)`.',
+        checkpoint: {
+          question: '¿Qué diferencia existe entre copiar un objeto con `{ ...objeto }` (Spread) y usar `structuredClone(objeto)`?',
+          options: [
+            'El operador spread copia también los métodos privados del prototipo y structuredClone solo copia números.',
+            'El operador spread realiza una copia superficial (los objetos o arrays anidados en niveles internos siguen compartiendo la misma referencia en memoria), mientras que structuredClone realiza una copia profunda independiente.',
+            'structuredClone muta y vacía el objeto original después de copiarlo.',
+            'No existe ninguna diferencia técnica entre ambos.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 4: Debouncing, Throttling y Prevención de Fugas de Memoria (Memory Leaks)',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'Si conectas un campo de búsqueda directamente a un endpoint del servidor en el evento "input", un usuario que escriba "curso de python" (15 letras) disparará 15 peticiones HTTP seguidas en 2 segundos, saturando tu backend y provocando condiciones de carrera (Race Conditions) donde una respuesta vieja pisa a una nueva.',
+          'La técnica de "Debounce" pospone la ejecución de la función hasta que el usuario deje de teclear durante un intervalo determinado (ej. 300ms), enviando una única petición limpia.'
+        ],
+        keyPoints: [
+          'Debounce: Espera a que cese la ráfaga de eventos (ideal para buscadores en vivo y autoguardado).',
+          'Throttle: Garantiza que la función se ejecute como máximo 1 vez cada X milisegundos (ideal para eventos de scroll o resize).',
+          'Usa AbortController para cancelar peticiones fetch en vuelo si el usuario cambia de pestaña o vuelve a escribir.'
+        ],
+        code: `function debounce(fn, delayMs = 300) {
+  let timerId = null;
+  return function (...args) {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      fn.apply(this, args);
+    }, delayMs);
+  };
+}
+
+const buscarEnServidor = debounce((texto) => fetch(\`/api/search?q=\${texto}\`), 300);`,
+        warning: '⚠️ Olvidar limpiar intervalos (clearInterval) o EventListeners globales cuando un componente se destruye causa Memory Leaks que degradan el navegador.',
+        checkpoint: {
+          question: 'Si un usuario escribe 8 letras seguidas (una cada 100ms) en un buscador que tiene aplicado un `debounce` de `300ms`, ¿cuántas peticiones HTTP se enviarán al servidor?',
+          options: [
+            '8 peticiones en total, pero espaciadas cada 300ms una de otra.',
+            '2 peticiones: una en la primera letra y otra en la última.',
+            '1 única petición, que se ejecutará 300ms después de que el usuario haya presionado la octava y última tecla.',
+            'Ninguna petición, porque clearTimeout bloquea permanentemente la función.'
+          ],
+          correctIndex: 2
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. Si necesitas ejecutar 3 llamadas `fetch` independientes que tardan `500ms` cada una, ¿cuánto tardará aproximadamente resolverlas con `Promise.all()` frente a usar 3 `await` secuenciales?',
+          options: [
+            '~1,500ms con Promise.all() y ~500ms con await secuenciales.',
+            '~500ms con Promise.all() (concurrencia paralela limitada por la más lenta) frente a ~1,500ms con 3 await secuenciales (suma de las tres).',
+            'Ambas opciones tardarán exactamente 1,500ms porque JavaScript tiene un solo hilo.',
+            'Promise.all() tardará 0ms porque no espera la respuesta de la red.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '2. ¿Qué ocurre en el siguiente código: `const a = { puntos: 100 }; const b = a; b.puntos = 250; console.log(a.puntos);`?',
+          options: [
+            'Imprime `100`, porque `b` es una copia independiente de `a`.',
+            'Lanza un `TypeError` porque `a` fue declarada con `const` y sus propiedades no pueden cambiar.',
+            'Imprime `250`, porque `a` y `b` apuntan a la misma referencia de objeto en memoria y `const` solo impide reasignar la referencia de la variable, no mutar sus propiedades internas.',
+            'Imprime `undefined`.'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '3. ¿Cuál es la diferencia práctica entre aplicar `Debounce` y aplicar `Throttle` a un evento de interfaz?',
+          options: [
+            'Debounce solo funciona con eventos de teclado y Throttle solo funciona con clics del mouse.',
+            'Debounce agrupa una ráfaga continua y ejecuta la función recién cuando el usuario se detiene por X ms; Throttle ejecuta la función a un ritmo periódico máximo (ej. 1 vez cada 200ms) mientras dura el movimiento.',
+            'Throttle cancela las promesas pendientes y Debounce recarga la página.',
+            'Son dos nombres distintos para exactamente el mismo algoritmo.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '4. ¿Para qué se utiliza la interfaz `AbortController` junto con `fetch()` en aplicaciones web modernas?',
+          options: [
+            'Para cerrar la sesión del usuario cuando expira su cookie.',
+            'Para cancelar activamente una petición HTTP en curso (por ejemplo, si el usuario cambió de filtro antes de que llegara la respuesta anterior), evitando condiciones de carrera.',
+            'Para encriptar las cabeceras HTTP desde el navegador.',
+            'Para aumentar el límite de conexiones simultáneas del servidor.'
+          ],
+          correctIndex: 1
+        }
+      ]
+    }
+  },
+  {
+    id: 'fin-b2b-pricing',
+    title: 'Unit Economics, Punto de Equilibrio & Estrategia de Precios (Pricing)',
+    category: 'Finanzas',
+    priceUSD: 16.00,
+    pointsReward: 260,
+    vipPointsReward: 80,
+    xp: 310,
+    duration: 45,
+    secretCourse: false,
+    description: 'Domina Margen Bruto vs. Margen de Contribución, cálculo de Punto de Equilibrio (Break-Even), Value-Based Pricing y elasticidad de precios.',
+    lessons: [
+      {
+        heading: 'Módulo 1: Costos Fijos, Costos Variables y Margen de Contribución Unitario',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'Muchos emprendedores confunden facturación con ganancia y quiebran vendiendo mucho. Para entender la rentabilidad real de cada venta debes separar los Costos Variables (aquellos que sólo existen cuando vendes una unidad adicional: comisión de pasarela de pago, costo de mercadería, tokens de API por usuario) de los Costos Fijos (alquiler, sueldos fijos, servidores base que pagas vendas 0 o 1,000 unidades).',
+          'El Margen de Contribución Unitario es el Precio de Venta menos el Costo Variable Unitario. Ese dinero es lo que "contribuye" cada venta individual a pagar tus Costos Fijos mensuales; una vez cubiertos los costos fijos, cada dólar de margen de contribución adicional es utilidad neta pura.'
+        ],
+        keyPoints: [
+          'Margen de Contribución ($) = Precio de Venta Unitario - Costo Variable Unitario.',
+          'Razón de Contribución (%) = (Margen de Contribución / Precio de Venta) × 100.',
+          'Si tu Margen de Contribución es negativo, pierdes más dinero cuantas más unidades vendes.'
+        ],
+        code: `Análisis Unitario de un Producto Digital de $50 USD:
+- Precio de Venta:                     $50.00 USD
+- Costo Variable Pasarela (4% + $0.5): -$2.50 USD
+- Costo Variable Soporte/API por uso:  -$3.50 USD
+-------------------------------------------------
+= Margen de Contribución Unitario:     $44.00 USD (88% de margen de contribución)`,
+        warning: '⚠️ Hacer un descuento del 30% sobre el precio final NO reduce tu ganancia un 30%: si tu margen era del 40%, un descuento del 30% destruye el 75% de tu ganancia por unidad.',
+        checkpoint: {
+          question: 'Si vendes un servicio a $100 USD y tienes costos variables de $60 USD por cada cliente atendido (Margen de Contribución de $40 USD), ¿qué ocurre con tu ganancia unitaria si ofreces un descuento del 20% (precio final $80 USD)?',
+          options: [
+            'Tu ganancia por venta baja un 20% (pasa de $40 a $32 USD).',
+            'Tu ganancia por venta cae un 50% (pasa de $40 a $20 USD, porque los $60 USD de costo variable siguen siendo fijos por unidad).',
+            'Tu ganancia por venta sube porque los costos variables también bajan un 20% automáticamente.',
+            'Tu margen de contribución pasa a ser $80 USD.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Cálculo del Punto de Equilibrio (Break-Even Point)',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'El Punto de Equilibrio (Break-Even) indica exactamente cuántas unidades necesitas vender en un mes para que tu utilidad operativa sea $0 (ni ganas ni pierdes: cubres el 100% de tus costos fijos y variables).',
+          'La fórmula es: Punto de Equilibrio (en unidades) = Costos Fijos Mensuales Totales / Margen de Contribución Unitario. A partir de la unidad siguiente al punto de equilibrio, la empresa entra en zona de ganancias reales.'
+        ],
+        keyPoints: [
+          'Break-Even (Unidades) = Costos Fijos Totales / (Precio Unitario - Costo Variable Unitario).',
+          'Para bajar tu punto de equilibrio tienes 3 palancas: reducir costos fijos, subir el precio o bajar el costo variable.',
+          'En software y educación digital, el alto margen de contribución (>85%) permite alcanzar el punto de equilibrio con muy pocas ventas.'
+        ],
+        code: `Cálculo de Punto de Equilibrio Mensual:
+- Costos Fijos Mensuales (Herramientas, Servidores, Sueldo base): $2,200 USD
+- Margen de Contribución por Curso Vendido:                       $44 USD
+👉 Punto de Equilibrio = $2,200 / $44 = 50 ventas al mes.
+(De la venta #1 a la #50 pagas la estructura; desde la venta #51 ganas $44 limpios por cada venta).`,
+        warning: '⚠️ Nunca dividas los Costos Fijos por el Precio Bruto de venta olvidando restar antes los Costos Variables, o subestimarás cuántas ventas necesitas.',
+        checkpoint: {
+          question: 'Una empresa tiene Costos Fijos de $3,000 USD/mes. Su producto se vende a $50 USD y tiene un Costo Variable de $20 USD por unidad. ¿Cuántas unidades debe vender al mes para alcanzar el Punto de Equilibrio?',
+          options: [
+            '60 unidades ($3,000 dividido el precio de venta de $50).',
+            '150 unidades ($3,000 dividido el costo variable de $20).',
+            '100 unidades ($3,000 dividido el margen de contribución unitario de $30).',
+            '42 unidades.'
+          ],
+          correctIndex: 2
+        }
+      },
+      {
+        heading: 'Módulo 3: Cost-Plus Pricing vs. Value-Based Pricing (Precio Basado en Valor)',
+        readTime: '12 min de lectura',
+        paragraphs: [
+          'Fijar precios sumando tus horas o costos más un 20% (Cost-Plus Pricing) es la peor estrategia en servicios profesionales y tecnología: te castiga por volverte más rápido y eficiente. Al cliente corporativo no le importa cuántas horas tardaste en escribir un script; le importa cuánto dinero le hace ganar o ahorrar ese script.',
+          'Con Value-Based Pricing (Precio Basado en Valor), primero cuantificas el impacto económico anual que el problema le genera al cliente (ej. pierde $24,000 USD/año en tareas manuales y errores) y posicionas tu solución como una fracción de ese retorno (ej. $2,400 USD, ofreciendo un ROI de 10x).'
+        ],
+        keyPoints: [
+          'Nunca des un presupuesto sin antes diagnosticar cuánto le cuesta hoy el problema al cliente.',
+          'Ancla tu precio contra el costo de la inacción (lo que perderá en los próximos 12 meses si no lo resuelve).',
+          'Presenta 3 opciones escalonadas (Esencial, Profesional, Élite) para que el cliente compare tus planes entre sí y no contra la competencia.'
+        ],
+        code: `Conversación de Anclaje de Valor B2B:
+- Impacto detectado: El equipo pierde 40 hs/mes cargando facturas ($1,500 USD/mes = $18,000 USD/año).
+- Propuesta de Automatización Llave en Mano: $1,800 USD pago único.
+- Argumento financiero: "El sistema se paga solo en los primeros 36 días y les ahorra $16,200 USD netos este año."`,
+        warning: '⚠️ Competir por ser "el más barato del mercado" atrae a los clientes más conflictivos y te deja sin margen para ofrecer un servicio de excelencia.',
+        checkpoint: {
+          question: '¿Por qué el modelo de cobro por hora (o Cost-Plus) penaliza a los profesionales y empresas tecnológicas más experimentadas?',
+          options: [
+            'Porque es ilegal facturar por proyecto cerrado en empresas de software.',
+            'Porque cuanto más experto y automatizado eres, menos horas tardas en resolver un problema crítico, por lo que cobrando por hora ganas menos dinero entregando un resultado superior y más rápido.',
+            'Porque los clientes prefieren que un proyecto tarde 12 meses en lugar de 1 semana.',
+            'Porque el cobro por hora obliga a tener al menos 50 empleados.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 4: Psicología de Precios, Upsells, Cross-Sells y Maximización del Ticket Promedio (AOV)',
+        readTime: '11 min de lectura',
+        paragraphs: [
+          'El costo más difícil y caro de cualquier negocio es conseguir que un desconocido saque la tarjeta por primera vez (CAC). Una vez que el cliente confía y está comprando, aumentar el Ticket Promedio de Orden (AOV) mediante un Order Bump o un Upsell complementario multiplica el margen neto de forma inmediata.',
+          'Un "Order Bump" es un complemento de bajo costo y alta utilidad que se añade con 1 solo clic en el checkout (ej. "+$9 USD por las plantillas listas para usar"), mientras que un "Upsell" ofrece la versión acelerada o membresía completa justo después de la compra.'
+        ],
+        keyPoints: [
+          'AOV (Average Order Value) = Ingresos Totales / Número Total de Pedidos.',
+          'Si el 30% de tus compradores añade un Order Bump de $15 USD, tu ingreso sube sin gastar $1 más en marketing.',
+          'El complemento debe ahorrar tiempo o acelerar la implementación del producto principal.'
+        ],
+        code: `Impacto de un Order Bump en la Rentabilidad Neta:
+- 100 ventas de curso a $20 USD (CAC $12 USD) -> Utilidad sin Bump: $800 USD.
+- Añades Order Bump de $15 USD (35% lo acepta = +$525 USD puros sin costo publicitario extra).
+👉 La utilidad neta salta de $800 a $1,325 USD (+65.6% más ganancia neta).`,
+        warning: '⚠️ El Order Bump debe entenderse en una sola oración; si requiere 5 párrafos de explicación, distraerá al comprador de completar la compra principal.',
+        checkpoint: {
+          question: '¿Por qué incrementar el Ticket Promedio (AOV) mediante un Order Bump o paquete VIP impacta de forma desproporcionada en la utilidad neta final?',
+          options: [
+            'Porque los ingresos de un Order Bump están exentos de pasarelas de pago.',
+            'Porque el Costo de Adquisición del Cliente (CAC) ya fue absorbido por la venta principal, por lo que el margen del complemento va casi íntegro a ganancia neta.',
+            'Porque obliga a todos los visitantes a comprar aunque no quieran el producto principal.',
+            'Porque reduce el precio del producto base a cero.'
+          ],
+          correctIndex: 1
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. ¿Qué indica que un negocio tenga alta facturación mensual pero un Margen de Contribución Unitario negativo?',
+          options: [
+            'Que alcanzará el punto de equilibrio automáticamente cuando duplique sus ventas.',
+            'Que el costo directo de producir y entregar cada unidad supera su precio de venta, por lo que cuantas más unidades venda, mayores serán sus pérdidas operativas.',
+            'Que sus costos fijos de alquiler son demasiado bajos.',
+            'Que tiene un exceso de liquidez en caja.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '2. Si tus Costos Fijos son $4,000 USD/mes, tu precio de venta es $100 USD y tu costo variable unitario es $20 USD, ¿cuál es tu utilidad neta en un mes en que vendes 70 unidades?',
+          options: [
+            '+$7,000 USD de utilidad neta.',
+            '+$3,000 USD de utilidad neta.',
+            '+$1,600 USD de utilidad neta (50 unidades cubren los $4,000 de costos fijos, y las 20 unidades restantes aportan $80 USD de margen limpio cada una).',
+            '$0 USD (queda exactamente en punto de equilibrio).'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '3. En `Value-Based Pricing`, ¿cuál es el factor determinante para fijar el precio de una solución o consultoría B2B?',
+          options: [
+            'La cantidad de líneas de código multiplicada por el costo de la electricidad.',
+            'El retorno económico cuantificable (ahorro de costos, reducción de errores o incremento de ingresos) que la solución genera para el negocio del cliente.',
+            'Cobrar exactamente un 10% menos que el competidor más barato del mercado.',
+            'El salario mínimo dividido por la cantidad de horas del mes.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '4. ¿Qué característica debe tener un `Order Bump` en la pantalla de pago para maximizar la conversión sin generar abandono del carrito?',
+          options: [
+            'Ser un producto de otra industria completamente distinta y costar 5 veces más que el producto principal.',
+            'Ser un acelerador o complemento natural del producto principal (ej. plantillas o scripts listos para usar), de bajo precio relativo y comprensible en una sola línea.',
+            'Exigir que el usuario llene un segundo formulario de 10 campos antes de marcar la casilla.',
+            'Ocultar su precio hasta después de haber cobrado la tarjeta.'
+          ],
+          correctIndex: 1
+        }
+      ]
+    }
+  },
+  {
+    id: 'mkt-copywriting-funnels',
+    title: 'Copywriting Científico, Psicología de Objeciones & Embudos de Venta',
+    category: 'Diseño & Marketing',
+    priceUSD: 14.50,
+    pointsReward: 250,
+    vipPointsReward: 80,
+    xp: 300,
+    duration: 40,
+    secretCourse: false,
+    description: 'Domina los 5 Niveles de Consciencia de Schwartz, frameworks PAS y AIDA, desarme de objeciones, inversión de riesgo y secuencias de conversión.',
+    lessons: [
+      {
+        heading: 'Módulo 1: Los 5 Niveles de Consciencia del Mercado (Eugene Schwartz)',
+        readTime: '10 min de lectura',
+        paragraphs: [
+          'El error más común al redactar una página de ventas o un anuncio es escribir igual para todo el mundo. Eugene Schwartz demostró en "Breakthrough Advertising" que todo comprador potencial se encuentra en uno de 5 niveles de consciencia, y el titular debe adaptarse exactamente a ese nivel:',
+          '1) Inconsciente (no sabe que tiene un problema), 2) Consciente del Problema (siente el dolor pero no conoce soluciones), 3) Consciente de la Solución (sabe que existen métodos pero no conoce tu producto), 4) Consciente del Producto (conoce tu oferta pero duda si es para él), 5) Totalmente Consciente (solo necesita el precio y un disparador para comprar hoy).'
+        ],
+        keyPoints: [
+          'A un público Consciente del Problema se le entra por el síntoma concreto y el costo de no resolverlo.',
+          'A un público Consciente de la Solución se le demuestra por qué tu mecanismo único supera a las alternativas tradicionales.',
+          'Al público Totalmente Consciente no le des 10 páginas de introducción: dale la oferta directa, el bono y el botón.'
+        ],
+        code: `Adaptación del Titular según el Nivel de Consciencia:
+- Nivel 2 (Consciente del Problema): "¿Pierdes 2 horas al día conciliando pagos a mano en Excel?"
+- Nivel 3 (Consciente de la Solución): "Cómo automatizar tu facturación en 5 minutos sin contratar programadores."
+- Nivel 5 (Totalmente Consciente): "Pase Anual SkillVault PRO — Activa hoy tu acceso con +100 VP de bono."`,
+        warning: '⚠️ Hablar de características técnicas y descuentos en la primera línea a un usuario que aún no entiende qué problema resuelves genera rechazo inmediato.',
+        checkpoint: {
+          question: 'Según la escala de Eugene Schwartz, ¿qué enfoque de titular debe usarse cuando te diriges a una audiencia en el Nivel 3 ("Consciente de la Solución" pero que aún no conoce tu producto)?',
+          options: [
+            'Mostrar únicamente el logotipo de la marca y el botón de pago sin ningún texto explicativo.',
+            'Presentar el resultado deseado y explicar el "Mecanismo Único" por el cual tu método logra ese resultado de forma más rápida o segura que las opciones genéricas.',
+            'Evitar mencionar el resultado o beneficio hasta el final de los términos legales.',
+            'Hablar de temas generales de entretenimiento que no tengan relación con la industria.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Frameworks de Persuasión Estructurada (PAS y AIDA)',
+        readTime: '10 min de lectura',
+        paragraphs: [
+          'Los grandes copywriters no escriben por "inspiración", sino ensamblando bloques lógicos probados. El framework más efectivo para páginas de aterrizaje, correos y guiones de video es P-A-S: Problema -> Agitación -> Solución.',
+          'Primero describes el Problema con las mismas palabras que usa el cliente en su mente; luego Agitas mostrando las consecuencias reales (tiempo perdido, dinero desperdiciado, frustración) si todo sigue igual dentro de 6 meses; y finalmente presentas tu producto como el puente lógico e inevitable hacia la Solución.'
+        ],
+        keyPoints: [
+          'Característica vs. Beneficio: "Tiene 4 módulos en texto" es una característica; "Aprende a tu ritmo en 40 minutos y aplícalo hoy mismo" es el beneficio.',
+          'Usa la prueba del "¿Y qué con eso?": después de cada afirmación técnica, traduce cómo mejora la vida o el bolsillo del lector.',
+          'Mantén párrafos cortos de 2 a 3 líneas para facilitar la lectura escaneable (Skimming).'
+        ],
+        code: `Aplicación Práctica del Framework P-A-S:
+[P - Problema]: Tienes visitantes entrando a tu web todos los días, pero el 98% se va sin comprar.
+[A - Agitación]: Cada semana que pasa con un embudo roto estás pagando tráfico y esfuerzo para regalarle clientes a tu competencia.
+[S - Solución]: Con el sistema de conversión de 4 pasos optimizarás tus titulares y tu checkout hoy mismo para duplicar tus cierres.`,
+        warning: '⚠️ Agitar el problema no significa exagerar con promesas irreales; significa cuantificar con realismo el costo de seguir posponiendo la solución.',
+        checkpoint: {
+          question: 'Al redactar propuestas de valor, ¿cuál es la diferencia entre una "Característica Técnica" y un "Beneficio Transformacional"?',
+          options: [
+            'La característica es una opinión subjetiva y el beneficio es el código fuente del programa.',
+            'La característica describe qué tiene o cómo está construido el producto (ej. "Base de datos indexada B-Tree"); el beneficio traduce qué gana o ahorra el usuario gracias a eso (ej. "Encuentra cualquier factura de tus clientes en 0.1 segundos").',
+            'Los beneficios solo se usan en productos gratuitos y las características en productos pagos.',
+            'Son exactamente lo mismo escrito con distinta tipografía.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 3: Matriz de Desarme de Objeciones e Inversión de Riesgo (Risk Reversal)',
+        readTime: '10 min de lectura',
+        paragraphs: [
+          'En el instante previo a comprar, todo cliente tiene 4 objeciones universales silenciosas: 1) "¿Funcionará para mi caso específico?", 2) "¿Tengo el tiempo/capacidad para implementarlo?", 3) "¿Vale lo que cuesta?", y 4) "¿Qué pasa si me arrepiento?".',
+          'En lugar de ignorar esas dudas, una página de alta conversión las responde proactivamente mediante casos de estudio, demostración del producto por dentro y una Garantía de Inversión de Riesgo (Risk Reversal) que transfiere el riesgo del comprador hacia el vendedor.'
+        ],
+        keyPoints: [
+          'Una sección de Preguntas Frecuentes (FAQ) estratégica no es para relleno: sirve para derribar las 5 objeciones principales de compra.',
+          'Muestra capturas o vistas previas reales de lo que recibirá adentro inmediatamente tras pagar.',
+          'Cuanto menor sea el riesgo percibido por el comprador, mayor será la tasa de cierre.'
+        ],
+        code: `Desarme de las 3 Objeciones Clásicas en la Página de Ventas:
+1. Objeción de Tiempo -> "Módulos directos al grano de 10 minutos con plantillas copiables."
+2. Objeción de Nivel  -> "Explicado desde cero paso a paso, sin requerir conocimientos previos."
+3. Objeción de Valor  -> "Incluye acceso a la Bóveda de Herramientas y Certificados Verificados."`,
+        warning: '⚠️ Si ocultas qué incluye exactamente el producto o cómo es por dentro, la incertidumbre frena la compra.',
+        checkpoint: {
+          question: '¿Cuál es el objetivo estratégico de la sección de Preguntas Frecuentes (FAQ) ubicada justo debajo de la tabla de precios?',
+          options: [
+            'Aumentar la longitud del texto únicamente para que la barra de scroll sea más pequeña.',
+            'Explicar la historia del lenguaje HTML desde 1991.',
+            'Anticipar y resolver racionalmente las objeciones finales de compra (tiempo, nivel requerido, soporte, garantía y métodos de acceso) sin que el usuario tenga que abandonar la página.',
+            'Reemplazar el botón de compra por un formulario postal.'
+          ],
+          correctIndex: 2
+        }
+      },
+      {
+        heading: 'Módulo 4: Secuencias de Email Automatizadas y Entregabilidad (SPF, DKIM y DMARC)',
+        readTime: '10 min de lectura',
+        paragraphs: [
+          'Más del 70% de las personas que visitan una oferta por primera vez no compran en esa primera sesión. Si capturas su contacto ofreciendo un recurso o curso introductorio gratuito (Lead Magnet), puedes activar una secuencia automatizada de correos que aporte valor real y convierta a lo largo de los días siguientes.',
+          'Para que tus correos lleguen a la bandeja principal y no a la carpeta de Spam, tu dominio de envío debe tener configurados en sus registros DNS tres protocolos de autenticación criptográfica: SPF, DKIM y DMARC.'
+        ],
+        keyPoints: [
+          'SPF declara qué servidores tienen permiso para enviar correos en nombre de tu dominio.',
+          'DKIM añade una firma criptográfica al encabezado de cada correo para probar que no fue alterado en tránsito.',
+          'Secuencia ideal de 4 correos: 1) Entrega inmediata de valor, 2) Caso práctico + error común, 3) Resolución de objeción principal, 4) Invitación clara a pasar al nivel VIP.'
+        ],
+        code: `Arquitectura de Secuencia Automatizada Post-Registro (4 Días):
+- Día 0 (Inmediato): Entrega del acceso gratuito + Victoria rápida en 5 minutos.
+- Día 1 (Educativo): "El error que comete el 80% al intentar [Habilidad] y cómo evitarlo."
+- Día 2 (Prueba):    Caso real desglosado paso a paso + Presentación del Pase VIP.
+- Día 4 (Cierre):    Resumen de beneficios + Bono de puntos por activación.`,
+        warning: '⚠️ Enviar correos masivos desde una cuenta gratuita (@gmail.com) o desde un dominio sin registros SPF y DKIM hará que Gmail y Outlook bloqueen tus envíos.',
+        checkpoint: {
+          question: '¿Qué función técnica cumplen los registros DNS `SPF`, `DKIM` y `DMARC` en una estrategia de email marketing o notificaciones transaccionales?',
+          options: [
+            'Cambian automáticamente el diseño gráfico del correo a modo oscuro.',
+            'Autentican criptográficamente la identidad del dominio remitente ante proveedores como Gmail/Outlook, evitando la suplantación de identidad (Spoofing) y asegurando que los correos lleguen a la bandeja principal en vez de Spam.',
+            'Traducen el asunto del correo al idioma del destinatario.',
+            'Permiten enviar archivos adjuntos de más de 50 GB por correo.'
+          ],
+          correctIndex: 1
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. ¿Qué ocurre si le muestras un anuncio centrado únicamente en un "15% de descuento hoy" a una audiencia que se encuentra en el Nivel 1 o 2 de Consciencia (apenas consciente del problema y que no te conoce)?',
+          options: [
+            'Tendrá la tasa de conversión más alta posible porque a todo el mundo le gustan los descuentos.',
+            'Fracasará porque el usuario aún no comprende cómo tu mecanismo resuelve su problema ni confía en tu autoridad; el descuento solo funciona en los niveles finales de consciencia (Nivel 4 y 5).',
+            'El navegador bloqueará el anuncio automáticamente.',
+            'Convertirá exactamente igual que con cualquier otro mensaje.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '2. En el framework de copywriting `P-A-S`, ¿qué objetivo cumple específicamente la etapa intermedia de "Agitación"?',
+          options: [
+            'Usar signos de exclamación en todas las palabras del texto.',
+            'Hacer tangible y cuantificable el costo real (en tiempo, dinero o estrés) de dejar el problema sin resolver, elevando la prioridad de tomar acción ahora.',
+            'Explicar la biografía académica de los programadores de la empresa.',
+            'Ocultar la solución para que el usuario tenga que adivinarla.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '3. ¿Cuál de las siguientes oraciones está redactada como un "Beneficio claro orientado a resultados" en lugar de una mera característica técnica?',
+          options: [
+            '"Curso grabado en formato MP4 con códec H.264 a 60 cuadros por segundo."',
+            '"Plataforma alojada en servidores Linux con 16 GB de memoria RAM."',
+            '"Domina la creación de bots de automatización en una tarde y ahorra 8 horas de carga manual cada semana."',
+            '"Incluye un archivo PDF de 42 páginas con fuente tamaño 12."'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '4. ¿Por qué es fundamental combinar un curso o recurso introductorio gratuito con una secuencia de nutrición posterior?',
+          options: [
+            'Porque el 100% de los visitantes compra el plan más caro en los primeros 3 segundos de entrar a una web.',
+            'Porque permite demostrar primero la calidad pedagógica de tu academia, generar una victoria rápida real en el alumno y construir la confianza necesaria para que un alto porcentaje decida adquirir los cursos pagos o la Membresía VIP.',
+            'Porque los buscadores prohíben tener páginas sin cursos gratuitos.',
+            'Para llenar la base de datos de usuarios inactivos sin ofrecerles nunca ningún producto.'
+          ],
+          correctIndex: 1
+        }
+      ]
+    }
+  },
+  {
+    id: 'secret-high-ticket-agency',
+    title: '🔒 [CURSO SECRETO VIP] Agencia de Automatización IA & Ventas B2B High-Ticket ($2,000+ USD)',
+    category: 'Curso Secreto VIP',
+    priceUSD: 0,
+    pointsReward: 550,
+    vipPointsReward: 200,
+    xp: 650,
+    duration: 65,
+    secretCourse: true,
+    requiredRewardId: 'vip-rw-secret-agency',
+    description: 'Masterclass Secreta VIP: cómo empaquetar tus habilidades de programación e IA en servicios B2B de $1,500 a $4,000 USD con abono recurrente de mantenimiento.',
+    lessons: [
+      {
+        heading: 'Módulo 1: Selección de Nicho Rentable y Empaquetado de Oferta "Productized Service"',
+        readTime: '16 min de lectura',
+        paragraphs: [
+          'Vender "desarrollo a medida general" te obliga a presupuestar desde cero cada vez, lidiar con alcances infinitos y competir por precio con miles de freelancers. El modelo de alta rentabilidad es el "Servicio Productizado" (Productized Service): resolver UN problema específico para UN tipo de empresa con un alcance fijo, plazo fijo y precio fijo.',
+          'Los mejores nichos B2B para automatización e IA son aquellos con alto valor por cliente y cuellos de botella operativos: clínicas privadas, estudios jurídicos/contables, inmobiliarias, e-commerce medianos y empresas de logística.'
+        ],
+        keyPoints: [
+          'No vendas "horas de programación en Python o IA"; vende "Sistema de Respuesta, Calificación y Agendamiento Automático 24/7".',
+          'Al estandarizar el 80% de la arquitectura técnica, entregas en 5 días lo que a otro le toma 2 meses.',
+          'Tu margen bruto supera el 85% porque reutilizas tus propios módulos y plantillas probadas.'
+        ],
+        code: `Comparativa de Posicionamiento Comercial:
+❌ Freelancer Genérico: "Hago scripts en Python, páginas web y chatbots a $15/hora."
+✅ Oferta B2B Productizada: "Implementamos en 7 días un Agente de IA + CRM que califica consultas y agenda reuniones en automático para Clínicas Dentales — Garantizando 0 leads perdidos fuera de horario."`,
+        warning: '⚠️ Nunca aceptes clientes de 10 industrias distintas en tu primer trimestre; al enfocarte en 1 vertical puedes reutilizar exactamente el mismo sistema y casos de éxito.',
+        checkpoint: {
+          question: '¿Cuál es la ventaja operativa central de un "Servicio Productizado" (Productized Service) frente a una agencia tradicional a medida?',
+          options: [
+            'Permite cobrar menos de $20 USD por proyecto trabajando 80 horas semanales.',
+            'Estandariza la solución para un dolor específico de un nicho, permitiendo reutilizar el 80% de la infraestructura técnica, entregar en días en vez de meses y escalar márgenes sin depender de horas hombre.',
+            'Obliga a escribir todo el código desde cero en cada nuevo cliente sin reutilizar funciones.',
+            'Elimina la necesidad de firmar acuerdos de alcance con el cliente.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 2: Auditoría Diagnóstica y Cálculo de ROI en la Llamada de Descubrimiento',
+        readTime: '17 min de lectura',
+        paragraphs: [
+          'En ventas High-Ticket ($1,500 a $4,000 USD) nunca se envía un PDF con precios por chat en frío. El proceso profesional consta de una llamada diagnóstica de 20 minutos estructurada como la consulta de un médico: antes de recetar tu solución, cuantificas con los propios números del cliente cuánto dinero pierde cada mes por su proceso actual.',
+          'Haces tres preguntas financieras clave: 1) ¿Cuántas consultas o pedidos reciben al mes?, 2) ¿Cuántos se pierden o demoran por falta de seguimiento inmediato?, y 3) ¿Cuál es el valor promedio de cada cliente cerrado (LTV)?'
+        ],
+        keyPoints: [
+          'Si el cliente pierde 10 ventas al mes de $300 USD por responder tarde, su problema le cuesta $3,000 USD/mes ($36,000 USD/año).',
+          'Cuando el propio prospecto dice en voz alta que pierde $36,000 USD al año, una inversión de $2,000 USD por resolverlo se percibe como una ganga absoluta.',
+          'Vende siempre contra el costo comprobado del problema, nunca contra tu costo de vida.'
+        ],
+        code: `Guion de Cuantificación de ROI en Vivo:
+1. "Me comentas que reciben 300 consultas mensuales y tardan 6 horas en responder."
+2. "Si recuperar solo el 5% de esas consultas representa 15 ventas nuevas a $200 USD cada una, hablamos de $3,000 USD extra cada mes ($36,000 al año)."
+3. "Nuestro sistema de implementación completa tiene una inversión única de $1,800 USD: con el primer mes de mejora queda 100% amortizado."`,
+        warning: '⚠️ Si pasas los primeros 15 minutos de la reunión hablando de APIs, vectores, JSON y servidores en vez de hablar del negocio del cliente, perderás la venta.',
+        checkpoint: {
+          question: 'Durante una llamada de diagnóstico B2B, ¿por qué es indispensable que el propio cliente calcule junto a ti cuánto dinero pierde al mes por el problema antes de revelarle tu precio?',
+          options: [
+            'Para alargar la reunión artificialmente a más de 3 horas.',
+            'Porque establece un ancla financiera objetiva (ej. $30,000 USD/año de pérdida) contra la cual tu honorario de implementación ($2,000 USD) se evalúa como una inversión de alto retorno y no como un gasto.',
+            'Para cobrarle una multa impositiva al finalizar la llamada.',
+            'Porque los clientes B2B solo compran si les explicas primero cómo funciona el Event Loop de JavaScript.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 3: Estructura de Cobro Híbrida: Setup Inicial + Iguala Mensual Recurrente (Retainer)',
+        readTime: '16 min de lectura',
+        paragraphs: [
+          'El secreto para que una agencia o consultora tecnológica construya riqueza predecible es no quedarse únicamente con el pago único de instalación (Setup Fee). Toda implementación de software, bots o automatizaciones requiere monitoreo de APIs, actualizaciones de prompts, servidores y optimización mensual.',
+          'Por eso estructuramos cada contrato en dos partes: 1) Pago de Implementación Inicial (ej. $1,800 USD, 50% al iniciar y 50% contra entrega en 7 días) + 2) Abono de Mantenimiento, Soporte y Optimización Continua (ej. $250 a $400 USD/mes recurrentes).'
+        ],
+        keyPoints: [
+          'Con solo 10 clientes activos en abono de $300 USD/mes, tienes $3,000 USD/mes de ingreso base recurrente antes de vender un solo proyecto nuevo.',
+          'Define claramente un SLA (Acuerdo de Nivel de Servicio) y qué incluye el abono mensual (monitoreo, reportes, consumo de API hasta X volumen).',
+          'Ofrece bonificar el primer mes de mantenimiento si abonan el 100% del Setup al contado.'
+        ],
+        code: `Economía de una Cartera de 8 Clientes B2B en 6 Meses:
+- Ingresos por Setup Inicial (8 × $1,800 USD):     $14,400 USD
+- Ingreso Recurrente Mensual (8 × $300 USD/mes):    $2,400 USD / mes ($28,800 USD/año ARR)
+- Tiempo operativo de mantenimiento con plantillas: ~4 horas totales a la semana.`,
+        warning: '⚠️ Nunca incluyas "desarrollo ilimitado de nuevas funciones" dentro del abono básico mensual; el abono cubre mantenimiento, hosting y optimización del flujo contratado.',
+        checkpoint: {
+          question: '¿Qué riesgo protege definir claramente el alcance del Abono Mensual (Retainer) separando el "Mantenimiento y Monitoreo" del "Desarrollo de Nuevos Módulos"?',
+          options: [
+            'Evita tener que emitir facturas por el servicio.',
+            'Previene el "Scope Creep" (expansión descontrolada de alcance), garantizando que el soporte mensual sea altamente rentable y que cualquier nuevo sistema adicional se cotice como un nuevo proyecto.',
+            'Impide que el cliente pueda usar el software los fines de semana.',
+            'Obliga al cliente a programar sus propias actualizaciones.'
+          ],
+          correctIndex: 1
+        }
+      },
+      {
+        heading: 'Módulo 4: Prospección B2B con Demos Personalizadas y Cierre de Contratos',
+        readTime: '16 min de lectura',
+        paragraphs: [
+          'Los dueños de empresas reciben decenas de correos genéricos copiados y pegados que borran sin leer. La forma de lograr tasas de respuesta superiores al 25% es enviar una micro-demostración personalizada de 90 segundos (en video Loom o prototipo funcional) usando el nombre y caso real de su empresa.',
+          'Cuando un dueño de clínica o inmobiliaria ve un prototipo funcionando con su propio logo que responde en 2 segundos una consulta real de sus servicios, la barrera de escepticismo desaparece y pide agendar la llamada de implementación.'
+        ],
+        keyPoints: [
+          'Investiga 3 minutos antes de contactar: detecta si tardan en responder en WhatsApp/Web o si su formulario es lento.',
+          'Mensaje de 4 líneas: 1) Observación específica de su web, 2) Costo de ese cuello de botella, 3) Link a demo de 90s armada para ellos, 4) Invitación sin presión.',
+          'Pide referidos a cada cliente satisfecho a los 30 días de entrega a cambio de 1 mes de abono bonificado.'
+        ],
+        code: `Plantilla de Prospección B2B de Alta Respuesta:
+"Hola [Nombre], ayer probé hacer una consulta desde la web de [Empresa] y noté que no tienen calificación automática fuera de horario.
+Armé un prototipo rápido de 60 segundos entrenado con los servicios reales de [Empresa] para mostrarte cómo podría agendar esas consultas en automático en tu calendario: [Link Video 60s].
+¿Te sirve si te muestro el jueves en 15 min cómo conectarlo a su flujo actual?"`,
+        warning: '⚠️ No envíes propuestas de 15 páginas y déjalas "para que lo piensen"; revisa siempre la propuesta en vivo en una llamada de 15 minutos para resolver dudas en el momento.',
+        checkpoint: {
+          question: '¿Por qué enviar un video o prototipo personalizado de 60-90 segundos aplicado al negocio real del prospecto supera por amplio margen a los mensajes masivos de texto?',
+          options: [
+            'Porque los servidores de correo dan prioridad a los mensajes que no contienen vocales.',
+            'Porque aplica el principio de reciprocidad y "demostración sobre afirmación": prueba tu competencia técnica de inmediato y le permite visualizar el sistema funcionando en su propio negocio antes de pagar.',
+            'Porque obliga al prospecto a descargar un archivo ejecutable .exe en su computadora.',
+            'Porque permite cobrar el servicio sin hablar nunca con el cliente.'
+          ],
+          correctIndex: 1
+        }
+      }
+    ],
+    quiz: {
+      questions: [
+        {
+          question: '1. ¿Por qué especializarse en un único nicho B2B al iniciar tu agencia de automatización es mucho más rentable que aceptar proyectos de cualquier rubro?',
+          options: [
+            'Porque las leyes fiscales solo permiten facturar a un rubro por año.',
+            'Porque te permite hablar el mismo lenguaje financiero del cliente, mostrar casos de éxito idénticos a su negocio y reutilizar el 80% de tu código y flujos con márgenes superiores al 85%.',
+            'Porque en un nicho específico no hace falta que el software funcione correctamente.',
+            'Porque reduce el precio que puedes cobrar a la mitad.'
+          ],
+          correctIndex: 1
+        },
+        {
+          question: '2. Si durante el diagnóstico descubres que una empresa pierde $4,000 USD/mes por demoras operativas, ¿cómo debes estructurar y presentar tu precio de $2,000 USD?',
+          options: [
+            'Disculpándote por el precio y ofreciéndoles un 70% de descuento antes de que hablen.',
+            'Explicando que cobras $2,000 USD porque necesitas comprarte una computadora nueva.',
+            'Contrastando la inversión única de $2,000 USD frente a los $48,000 USD anuales que hoy pierden, demostrando que el sistema se amortiza en apenas 15 días de operación.',
+            'Enviando solo el número "$2,000" por mensaje de texto sin contexto.'
+          ],
+          correctIndex: 2
+        },
+        {
+          question: '3. ¿Cuál es la ventaja financiera de combinar un `Setup Fee` (pago inicial de implementación) con un `Retainer` (abono mensual de mantenimiento y optimización)?',
+          options: [
+            'El Setup Fee financia el flujo de caja inmediato y el margen de instalación, mientras que el Retainer construye un ingreso recurrente mensual (MRR) acumulativo que cubre tus costos fijos y valoriza tu negocio.',
+            'Permite cobrar el Setup Fee y luego apagar el servidor al día siguiente sin dar soporte.',
+            'Obliga al cliente a pagar el doble de impuestos bancarios.',
+            'Reemplaza la necesidad de entregar el proyecto funcionando.'
+          ],
+          correctIndex: 0
+        },
+        {
+          question: '4. ¿Qué error comercial debes evitar al presentar una propuesta B2B High-Ticket?',
+          options: [
+            'Mostrar casos de éxito cuantificables de clientes anteriores.',
+            'Enviar un PDF con el presupuesto en frío por correo sin revisarlo en vivo en una llamada corta donde puedas despejar objeciones de alcance o forma de pago en el acto.',
+            'Ofrecer un acuerdo de nivel de servicio (SLA) claro por escrito.',
+            'Dividir el pago de implementación en 50% al iniciar y 50% contra entrega.'
+          ],
+          correctIndex: 1
+        }
+      ]
+    }
   }
 ];
 
@@ -1116,12 +2189,21 @@ const token = jwt.sign(
 const EXCLUSIVE_VIP_REWARDS = [
   {
     id: 'vip-rw-secret-saas',
-    type: 'Exclusivo VIP • Curso Secreto',
+    type: 'Exclusivo VIP • Curso Secreto #1',
     icon: '🗝️',
     title: 'Desbloquear Masterclass Oculta: "Lanza un Micro-SaaS en 7 Días"',
     costVIPPoints: 180,
-    description: 'Solo para poseedores de Puntos Exclusivos VIP (VP). Habilita el curso secreto completo de 4 módulos intensivos en el catálogo.',
-    deliverable: '¡Curso Secreto desbloqueado con tus Puntos VIP! Ya puedes cursarlo en el Catálogo.'
+    description: 'Solo para poseedores de Puntos Exclusivos VIP (VP). Habilita el curso secreto completo de Micro-SaaS en el catálogo.',
+    deliverable: '¡Curso Secreto #1 desbloqueado con tus Puntos VIP! Ya puedes cursarlo en el Catálogo.'
+  },
+  {
+    id: 'vip-rw-secret-agency',
+    type: 'Exclusivo VIP • Curso Secreto #2',
+    icon: '💼',
+    title: 'Desbloquear Masterclass Oculta: "Agencia IA & Ventas B2B High-Ticket ($2,000+)"',
+    costVIPPoints: 220,
+    description: 'Habilita la masterclass secreta de 4 módulos sobre cómo vender implementaciones de IA y automatización a empresas por +$2,000 USD.',
+    deliverable: '¡Curso Secreto #2 desbloqueado con tus Puntos VIP! Ya puedes cursarlo en el Catálogo.'
   },
   {
     id: 'vip-rw-black-cert',
@@ -1415,7 +2497,8 @@ function renderSkillsGrid() {
 
       let actionButton = '';
       if (skill.secretCourse && !unlocked) {
-        actionButton = `<button class="btn-start-skill gold-btn" onclick="document.querySelector('[data-tab=rewards]').click()">👑 Desbloquear con ${EXCLUSIVE_VIP_REWARDS[0].costVIPPoints} VP en Bóveda VIP</button>`;
+        const reqRw = EXCLUSIVE_VIP_REWARDS.find(r => r.id === skill.requiredRewardId) || EXCLUSIVE_VIP_REWARDS[0];
+        actionButton = `<button class="btn-start-skill gold-btn" onclick="document.querySelector('[data-tab=rewards]').click()">👑 Desbloquear con ${reqRw.costVIPPoints} VP en Bóveda VIP</button>`;
       } else if (unlocked) {
         actionButton = `<button class="btn-start-skill ${completed ? 'done' : ''}" onclick="openSkillModal('${skill.id}')">
           ${completed ? '✅ Completado (Repasar Módulos)' : `🎓 Cursar ${skill.lessons.length} Módulos (+${skill.pointsReward} PTS ${state.isProMember ? `+ ${vpAmount} VP` : ''})`}
