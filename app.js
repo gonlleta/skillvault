@@ -4,7 +4,7 @@
 const DEFAULT_SKILLS = [
   {
     id: 'py-automation',
-    title: 'Python desde Cero: Automatización de Procesos y Datos',
+    title: 'Python desde Cero: Automatiza tu Trabajo Diario y Ahorra Horas en la PC',
     category: 'Programación',
     priceUSD: 0,
     pointsReward: 150,
@@ -12,7 +12,12 @@ const DEFAULT_SKILLS = [
     xp: 200,
     duration: 35,
     secretCourse: false,
-    description: 'Domina tipos de datos, estructuras condicionales, listas, diccionarios, funciones modulares y manejo de errores para automatizar tareas reales en Python.',
+    description: '¿Pierdes horas copiando datos en planillas, renombrando archivos o haciendo tareas repetitivas a mano? Aprende a programar en Python desde absoluto cero —sin experiencia previa— para que tu computadora haga el trabajo pesado en segundos y sin errores.',
+    bioHighlights: [
+      'Aprende la lógica de programación explicada en español simple y sin rodeos.',
+      'Organiza miles de datos de clientes, ventas o inventarios automáticamente.',
+      'Crea tus propios programas a prueba de fallos listos para usar en tu trabajo.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Variables, Tipado Dinámico y Operadores Aritméticos',
@@ -203,7 +208,7 @@ print(calcular_ticket_promedio(1500, 0))  # No rompe el programa: devuelve 0.0`,
   },
   {
     id: 'ai-agents-pro',
-    title: 'Ingeniería de Prompts Avanzada & Arquitectura de Agentes IA',
+    title: 'Domina ChatGPT y la Inteligencia Artificial: Haz que la IA Trabaje para Ti',
     category: 'Inteligencia Artificial',
     priceUSD: 14.99,
     pointsReward: 260,
@@ -211,7 +216,12 @@ print(calcular_ticket_promedio(1500, 0))  # No rompe el programa: devuelve 0.0`,
     xp: 320,
     duration: 45,
     secretCourse: false,
-    description: 'Domina el framework R-C-T-R-F, Few-Shot Prompting, Chain-of-Thought, salidas estructuradas JSON y diseño de agentes autónomos con herramientas.',
+    description: 'El 95% de la gente usa la Inteligencia Artificial como un simple buscador y recibe respuestas genéricas. Aquí aprenderás la fórmula exacta para darle órdenes profesionales a ChatGPT, Claude o Gemini y crear asistentes capaces de redactar, analizar negocios y resolver tareas completas por ti.',
+    bioHighlights: [
+      'Fórmula paso a paso para que la IA nunca te dé respuestas vagas ni inventadas.',
+      'Entrena a la IA con ejemplos para que escriba con tu propio estilo y criterio.',
+      'Diseña asistentes inteligentes que conectan datos y automatizan tu trabajo.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Arquitectura R-C-T-R-F y Delimitadores Estructurales',
@@ -402,7 +412,7 @@ const tools = [{
   },
   {
     id: 'fin-crypto-invest',
-    title: 'Finanzas Digitales, Flujo de Caja, Interés Compuesto y Gestión de Riesgo',
+    title: 'Finanzas Personales e Inversión Inteligente: Multiplica tus Ahorros desde Cero',
     category: 'Finanzas',
     priceUSD: 12.00,
     pointsReward: 220,
@@ -410,7 +420,12 @@ const tools = [{
     xp: 280,
     duration: 40,
     secretCourse: false,
-    description: 'Aprende arquitectura de flujo de caja, matemática del interés compuesto, fondo de liquidez, diversificación asimétrica y control de riesgo.',
+    description: 'No necesitas ser economista ni tener miles de dólares para ordenar tu dinero y empezar a invertir. Este curso te enseña paso a paso cómo organizar tu sueldo, frenar los gastos invisibles que vacían tu cuenta, armar tu fondo de tranquilidad y hacer crecer tus ahorros mes a mes con interés compuesto.',
+    bioHighlights: [
+      'Sistema automático para dividir gastos, ahorro e inversión apenas cobras.',
+      'Cómo usar el interés compuesto para multiplicar tu dinero a mediano y largo plazo.',
+      'Reglas claras para invertir con seguridad sin caer en estafas ni perder tus ahorros.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Arquitectura del Flujo de Caja y Regla 50 / 30 / 20 Automatizada',
@@ -573,7 +588,7 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
   },
   {
     id: 'ux-growth-convert',
-    title: 'Diseño UI/UX & Psicología de Conversión (CRO) para Productos Digitales',
+    title: 'Diseño de Páginas Web que Venden: Convierte Visitantes en Clientes Reales',
     category: 'Diseño & Marketing',
     priceUSD: 19.00,
     pointsReward: 310,
@@ -581,7 +596,12 @@ Meta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)`,
     xp: 350,
     duration: 45,
     secretCourse: false,
-    description: 'Domina leyes de UX (Fitts, Hick, Jakob), arquitectura de Landing Pages de alta conversión, prueba social, reducción de fricción y pruebas A/B.',
+    description: 'De nada sirve tener una página web linda si la gente entra, mira dos segundos y se va sin comprar. Descubrirás la psicología visual que usan las grandes marcas: dónde ubicar cada botón, qué mensaje poner al principio y cómo eliminar las trabas que espantan a tus clientes.',
+    bioHighlights: [
+      'Psicología visual para guiar la mirada del visitante directo al botón de compra.',
+      'Estructura completa de una página de ventas ganadora explicada bloque por bloque.',
+      'Cómo mostrar reseñas reales, garantías y formularios simples que duplican las ventas.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Las 3 Leyes Cognitivas del Diseño UI/UX (Hick, Fitts y Jakob)',
@@ -744,7 +764,7 @@ Tráfico mensual: 10,000 visitas | Ticket promedio: $29 USD
   },
   {
     id: 'fullstack-apis-sql',
-    title: 'Arquitectura Web Full-Stack: APIs REST, Autenticación JWT y SQL',
+    title: 'Crea Aplicaciones Web Completas: Bases de Datos, Usuarios y Servidores',
     category: 'Programación',
     priceUSD: 16.99,
     pointsReward: 290,
@@ -752,7 +772,12 @@ Tráfico mensual: 10,000 visitas | Ticket promedio: $29 USD
     xp: 340,
     duration: 50,
     secretCourse: false,
-    description: 'Construye backends profesionales: verbos y códigos HTTP, diseño relacional SQL con claves foráneas, consultas JOIN y seguridad con JWT y hashing.',
+    description: 'Da el salto de hacer páginas simples a construir aplicaciones reales como MercadoLibre, Uber o Netflix. Aprenderás cómo funciona el "motor interno" de cualquier sistema moderno: cómo guardar usuarios, productos y pagos en bases de datos SQL y cómo proteger el inicio de sesión.',
+    bioHighlights: [
+      'Conecta el diseño visual de tu web con un servidor real y profesional.',
+      'Diseña bases de datos SQL para guardar usuarios, pedidos y ventas sin errores.',
+      'Crea sistemas de registro e inicio de sesión seguros con contraseñas protegidas.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Diseño de APIs RESTful, Verbos HTTP y Códigos de Estado',
@@ -941,7 +966,7 @@ const token = jwt.sign(
   },
   {
     id: 'secret-saas-masterclass',
-    title: '🔒 [CURSO SECRETO VIP] Cómo Lanzar y Escalar un Micro-SaaS Rentable en 7 Días',
+    title: '🔒 [CURSO SECRETO VIP] Crea tu Propio Software por Suscripción (Micro-SaaS) en 7 Días',
     category: 'Curso Secreto VIP',
     priceUSD: 0,
     pointsReward: 500,
@@ -950,7 +975,12 @@ const token = jwt.sign(
     duration: 60,
     secretCourse: true,
     requiredRewardId: 'vip-rw-secret-saas',
-    description: 'Masterclass Élite exclusiva para miembros VIP: validación sin código, arquitectura MVP en 72h, métricas SaaS (MRR, Churn, LTV/CAC) y adquisición de los primeros 50 clientes recurrentes.',
+    description: 'Masterclass exclusiva para miembros VIP: aprende el paso a paso para crear una herramienta digital pequeña que resuelva un problema concreto y te pague suscripciones mensuales en dólares. Descubrirás cómo validar si la gente pagará antes de programar y cómo conseguir tus primeros 50 clientes.',
+    bioHighlights: [
+      'Cómo encontrar ideas rentables que empresas y profesionales ya quieran pagar hoy.',
+      'Plan práctico de 72 horas para lanzar tu primera versión con cobros automáticos.',
+      'Estrategia probada para conseguir tus primeros 50 suscriptores mensuales.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Validación de Dolor Agudo B2B antes de Escribir Código',
@@ -1112,7 +1142,7 @@ const token = jwt.sign(
   },
   {
     id: 'cybersec-ethical-web',
-    title: 'Ciberseguridad Web, OWASP Top 10 & Blindaje de Aplicaciones',
+    title: 'Ciberseguridad y Hacking Ético: Protege Páginas Web y Datos de Ataques Reales',
     category: 'Programación',
     priceUSD: 18.99,
     pointsReward: 300,
@@ -1120,7 +1150,12 @@ const token = jwt.sign(
     xp: 360,
     duration: 50,
     secretCourse: false,
-    description: 'Aprende a detectar y mitigar ataques XSS, CSRF, SSRF, configuración de cabeceras CSP, cookies HttpOnly y Rate Limiting en producción.',
+    description: 'Todos los días miles de tiendas online y aplicaciones son hackeadas por descuidos que se podrían evitar en minutos. En este curso entenderás cómo actúan los hackers en la vida real, por dónde intentan entrar a un sitio web y cómo blindar tus proyectos para que nadie robe tus datos.',
+    bioHighlights: [
+      'Entiende cómo funcionan los robos de cuentas y sesiones para bloquearlos a tiempo.',
+      'Protege formularios de contacto, inicios de sesión y bases de datos contra intrusos.',
+      'Activa escudos automáticos contra bots maliciosos e intentos de adivinar claves.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Cross-Site Scripting (XSS) y Sanitización del DOM',
@@ -1297,7 +1332,7 @@ app.post('/api/v1/auth/login', loginLimiter, loginController);`,
   },
   {
     id: 'ai-rag-embeddings',
-    title: 'Sistemas RAG, Bases de Datos Vectoriales & Búsqueda Semántica con IA',
+    title: 'Entrena a la IA con tus Propios Documentos: Crea Chatbots Expertos en tu Negocio',
     category: 'Inteligencia Artificial',
     priceUSD: 21.00,
     pointsReward: 330,
@@ -1305,7 +1340,12 @@ app.post('/api/v1/auth/login', loginLimiter, loginController);`,
     xp: 390,
     duration: 55,
     secretCourse: false,
-    description: 'Construye sistemas de IA conectados a documentos privados: Embeddings, similitud coseno, Chunking con solapamiento, búsqueda híbrida y control de alucinaciones.',
+    description: '¿Te imaginas cargar todos los PDFs, catálogos de precios, contratos y manuales de una empresa y tener una Inteligencia Artificial que responda cualquier consulta al instante citando la página exacta? Aprende a crear asistentes conectados a tus propios archivos privados sin que inventen respuestas.',
+    bioHighlights: [
+      'Conecta archivos PDF, Word y planillas privadas a un cerebro de Inteligencia Artificial.',
+      'Crea un buscador inteligente que entiende preguntas complejas en milisegundos.',
+      'Aplica reglas de seguridad para que la IA responda solo con datos 100% reales.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Qué es RAG (Retrieval-Augmented Generation) vs. Fine-Tuning',
@@ -1475,7 +1515,7 @@ const splitter = new RecursiveCharacterTextSplitter({
   },
   {
     id: 'js-react-modern',
-    title: 'JavaScript Asíncrono, Event Loop & Estado en Aplicaciones Web Modernas',
+    title: 'JavaScript Moderno y Profesional: Crea Sitios Web Rápidos, Dinámicos e Interactivos',
     category: 'Programación',
     priceUSD: 15.99,
     pointsReward: 270,
@@ -1483,7 +1523,12 @@ const splitter = new RecursiveCharacterTextSplitter({
     xp: 330,
     duration: 45,
     secretCourse: false,
-    description: 'Domina el Event Loop, Promesas, concurrencia con Promise.all vs secuencial, Closures, inmutabilidad de estado y optimización de renderizado.',
+    description: 'JavaScript es el lenguaje que le da vida e interactividad a todas las páginas web del mundo. En este curso dejarás atrás los errores más comunes y aprenderás a cargar datos al instante sin que la pantalla se congele, dominando las bases que usan hoy React y Next.js.',
+    bioHighlights: [
+      'Haz que tu sitio web cargue datos en paralelo hasta 3 veces más rápido.',
+      'Domina las técnicas de JavaScript que siempre preguntan en entrevistas laborales.',
+      'Actualiza datos en pantalla al instante sin errores ni recargas molestas.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: El Event Loop, Call Stack, Microtasks y Macrotasks',
@@ -1671,7 +1716,7 @@ const buscarEnServidor = debounce((texto) => fetch(\`/api/search?q=\${texto}\`),
   },
   {
     id: 'fin-b2b-pricing',
-    title: 'Unit Economics, Punto de Equilibrio & Estrategia de Precios (Pricing)',
+    title: 'Cómo Poner Precios y Calcular Ganancias: Haz que tu Negocio Sea Siempre Rentable',
     category: 'Finanzas',
     priceUSD: 16.00,
     pointsReward: 260,
@@ -1679,7 +1724,12 @@ const buscarEnServidor = debounce((texto) => fetch(\`/api/search?q=\${texto}\`),
     xp: 310,
     duration: 45,
     secretCourse: false,
-    description: 'Domina Margen Bruto vs. Margen de Contribución, cálculo de Punto de Equilibrio (Break-Even), Value-Based Pricing y elasticidad de precios.',
+    description: 'Muchos emprendedores y freelancers trabajan todo el día y venden mucho, pero a fin de mes no ven un dólar de ganancia porque calculan mal sus precios. Aquí aprenderás cuánto ganas realmente en cada venta, cuántas ventas necesitas para cubrir tus gastos y cómo cobrar lo que vale tu trabajo.',
+    bioHighlights: [
+      'Calcula tu ganancia real de bolsillo descontando comisiones, envíos e impuestos.',
+      'Descubre cuántas ventas exactas necesitas al mes para no perder dinero nunca.',
+      'Diseña 3 opciones de precios inteligentes para que tus clientes elijan el plan más completo.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Costos Fijos, Costos Variables y Margen de Contribución Unitario',
@@ -1844,7 +1894,7 @@ const buscarEnServidor = debounce((texto) => fetch(\`/api/search?q=\${texto}\`),
   },
   {
     id: 'mkt-copywriting-funnels',
-    title: 'Copywriting Científico, Psicología de Objeciones & Embudos de Venta',
+    title: 'Escritura Persuasiva (Copywriting): Cómo Escribir Textos que Convencen y Venden',
     category: 'Diseño & Marketing',
     priceUSD: 14.50,
     pointsReward: 250,
@@ -1852,7 +1902,12 @@ const buscarEnServidor = debounce((texto) => fetch(\`/api/search?q=\${texto}\`),
     xp: 300,
     duration: 40,
     secretCourse: false,
-    description: 'Domina los 5 Niveles de Consciencia de Schwartz, frameworks PAS y AIDA, desarme de objeciones, inversión de riesgo y secuencias de conversión.',
+    description: 'Saber escribir para vender es una de las habilidades más rentables del mundo digital. En este curso aprenderás a elegir las palabras exactas para captar la atención en segundos, despertar el interés de tu cliente, resolver sus miedos antes de que pregunte y lograr que compre con confianza.',
+    bioHighlights: [
+      'Fórmulas paso a paso para escribir anuncios, publicaciones y páginas de venta.',
+      'Cómo derribar dudas clásicas como "es muy caro" o "no sé si me va a funcionar".',
+      'Crea secuencias de mensajes que transforman desconocidos en clientes fieles.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Los 5 Niveles de Consciencia del Mercado (Eugene Schwartz)',
@@ -2015,7 +2070,7 @@ const buscarEnServidor = debounce((texto) => fetch(\`/api/search?q=\${texto}\`),
   },
   {
     id: 'secret-high-ticket-agency',
-    title: '🔒 [CURSO SECRETO VIP] Agencia de Automatización IA & Ventas B2B High-Ticket ($2,000+ USD)',
+    title: '🔒 [CURSO SECRETO VIP] Crea tu Agencia de IA: Vende Servicios de $2,000+ USD a Empresas',
     category: 'Curso Secreto VIP',
     priceUSD: 0,
     pointsReward: 550,
@@ -2024,7 +2079,12 @@ const buscarEnServidor = debounce((texto) => fetch(\`/api/search?q=\${texto}\`),
     duration: 65,
     secretCourse: true,
     requiredRewardId: 'vip-rw-secret-agency',
-    description: 'Masterclass Secreta VIP: cómo empaquetar tus habilidades de programación e IA en servicios B2B de $1,500 a $4,000 USD con abono recurrente de mantenimiento.',
+    description: 'Masterclass secreta exclusiva para miembros VIP: aprende a transformar tus conocimientos de Inteligencia Artificial y automatización en una agencia rentable que le vende sistemas listos para usar a clínicas, inmobiliarias y empresas por entre $1,500 y $4,000 USD más un abono mensual.',
+    bioHighlights: [
+      'Cómo armar una oferta irresistible que los dueños de negocios entiendan y quieran comprar.',
+      'Cómo demostrarle al cliente con números simples cuánto dinero ahorrará contratándote.',
+      'Sistema de cobro con pago inicial en dólares + cuota fija todos los meses por mantenimiento.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Selección de Nicho Rentable y Empaquetado de Oferta "Productized Service"',
@@ -2185,7 +2245,7 @@ Armé un prototipo rápido de 60 segundos entrenado con los servicios reales de 
   },
   {
     id: 'nocode-n8n-whatsapp',
-    title: 'Automatización con n8n / Make & Creación de Bots de WhatsApp con IA',
+    title: 'Crea Bots de WhatsApp con IA y Automatiza Negocios Sin Saber Programar',
     category: 'Inteligencia Artificial',
     priceUSD: 17.99,
     pointsReward: 290,
@@ -2193,7 +2253,12 @@ Armé un prototipo rápido de 60 segundos entrenado con los servicios reales de 
     xp: 350,
     duration: 50,
     secretCourse: false,
-    description: 'Crea flujos automatizados profesionales: Webhooks en tiempo real, WhatsApp Cloud API, memoria conversacional, sincronización con CRM y manejo de errores.',
+    description: 'Hoy cualquier negocio necesita responder mensajes de WhatsApp las 24 horas, agendar turnos y registrar clientes al instante. Aprenderás a usar herramientas visuales como n8n y Make para conectar WhatsApp con Inteligencia Artificial, agendas y planillas sin necesidad de programar.',
+    bioHighlights: [
+      'Crea asistentes de WhatsApp con IA que responden y atienden clientes las 24 horas.',
+      'Conecta WhatsApp con Google Calendar y planillas para agendar citas automáticamente.',
+      'Configura avisos al celular de un vendedor humano cuando el cliente está listo para pagar.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: Arquitectura de Automatización: Webhooks en Tiempo Real vs. Polling',
@@ -2367,7 +2432,7 @@ Armé un prototipo rápido de 60 segundos entrenado con los servicios reales de 
   },
   {
     id: 'viral-video-retention',
-    title: 'Edición de Video Viral (Reels, TikTok & Shorts) e Ingeniería de Retención',
+    title: 'Edición de Videos Virales para TikTok, Reels y Shorts: Multiplica tus Vistas',
     category: 'Diseño & Marketing',
     priceUSD: 14.99,
     pointsReward: 260,
@@ -2375,7 +2440,12 @@ Armé un prototipo rápido de 60 segundos entrenado con los servicios reales de 
     xp: 310,
     duration: 45,
     secretCourse: false,
-    description: 'Domina la psicología de los primeros 3 segundos, curvas de retención algorítmica, cortes de patrón (Pattern Interrupts), diseño sonoro SFX y guiones virales.',
+    description: '¿Por qué algunos videos logran millones de reproducciones mientras otros se quedan en 200 vistas? El secreto está en lograr que la gente no deslice el dedo. Aprenderás a capturar la atención en los primeros 3 segundos, darle ritmo dinámico a tu edición y armar guiones que se miren hasta el final.',
+    bioHighlights: [
+      'La regla de los primeros 3 segundos para atrapar al espectador desde el primer instante.',
+      'Trucos de edición, zooms, subtítulos y sonidos para que nadie se aburra ni abandone el video.',
+      'Estructura de guiones cortos que convierten vistas en seguidores y ventas reales.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: La Regla de los 3 Segundos y el Triple Gancho (Visual, Auditivo y Textual)',
@@ -2540,7 +2610,7 @@ Armé un prototipo rápido de 60 segundos entrenado con los servicios reales de 
   },
   {
     id: 'meta-ads-roas',
-    title: 'Tráfico Pago con Meta Ads & TikTok Ads: Píxel, API de Conversiones y ROAS',
+    title: 'Publicidad en Instagram, Facebook y TikTok Ads: Consigue Clientes Todos los Días',
     category: 'Diseño & Marketing',
     priceUSD: 18.50,
     pointsReward: 300,
@@ -2548,7 +2618,12 @@ Armé un prototipo rápido de 60 segundos entrenado con los servicios reales de 
     xp: 360,
     duration: 50,
     secretCourse: false,
-    description: 'Domina la atribución con Píxel + CAPI Server-Side, campañas CBO vs. ABO, lectura de métricas (CPM, CTR, CPA, ROAS) y escalado rentable de anuncios.',
+    description: 'Aprende a hacer publicidad digital rentable sin tirar tu presupuesto a la basura. Descubrirás cómo lanzar campañas en Instagram, Facebook y TikTok desde cero, cómo medir cuántas ventas te trae cada dólar invertido y cómo identificar rápido qué anuncios apagar y cuáles potenciar.',
+    bioHighlights: [
+      'Configura tus campañas para que la plataforma busque personas listas para comprar.',
+      'Aprende a leer las estadísticas de tus anuncios en 5 minutos de forma simple.',
+      'Método paso a paso para invertir con bajo riesgo y multiplicar los anuncios ganadores.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: El Píxel de Seguimiento, API de Conversiones (CAPI) y Deduplicación',
@@ -2715,7 +2790,7 @@ Caso 2: CTR Saliente = 2.6% | CPC = $0.25 USD | 0 Ventas -> ❌ La Landing Page 
   },
   {
     id: 'closer-high-ticket-sales',
-    title: 'Appointment Setting & Cierre de Ventas High-Ticket por Chat y Llamada',
+    title: 'Ventas por Chat y Llamada (Closer & Setter): Cierra Clientes de Alto Valor',
     category: 'Finanzas',
     priceUSD: 16.50,
     pointsReward: 280,
@@ -2723,7 +2798,12 @@ Caso 2: CTR Saliente = 2.6% | CPC = $0.25 USD | 0 Ventas -> ❌ La Landing Page 
     xp: 330,
     duration: 45,
     secretCourse: false,
-    description: 'Domina la prospección por chat (Social Selling), calificación BANT, psicología de cierre consultivo, resolución de objeciones y seguimiento de alto valor.',
+    description: 'Miles de negocios online buscan personas que sepan responder mensajes en Instagram o WhatsApp y cerrar ventas por videollamada a cambio de excelentes comisiones en dólares. En este curso aprenderás a conversar sin parecer un vendedor molesto, filtrar interesados reales y cerrar ventas con naturalidad.',
+    bioHighlights: [
+      'Guiones prácticos de chat para transformar seguidores y consultas en reuniones agendadas.',
+      'Paso a paso para llevar una videollamada de ventas sin presionar al cliente.',
+      'Cómo responder con seguridad cuando te dicen "lo voy a pensar" o "está caro".'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: El Rol del Appointment Setter y Calificación por Chat (Método BANT)',
@@ -2885,7 +2965,7 @@ Siendo 100% sinceros entre nosotros, ¿cuál de las dos sientes que pesa más ah
   },
   {
     id: 'english-remote-tech',
-    title: 'Inglés para Trabajo Remoto en USD, Entrevistas STAR & Negociación Contractor',
+    title: 'Inglés Práctico para Trabajar Remoto y Cobrar en Dólares desde Casa',
     category: 'Programación',
     priceUSD: 13.99,
     pointsReward: 240,
@@ -2893,7 +2973,12 @@ Siendo 100% sinceros entre nosotros, ¿cuál de las dos sientes que pesa más ah
     xp: 290,
     duration: 40,
     secretCourse: false,
-    description: 'Consigue clientes y puestos remotos en EE.UU./Europa: CV formato ATS en inglés, respuestas con método STAR, comunicación en Slack/PRs y negociación salarial en USD.',
+    description: 'No necesitas hablar inglés perfecto como un nativo para conseguir un empleo o clientes en Estados Unidos y Europa que te paguen en dólares. En este curso aprenderás el inglés práctico y las estrategias exactas para armar tu currículum internacional, superar entrevistas laborales y desenvolverte en el día a día.',
+    bioHighlights: [
+      'Cómo armar tu CV y LinkedIn en inglés para pasar los filtros de empresas extranjeras.',
+      'Estructura simple para responder con fluidez las preguntas clásicas de toda entrevista.',
+      'Frases clave para reuniones, mensajes de trabajo y para negociar un mejor sueldo en USD.'
+    ],
     lessons: [
       {
         heading: 'Módulo 1: CV en Formato Harvard/ATS y Optimización de LinkedIn en Inglés',
@@ -3446,6 +3531,14 @@ function renderSkillsGrid() {
         `
         : '';
 
+      const bioListHtml = Array.isArray(skill.bioHighlights) && skill.bioHighlights.length > 0
+        ? `
+          <ul class="course-bio-list">
+            ${skill.bioHighlights.map(item => `<li><span>${item}</span></li>`).join('')}
+          </ul>
+        `
+        : '';
+
       return `
         <article class="skill-card ${skill.secretCourse ? 'vip-exclusive-card' : ''}">
           <div>
@@ -3457,7 +3550,11 @@ function renderSkillsGrid() {
               </div>
             </div>
             <h3>${skill.title}</h3>
-            <p>${skill.description}</p>
+            <div class="course-bio-box">
+              <span class="course-bio-title">📖 De qué trata este curso</span>
+              <p style="margin-bottom:0; color: var(--text-muted); font-size: 13px; line-height: 1.5;">${skill.description}</p>
+              ${bioListHtml}
+            </div>
           </div>
           <div>
             ${progressHtml}
@@ -3646,8 +3743,7 @@ window.openSkillModal = function (skillId) {
     ? `👑 +${vpAmount} VP (VIP Activo)`
     : `🔒 +${vpAmount} VP (Solo VIP)`;
   document.getElementById('modal-title').textContent = currentSkill.title;
-  document.getElementById('modal-subtitle').textContent =
-    'Debes resolver la comprobación práctica de cada módulo para avanzar y aprobar el 100% del examen final para cobrar los puntos.';
+  document.getElementById('modal-subtitle').textContent = currentSkill.description;
 
   renderModalStep();
   document.getElementById('lesson-modal').classList.add('open');
