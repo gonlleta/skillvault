@@ -3163,7 +3163,9 @@ function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      if (!parsed.courseProgress) parsed.courseProgress = {};
+      return parsed;
     } catch (e) {
       console.error(e);
     }
@@ -3176,6 +3178,7 @@ function loadState() {
     isProMember: false, // Cuando es true, el usuario es VIP y gana VP
     ownedCourses: ['py-automation'],
     completedCourses: [],
+    courseProgress: {}, // { skillId: [0, 1, ...] } módulos superados
     unlockedRewards: [],
     customSkills: [],
     ownerBalanceUSD: 348.00,
@@ -3341,13 +3344,38 @@ function renderFeaturedSkill() {
 }
 
 // Catálogo de Cursos
+function updateCategoryButtonsCounts() {
+  const all = getAllSkills();
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    const cat = btn.dataset.cat;
+    if (!btn.dataset.baseLabel) {
+      btn.dataset.baseLabel = btn.textContent.trim();
+    }
+    let count = 0;
+    if (cat === 'all') {
+      count = all.length;
+    } else if (cat === 'unlocked') {
+      count = all.filter(s => hasAccessToCourse(s)).length;
+    } else {
+      count = all.filter(s => s.category === cat).length;
+    }
+    btn.innerHTML = `${btn.dataset.baseLabel} <span class="cat-count-badge">${count}</span>`;
+  });
+}
+
 function renderSkillsGrid() {
+  updateCategoryButtonsCounts();
   const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
   const sortMode = document.getElementById('sort-select').value;
   const grid = document.getElementById('skills-grid');
 
   let skills = getAllSkills().filter(skill => {
-    const matchesCat = activeFilter === 'all' || skill.category === activeFilter;
+    const matchesCat =
+      activeFilter === 'all'
+        ? true
+        : activeFilter === 'unlocked'
+        ? hasAccessToCourse(skill)
+        : skill.category === activeFilter;
     const matchesSearch =
       skill.title.toLowerCase().includes(searchQuery) ||
       skill.description.toLowerCase().includes(searchQuery) ||
@@ -3363,12 +3391,26 @@ function renderSkillsGrid() {
     skills.sort((a, b) => a.duration - b.duration);
   }
 
+  if (skills.length === 0) {
+    grid.innerHTML = `
+      <div class="certificate-card" style="grid-column: 1/-1; text-align: center;">
+        <h3>No se encontraron cursos con ese filtro o búsqueda</h3>
+        <p style="color:var(--text-muted); margin: 8px 0 16px;">Prueba limpiando el buscador o seleccionando "Todos los Cursos".</p>
+        <button class="btn-secondary" onclick="document.getElementById('search-input').value=''; document.querySelector('[data-cat=all]').click();">Ver todos los cursos</button>
+      </div>
+    `;
+    return;
+  }
+
   grid.innerHTML = skills
     .map(skill => {
       const unlocked = hasAccessToCourse(skill);
       const completed = state.completedCourses.includes(skill.id);
       const vpAmount = skill.vipPointsReward || 50;
       const qCount = getSkillQuestions(skill).length;
+      const savedPassed = (state.courseProgress && state.courseProgress[skill.id]) || [];
+      const doneModulesCount = completed ? skill.lessons.length : savedPassed.length;
+      const pct = Math.min(100, Math.round((doneModulesCount / skill.lessons.length) * 100));
 
       let actionButton = '';
       if (skill.secretCourse && !unlocked) {
@@ -3376,13 +3418,33 @@ function renderSkillsGrid() {
         actionButton = `<button class="btn-start-skill gold-btn" onclick="document.querySelector('[data-tab=rewards]').click()">👑 Desbloquear con ${reqRw.costVIPPoints} VP en Bóveda VIP</button>`;
       } else if (unlocked) {
         actionButton = `<button class="btn-start-skill ${completed ? 'done' : ''}" onclick="openSkillModal('${skill.id}')">
-          ${completed ? '✅ Completado (Repasar Módulos)' : `🎓 Cursar ${skill.lessons.length} Módulos (+${skill.pointsReward} PTS ${state.isProMember ? `+ ${vpAmount} VP` : ''})`}
+          ${
+            completed
+              ? '✅ Completado (Repasar Módulos)'
+              : doneModulesCount > 0
+              ? `▶ Continuar Curso (${doneModulesCount}/${skill.lessons.length} Módulos)`
+              : `🎓 Cursar ${skill.lessons.length} Módulos (+${skill.pointsReward} PTS ${state.isProMember ? `+ ${vpAmount} VP` : ''})`
+          }
         </button>`;
       } else {
         actionButton = `<button class="btn-start-skill buy-btn" onclick="buyCourse('${skill.id}')">
           💳 Desbloquear Curso por $${skill.priceUSD.toFixed(2)} USD
         </button>`;
       }
+
+      const progressHtml = unlocked
+        ? `
+          <div class="course-progress-wrap">
+            <div class="course-progress-header">
+              <span>${completed ? '🏆 Certificado Emitido' : `Progreso: ${doneModulesCount}/${skill.lessons.length} módulos`}</span>
+              <span>${pct}%</span>
+            </div>
+            <div class="course-progress-bar">
+              <div class="course-progress-fill" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+        `
+        : '';
 
       return `
         <article class="skill-card ${skill.secretCourse ? 'vip-exclusive-card' : ''}">
@@ -3398,6 +3460,7 @@ function renderSkillsGrid() {
             <p>${skill.description}</p>
           </div>
           <div>
+            ${progressHtml}
             <div class="vip-bonus-banner">
               <span>📚 <b>${skill.lessons.length} Módulos</b> + 📝 <b>Examen (${qCount} preg.)</b></span>
               <span>👑 <b>+${vpAmount} VP</b></span>
@@ -3552,10 +3615,25 @@ window.openSkillModal = function (skillId) {
   }
 
   currentSkill = skillClone;
-  currentStepIndex = 0;
   passedCheckpoints = {};
   selectedCheckAnswers = {};
   examAnswers = {};
+
+  if (!state.courseProgress) state.courseProgress = {};
+  const savedSteps = state.courseProgress[skillId] || [];
+  savedSteps.forEach(idx => {
+    passedCheckpoints[idx] = true;
+    if (currentSkill.lessons[idx] && currentSkill.lessons[idx].checkpoint) {
+      selectedCheckAnswers[idx] = currentSkill.lessons[idx].checkpoint.correctIndex;
+    }
+  });
+
+  if (state.completedCourses.includes(skillId)) {
+    currentStepIndex = 0;
+  } else {
+    const firstPending = currentSkill.lessons.findIndex((_, idx) => !passedCheckpoints[idx]);
+    currentStepIndex = firstPending === -1 ? currentSkill.lessons.length : firstPending;
+  }
 
   const mult = getPointsMultiplier();
   const finalPoints = Math.round(currentSkill.pointsReward * mult);
@@ -3719,7 +3797,16 @@ window.answerLessonCheckpoint = function (optionIdx) {
   selectedCheckAnswers[currentStepIndex] = optionIdx;
   if (optionIdx === lesson.checkpoint.correctIndex) {
     passedCheckpoints[currentStepIndex] = true;
-    showToast(`✅ ¡Correcto! Módulo ${currentStepIndex + 1} verificado. Ya puedes avanzar.`);
+    if (!state.courseProgress) state.courseProgress = {};
+    if (!Array.isArray(state.courseProgress[currentSkill.id])) {
+      state.courseProgress[currentSkill.id] = [];
+    }
+    if (!state.courseProgress[currentSkill.id].includes(currentStepIndex)) {
+      state.courseProgress[currentSkill.id].push(currentStepIndex);
+      saveState();
+      renderSkillsGrid();
+    }
+    showToast(`✅ ¡Correcto! Módulo ${currentStepIndex + 1} verificado y progreso guardado.`);
   } else {
     passedCheckpoints[currentStepIndex] = false;
     showToast('❌ Respuesta incorrecta. Revisa la explicación del módulo e inténtalo de nuevo.');
@@ -3906,13 +3993,48 @@ window.redeemStandardReward = function (rewardId) {
 };
 
 function renderUnlockedItems() {
+  const diplomasContainer = document.getElementById('completed-diplomas-list');
   const container = document.getElementById('unlocked-list');
+  const allSkills = getAllSkills();
   const allRewards = [...EXCLUSIVE_VIP_REWARDS, ...STANDARD_REWARDS];
+
+  if (diplomasContainer) {
+    if (state.completedCourses.length === 0) {
+      diplomasContainer.innerHTML = `
+        <div class="certificate-card" style="grid-column: 1/-1;">
+          <h3>Aún no tienes diplomas de cursos completados</h3>
+          <p style="color:var(--text-muted); margin: 8px 0 16px;">Aprueba los 4 módulos prácticos y el examen final (100%) de cualquier curso para recibir automáticamente tu diploma verificable aquí.</p>
+          <button class="btn-secondary" onclick="document.querySelector('[data-tab=explore]').click()">Ir al Catálogo de Cursos 🎓</button>
+        </div>
+      `;
+    } else {
+      diplomasContainer.innerHTML = state.completedCourses
+        .map(courseId => {
+          const course = allSkills.find(s => s.id === courseId);
+          if (!course) return '';
+          const codeHash = course.id.toUpperCase().slice(0, 8);
+          return `
+            <div class="certificate-card ${course.secretCourse ? 'gold-cert' : ''}">
+              <div class="card-top">
+                <span class="skill-cat-tag ${course.secretCourse ? 'gold-tag' : ''}">🎓 Diploma Académico • ${course.category}</span>
+                <span class="price-badge">✅ 100% APROBADO</span>
+              </div>
+              <h3 style="margin-bottom:8px;">${course.title}</h3>
+              <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">
+                Certificación oficial por completar los ${course.lessons.length} módulos técnicos y aprobar con excelencia el examen final.
+              </p>
+              <div class="lesson-code" style="margin-top:0;">ID Diploma Verificado: #SV-CERT-2026-${codeHash}</div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  }
 
   if (state.unlockedRewards.length === 0) {
     container.innerHTML = `
       <div class="certificate-card" style="grid-column: 1/-1;">
-        <h3>Aún no has canjeado recompensas</h3>
+        <h3>Aún no has canjeado recompensas de la bóveda</h3>
         <p style="color:var(--text-muted); margin: 8px 0 16px;">Completa todos los módulos y exámenes de los cursos para ganar Puntos Estándar (PTS) o hazte miembro VIP para ganar Puntos Exclusivos VIP (👑 VP).</p>
         <button class="btn-secondary" onclick="document.querySelector('[data-tab=rewards]').click()">Ir a la Bóveda de Canje 💎</button>
       </div>
@@ -3990,11 +4112,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  document.getElementById('search-input').addEventListener('input', renderSkillsGrid);
+  document.getElementById('search-input').addEventListener('input', () => {
+    const exploreView = document.getElementById('view-explore');
+    if (exploreView && !exploreView.classList.contains('active')) {
+      switchTab('explore');
+    }
+    renderSkillsGrid();
+  });
   document.getElementById('sort-select').addEventListener('change', renderSkillsGrid);
 
+  const lessonModal = document.getElementById('lesson-modal');
   document.getElementById('close-modal-btn').addEventListener('click', () => {
-    document.getElementById('lesson-modal').classList.remove('open');
+    lessonModal.classList.remove('open');
+  });
+  lessonModal.addEventListener('click', e => {
+    if (e.target === lessonModal) {
+      lessonModal.classList.remove('open');
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && lessonModal.classList.contains('open')) {
+      lessonModal.classList.remove('open');
+    }
   });
 
   document.querySelectorAll('.method-option').forEach(label => {
@@ -4044,6 +4183,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const content = document.getElementById('custom-content').value.trim();
     const question = document.getElementById('custom-question').value.trim();
     const answer = document.getElementById('custom-answer').value.trim();
+    const wrong1El = document.getElementById('custom-wrong-1');
+    const wrong2El = document.getElementById('custom-wrong-2');
+    const wrong1 = (wrong1El && wrong1El.value.trim()) || 'Aplicar configuraciones manuales sin métricas ni validación previa';
+    const wrong2 = (wrong2El && wrong2El.value.trim()) || 'Omitir la arquitectura base y depender únicamente de plantillas genéricas';
 
     const paragraphs = content
       .split(/\n+/)
@@ -4072,7 +4215,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ],
           checkpoint: {
             question: question,
-            options: [answer, 'Ninguna de las anteriores', 'Omitir validación'],
+            options: [answer, wrong1, wrong2],
             correctIndex: 0
           }
         }
@@ -4081,7 +4224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         questions: [
           {
             question: `1. ${question}`,
-            options: [answer, 'Opción incorrecta A', 'Opción incorrecta B'],
+            options: [answer, wrong1, wrong2],
             correctIndex: 0
           }
         ]

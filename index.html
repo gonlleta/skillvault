@@ -132,9 +132,10 @@
             <button class="cat-btn active" data-cat="all">Todos</button>
             <button class="cat-btn" data-cat="Programación">💻 Programación</button>
             <button class="cat-btn" data-cat="Inteligencia Artificial">🤖 IA & Prompts</button>
-            <button class="cat-btn" data-cat="Finanzas">📈 Finanzas</button>
-            <button class="cat-btn" data-cat="Diseño & Marketing">🎨 Diseño & Growth</button>
+            <button class="cat-btn" data-cat="Finanzas">📈 Finanzas & Ventas</button>
+            <button class="cat-btn" data-cat="Diseño & Marketing">🎨 Marketing & Video</button>
             <button class="cat-btn" data-cat="Curso Secreto VIP">🔒 Cursos Secretos</button>
+            <button class="cat-btn" data-cat="unlocked">🔓 Mis Desbloqueados</button>
           </div>
           <div class="sort-box">
             <label for="sort-select">Ordenar por:</label>
@@ -200,8 +201,8 @@
             <p>Activa la recolección de <strong>Puntos Exclusivos VIP (👑 VP)</strong> en todos los cursos + todos los cursos pagos desbloqueados.</p>
             <ul class="plan-features">
               <li>👑 <strong>Habilita los Puntos Exclusivos VIP (VP)</strong> al aprobar cada curso</li>
-              <li>🎁 <strong>+150 VP Exclusivos + 500 PTS de regalo inmediato</strong> al suscribirte</li>
-              <li>🔥 <strong>Todos los cursos pagos desbloqueados</strong> sin pagar extra</li>
+              <li>🎁 <strong>+100 VP Exclusivos + 250 PTS de regalo inmediato</strong> al suscribirte</li>
+              <li>🔥 <strong>Todos los 14 cursos pagos desbloqueados</strong> sin pagar extra</li>
               <li>⚡ Multiplicador <strong>x1.5 en Puntos Estándar (PTS)</strong></li>
             </ul>
             <button class="btn-primary-full" id="buy-pro-btn" onclick="purchaseProMembership()">👑 Activar Pase VIP PRO por $29.00 USD (Pagar al Creador)</button>
@@ -213,8 +214,16 @@
       <section class="tab-view" id="view-certificates">
         <div class="section-header">
           <div>
-            <h2>📜 Mis Recompensas, Herramientas y Certificados Desbloqueados</h2>
-            <p>Aquí tienes todos los premios tanto de la Bóveda Estándar (PTS) como de la Bóveda Exclusiva VIP (VP).</p>
+            <h2>🎓 Mis Diplomas de Cursos Aprobados (100% Verificados)</h2>
+            <p>Cada vez que superas los 4 módulos y apruebas el examen final al 100%, se emite aquí tu certificado académico con código único.</p>
+          </div>
+        </div>
+        <div class="unlocked-list" id="completed-diplomas-list" style="margin-bottom: 36px;"></div>
+
+        <div class="section-header">
+          <div>
+            <h2>💎 Mis Cofres, Herramientas y Recompensas Canjeadas en Bóveda</h2>
+            <p>Aquí tienes todos los premios desbloqueados con tus Puntos Estándar (PTS) y Puntos Exclusivos VIP (👑 VP).</p>
           </div>
         </div>
         <div class="unlocked-list" id="unlocked-list"></div>
@@ -360,6 +369,17 @@
             <div class="form-group">
               <label>Respuesta Correcta</label>
               <input type="text" id="custom-answer" placeholder="Escribe la opción correcta..." required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Opción Incorrecta (Distractor 1)</label>
+              <input type="text" id="custom-wrong-1" placeholder="Escribe una opción incorrecta realista..." required />
+            </div>
+            <div class="form-group">
+              <label>Opción Incorrecta (Distractor 2)</label>
+              <input type="text" id="custom-wrong-2" placeholder="Escribe otra opción incorrecta realista..." required />
             </div>
           </div>
 
