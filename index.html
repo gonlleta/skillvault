@@ -29,6 +29,11 @@
           <span class="nav-icon">🎓</span>
           <span>Catálogo de Cursos</span>
         </button>
+        <button class="nav-item" data-tab="dictionary">
+          <span class="nav-icon">📖</span>
+          <span>Diccionario A-Z</span>
+          <span class="badge-pill" id="dict-count-badge">60+</span>
+        </button>
         <button class="nav-item" data-tab="rewards">
           <span class="nav-icon">💎</span>
           <span>Bóveda de Canje</span>
@@ -215,7 +220,7 @@
         <div class="section-header">
           <div>
             <h2>🎓 Mis Diplomas de Cursos Aprobados (100% Verificados)</h2>
-            <p>Cada vez que superas los 4 módulos y apruebas el examen final al 100%, se emite aquí tu certificado académico con código único.</p>
+            <p>Cada vez que superas los 6 módulos y apruebas el examen final al 100%, se emite aquí tu certificado académico con código único.</p>
           </div>
         </div>
         <div class="unlocked-list" id="completed-diplomas-list" style="margin-bottom: 36px;"></div>
@@ -227,6 +232,33 @@
           </div>
         </div>
         <div class="unlocked-list" id="unlocked-list"></div>
+      </section>
+
+      <!-- VISTA DICCIONARIO: GLOSARIO COMPLETO DE TODAS LAS PALABRAS DE LA ACADEMIA -->
+      <section class="tab-view" id="view-dictionary">
+        <div class="section-header">
+          <div>
+            <h2>📖 Diccionario Completo de la Academia (Explicado en Español Simple)</h2>
+            <p>¿Encontraste una palabra técnica, sigla en inglés o término de negocios en algún módulo? Búscala aquí y entiéndela en segundos con ejemplos de la vida real.</p>
+          </div>
+        </div>
+
+        <div class="dictionary-controls">
+          <div class="search-box dict-search-box">
+            <span class="search-icon">🔎</span>
+            <input type="text" id="dict-search-input" placeholder="Buscar palabra o sigla (ej: API, ROAS, Webhook, JWT, LTV, CAC, RAG, BANT, Pip, ETF...)" />
+          </div>
+          <div class="categories" id="dict-category-filters">
+            <button class="cat-btn dict-cat-btn active" data-dcat="all">📚 Todas las Palabras</button>
+            <button class="cat-btn dict-cat-btn" data-dcat="Programación">💻 Programación & Ciberseguridad</button>
+            <button class="cat-btn dict-cat-btn" data-dcat="Inteligencia Artificial">🤖 Inteligencia Artificial & Bots</button>
+            <button class="cat-btn dict-cat-btn" data-dcat="Finanzas">📈 Finanzas, Precios & Ventas</button>
+            <button class="cat-btn dict-cat-btn" data-dcat="Diseño & Marketing">🎨 Marketing, Diseño & Ads</button>
+            <button class="cat-btn dict-cat-btn" data-dcat="Trabajo Remoto">🌎 Inglés & Trabajo Remoto</button>
+          </div>
+        </div>
+
+        <div class="dictionary-grid" id="dictionary-grid"></div>
       </section>
 
       <!-- VISTA 5: PANEL DEL DUEÑO (TUS INGRESOS REALES POR ENSEÑAR) -->
