@@ -44,16 +44,16 @@
           <span>Hacerse VIP (Planes)</span>
         </button>
         <button class="nav-item" data-tab="certificates">
-          <span class="nav-icon">📜</span>
-          <span>Mis Certificados & VIP</span>
+          <span class="nav-icon">✅</span>
+          <span>Cursos Completos & VIP</span>
         </button>
-        <div class="nav-divider-label">PANEL DEL DUEÑO (TÚ)</div>
-        <button class="nav-item owner-nav" data-tab="owner">
+        <div class="nav-divider-label owner-only-el" style="display: none;">PANEL ADMINISTRADOR</div>
+        <button class="nav-item owner-nav owner-only-el" data-tab="owner" style="display: none;">
           <span class="nav-icon">💰</span>
-          <span>Mis Ingresos & Ventas</span>
+          <span>Ingresos & Ventas</span>
           <span class="badge-pill owner-pill" id="owner-revenue-pill">$348</span>
         </button>
-        <button class="nav-item owner-nav" data-tab="create">
+        <button class="nav-item owner-nav owner-only-el" data-tab="create" style="display: none;">
           <span class="nav-icon">➕</span>
           <span>Publicar Nuevo Curso</span>
         </button>
@@ -77,6 +77,7 @@
           <span><b id="user-xp">200</b> / <span id="user-next-xp">500</span> XP</span>
           <span class="bonus-rate" id="vip-status-tag">Cuenta Estándar</span>
         </div>
+        <button type="button" id="toggle-admin-btn" class="admin-mode-toggle" onclick="toggleAdminMode()">🔐 Modo Administrador</button>
       </div>
     </aside>
 
@@ -86,11 +87,11 @@
       <header class="topbar">
         <div class="search-box">
           <span class="search-icon">🔍</span>
-          <input type="text" id="search-input" placeholder="Buscar cursos (Python, IA, Finanzas, Diseño, Cursos Secretos...)" />
+          <input type="text" id="search-input" placeholder="Buscar cursos completos (Python, IA, Finanzas, Diseño, Cursos Secretos...)" />
         </div>
 
         <div class="wallet-summary">
-          <div class="balance-chip points-chip" id="top-points-btn" title="Puntos estándar ganados al aprobar cursos">
+          <div class="balance-chip points-chip" id="top-points-btn" title="Puntos estándar ganados al aprobar cursos completos">
             <span class="chip-label">Puntos Estándar</span>
             <span class="chip-amount" id="user-points">450 <small>PTS</small></span>
           </div>
@@ -98,8 +99,8 @@
             <span class="chip-label">👑 Puntos Exclusivos VIP</span>
             <span class="chip-amount" id="user-vip-points">0 <small>VP</small></span>
           </div>
-          <div class="balance-chip owner-chip" id="top-owner-btn" title="Dinero que te pagan los alumnos a ti">
-            <span class="chip-label">Tus Ganancias (Dueño)</span>
+          <div class="balance-chip owner-chip owner-only-el" id="top-owner-btn" style="display: none;" title="Panel de ingresos del administrador">
+            <span class="chip-label">Ingresos Academia</span>
             <span class="chip-amount" id="top-owner-usd">$348.00 <small>USD</small></span>
           </div>
           <button class="btn-withdraw-quick" id="go-rewards-btn">🎁 Canjear Puntos</button>
@@ -110,13 +111,13 @@
       <section class="tab-view active" id="view-explore">
         <div class="hero-banner">
           <div class="hero-text">
-            <span class="hero-kicker">👑 NUEVO: PUNTOS EXCLUSIVOS VIP (VP) ACTIVADOS</span>
-            <h1>Aprende habilidades, suma Puntos y desbloquea la Bóveda Élite.</h1>
-            <p>Todos los alumnos ganan <strong>Puntos Estándar (PTS)</strong> al aprobar cursos, pero solo los miembros con <strong>Pase VIP PRO</strong> ganan además <strong>Puntos Exclusivos VIP (👑 VP)</strong> para desbloquear cursos secretos, código fuente y certificados Black-Gold.</p>
+            <span class="hero-kicker">👑 ACADEMIA PRÁCTICA • CURSOS COMPLETOS DE 6 MÓDULOS</span>
+            <h1>Domina las habilidades más rentables hoy con Cursos Completos paso a paso.</h1>
+            <p>Aprende desde cero con casos reales y guías prácticas. Al finalizar cada curso completo sumas <strong>Puntos Estándar (PTS)</strong>, y con tu <strong>Pase VIP PRO</strong> ganas además <strong>Puntos Exclusivos VIP (👑 VP)</strong> para desbloquear cursos secretos, código fuente y packs descargables.</p>
             <div class="hero-stats">
               <div class="h-stat">
                 <strong id="stat-completed">0</strong>
-                <span>Cursos completados</span>
+                <span>Cursos completos</span>
               </div>
               <div class="h-stat">
                 <strong id="stat-total-points">450 PTS</strong>
@@ -161,7 +162,7 @@
         <div class="section-header">
           <div>
             <h2>👑 Recompensas Exclusivas para Miembros VIP (Solo con 👑 VP)</h2>
-            <p>Estos cofres, cursos secretos y certificados Black-Gold solo pueden desbloquearse con <strong>Puntos Exclusivos VIP (VP)</strong> obtenidos siendo miembro VIP.</p>
+            <p>Estos cofres, cursos secretos, plantillas y packs de cursos completos solo pueden desbloquearse con <strong>Puntos Exclusivos VIP (VP)</strong> obtenidos siendo miembro VIP.</p>
           </div>
         </div>
         <div class="skills-grid" id="vip-exclusive-rewards-grid" style="margin-bottom: 38px;"></div>
@@ -169,18 +170,18 @@
         <div class="section-header">
           <div>
             <h2>💎 Bóveda Estándar (Canjeable con Puntos Normales PTS)</h2>
-            <p>Usa tus puntos de estudio regulares (PTS) para desbloquear herramientas, plantillas y certificados básicos.</p>
+            <p>Usa tus puntos de estudio regulares (PTS) para desbloquear herramientas, plantillas y guías prácticas de cursos completos.</p>
           </div>
         </div>
         <div class="skills-grid" id="rewards-grid"></div>
       </section>
 
-      <!-- VISTA 3: PLANES Y MEMBRESÍAS (LOS ALUMNOS TE PAGAN A TI) -->
+      <!-- VISTA 3: PLANES Y MEMBRESÍAS -->
       <section class="tab-view" id="view-plans">
         <div class="section-header">
           <div>
-            <h2>👑 Membresía VIP — Desbloquea los Puntos Exclusivos VIP (VP)</h2>
-            <p>Cuando un alumno paga la membresía VIP o compra un curso, el dinero en dólares va directo a tu cuenta de dueño.</p>
+            <h2>👑 Planes de Acceso — Desbloquea Todos los Cursos Completos y Puntos VIP</h2>
+            <p>Elige cómo quieres estudiar: adquiere cursos individuales a tu propio ritmo o activa el Pase VIP PRO para tener acceso ilimitado a todos los cursos completos y ganar Puntos Exclusivos VIP (👑 VP).</p>
           </div>
         </div>
 
@@ -189,38 +190,38 @@
             <span class="plan-tag">CUENTA ESTÁNDAR</span>
             <h3>Compra por Curso</h3>
             <div class="plan-price">Desde $12.00 <small>USD / curso</small></div>
-            <p>Compra cursos sueltos. Ganarás Puntos Estándar (PTS), pero no recibirás Puntos Exclusivos VIP (VP).</p>
+            <p>Desbloquea cursos completos individuales con acceso permanente. Ganarás Puntos Estándar (PTS) al aprobar cada uno.</p>
             <ul class="plan-features">
-              <li>✅ Acceso al curso individual comprado</li>
+              <li>✅ Acceso ilimitado a los 6 módulos del curso adquirido</li>
               <li>✅ Gana el 100% de Puntos Estándar (PTS)</li>
-              <li>❌ <strong>No gana Puntos Exclusivos VIP (👑 VP)</strong></li>
-              <li>❌ Sin acceso a los cofres exclusivos VIP</li>
+              <li>❌ <strong>No suma Puntos Exclusivos VIP (👑 VP)</strong></li>
+              <li>❌ Sin acceso a los cofres y cursos secretos VIP</li>
             </ul>
-            <button class="btn-secondary" style="width:100%" onclick="document.querySelector('[data-tab=explore]').click()">Ver Cursos Individuales</button>
+            <button class="btn-secondary" style="width:100%" onclick="document.querySelector('[data-tab=explore]').click()">Explorar Cursos Individuales</button>
           </div>
 
           <div class="plan-card featured-plan">
-            <span class="plan-tag highlight">👑 ACCESO A PUNTOS EXCLUSIVOS VIP</span>
+            <span class="plan-tag highlight">👑 ACCESO TOTAL + PUNTOS EXCLUSIVOS VIP</span>
             <h3>Pase VIP PRO</h3>
             <div class="plan-price">$29.00 <small>USD / mes</small></div>
-            <p>Activa la recolección de <strong>Puntos Exclusivos VIP (👑 VP)</strong> en todos los cursos + todos los cursos pagos desbloqueados.</p>
+            <p>Acceso inmediato a todos los cursos completos de la academia + recolección activa de <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
             <ul class="plan-features">
               <li>👑 <strong>Habilita los Puntos Exclusivos VIP (VP)</strong> al aprobar cada curso</li>
               <li>🎁 <strong>+100 VP Exclusivos + 250 PTS de regalo inmediato</strong> al suscribirte</li>
-              <li>🔥 <strong>Todos los 14 cursos pagos desbloqueados</strong> sin pagar extra</li>
+              <li>🔥 <strong>Todos los 14 cursos completos pagos desbloqueados</strong> sin costo extra</li>
               <li>⚡ Multiplicador <strong>x1.5 en Puntos Estándar (PTS)</strong></li>
             </ul>
-            <button class="btn-primary-full" id="buy-pro-btn" onclick="purchaseProMembership()">👑 Activar Pase VIP PRO por $29.00 USD (Pagar al Creador)</button>
+            <button class="btn-primary-full" id="buy-pro-btn" onclick="purchaseProMembership()">👑 Activar Pase VIP PRO — $29.00 USD / mes</button>
           </div>
         </div>
       </section>
 
-      <!-- VISTA 4: MIS CERTIFICADOS, HERRAMIENTAS Y ACCESOS VIP -->
+      <!-- VISTA 4: CURSOS COMPLETOS, HERRAMIENTAS Y ACCESOS VIP -->
       <section class="tab-view" id="view-certificates">
         <div class="section-header">
           <div>
-            <h2>🎓 Mis Diplomas de Cursos Aprobados (100% Verificados)</h2>
-            <p>Cada vez que superas los 6 módulos y apruebas el examen final al 100%, se emite aquí tu certificado académico con código único.</p>
+            <h2>🎓 Mis Cursos Completos (100% Finalizados)</h2>
+            <p>Cada vez que superas los 6 módulos prácticos y apruebas el examen final al 100%, queda registrado aquí tu curso completo.</p>
           </div>
         </div>
         <div class="unlocked-list" id="completed-diplomas-list" style="margin-bottom: 36px;"></div>
@@ -228,7 +229,7 @@
         <div class="section-header">
           <div>
             <h2>💎 Mis Cofres, Herramientas y Recompensas Canjeadas en Bóveda</h2>
-            <p>Aquí tienes todos los premios desbloqueados con tus Puntos Estándar (PTS) y Puntos Exclusivos VIP (👑 VP).</p>
+            <p>Aquí tienes todos los premios y recursos desbloqueados con tus Puntos Estándar (PTS) y Puntos Exclusivos VIP (👑 VP).</p>
           </div>
         </div>
         <div class="unlocked-list" id="unlocked-list"></div>

@@ -2381,7 +2381,7 @@ const DEFAULT_SKILLS = [
         ],
         "caseStudy": {
           "title": "Caso Real: Plataforma Educativa con 15.000 Consultas Diarias de Alumnos",
-          "scenario": "Los alumnos hacían miles de preguntas similares sobre fechas de exámenes y certificados, generando una factura de API de $900 USD al mes.",
+          "scenario": "Los alumnos hacían miles de preguntas similares sobre fechas de exámenes y cursos completos, generando una factura de API de $900 USD al mes.",
           "result": "Implementaron Caché Semántico (umbral 0.96) y filtro de umbral mínimo: el tiempo de respuesta bajó a 0.1 segundos y el gasto mensual cayó a $210 USD."
         },
         "keyPoints": [
@@ -3183,7 +3183,7 @@ const DEFAULT_SKILLS = [
           "Cuanto menor sea el riesgo percibido por el comprador, mayor será la tasa de cierre.",
           "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
         ],
-        "code": "Desarme de las 3 Objeciones Clásicas en la Página de Ventas:\n1. Objeción de Tiempo -> \"Módulos directos al grano de 10 minutos con plantillas copiables.\"\n2. Objeción de Nivel  -> \"Explicado desde cero paso a paso, sin requerir conocimientos previos.\"\n3. Objeción de Valor  -> \"Incluye acceso a la Bóveda de Herramientas y Certificados Verificados.\"",
+        "code": "Desarme de las 3 Objeciones Clásicas en la Página de Ventas:\n1. Objeción de Tiempo -> \"Módulos prácticos paso a paso con plantillas copiables.\"\n2. Objeción de Nivel  -> \"Explicado desde cero paso a paso, sin requerir conocimientos previos.\"\n3. Objeción de Valor  -> \"Incluye acceso a la Bóveda de Herramientas y Cursos Completos.\"",
         "warning": "⚠️ Si ocultas qué incluye exactamente el producto o cómo es por dentro, la incertidumbre frena la compra.",
         "checkpoint": {
           "question": "¿Cuál es el objetivo estratégico de la sección de Preguntas Frecuentes (FAQ) ubicada justo debajo de la tabla de precios?",
@@ -5247,12 +5247,12 @@ const EXCLUSIVE_VIP_REWARDS = [
   },
   {
     id: 'vip-rw-black-cert',
-    type: 'Exclusivo VIP • Certificado Black-Gold',
+    type: 'Exclusivo VIP • Pack Cursos Completos',
     icon: '🏆',
-    title: 'Certificado "Master Black-Gold" con Sello de Honor VIP',
+    title: 'Pack Maestro VIP: Todos los Cursos Completos Descargables + Plantillas Pro',
     costVIPPoints: 260,
-    description: 'El diploma de mayor prestigio de la academia, reservado únicamente para miembros VIP que superaron los exámenes rigurosos.',
-    deliverable: 'Diploma Black-Gold emitido: #SV-VIP-BLACKGOLD-001 (Prioridad en bolsa de empleo).'
+    description: 'Paquete descargable con las guías completas, resúmenes ejecutivos y plantillas de los 16 cursos completos de la academia.',
+    deliverable: 'Pack Maestro VIP de Cursos Completos desbloqueado: #SV-VIP-PACK-001 (Descarga directa habilitada).'
   },
   {
     id: 'vip-rw-saas-source',
@@ -5278,12 +5278,12 @@ const EXCLUSIVE_VIP_REWARDS = [
 const STANDARD_REWARDS = [
   {
     id: 'rw-cert-fullstack',
-    type: 'Certificado Estándar',
-    icon: '📜',
-    title: 'Certificado de Finalización en Tecnología & IA',
+    type: 'Recurso de Cursos Completos',
+    icon: '📚',
+    title: 'Guía Maestra & Hojas de Ruta de Cursos Completos (PDF & Notion)',
     costPoints: 450,
-    description: 'Emite tu diploma digital verificable para añadir a tu LinkedIn y CV.',
-    deliverable: 'Código de Certificado Verificado: #SV-2026-STD-9941'
+    description: 'Manual práctico descargable con el paso a paso resumido y ejercicios resueltos de los cursos completos.',
+    deliverable: 'Acceso a la Guía Maestra de Cursos Completos: #SV-2026-STD-9941'
   },
   {
     id: 'rw-vip-badge',
@@ -6200,7 +6200,7 @@ function renderSkillsGrid() {
         ? `
           <div class="course-progress-wrap">
             <div class="course-progress-header">
-              <span>${completed ? '🏆 Certificado Emitido' : `Progreso: ${doneModulesCount}/${skill.lessons.length} módulos`}</span>
+              <span>${completed ? '🏆 Curso Completo (100%)' : `Progreso: ${doneModulesCount}/${skill.lessons.length} módulos`}</span>
               <span>${pct}%</span>
             </div>
             <div class="course-progress-bar">
@@ -6281,7 +6281,7 @@ window.buyCourse = function (skillId) {
   saveState();
   renderHeaderAndStats();
   renderSkillsGrid();
-  showToast(`💰 ¡Recibiste +$${skill.priceUSD.toFixed(2)} USD por la venta del curso!`);
+  showToast(`🎉 ¡Curso completo "${skill.title}" desbloqueado! Ya puedes comenzar el Módulo 1.`);
 };
 
 // Suscripción al Pase VIP PRO -> Dinero para ti ($29 USD) + Habilita los Puntos Exclusivos VIP (VP)
@@ -6305,7 +6305,7 @@ window.purchaseProMembership = function () {
   saveState();
   renderHeaderAndStats();
   renderSkillsGrid();
-  showToast(`👑 ¡Recibiste +$29.00 USD! El alumno ahora es VIP y recibió +100 VP Exclusivos + 250 PTS.`);
+  showToast(`👑 ¡Bienvenido a VIP PRO! Tienes todos los cursos completos desbloqueados + 100 VP y 250 PTS.`);
 };
 
 window.simulateStudentPurchase = function () {
@@ -6597,7 +6597,7 @@ function renderModalStep() {
           !checkpointSolved
             ? '🔒 Responde el reto del módulo para avanzar'
             : currentStepIndex === currentSkill.lessons.length - 1
-            ? 'Ir al Examen Final de Certificación 🎯'
+            ? 'Ir al Examen Final del Curso Completo 🎯'
             : 'Siguiente Módulo ➡'
         }
       </button>
@@ -6610,7 +6610,7 @@ function renderModalStep() {
     body.innerHTML = `
       <div class="lesson-box">
         <div class="lesson-header-bar">
-          <span class="lesson-module-badge" style="background: rgba(251, 191, 36, 0.2); color: #fde68a;">📝 Examen Final de Certificación</span>
+          <span class="lesson-module-badge" style="background: rgba(251, 191, 36, 0.2); color: #fde68a;">📝 Examen Final del Curso Completo</span>
           <span class="lesson-read-time">Requisito: ${questions.length} de ${questions.length} correctas (100%)</span>
         </div>
         <h4>Demuestra lo aprendido en los ${currentSkill.lessons.length} módulos</h4>
@@ -6771,7 +6771,7 @@ function renderRewardsVault() {
         <div>
           ${
             unlocked
-              ? `<button class="btn-start-skill done" onclick="document.querySelector('[data-tab=certificates]').click()">✅ Desbloqueado (Ver en Mis Certificados & VIP)</button>`
+              ? `<button class="btn-start-skill done" onclick="document.querySelector('[data-tab=certificates]').click()">✅ Desbloqueado (Ver en Cursos Completos & VIP)</button>`
               : !state.isProMember
               ? `<button class="btn-start-skill gold-btn" onclick="document.querySelector('[data-tab=plans]').click()">👑 Hazte Miembro VIP para Desbloquear (${rw.costVIPPoints} VP)</button>`
               : `<button class="btn-start-skill gold-btn" style="${!canAfford ? 'opacity:0.65' : ''}" onclick="redeemVIPReward('${rw.id}')">
@@ -6801,7 +6801,7 @@ function renderRewardsVault() {
         <div>
           ${
             unlocked
-              ? `<button class="btn-start-skill done" onclick="document.querySelector('[data-tab=certificates]').click()">✅ Desbloqueado (Ver en Mis Certificados & VIP)</button>`
+              ? `<button class="btn-start-skill done" onclick="document.querySelector('[data-tab=certificates]').click()">✅ Desbloqueado (Ver en Cursos Completos & VIP)</button>`
               : `<button class="btn-start-skill" style="${!canAfford ? 'opacity:0.65' : ''}" onclick="redeemStandardReward('${rw.id}')">
                   🔓 Canjear por ${rw.costPoints} PTS
                  </button>`
@@ -6862,8 +6862,8 @@ function renderUnlockedItems() {
     if (state.completedCourses.length === 0) {
       diplomasContainer.innerHTML = `
         <div class="certificate-card" style="grid-column: 1/-1;">
-          <h3>Aún no tienes diplomas de cursos completados</h3>
-          <p style="color:var(--text-muted); margin: 8px 0 16px;">Aprueba los 4 módulos prácticos y el examen final (100%) de cualquier curso para recibir automáticamente tu diploma verificable aquí.</p>
+          <h3>Aún no tienes cursos completos finalizados</h3>
+          <p style="color:var(--text-muted); margin: 8px 0 16px;">Aprueba los 6 módulos prácticos y el examen final (100%) de cualquier curso para registrar aquí tus cursos completos al 100%.</p>
           <button class="btn-secondary" onclick="document.querySelector('[data-tab=explore]').click()">Ir al Catálogo de Cursos 🎓</button>
         </div>
       `;
@@ -6876,14 +6876,14 @@ function renderUnlockedItems() {
           return `
             <div class="certificate-card ${course.secretCourse ? 'gold-cert' : ''}">
               <div class="card-top">
-                <span class="skill-cat-tag ${course.secretCourse ? 'gold-tag' : ''}">🎓 Diploma Académico • ${course.category}</span>
-                <span class="price-badge">✅ 100% APROBADO</span>
+                <span class="skill-cat-tag ${course.secretCourse ? 'gold-tag' : ''}">🎓 Curso Completo • ${course.category}</span>
+                <span class="price-badge">✅ 100% COMPLETADO</span>
               </div>
               <h3 style="margin-bottom:8px;">${course.title}</h3>
               <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">
-                Certificación oficial por completar los ${course.lessons.length} módulos técnicos y aprobar con excelencia el examen final.
+                Curso completo finalizado al 100% superando los ${course.lessons.length} módulos prácticos y el examen final con excelencia.
               </p>
-              <div class="lesson-code" style="margin-top:0;">ID Diploma Verificado: #SV-CERT-2026-${codeHash}</div>
+              <div class="lesson-code" style="margin-top:0;">Registro de Curso Completo: #SV-CURSO-2026-${codeHash}</div>
             </div>
           `;
         })
@@ -6940,6 +6940,31 @@ function renderOwnerTransactions() {
     )
     .join('');
 }
+
+let isAdminModeActive = false;
+window.toggleAdminMode = function () {
+  isAdminModeActive = !isAdminModeActive;
+  document.querySelectorAll('.owner-only-el').forEach(el => {
+    el.style.display = isAdminModeActive ? '' : 'none';
+  });
+  const btn = document.getElementById('toggle-admin-btn');
+  if (btn) {
+    btn.textContent = isAdminModeActive ? '👤 Volver a Vista Cliente' : '🔐 Modo Administrador';
+    btn.classList.toggle('active', isAdminModeActive);
+  }
+  if (!isAdminModeActive) {
+    const activeTab = document.querySelector('.nav-item.active');
+    if (activeTab && (activeTab.dataset.tab === 'owner' || activeTab.dataset.tab === 'create')) {
+      const exploreBtn = document.querySelector('.nav-item[data-tab="explore"]');
+      if (exploreBtn) exploreBtn.click();
+    }
+  }
+  showToast(
+    isAdminModeActive
+      ? '🔐 Modo Administrador activado: Panel de ganancias y creador de cursos visibles.'
+      : '👤 Vista Cliente activada: Academia lista para tus alumnos.'
+  );
+};
 
 // Eventos principales
 document.addEventListener('DOMContentLoaded', () => {
