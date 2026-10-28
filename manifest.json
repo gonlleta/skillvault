@@ -1,21 +1,84 @@
 {
+  "id": "com.skillvault.app",
   "name": "SkillVault — Academia Interactiva & Club VIP",
   "short_name": "SkillVault",
-  "description": "Aprende automatización, IA, programación y finanzas ganando puntos canjeables por recompensas reales.",
-  "start_url": "/",
+  "description": "Aprende automatización, IA, programación y finanzas superando misiones prácticas y ganando puntos canjeables por recompensas reales.",
+  "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
   "background_color": "#08090e",
   "theme_color": "#08090e",
+  "dir": "ltr",
   "lang": "es",
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
   "categories": ["education", "finance", "productivity"],
   "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Catálogo interactivo de cursos y misiones en SkillVault"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Academia Interactiva SkillVault"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Catálogo de Cursos",
+      "short_name": "Cursos",
+      "description": "Explora todos los cursos y gana puntos PTS",
+      "url": "/?tab=explore",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Bóveda VIP de Canje",
+      "short_name": "Bóveda VIP",
+      "description": "Canjea tus puntos por cofres y recompensas",
+      "url": "/?tab=rewards",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

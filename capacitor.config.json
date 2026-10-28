@@ -1,0 +1,18 @@
+{
+  "appId": "com.skillvault.app",
+  "appName": "SkillVault",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://skillvault-umber.vercel.app",
+    "cleartext": false
+  },
+  "android": {
+    "backgroundColor": "#08090e",
+    "allowMixedContent": false
+  },
+  "ios": {
+    "backgroundColor": "#08090e",
+    "contentInset": "always"
+  }
+}
