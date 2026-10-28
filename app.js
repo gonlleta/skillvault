@@ -7586,7 +7586,108 @@ window.switchAuthMode = function (mode) {
   }
 };
 
+// ==========================================================================
+// INTEGRACIÓN OFICIAL GOOGLE IDENTITY SERVICES (PARA VERCEL / DOMINIO PÚBLICO)
+// Pega aquí tu Client ID de Google Cloud Console (termina en .apps.googleusercontent.com)
+// ==========================================================================
+const GOOGLE_CLIENT_ID = localStorage.getItem('skillvault_google_client_id') || '';
+
+function decodeGoogleJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      window
+        .atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
+
+window.handleGoogleCredentialResponse = function (response) {
+  const payload = decodeGoogleJwt(response.credential);
+  if (!payload || !payload.email) {
+    showToast('❌ No se pudo verificar la respuesta de Google.');
+    return;
+  }
+
+  const email = payload.email.toLowerCase();
+  const name = payload.name || email.split('@')[0];
+  const db = loadUsersDB();
+
+  if (!db[email]) {
+    db[email] = {
+      name,
+      email,
+      provider: 'Google',
+      picture: payload.picture || '',
+      passwordHash: hashPassword('google_verified_' + payload.sub),
+      createdAt: new Date().toISOString(),
+      profile: {
+        points: 150,
+        vipPoints: 0,
+        xp: 100,
+        streak: 1,
+        isProMember: false,
+        ownedCourses: ['py-automation'],
+        completedCourses: [],
+        courseProgress: {},
+        unlockedRewards: [],
+        freeTrialBonusClaimed: false
+      }
+    };
+    saveUsersDB(db);
+    applyUserProfileToState(db[email]);
+    closeAuthModal();
+    closeGoogleOAuthModal();
+    showToast(`🎉 ¡Cuenta oficial de Google (${email}) conectada! +50 PTS de bienvenida.`);
+  } else {
+    applyUserProfileToState(db[email]);
+    closeAuthModal();
+    closeGoogleOAuthModal();
+    showToast(`👋 ¡Hola de nuevo, ${db[email].name}! Sesión de Google iniciada.`);
+  }
+};
+
+function initGoogleIdentityServices() {
+  if (!GOOGLE_CLIENT_ID || !window.google || !window.google.accounts || !window.google.accounts.id) {
+    return false;
+  }
+  try {
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: window.handleGoogleCredentialResponse
+    });
+    const container = document.getElementById('google-gsi-button-container');
+    const fallbackBtn = document.getElementById('fallback-google-btn');
+    if (container) {
+      container.innerHTML = '';
+      window.google.accounts.id.renderButton(container, {
+        theme: 'filled_black',
+        size: 'large',
+        width: 340,
+        text: 'continue_with',
+        shape: 'pill'
+      });
+      if (fallbackBtn) fallbackBtn.style.display = 'none';
+    }
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}
+
 window.handleGoogleAuth = function () {
+  if (initGoogleIdentityServices()) {
+    window.google.accounts.id.prompt();
+    return;
+  }
   closeAuthModal();
   renderSavedGoogleAccounts();
   const fb = document.getElementById('google-oauth-feedback');
