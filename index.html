@@ -2,7 +2,15 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#08090e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SkillVault" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
   <title>SkillVault — Academia Interactiva & Club VIP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -452,6 +460,18 @@
               <button type="button" class="btn-secondary" onclick="switchAppTab('plans')">👑 Ver Planes VIP</button>
               <button type="button" class="btn-secondary" onclick="switchAppTab('dictionary')">📖 Diccionario A-Z</button>
             </div>
+          </div>
+
+          <!-- Tarjeta para Instalar App en iPhone y Android (PWA) -->
+          <div class="profile-card" id="pwa-install-card">
+            <span class="level-label">📱 APLICACIÓN MÓVIL OFICIAL</span>
+            <h3 style="margin: 4px 0 6px;">Instalar SkillVault en tu Celular</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+              Agrégala a la pantalla de inicio de tu <strong>iPhone (iOS)</strong> o <strong>Android</strong> para abrirla a pantalla completa como app nativa.
+            </p>
+            <button type="button" class="btn-primary-full" id="pwa-install-btn" onclick="triggerPwaInstall()">
+              📲 Instalar App en mi Celular
+            </button>
           </div>
 
           <!-- Tarjeta de Controles de Simulación Oculta para el Público -->
@@ -1003,6 +1023,41 @@
           🔒 Pagar ahora ($49.00 USD)
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE INSTALACIÓN DE APP MÓVIL (iPHONE & ANDROID PWA) -->
+  <div class="modal-overlay" id="pwa-install-modal">
+    <div class="modal-window mobile-friendly-modal" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="modal-cat-badge">📲 App para iPhone & Android</span>
+        </div>
+        <button class="modal-close" type="button" onclick="closePwaInstallModal()">✕</button>
+      </div>
+
+      <h2>Instalar SkillVault en tu Celular</h2>
+      <p class="modal-sponsor">Sigue estos 2 pasos según tu teléfono para tener el ícono en tu pantalla de inicio a pantalla completa:</p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px;">
+        <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 14px; padding: 14px;">
+          <strong style="display: block; color: var(--text-main); font-size: 14px; margin-bottom: 6px;">🍎 En iPhone / iPad (Safari):</strong>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0;">
+            1. Toca el botón <strong>Compartir</strong> (el cuadrado con la flecha hacia arriba <strong>⬆️</strong> en la barra inferior de Safari).<br />
+            2. Desliza hacia abajo y toca <strong>"Agregar a inicio" (➕)</strong> y luego <strong>Agregar</strong>.
+          </p>
+        </div>
+
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 14px;">
+          <strong style="display: block; color: var(--text-main); font-size: 14px; margin-bottom: 6px;">🤖 En Android (Chrome):</strong>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0;">
+            1. Toca los <strong>3 puntitos (⋮)</strong> arriba a la derecha en Chrome.<br />
+            2. Selecciona <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla principal"</strong>.
+          </p>
+        </div>
+      </div>
+
+      <button type="button" class="btn-primary-full" onclick="closePwaInstallModal()">¡Entendido!</button>
     </div>
   </div>
 

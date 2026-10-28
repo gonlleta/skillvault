@@ -8286,3 +8286,38 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast(`🚀 Curso "${title}" publicado (+${pointsReward} PTS y 👑 +${vipPointsReward} VP para VIPs).`);
   });
 });
+
+// ==========================================================================
+// SOPORTE PWA NATIVO PARA IPHONE (iOS) Y ANDROID
+// ==========================================================================
+let deferredPwaPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+});
+
+window.triggerPwaInstall = async function () {
+  if (deferredPwaPrompt) {
+    deferredPwaPrompt.prompt();
+    const { outcome } = await deferredPwaPrompt.userChoice;
+    if (outcome === 'accepted') {
+      showToast('📲 ¡Instalando SkillVault en tu pantalla de inicio!');
+    }
+    deferredPwaPrompt = null;
+    return;
+  }
+  const modal = document.getElementById('pwa-install-modal');
+  if (modal) modal.classList.add('open');
+};
+
+window.closePwaInstallModal = function () {
+  const modal = document.getElementById('pwa-install-modal');
+  if (modal) modal.classList.remove('open');
+};
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}

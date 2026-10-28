@@ -1,0 +1,21 @@
+{
+  "name": "SkillVault — Academia Interactiva & Club VIP",
+  "short_name": "SkillVault",
+  "description": "Aprende automatización, IA, programación y finanzas ganando puntos canjeables por recompensas reales.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08090e",
+  "theme_color": "#08090e",
+  "lang": "es",
+  "categories": ["education", "finance", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
