@@ -7524,6 +7524,7 @@ window.openAuthModal = function (mode = 'login') {
   showAuthFeedback('');
   switchAuthMode(mode);
   document.getElementById('auth-modal').classList.add('open');
+  initGoogleIdentityServices();
 };
 
 window.closeAuthModal = function () {
@@ -7588,9 +7589,11 @@ window.switchAuthMode = function (mode) {
 
 // ==========================================================================
 // INTEGRACIÓN OFICIAL GOOGLE IDENTITY SERVICES (PARA VERCEL / DOMINIO PÚBLICO)
-// Pega aquí tu Client ID de Google Cloud Console (termina en .apps.googleusercontent.com)
+// Client ID configurado para: https://skillvault-umber.vercel.app
 // ==========================================================================
-const GOOGLE_CLIENT_ID = localStorage.getItem('skillvault_google_client_id') || '';
+const GOOGLE_CLIENT_ID =
+  localStorage.getItem('skillvault_google_client_id') ||
+  '1025561375783-aotcuc2sq5et7813cq774dvv664588eg.apps.googleusercontent.com';
 
 function decodeGoogleJwt(token) {
   try {
@@ -7682,6 +7685,8 @@ function initGoogleIdentityServices() {
     return false;
   }
 }
+
+window.addEventListener('load', initGoogleIdentityServices);
 
 window.handleGoogleAuth = function () {
   if (initGoogleIdentityServices()) {
