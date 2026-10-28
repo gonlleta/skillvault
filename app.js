@@ -5315,6 +5315,30 @@ const STANDARD_REWARDS = [
 ];
 
 const STORAGE_KEY = 'skillvault_academy_v4';
+const USERS_DB_KEY = 'skillvault_accounts_db_v1';
+
+function loadUsersDB() {
+  try {
+    const raw = localStorage.getItem(USERS_DB_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveUsersDB(db) {
+  localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
+}
+
+function hashPassword(rawPass) {
+  let h = 2166136261;
+  const str = 'sv_salt_2026_' + String(rawPass);
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return 'svh_' + (h >>> 0).toString(16);
+}
 
 let state = loadState();
 let activeFilter = 'all';
@@ -5376,6 +5400,25 @@ function loadState() {
 }
 
 function saveState() {
+  if (state.userAccount && state.userAccount.email) {
+    const db = loadUsersDB();
+    const emailKey = state.userAccount.email.toLowerCase();
+    if (db[emailKey]) {
+      db[emailKey].profile = {
+        points: state.points,
+        vipPoints: state.vipPoints,
+        xp: state.xp,
+        streak: state.streak,
+        isProMember: state.isProMember,
+        ownedCourses: state.ownedCourses,
+        completedCourses: state.completedCourses,
+        courseProgress: state.courseProgress,
+        unlockedRewards: state.unlockedRewards,
+        freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed)
+      };
+      saveUsersDB(db);
+    }
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
@@ -7438,28 +7481,70 @@ window.closeWaitlistModal = function () {
 };
 
 // ==========================================================================
-// MEJORA MOBILE 3: FLUJO DE AUTENTICACIÓN (LOGIN / REGISTRO / GOOGLE)
+// MEJORA MOBILE 3: FLUJO DE AUTENTICACIÓN REAL (BASE DE DATOS DE CUENTAS)
 // ==========================================================================
-let currentAuthMode = 'login';
+let currentAuthMode = 'login'; // 'login' | 'register' | 'reset'
+
+function showAuthFeedback(msg, type = 'error') {
+  const box = document.getElementById('auth-feedback-box');
+  if (!box) return;
+  if (!msg) {
+    box.style.display = 'none';
+    box.textContent = '';
+    return;
+  }
+  box.className = `auth-feedback-box ${type}`;
+  box.innerHTML = msg;
+  box.style.display = 'block';
+}
+
+function applyUserProfileToState(accountRecord) {
+  const prof = accountRecord.profile || {};
+  state.userAccount = {
+    name: accountRecord.name,
+    email: accountRecord.email,
+    provider: accountRecord.provider || 'Email'
+  };
+  state.points = typeof prof.points === 'number' ? prof.points : 150;
+  state.vipPoints = typeof prof.vipPoints === 'number' ? prof.vipPoints : 0;
+  state.xp = typeof prof.xp === 'number' ? prof.xp : 100;
+  state.streak = typeof prof.streak === 'number' ? prof.streak : 1;
+  state.isProMember = Boolean(prof.isProMember);
+  state.ownedCourses = Array.isArray(prof.ownedCourses) ? prof.ownedCourses : ['py-automation'];
+  state.completedCourses = Array.isArray(prof.completedCourses) ? prof.completedCourses : [];
+  state.courseProgress = prof.courseProgress || {};
+  state.unlockedRewards = Array.isArray(prof.unlockedRewards) ? prof.unlockedRewards : [];
+  state.freeTrialBonusClaimed = Boolean(prof.freeTrialBonusClaimed);
+  saveState();
+  renderHeaderAndStats();
+  renderSkillsGrid();
+}
 
 window.openAuthModal = function (mode = 'login') {
+  showAuthFeedback('');
   switchAuthMode(mode);
   document.getElementById('auth-modal').classList.add('open');
 };
 
 window.closeAuthModal = function () {
+  showAuthFeedback('');
   document.getElementById('auth-modal').classList.remove('open');
 };
 
 window.switchAuthMode = function (mode) {
-  currentAuthMode = mode === 'register' ? 'register' : 'login';
+  currentAuthMode = mode === 'register' ? 'register' : mode === 'reset' ? 'reset' : 'login';
   const isRegister = currentAuthMode === 'register';
+  const isReset = currentAuthMode === 'reset';
 
-  document.getElementById('auth-tab-login').classList.toggle('active', !isRegister);
+  showAuthFeedback('');
+  document.getElementById('auth-tab-login').classList.toggle('active', currentAuthMode === 'login');
   document.getElementById('auth-tab-register').classList.toggle('active', isRegister);
 
   const nameGroup = document.getElementById('auth-name-group');
   const nameInput = document.getElementById('auth-name');
+  const confirmGroup = document.getElementById('auth-confirm-group');
+  const confirmInput = document.getElementById('auth-password-confirm');
+  const passLabel = document.getElementById('auth-password-label');
   const heading = document.getElementById('auth-modal-heading');
   const subtext = document.getElementById('auth-modal-subtext');
   const submitBtn = document.getElementById('auth-submit-btn');
@@ -7468,54 +7553,114 @@ window.switchAuthMode = function (mode) {
   if (nameGroup) nameGroup.style.display = isRegister ? 'block' : 'none';
   if (nameInput) nameInput.required = isRegister;
 
+  if (confirmGroup) confirmGroup.style.display = isRegister || isReset ? 'block' : 'none';
+  if (confirmInput) confirmInput.required = isRegister || isReset;
+
+  if (passLabel) {
+    passLabel.textContent = isReset ? 'Nueva Contraseña (mín. 6 caracteres)' : 'Contraseña (mín. 6 caracteres)';
+  }
+
   if (heading) {
     heading.textContent = isRegister
       ? 'Crea tu Cuenta Gratis en SkillVault'
+      : isReset
+      ? 'Restablecer Contraseña de tu Cuenta'
       : 'Bienvenido de nuevo a SkillVault';
   }
   if (subtext) {
     subtext.textContent = isRegister
-      ? 'Regístrate en segundos para guardar tus puntos PTS, subir de rango y desbloquear cofres.'
-      : 'Ingresa para sincronizar tus Puntos Estándar (PTS), Puntos Exclusivos VIP (👑 VP) y diplomas.';
+      ? 'Regístrate para crear tu perfil real, guardar tus puntos PTS y desbloquear cofres.'
+      : isReset
+      ? 'Ingresa el correo de tu cuenta registrada y escribe tu nueva contraseña.'
+      : 'Ingresa con tu correo y contraseña registrados para cargar tu progreso.';
   }
   if (submitBtn) {
     submitBtn.textContent = isRegister
-      ? '✨ Crear mi Cuenta y Reclamar Rango Bronce'
+      ? '✨ Crear mi Cuenta (+50 PTS de Bienvenida)'
+      : isReset
+      ? '🔑 Guardar Nueva Contraseña e Iniciar Sesión'
       : '🚀 Iniciar Sesión en mi Cuenta';
   }
   if (forgotLink) {
-    forgotLink.style.display = isRegister ? 'none' : 'inline';
+    forgotLink.style.display = currentAuthMode === 'login' ? 'inline' : 'none';
   }
 };
 
 window.handleGoogleAuth = function () {
-  state.userAccount = {
-    name: 'Gonzalo Estudiante VIP',
-    email: 'gonzalo.google@skillvault.academy',
-    provider: 'Google'
-  };
-  saveState();
-  renderHeaderAndStats();
-  closeAuthModal();
-  showToast('✅ ¡Autenticado con Google! Tus puntos PTS y progreso están sincronizados.');
+  const emailInput = document.getElementById('auth-email');
+  const typedEmail = emailInput && emailInput.value.trim().toLowerCase();
+  const googleEmail =
+    typedEmail && typedEmail.includes('@')
+      ? typedEmail
+      : window.prompt('Ingresa tu correo de Google para conectar tu cuenta:', 'tu.correo@gmail.com');
+
+  if (!googleEmail || !googleEmail.includes('@')) {
+    showAuthFeedback('⚠️ Ingresa un correo válido de Google para continuar.', 'error');
+    return;
+  }
+
+  const cleanEmail = googleEmail.trim().toLowerCase();
+  const db = loadUsersDB();
+
+  if (!db[cleanEmail]) {
+    const rawUser = cleanEmail.split('@')[0].replace(/[._-]/g, ' ');
+    const formattedName = rawUser.charAt(0).toUpperCase() + rawUser.slice(1);
+    db[cleanEmail] = {
+      name: formattedName,
+      email: cleanEmail,
+      provider: 'Google',
+      passwordHash: hashPassword('google_oauth_' + cleanEmail),
+      createdAt: new Date().toISOString(),
+      profile: {
+        points: state.points + 50,
+        vipPoints: state.vipPoints,
+        xp: state.xp,
+        streak: state.streak || 1,
+        isProMember: state.isProMember,
+        ownedCourses: state.ownedCourses || ['py-automation'],
+        completedCourses: state.completedCourses || [],
+        courseProgress: state.courseProgress || {},
+        unlockedRewards: state.unlockedRewards || [],
+        freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed)
+      }
+    };
+    saveUsersDB(db);
+    applyUserProfileToState(db[cleanEmail]);
+    closeAuthModal();
+    showToast(`✅ ¡Cuenta Google (${cleanEmail}) creada y conectada! +50 PTS acreditados.`);
+  } else {
+    applyUserProfileToState(db[cleanEmail]);
+    closeAuthModal();
+    showToast(`👋 ¡Conectado con Google como ${db[cleanEmail].name}! Se cargaron tus puntos y cursos.`);
+  }
 };
 
 window.handleForgotPassword = function () {
+  switchAuthMode('reset');
   const emailInput = document.getElementById('auth-email');
-  const emailVal = emailInput && emailInput.value.trim();
-  if (!emailVal) {
-    showToast('📧 Escribe primero tu correo electrónico arriba para enviarte el enlace de recuperación.');
-    if (emailInput) emailInput.focus();
-    return;
+  if (emailInput && !emailInput.value.trim()) {
+    emailInput.focus();
   }
-  showToast(`🔑 Enlace de recuperación enviado a ${emailVal}. Revisa tu bandeja de entrada.`);
+  showAuthFeedback('🔑 Escribe tu correo registrado y elige tu nueva contraseña abajo.', 'success');
 };
 
 window.logoutUser = function () {
+  saveState(); // Guarda el progreso de la cuenta antes de salir
   state.userAccount = null;
-  saveState();
+  state.points = 100;
+  state.vipPoints = 0;
+  state.xp = 100;
+  state.streak = 1;
+  state.isProMember = false;
+  state.ownedCourses = ['py-automation'];
+  state.completedCourses = [];
+  state.courseProgress = {};
+  state.unlockedRewards = [];
+  state.freeTrialBonusClaimed = false;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   renderHeaderAndStats();
-  showToast('👋 Sesión cerrada correctamente.');
+  renderSkillsGrid();
+  showToast('👋 Sesión cerrada. Vuelve a iniciar sesión cuando quieras recuperar tus puntos y cursos.');
 };
 
 // ==========================================================================
@@ -7637,36 +7782,115 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Submit de Login / Registro (#auth-form)
+  // Submit de Login / Registro / Restablecer Contraseña (#auth-form)
   const authForm = document.getElementById('auth-form');
   if (authForm) {
     authForm.addEventListener('submit', e => {
       e.preventDefault();
-      const email = document.getElementById('auth-email').value.trim();
+      showAuthFeedback('');
+
+      const email = document.getElementById('auth-email').value.trim().toLowerCase();
       const rawName = document.getElementById('auth-name').value.trim();
-      const displayName =
-        currentAuthMode === 'register' && rawName
-          ? rawName
-          : email.split('@')[0].replace(/[._-]/g, ' ');
+      const password = document.getElementById('auth-password').value;
+      const confirmPassEl = document.getElementById('auth-password-confirm');
+      const confirmPassword = confirmPassEl ? confirmPassEl.value : '';
 
-      state.userAccount = {
-        name: displayName.charAt(0).toUpperCase() + displayName.slice(1),
-        email,
-        provider: 'Email'
-      };
+      const db = loadUsersDB();
 
-      if (currentAuthMode === 'register' && !state.welcomeAuthPtsClaimed) {
-        state.points += 50;
-        state.welcomeAuthPtsClaimed = true;
-        showToast(`✨ ¡Cuenta creada con éxito, ${state.userAccount.name}! Recibiste +50 PTS de bienvenida.`);
-      } else {
-        showToast(`👋 ¡Bienvenido de nuevo, ${state.userAccount.name}! Sesión iniciada.`);
+      // MODO 1: CREAR CUENTA NUEVA
+      if (currentAuthMode === 'register') {
+        if (!rawName || rawName.length < 2) {
+          showAuthFeedback('⚠️ Por favor escribe tu nombre y apellido.', 'error');
+          return;
+        }
+        if (password.length < 6) {
+          showAuthFeedback('⚠️ La contraseña debe tener al menos 6 caracteres.', 'error');
+          return;
+        }
+        if (password !== confirmPassword) {
+          showAuthFeedback('❌ Las contraseñas no coinciden. Verifícalas e inténtalo de nuevo.', 'error');
+          return;
+        }
+        if (db[email]) {
+          showAuthFeedback(`⚠️ Ya existe una cuenta registrada con <strong>${email}</strong>. Cambia a "Iniciar Sesión".`, 'error');
+          return;
+        }
+
+        const newAccount = {
+          name: rawName,
+          email,
+          provider: 'Email',
+          passwordHash: hashPassword(password),
+          createdAt: new Date().toISOString(),
+          profile: {
+            points: 150, // 100 iniciales + 50 PTS bono de bienvenida por registro
+            vipPoints: 0,
+            xp: 100,
+            streak: 1,
+            isProMember: false,
+            ownedCourses: ['py-automation'],
+            completedCourses: [],
+            courseProgress: {},
+            unlockedRewards: [],
+            freeTrialBonusClaimed: false
+          }
+        };
+
+        db[email] = newAccount;
+        saveUsersDB(db);
+        applyUserProfileToState(newAccount);
+        authForm.reset();
+        closeAuthModal();
+        showToast(`✨ ¡Cuenta creada con éxito, ${newAccount.name}! Recibiste +50 PTS de bienvenida (Total: 150 PTS).`);
+        return;
       }
 
-      saveState();
-      renderHeaderAndStats();
+      // MODO 2: RESTABLECER CONTRASEÑA
+      if (currentAuthMode === 'reset') {
+        if (!db[email]) {
+          showAuthFeedback(`❌ No encontramos ninguna cuenta registrada con el correo <strong>${email}</strong>.`, 'error');
+          return;
+        }
+        if (password.length < 6) {
+          showAuthFeedback('⚠️ La nueva contraseña debe tener al menos 6 caracteres.', 'error');
+          return;
+        }
+        if (password !== confirmPassword) {
+          showAuthFeedback('❌ Las contraseñas nuevas no coinciden.', 'error');
+          return;
+        }
+
+        db[email].passwordHash = hashPassword(password);
+        saveUsersDB(db);
+        applyUserProfileToState(db[email]);
+        authForm.reset();
+        closeAuthModal();
+        showToast(`🔑 ¡Contraseña actualizada con éxito! Sesión iniciada como ${db[email].name}.`);
+        return;
+      }
+
+      // MODO 3: INICIAR SESIÓN (LOGIN)
+      const existingAccount = db[email];
+      if (!existingAccount) {
+        showAuthFeedback(
+          `❌ No existe ninguna cuenta registrada con <strong>${email}</strong>. Toca la pestaña <strong>"Crear Cuenta"</strong> arriba para registrarte primero.`,
+          'error'
+        );
+        return;
+      }
+
+      if (existingAccount.passwordHash !== hashPassword(password)) {
+        showAuthFeedback(
+          '❌ Contraseña incorrecta para esta cuenta. Inténtalo de nuevo o usa "¿Olvidaste tu contraseña?".',
+          'error'
+        );
+        return;
+      }
+
+      applyUserProfileToState(existingAccount);
       authForm.reset();
       closeAuthModal();
+      showToast(`👋 ¡Bienvenido de nuevo, ${existingAccount.name}! Se cargaron tus ${state.points} PTS y tu progreso.`);
     });
   }
 

@@ -2833,3 +2833,24 @@ body {
   width: 100% !important;
   max-width: 100% !important;
 }
+
+.auth-feedback-box {
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  margin-top: 10px;
+}
+
+.auth-feedback-box.error {
+  background: rgba(244, 63, 94, 0.16);
+  border: 1px solid rgba(244, 63, 94, 0.45);
+  color: #fda4af;
+}
+
+.auth-feedback-box.success {
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #a7f3d0;
+}
