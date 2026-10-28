@@ -6,7 +6,7 @@ const DEFAULT_SKILLS = [
     "id": "py-automation",
     "title": "Python desde Cero: Automatiza tu Trabajo Diario y Ahorra Horas en la PC",
     "category": "Programación",
-    "priceUSD": 0,
+    "priceUSD": 24.99,
     "pointsReward": 225,
     "vipPointsReward": 68,
     "xp": 300,
@@ -313,7 +313,7 @@ const DEFAULT_SKILLS = [
     "id": "ai-agents-pro",
     "title": "Domina ChatGPT y la Inteligencia Artificial: Haz que la IA Trabaje para Ti",
     "category": "Inteligencia Artificial",
-    "priceUSD": 14.99,
+    "priceUSD": 29.99,
     "pointsReward": 390,
     "vipPointsReward": 128,
     "xp": 480,
@@ -620,7 +620,7 @@ const DEFAULT_SKILLS = [
     "id": "fin-crypto-invest",
     "title": "Finanzas Personales e Inversión Inteligente: Multiplica tus Ahorros desde Cero",
     "category": "Finanzas",
-    "priceUSD": 12,
+    "priceUSD": 24.99,
     "pointsReward": 330,
     "vipPointsReward": 105,
     "xp": 420,
@@ -927,7 +927,7 @@ const DEFAULT_SKILLS = [
     "id": "ux-growth-convert",
     "title": "Diseño de Páginas Web que Venden: Convierte Visitantes en Clientes Reales",
     "category": "Diseño & Marketing",
-    "priceUSD": 19,
+    "priceUSD": 29.99,
     "pointsReward": 465,
     "vipPointsReward": 143,
     "xp": 525,
@@ -1234,7 +1234,7 @@ const DEFAULT_SKILLS = [
     "id": "fullstack-apis-sql",
     "title": "Crea Aplicaciones Web Completas: Bases de Datos, Usuarios y Servidores",
     "category": "Programación",
-    "priceUSD": 16.99,
+    "priceUSD": 36.99,
     "pointsReward": 435,
     "vipPointsReward": 135,
     "xp": 510,
@@ -1849,7 +1849,7 @@ const DEFAULT_SKILLS = [
     "id": "cybersec-ethical-web",
     "title": "Ciberseguridad y Hacking Ético: Protege Páginas Web y Datos de Ataques Reales",
     "category": "Programación",
-    "priceUSD": 18.99,
+    "priceUSD": 39.99,
     "pointsReward": 450,
     "vipPointsReward": 143,
     "xp": 540,
@@ -2156,7 +2156,7 @@ const DEFAULT_SKILLS = [
     "id": "ai-rag-embeddings",
     "title": "Entrena a la IA con tus Propios Documentos: Crea Chatbots Expertos en tu Negocio",
     "category": "Inteligencia Artificial",
-    "priceUSD": 21,
+    "priceUSD": 39.99,
     "pointsReward": 495,
     "vipPointsReward": 158,
     "xp": 585,
@@ -2463,7 +2463,7 @@ const DEFAULT_SKILLS = [
     "id": "js-react-modern",
     "title": "JavaScript Moderno y Profesional: Crea Sitios Web Rápidos, Dinámicos e Interactivos",
     "category": "Programación",
-    "priceUSD": 15.99,
+    "priceUSD": 34.99,
     "pointsReward": 405,
     "vipPointsReward": 128,
     "xp": 495,
@@ -2770,7 +2770,7 @@ const DEFAULT_SKILLS = [
     "id": "fin-b2b-pricing",
     "title": "Cómo Poner Precios y Calcular Ganancias: Haz que tu Negocio Sea Siempre Rentable",
     "category": "Finanzas",
-    "priceUSD": 16,
+    "priceUSD": 29.99,
     "pointsReward": 390,
     "vipPointsReward": 120,
     "xp": 465,
@@ -3077,7 +3077,7 @@ const DEFAULT_SKILLS = [
     "id": "mkt-copywriting-funnels",
     "title": "Escritura Persuasiva (Copywriting): Cómo Escribir Textos que Convencen y Venden",
     "category": "Diseño & Marketing",
-    "priceUSD": 14.5,
+    "priceUSD": 27.99,
     "pointsReward": 375,
     "vipPointsReward": 120,
     "xp": 450,
@@ -3692,7 +3692,7 @@ const DEFAULT_SKILLS = [
     "id": "nocode-n8n-whatsapp",
     "title": "Crea Bots de WhatsApp con IA y Automatiza Negocios Sin Saber Programar",
     "category": "Inteligencia Artificial",
-    "priceUSD": 17.99,
+    "priceUSD": 34.99,
     "pointsReward": 435,
     "vipPointsReward": 135,
     "xp": 525,
@@ -3999,7 +3999,7 @@ const DEFAULT_SKILLS = [
     "id": "viral-video-retention",
     "title": "Edición de Videos Virales para TikTok, Reels y Shorts: Multiplica tus Vistas",
     "category": "Diseño & Marketing",
-    "priceUSD": 14.99,
+    "priceUSD": 27.99,
     "pointsReward": 390,
     "vipPointsReward": 120,
     "xp": 465,
@@ -4306,7 +4306,7 @@ const DEFAULT_SKILLS = [
     "id": "meta-ads-roas",
     "title": "Publicidad en Instagram, Facebook y TikTok Ads: Consigue Clientes Todos los Días",
     "category": "Diseño & Marketing",
-    "priceUSD": 18.5,
+    "priceUSD": 36.99,
     "pointsReward": 450,
     "vipPointsReward": 143,
     "xp": 540,
@@ -4613,7 +4613,7 @@ const DEFAULT_SKILLS = [
     "id": "closer-high-ticket-sales",
     "title": "Ventas por Chat y Llamada (Closer & Setter): Cierra Clientes de Alto Valor",
     "category": "Finanzas",
-    "priceUSD": 16.5,
+    "priceUSD": 34.99,
     "pointsReward": 420,
     "vipPointsReward": 128,
     "xp": 495,
@@ -4920,7 +4920,7 @@ const DEFAULT_SKILLS = [
     "id": "english-remote-tech",
     "title": "Inglés Práctico para Trabajar Remoto y Cobrar en Dólares desde Casa",
     "category": "Programación",
-    "priceUSD": 13.99,
+    "priceUSD": 24.99,
     "pointsReward": 360,
     "vipPointsReward": 113,
     "xp": 435,
@@ -5346,29 +5346,29 @@ function loadState() {
     courseProgress: {}, // { skillId: [0, 1, ...] } módulos superados
     unlockedRewards: [],
     customSkills: [],
-    ownerBalanceUSD: 348.00,
+    ownerBalanceUSD: 485.00,
     ownerSalesCount: 14,
     ownerSubsCount: 8,
     ownerTransactions: [
       {
         id: 'otx-1',
-        title: '👑 Suscripción Pase VIP PRO — Alumno: Martín G.',
+        title: '👑 Suscripción Pase VIP PRO Mensual — Alumno: Martín G.',
         date: 'Hace 2 horas',
-        amount: 29.00,
+        amount: 49.00,
         type: 'positive'
       },
       {
         id: 'otx-2',
         title: '🎓 Compra Curso "Ingeniería de Prompts IA" — Alumna: Lucía P.',
         date: 'Hace 5 horas',
-        amount: 14.99,
+        amount: 27.99,
         type: 'positive'
       },
       {
         id: 'otx-3',
-        title: '👑 Suscripción Pase VIP PRO — Alumno: Diego R.',
+        title: '💎 Suscripción Pase VIP Founder Anual — Alumno: Diego R.',
         date: 'Ayer',
-        amount: 29.00,
+        amount: 129.00,
         type: 'positive'
       }
     ]
@@ -5473,9 +5473,33 @@ function renderHeaderAndStats() {
   document.getElementById('owner-subs-count').textContent = `${state.ownerSubsCount} miembros`;
 
   const buyProBtn = document.getElementById('buy-pro-btn');
-  if (state.isProMember) {
+  if (buyProBtn && state.isProMember) {
     buyProBtn.textContent = '👑 Membresía VIP PRO Activa (Ganas Puntos Exclusivos VP)';
     buyProBtn.disabled = true;
+  }
+
+  const buyFounderBtn = document.getElementById('buy-founder-btn');
+  if (buyFounderBtn && state.isProMember) {
+    buyFounderBtn.textContent = '👑 Cuenta VIP Activa (Todos los Cursos Desbloqueados)';
+    buyFounderBtn.disabled = true;
+  }
+
+  const topVipBtn = document.getElementById('top-vip-cta-btn');
+  if (topVipBtn) {
+    topVipBtn.textContent = state.isProMember ? '👑 Miembro VIP Activo' : '👑 Hacerse VIP';
+    topVipBtn.classList.toggle('vip-active-btn', state.isProMember);
+  }
+
+  const heroVipBtn = document.getElementById('hero-vip-btn');
+  if (heroVipBtn) {
+    heroVipBtn.textContent = state.isProMember
+      ? '👑 Pase VIP PRO Activo — Todos los Cursos Desbloqueados'
+      : '👑 Hacerse VIP PRO Ahora ($49 USD — Todo Desbloqueado)';
+  }
+
+  const sidebarVipBtn = document.getElementById('sidebar-vip-btn');
+  if (sidebarVipBtn) {
+    sidebarVipBtn.style.display = state.isProMember ? 'none' : '';
   }
 
   renderFeaturedSkill();
@@ -5513,6 +5537,9 @@ function renderFeaturedSkill() {
            </button>`
         : `<button class="btn-start-skill buy-btn" onclick="buyCourse('${nextSkill.id}')">
             🔓 Comprar Curso Completo por $${nextSkill.priceUSD.toFixed(2)} USD
+           </button>
+           <button class="btn-card-vip-upsell" onclick="document.querySelector('[data-tab=plans]').click()">
+            👑 O desbloquéalo con Pase VIP PRO ($49 USD • Incluye los 14 cursos)
            </button>`
     }
   `;
@@ -6191,9 +6218,14 @@ function renderSkillsGrid() {
           }
         </button>`;
       } else {
-        actionButton = `<button class="btn-start-skill buy-btn" onclick="buyCourse('${skill.id}')">
-          💳 Desbloquear Curso por $${skill.priceUSD.toFixed(2)} USD
-        </button>`;
+        actionButton = `
+          <button class="btn-start-skill buy-btn" onclick="buyCourse('${skill.id}')">
+            💳 Desbloquear Curso Completo por $${skill.priceUSD.toFixed(2)} USD
+          </button>
+          <button class="btn-card-vip-upsell" onclick="document.querySelector('[data-tab=plans]').click()">
+            👑 O desbloquéalo haciéndote VIP ($49 USD • Todos los cursos)
+          </button>
+        `;
       }
 
       const progressHtml = unlocked
@@ -6284,19 +6316,36 @@ window.buyCourse = function (skillId) {
   showToast(`🎉 ¡Curso completo "${skill.title}" desbloqueado! Ya puedes comenzar el Módulo 1.`);
 };
 
-// Suscripción al Pase VIP PRO -> Dinero para ti ($29 USD) + Habilita los Puntos Exclusivos VIP (VP)
-window.purchaseProMembership = function () {
-  if (state.isProMember) return;
-  const price = 29.00;
+window.handleVipQuickButton = function () {
+  if (state.isProMember) {
+    document.querySelector('[data-tab="rewards"]').click();
+    showToast('👑 Ya eres miembro VIP PRO activo. Aquí puedes canjear tus Puntos Exclusivos VIP (VP).');
+    return;
+  }
+  document.querySelector('[data-tab="plans"]').click();
+};
+
+// Suscripción al Pase VIP PRO -> Dinero para ti ($49 USD mensual o $129 USD anual) + Habilita los Puntos Exclusivos VIP (VP)
+window.purchaseProMembership = function (tier = 'monthly') {
+  if (state.isProMember) {
+    showToast('👑 Ya tienes tu Pase VIP PRO activo con todos los cursos completos desbloqueados.');
+    return;
+  }
+  const isAnnual = tier === 'annual';
+  const price = isAnnual ? 129.00 : 49.00;
+  const bonusPts = isAnnual ? 800 : 300;
+  const bonusVp = isAnnual ? 350 : 120;
+  const planLabel = isAnnual ? 'Pase VIP Founder Anual' : 'Pase VIP PRO Mensual';
+
   state.isProMember = true;
-  state.points += 250;
-  state.vipPoints += 100; // Bono inicial de bienvenida VIP
+  state.points += bonusPts;
+  state.vipPoints += bonusVp;
   state.ownerBalanceUSD += price;
   state.ownerSubsCount += 1;
 
   state.ownerTransactions.unshift({
     id: 'otx-pro-' + Date.now(),
-    title: `👑 Nueva Suscripción: Pase VIP PRO (+100 VP entregados al alumno)`,
+    title: `👑 Nueva Suscripción: ${planLabel} (+${bonusVp} VP entregados al alumno)`,
     date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     amount: price,
     type: 'positive'
@@ -6305,21 +6354,25 @@ window.purchaseProMembership = function () {
   saveState();
   renderHeaderAndStats();
   renderSkillsGrid();
-  showToast(`👑 ¡Bienvenido a VIP PRO! Tienes todos los cursos completos desbloqueados + 100 VP y 250 PTS.`);
+  showToast(`👑 ¡Bienvenido a ${planLabel}! Tienes todos los cursos completos desbloqueados + ${bonusVp} VP y +${bonusPts} PTS.`);
 };
 
 window.simulateStudentPurchase = function () {
   const names = ['Valentina S.', 'Nicolás M.', 'Camila T.', 'Facundo B.', 'Julián K.'];
   const randomStudent = names[Math.floor(Math.random() * names.length)];
-  const isVipSub = Math.random() > 0.4;
+  const rand = Math.random();
+  const isAnnualVip = rand > 0.78;
+  const isMonthlyVip = !isAnnualVip && rand > 0.4;
 
-  const amount = isVipSub ? 29.00 : 14.99;
-  const label = isVipSub
-    ? `👑 Suscripción Pase VIP PRO de ${randomStudent}`
-    : `💳 Compra de Curso por ${randomStudent}`;
+  const amount = isAnnualVip ? 129.00 : isMonthlyVip ? 49.00 : 34.99;
+  const label = isAnnualVip
+    ? `💎 Suscripción Pase VIP Founder Anual de ${randomStudent}`
+    : isMonthlyVip
+    ? `👑 Suscripción Pase VIP PRO Mensual de ${randomStudent}`
+    : `💳 Compra de Curso Completo por ${randomStudent}`;
 
   state.ownerBalanceUSD += amount;
-  if (isVipSub) state.ownerSubsCount += 1;
+  if (isAnnualVip || isMonthlyVip) state.ownerSubsCount += 1;
   else state.ownerSalesCount += 1;
 
   state.ownerTransactions.unshift({

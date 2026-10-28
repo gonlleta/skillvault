@@ -77,6 +77,7 @@
           <span><b id="user-xp">200</b> / <span id="user-next-xp">500</span> XP</span>
           <span class="bonus-rate" id="vip-status-tag">Cuenta Estándar</span>
         </div>
+        <button type="button" id="sidebar-vip-btn" class="btn-sidebar-vip" onclick="document.querySelector('[data-tab=plans]').click()">👑 Hacerse VIP PRO</button>
         <button type="button" id="toggle-admin-btn" class="admin-mode-toggle" onclick="toggleAdminMode()">🔐 Modo Administrador</button>
       </div>
     </aside>
@@ -101,8 +102,9 @@
           </div>
           <div class="balance-chip owner-chip owner-only-el" id="top-owner-btn" style="display: none;" title="Panel de ingresos del administrador">
             <span class="chip-label">Ingresos Academia</span>
-            <span class="chip-amount" id="top-owner-usd">$348.00 <small>USD</small></span>
+            <span class="chip-amount" id="top-owner-usd">$485.00 <small>USD</small></span>
           </div>
+          <button class="btn-vip-top" id="top-vip-cta-btn" onclick="handleVipQuickButton()">👑 Hacerse VIP</button>
           <button class="btn-withdraw-quick" id="go-rewards-btn">🎁 Canjear Puntos</button>
         </div>
       </header>
@@ -113,7 +115,7 @@
           <div class="hero-text">
             <span class="hero-kicker">👑 ACADEMIA PRÁCTICA • CURSOS COMPLETOS DE 6 MÓDULOS</span>
             <h1>Domina las habilidades más rentables hoy con Cursos Completos paso a paso.</h1>
-            <p>Aprende desde cero con casos reales y guías prácticas. Al finalizar cada curso completo sumas <strong>Puntos Estándar (PTS)</strong>, y con tu <strong>Pase VIP PRO</strong> ganas además <strong>Puntos Exclusivos VIP (👑 VP)</strong> para desbloquear cursos secretos, código fuente y packs descargables.</p>
+            <p>Aprende desde cero con casos reales y guías prácticas. Al finalizar cada curso completo sumas <strong>Puntos Estándar (PTS)</strong>, y con tu <strong>Pase VIP PRO</strong> desbloqueas todo el catálogo y ganas <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
             <div class="hero-stats">
               <div class="h-stat">
                 <strong id="stat-completed">0</strong>
@@ -127,6 +129,10 @@
                 <strong id="stat-vip-points" style="color: #fbbf24;">0 VP</strong>
                 <span>Puntos Exclusivos VIP</span>
               </div>
+            </div>
+            <div class="hero-cta-row">
+              <button type="button" class="btn-hero-vip" id="hero-vip-btn" onclick="purchaseProMembership('monthly')">👑 Hacerse VIP PRO Ahora ($49 USD — Todo Desbloqueado)</button>
+              <button type="button" class="btn-hero-plans" onclick="document.querySelector('[data-tab=plans]').click()">Ver Planes y Precios 💎</button>
             </div>
           </div>
           <div class="hero-featured-card" id="featured-skill-box"></div>
@@ -180,38 +186,63 @@
       <section class="tab-view" id="view-plans">
         <div class="section-header">
           <div>
-            <h2>👑 Planes de Acceso — Desbloquea Todos los Cursos Completos y Puntos VIP</h2>
-            <p>Elige cómo quieres estudiar: adquiere cursos individuales a tu propio ritmo o activa el Pase VIP PRO para tener acceso ilimitado a todos los cursos completos y ganar Puntos Exclusivos VIP (👑 VP).</p>
+            <h2>👑 Planes y Precios — Desbloquea Todos los Cursos Completos y Puntos VIP</h2>
+            <p>Cada curso completo (7.5h a 12h de formación práctica) cuesta entre <strong>$24.99 y $39.99 USD</strong> por separado (valor total del catálogo: <strong>+$450 USD</strong>). Con el <strong>Pase VIP PRO</strong> desbloqueas absolutamente todos los cursos completos al instante.</p>
           </div>
         </div>
 
         <div class="plans-grid">
           <div class="plan-card">
-            <span class="plan-tag">CUENTA ESTÁNDAR</span>
-            <h3>Compra por Curso</h3>
-            <div class="plan-price">Desde $12.00 <small>USD / curso</small></div>
-            <p>Desbloquea cursos completos individuales con acceso permanente. Ganarás Puntos Estándar (PTS) al aprobar cada uno.</p>
-            <ul class="plan-features">
-              <li>✅ Acceso ilimitado a los 6 módulos del curso adquirido</li>
-              <li>✅ Gana el 100% de Puntos Estándar (PTS)</li>
-              <li>❌ <strong>No suma Puntos Exclusivos VIP (👑 VP)</strong></li>
-              <li>❌ Sin acceso a los cofres y cursos secretos VIP</li>
-            </ul>
+            <div>
+              <span class="plan-tag">CUENTA ESTÁNDAR • PAGO POR CURSO</span>
+              <h3>Curso Completo Individual</h3>
+              <div class="plan-price">$24.99 – $39.99 <small>USD / curso</small></div>
+              <p>Ideal si solo quieres dominar una habilidad puntual. Acceso ilimitado de por vida al curso completo que elijas.</p>
+              <ul class="plan-features">
+                <li>✅ Acceso permanente a los 6 módulos extensos (7.5h–10h)</li>
+                <li>✅ Guía paso a paso, casos reales y diccionario integrado</li>
+                <li>✅ Suma el 100% de Puntos Estándar (PTS) al aprobar</li>
+                <li>❌ <strong>No incluye los demás cursos del catálogo</strong></li>
+                <li>❌ <strong>No suma Puntos Exclusivos VIP (👑 VP)</strong></li>
+              </ul>
+            </div>
             <button class="btn-secondary" style="width:100%" onclick="document.querySelector('[data-tab=explore]').click()">Explorar Cursos Individuales</button>
           </div>
 
           <div class="plan-card featured-plan">
-            <span class="plan-tag highlight">👑 ACCESO TOTAL + PUNTOS EXCLUSIVOS VIP</span>
-            <h3>Pase VIP PRO</h3>
-            <div class="plan-price">$29.00 <small>USD / mes</small></div>
-            <p>Acceso inmediato a todos los cursos completos de la academia + recolección activa de <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
-            <ul class="plan-features">
-              <li>👑 <strong>Habilita los Puntos Exclusivos VIP (VP)</strong> al aprobar cada curso</li>
-              <li>🎁 <strong>+100 VP Exclusivos + 250 PTS de regalo inmediato</strong> al suscribirte</li>
-              <li>🔥 <strong>Todos los 14 cursos completos pagos desbloqueados</strong> sin costo extra</li>
-              <li>⚡ Multiplicador <strong>x1.5 en Puntos Estándar (PTS)</strong></li>
-            </ul>
-            <button class="btn-primary-full" id="buy-pro-btn" onclick="purchaseProMembership()">👑 Activar Pase VIP PRO — $29.00 USD / mes</button>
+            <div>
+              <span class="plan-tag highlight">🔥 MÁS ELEGIDO • AHORRAS +$400 USD</span>
+              <h3>Pase VIP PRO Mensual</h3>
+              <div class="plan-old-price">Valor individual: $455.00 USD</div>
+              <div class="plan-price">$49.00 <small>USD / mes</small></div>
+              <p>Por el precio de apenas 1 curso y medio, desbloqueas los <strong>14 cursos completos pagos</strong> y activas los <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
+              <ul class="plan-features">
+                <li>🔥 <strong>Los 14 Cursos Completos desbloqueados</strong> desde el primer minuto</li>
+                <li>👑 <strong>Habilita Puntos Exclusivos VIP (VP)</strong> al aprobar cada curso</li>
+                <li>🎁 <strong>+120 VP Exclusivos + 300 PTS de bono inmediato</strong> al activar</li>
+                <li>⚡ Multiplicador <strong>x1.5 en Puntos Estándar (PTS)</strong></li>
+                <li>🔒 Acceso a la Bóveda de Cursos Secretos VIP y Plantillas</li>
+              </ul>
+            </div>
+            <button class="btn-primary-full gold-vip-cta" id="buy-pro-btn" onclick="purchaseProMembership('monthly')">👑 Hacerse VIP PRO — $49.00 USD / mes</button>
+          </div>
+
+          <div class="plan-card founder-plan">
+            <div>
+              <span class="plan-tag highlight-purple">💎 ACCESO TOTAL ANUAL + BONO MÁXIMO VP</span>
+              <h3>Pase VIP Founder (1 Año)</h3>
+              <div class="plan-old-price">12 meses ($588 USD) -> Ahorras 78%</div>
+              <div class="plan-price">$129.00 <small>USD / año</small></div>
+              <p>Acceso total durante 12 meses a todos los cursos actuales y futuros + <strong>350 VP imediatos</strong> para abrir un Curso Secreto hoy mismo.</p>
+              <ul class="plan-features">
+                <li>👑 <strong>Todo lo incluido en el Pase VIP PRO</strong> por 1 año entero</li>
+                <li>🚀 <strong>+350 VP Exclusivos de regalo hoy</strong> (alcanza para 1 Curso Secreto ya)</li>
+                <li>💎 <strong>+800 PTS Estándar de bienvenida</strong> para la Bóveda</li>
+                <li>⚡ Multiplicador <strong>x1.5 en Puntos Estándar (PTS)</strong></li>
+                <li>🏆 Acceso directo a plantillas Full-Stack y packs descargables</li>
+              </ul>
+            </div>
+            <button class="btn-primary-full" id="buy-founder-btn" onclick="purchaseProMembership('annual')">💎 Activar VIP Founder Anual — $129.00 USD</button>
           </div>
         </div>
       </section>
