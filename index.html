@@ -45,15 +45,19 @@
         </button>
         <button class="nav-item" data-tab="certificates">
           <span class="nav-icon">✅</span>
-          <span>Cursos Completos & VIP</span>
+          <span>Mis Cursos & VIP</span>
         </button>
-        <div class="nav-divider-label owner-only-el" style="display: none;">PANEL ADMINISTRADOR</div>
-        <button class="nav-item owner-nav owner-only-el" data-tab="owner" style="display: none;">
+        <button class="nav-item" data-tab="profile">
+          <span class="nav-icon">👤</span>
+          <span>Mi Perfil & Rango</span>
+        </button>
+        <div class="nav-divider-label owner-only-el" hidden style="display: none;">PANEL ADMINISTRADOR</div>
+        <button class="nav-item owner-nav owner-only-el" data-tab="owner" hidden style="display: none;">
           <span class="nav-icon">💰</span>
-          <span>Ingresos & Ventas</span>
+          <span>Panel del Creador & Ingresos</span>
           <span class="badge-pill owner-pill" id="owner-revenue-pill">$348</span>
         </button>
-        <button class="nav-item owner-nav owner-only-el" data-tab="create" style="display: none;">
+        <button class="nav-item owner-nav owner-only-el" data-tab="create" hidden style="display: none;">
           <span class="nav-icon">➕</span>
           <span>Publicar Nuevo Curso</span>
         </button>
@@ -78,44 +82,81 @@
           <span class="bonus-rate" id="vip-status-tag">Cuenta Estándar</span>
         </div>
         <button type="button" id="sidebar-vip-btn" class="btn-sidebar-vip" onclick="document.querySelector('[data-tab=plans]').click()">👑 Hacerse VIP PRO</button>
-        <button type="button" id="toggle-admin-btn" class="admin-mode-toggle" onclick="toggleAdminMode()">🔐 Modo Administrador</button>
+        <button type="button" id="toggle-admin-btn" class="admin-mode-toggle" onclick="toggleAdminMode()">Simular vista: Alumno (Cambiar a Admin)</button>
       </div>
     </aside>
 
     <!-- Contenido Principal -->
     <main class="main-content">
-      <!-- Barra Superior -->
+      <!-- Barra Superior (Adaptada Mobile-First) -->
       <header class="topbar">
+        <!-- Marca compacta visible solo en móvil -->
+        <div class="mobile-brand-bar">
+          <div class="brand-logo" style="width: 36px; height: 36px; font-size: 18px;">⚡</div>
+          <div>
+            <span class="brand-name" style="font-size: 18px;">Skill<span class="accent">Vault</span></span>
+            <span class="brand-tag" style="font-size: 9px;">ACADEMIA GAMIFICADA</span>
+          </div>
+          <button type="button" class="btn-auth-top mobile-only-auth" id="mobile-top-auth-btn" onclick="openAuthModal('login')">
+            👤 Entrar
+          </button>
+        </div>
+
         <div class="search-box">
           <span class="search-icon">🔍</span>
-          <input type="text" id="search-input" placeholder="Buscar cursos completos (Python, IA, Finanzas, Diseño, Cursos Secretos...)" />
+          <input type="text" id="search-input" placeholder="Buscar cursos completos (Python, IA, Finanzas, Diseño...)" />
         </div>
 
         <div class="wallet-summary">
+          <!-- MEJORA 1: Toggle de Separación de Roles en el Header -->
+          <div class="role-switcher-toggle" id="header-role-switcher" role="group" aria-label="Simular vista de rol">
+            <span class="role-switcher-label">Simular vista:</span>
+            <div class="role-switcher-pills">
+              <button type="button" class="role-pill active" id="role-btn-student" onclick="setRoleView('student')">
+                🎓 Alumno
+              </button>
+              <button type="button" class="role-pill" id="role-btn-admin" onclick="setRoleView('admin')">
+                🔐 Administrador
+              </button>
+            </div>
+          </div>
+
+          <!-- Simulador de Estado Vacío (0 Cursos Activos vs Catálogo Activo) -->
+          <button type="button" class="empty-state-sim-btn" id="toggle-empty-catalog-btn" onclick="toggleZeroCoursesSimulation()" title="Alternar entre Catálogo con Cursos y Estado Vacío (0 cursos) para probar la Lista de Espera">
+            📦 Catálogo: <span id="catalog-sim-status">Activo</span>
+          </button>
+
           <div class="balance-chip points-chip" id="top-points-btn" title="Puntos estándar ganados al aprobar cursos completos">
             <span class="chip-label">Puntos Estándar</span>
             <span class="chip-amount" id="user-points">450 <small>PTS</small></span>
           </div>
           <div class="balance-chip vip-points-chip" id="top-vip-points-btn" title="Puntos Exclusivos VIP: Solo los miembros VIP ganan y usan estos puntos">
-            <span class="chip-label">👑 Puntos Exclusivos VIP</span>
+            <span class="chip-label">👑 Puntos VIP</span>
             <span class="chip-amount" id="user-vip-points">0 <small>VP</small></span>
           </div>
-          <div class="balance-chip owner-chip owner-only-el" id="top-owner-btn" style="display: none;" title="Panel de ingresos del administrador">
-            <span class="chip-label">Ingresos Academia</span>
+          <div class="balance-chip owner-chip owner-only-el" id="top-owner-btn" hidden style="display: none;" title="Panel de ingresos del administrador">
+            <span class="chip-label">💰 Panel Creador</span>
             <span class="chip-amount" id="top-owner-usd">$485.00 <small>USD</small></span>
           </div>
+          <button type="button" class="btn-withdraw-quick owner-only-el" id="top-create-course-btn" hidden style="display: none;" onclick="switchAppTab('create')">
+            ➕ Publicar Curso
+          </button>
           <button class="btn-vip-top" id="top-vip-cta-btn" onclick="handleVipQuickButton()">👑 Hacerse VIP</button>
-          <button class="btn-withdraw-quick" id="go-rewards-btn">🎁 Canjear Puntos</button>
+          <button class="btn-withdraw-quick" id="go-rewards-btn">🎁 Canjear</button>
+          <button type="button" class="btn-auth-top" id="header-auth-btn" onclick="openAuthModal('login')">
+            👤 Iniciar Sesión
+          </button>
         </div>
       </header>
 
       <!-- VISTA 1: CATÁLOGO DE CURSOS -->
       <section class="tab-view active" id="view-explore">
+        <!-- MEJORA 2: Nueva Sección Hero orientada a la conversión con Claridad de Nicho y Gancho Gratuito -->
         <div class="hero-banner">
           <div class="hero-text">
-            <span class="hero-kicker">👑 ACADEMIA PRÁCTICA • CURSOS COMPLETOS DE 6 MÓDULOS</span>
-            <h1>Domina las habilidades más rentables hoy con Cursos Completos paso a paso.</h1>
-            <p>Aprende desde cero con casos reales y guías prácticas. Al finalizar cada curso completo sumas <strong>Puntos Estándar (PTS)</strong>, y con tu <strong>Pase VIP PRO</strong> desbloqueas todo el catálogo y ganas <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
+            <span class="hero-kicker">⚡ ACADEMIA GAMIFICADA DE PROGRAMACIÓN, IA, FINANZAS Y MARKETING DIGITAL</span>
+            <h1>Domina Programación, Inteligencia Artificial y Marketing Digital mientras subes de rango.</h1>
+            <p>Deja atrás los cursos teóricos que abandonas a la mitad. Aprende <strong>Desarrollo con Python, Automatización con IA, Finanzas y Ventas Digitales</strong> mediante misiones prácticas de 6 módulos: gana <strong>Puntos Estándar (PTS)</strong> para abrir cofres de herramientas y multiplica tus recompensas con <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
             <div class="hero-stats">
               <div class="h-stat">
                 <strong id="stat-completed">0</strong>
@@ -131,8 +172,12 @@
               </div>
             </div>
             <div class="hero-cta-row">
-              <button type="button" class="btn-hero-vip" id="hero-vip-btn" onclick="purchaseProMembership('monthly')">👑 Hacerse VIP PRO Ahora ($49 USD — Todo Desbloqueado)</button>
-              <button type="button" class="btn-hero-plans" onclick="document.querySelector('[data-tab=plans]').click()">Ver Planes y Precios 💎</button>
+              <button type="button" class="btn-hero-free-hook" id="hero-free-module-btn" onclick="startFreeTrialModule()">
+                🚀 Prueba el primer módulo gratis y gana tus primeros 50 PTS
+              </button>
+              <button type="button" class="btn-hero-plans" id="hero-vip-btn" onclick="document.querySelector('[data-tab=plans]').click()">
+                👑 Ver Pase VIP PRO y Planes 💎
+              </button>
             </div>
           </div>
           <div class="hero-featured-card" id="featured-skill-box"></div>
@@ -161,6 +206,71 @@
 
         <!-- Grid de Cursos -->
         <div class="skills-grid" id="skills-grid"></div>
+
+        <!-- MEJORA 3: Sección de Prueba Social (Testimonios de Alumnos Gamificados) -->
+        <section class="testimonials-section" id="social-proof-section" aria-labelledby="testimonials-heading">
+          <div class="testimonials-header">
+            <span class="testimonials-kicker">🏆 PRUEBA SOCIAL VERIFICADA • ESTUDIANTES QUE SÍ TERMINAN SUS CURSOS</span>
+            <h2 id="testimonials-heading">Por qué el 92% de nuestros alumnos completa sus rutas sin abandonar</h2>
+            <p>Descubre cómo el sistema de rangos, cofres de recompensas con <strong>PTS</strong> y la bóveda exclusiva <strong>VIP (👑 VP)</strong> transformó el hábito de estudio de nuestra comunidad.</p>
+          </div>
+
+          <div class="testimonials-grid">
+            <!-- Tarjeta 1 -->
+            <article class="testimonial-card">
+              <div class="testimonial-top">
+                <div class="testimonial-stars" aria-label="5 de 5 estrellas">★★★★★</div>
+                <span class="testimonial-badge pts-badge">💎 +1,450 PTS Canjeados</span>
+              </div>
+              <blockquote class="testimonial-quote">
+                "Solía comprar cursos de programación en otras plataformas y dejarlos abandonados en la segunda clase. En <strong>SkillVault</strong> el sistema de checkpoints por módulo y ganar <strong>PTS para abrir cofres en la Bóveda</strong> me enganchó como si fuera un RPG. En dos semanas terminé la ruta de Python, desbloqueé el pack de +200 Mega-Prompts y automatizé los reportes de mi oficina."
+              </blockquote>
+              <div class="testimonial-author">
+                <div class="author-avatar avatar-violet">MS</div>
+                <div class="author-info">
+                  <strong>Mateo S. <span class="verified-pill">✔ Alumno Verificado</span></strong>
+                  <span>Analista de Datos • Rango Especialista Oro (Nivel 4)</span>
+                </div>
+              </div>
+            </article>
+
+            <!-- Tarjeta 2 -->
+            <article class="testimonial-card featured-testimonial">
+              <div class="testimonial-top">
+                <div class="testimonial-stars" aria-label="5 de 5 estrellas">★★★★★</div>
+                <span class="testimonial-badge vip-badge">👑 Miembro Pase VIP PRO</span>
+              </div>
+              <blockquote class="testimonial-quote">
+                "Activar el <strong>Pase VIP PRO</strong> fue la mejor inversión del año. Ver cómo cada examen aprobado al 100% me sumaba <strong>Puntos Exclusivos VIP (👑 VP)</strong> y multiplicador x1.5 me dio la motivación exacta para no parar hasta desbloquear las <strong>Masterclasses Secretas de Micro-SaaS y Agencia IA</strong>. Hoy ya cerré mi primer cliente de automatización por $1,200 USD."
+              </blockquote>
+              <div class="testimonial-author">
+                <div class="author-avatar avatar-gold">VR</div>
+                <div class="author-info">
+                  <strong>Valentina R. <span class="verified-pill">✔ Miembro VIP PRO</span></strong>
+                  <span>Consultora de Marketing & IA • Racha de 21 días 🔥</span>
+                </div>
+              </div>
+            </article>
+
+            <!-- Tarjeta 3 -->
+            <article class="testimonial-card">
+              <div class="testimonial-top">
+                <div class="testimonial-stars" aria-label="5 de 5 estrellas">★★★★★</div>
+                <span class="testimonial-badge founder-badge">⚡ +680 VP Acumulados</span>
+              </div>
+              <blockquote class="testimonial-quote">
+                "Lo que hace único a SkillVault es que no puedes avanzar en piloto automático: cada módulo te desafía con casos reales y código listo para producción. Querer subir de <em>Estudiante Bronce</em> a <em>Maestro Platino</em> y juntar los 350 VP para el boilerplate Full-Stack me mantuvo estudiando 1 hora diaria sin fallar un solo día."
+              </blockquote>
+              <div class="testimonial-author">
+                <div class="author-avatar avatar-emerald">DL</div>
+                <div class="author-info">
+                  <strong>Diego L. <span class="verified-pill">✔ VIP Founder</span></strong>
+                  <span>Desarrollador Full-Stack • 6 Cursos Completados al 100%</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
       </section>
 
       <!-- VISTA 2: BÓVEDA DE CANJE DE PUNTOS (ESTÁNDAR + EXCLUSIVOS VIP) -->
@@ -206,7 +316,7 @@
                 <li>❌ <strong>No suma Puntos Exclusivos VIP (👑 VP)</strong></li>
               </ul>
             </div>
-            <button class="btn-secondary" style="width:100%" onclick="document.querySelector('[data-tab=explore]').click()">Explorar Cursos Individuales</button>
+            <button class="btn-secondary" id="buy-individual-btn" style="width:100%" onclick="handlePlanCTA('individual')">💳 Comprar Curso Individual ($24.99 USD)</button>
           </div>
 
           <div class="plan-card featured-plan">
@@ -224,7 +334,7 @@
                 <li>🔒 Acceso a la Bóveda de Cursos Secretos VIP y Plantillas</li>
               </ul>
             </div>
-            <button class="btn-primary-full gold-vip-cta" id="buy-pro-btn" onclick="purchaseProMembership('monthly')">👑 Hacerse VIP PRO — $49.00 USD / mes</button>
+            <button class="btn-primary-full gold-vip-cta" id="buy-pro-btn" onclick="handlePlanCTA('monthly')">👑 Hacerse VIP PRO — $49.00 USD / mes</button>
           </div>
 
           <div class="plan-card founder-plan">
@@ -242,7 +352,7 @@
                 <li>🏆 Acceso directo a plantillas Full-Stack y packs descargables</li>
               </ul>
             </div>
-            <button class="btn-primary-full" id="buy-founder-btn" onclick="purchaseProMembership('annual')">💎 Activar VIP Founder Anual — $129.00 USD</button>
+            <button class="btn-primary-full" id="buy-founder-btn" onclick="handlePlanCTA('annual')">💎 Activar VIP Founder Anual — $129.00 USD</button>
           </div>
         </div>
       </section>
@@ -293,8 +403,78 @@
         <div class="dictionary-grid" id="dictionary-grid"></div>
       </section>
 
-      <!-- VISTA 5: PANEL DEL DUEÑO (TUS INGRESOS REALES POR ENSEÑAR) -->
-      <section class="tab-view" id="view-owner">
+      <!-- VISTA PERFIL DEL ALUMNO (ESPECIAL MOBILE-FIRST + GESTIÓN DE CUENTA Y RANGO) -->
+      <section class="tab-view" id="view-profile">
+        <div class="section-header">
+          <div>
+            <h2>👤 Mi Perfil, Rango y Cuenta</h2>
+            <p>Consulta tu progreso gamificado, administra tu sesión y accede a las herramientas de simulación desde cualquier dispositivo móvil o escritorio.</p>
+          </div>
+        </div>
+
+        <div class="profile-mobile-grid">
+          <!-- Tarjeta de Cuenta y Sesión -->
+          <div class="profile-card">
+            <div class="profile-user-row">
+              <div class="author-avatar avatar-violet" id="profile-avatar-circle" style="width: 56px; height: 56px; font-size: 20px;">SV</div>
+              <div>
+                <span class="level-label" id="profile-account-badge">SESIÓN DE ESTUDIANTE</span>
+                <h3 id="profile-user-name">Estudiante Invitado</h3>
+                <p id="profile-user-email" style="font-size: 13px; color: var(--text-muted);">Inicia sesión para sincronizar tus puntos en la nube</p>
+              </div>
+            </div>
+            <div class="profile-auth-actions" id="profile-auth-actions">
+              <button type="button" class="btn-primary-full" onclick="openAuthModal('login')">🔐 Iniciar Sesión</button>
+              <button type="button" class="btn-secondary" style="width: 100%;" onclick="openAuthModal('register')">✨ Crear Cuenta Gratis</button>
+            </div>
+          </div>
+
+          <!-- Tarjeta de Rango, XP y Racha (Reemplaza al Sidebar oculto en móvil) -->
+          <div class="profile-card">
+            <div class="level-header">
+              <div>
+                <span class="level-label">RANGO ACTUAL • NIVEL <span id="mob-user-level">1</span></span>
+                <h3 id="mob-user-rank-title" style="font-size: 20px; margin-top: 2px;">Estudiante Bronce</h3>
+              </div>
+              <div class="streak-pill">
+                🔥 <span id="mob-user-streak">4</span> días
+              </div>
+            </div>
+            <div class="xp-bar-bg" style="height: 10px; margin: 14px 0 8px;">
+              <div class="xp-bar-fill" id="mob-xp-bar-fill" style="width: 40%;"></div>
+            </div>
+            <div class="xp-meta" style="margin-bottom: 16px;">
+              <span><b id="mob-user-xp">200</b> / <span id="mob-user-next-xp">500</span> XP</span>
+              <span class="bonus-rate" id="mob-vip-status-tag">Cuenta Estándar</span>
+            </div>
+
+            <div class="profile-quick-links">
+              <button type="button" class="btn-secondary" onclick="switchAppTab('plans')">👑 Ver Planes VIP</button>
+              <button type="button" class="btn-secondary" onclick="switchAppTab('dictionary')">📖 Diccionario A-Z</button>
+            </div>
+          </div>
+
+          <!-- Tarjeta de Controles de Simulación (Roles + Empty State Lista de Espera) -->
+          <div class="profile-card">
+            <span class="level-label">🛠️ CONTROLES DE SIMULACIÓN & QA</span>
+            <h3 style="margin: 4px 0 10px;">Probar Vistas y Estados</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+              Alterna el rol o simula qué ocurre cuando la academia tiene 0 cursos activos (Lista de Espera).
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button type="button" class="btn-secondary" style="width: 100%;" onclick="toggleAdminMode()">
+                🔄 Cambiar Rol (Alumno / Administrador)
+              </button>
+              <button type="button" class="btn-secondary" style="width: 100%;" onclick="toggleZeroCoursesSimulation()">
+                ⏳ Alternar Catálogo Vacío (0 Cursos / Lista de Espera)
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA 5: PANEL DEL DUEÑO (OCULTO EN MODO ALUMNO) -->
+      <section class="tab-view owner-only-el" id="view-owner" hidden style="display: none;">
         <div class="section-header">
           <div>
             <h2>💰 Panel del Creador — Tus Ingresos por Enseñar</h2>
@@ -378,8 +558,8 @@
         </div>
       </section>
 
-      <!-- VISTA 6: CREAR NUEVO CURSO PARA VENDER -->
-      <section class="tab-view" id="view-create">
+      <!-- VISTA 6: CREAR NUEVO CURSO PARA VENDER (OCULTO EN MODO ALUMNO) -->
+      <section class="tab-view owner-only-el" id="view-create" hidden style="display: none;">
         <div class="section-header">
           <div>
             <h2>➕ Publicar Nuevo Curso en tu Academia</h2>
@@ -450,6 +630,104 @@
           <button type="submit" class="btn-primary-full">🚀 Publicar Curso en Venta</button>
         </form>
       </section>
+
+      <!-- MEJORA 4: Footer de Confianza -->
+      <footer class="trust-footer" id="site-footer">
+        <div class="footer-top-grid">
+          <!-- Columna 1: Marca y Propuesta -->
+          <div class="footer-brand-col">
+            <div class="footer-brand">
+              <div class="brand-logo">⚡</div>
+              <div>
+                <span class="brand-name">Skill<span class="accent">Vault</span></span>
+                <span class="brand-tag">ACADEMIA GAMIFICADA & CLUB VIP</span>
+              </div>
+            </div>
+            <p class="footer-desc">
+              La plataforma de educación interactiva donde dominas Programación, Inteligencia Artificial, Finanzas y Marketing Digital superando misiones prácticas, subiendo de rango y desbloqueando recompensas reales con tus puntos <strong>PTS</strong> y <strong>👑 VP</strong>.
+            </p>
+            <div class="footer-status-pill">
+              <span class="status-dot"></span> Sistemas Operativos • +14 Cursos Completos Activos
+            </div>
+          </div>
+
+          <!-- Columna 2: Rutas de Estudio -->
+          <div class="footer-links-col">
+            <h4>Rutas de Estudio</h4>
+            <ul>
+              <li><a href="#view-explore" onclick="filterByFooterCategory('Programación'); return false;">💻 Programación & Python</a></li>
+              <li><a href="#view-explore" onclick="filterByFooterCategory('Inteligencia Artificial'); return false;">🤖 IA, Agentes & Prompts</a></li>
+              <li><a href="#view-explore" onclick="filterByFooterCategory('Finanzas'); return false;">📈 Finanzas & Ventas B2B</a></li>
+              <li><a href="#view-explore" onclick="filterByFooterCategory('Diseño & Marketing'); return false;">🎨 Marketing Digital & Growth</a></li>
+            </ul>
+          </div>
+
+          <!-- Columna 3: Soporte y Ayuda -->
+          <div class="footer-links-col">
+            <h4>Soporte al Estudiante</h4>
+            <ul>
+              <li><a href="#faq" onclick="openInfoModal('faq'); return false;">❓ Preguntas Frecuentes (FAQ)</a></li>
+              <li><a href="#help" onclick="openInfoModal('help'); return false;">🛟 Centro de Ayuda</a></li>
+              <li><a href="#dictionary" onclick="document.querySelector('[data-tab=dictionary]').click(); return false;">📖 Diccionario Técnico A-Z</a></li>
+              <li><a href="#rewards" onclick="document.querySelector('[data-tab=rewards]').click(); return false;">💎 Bóveda de Recompensas</a></li>
+            </ul>
+          </div>
+
+          <!-- Columna 4: Legal y Transparencia -->
+          <div class="footer-links-col">
+            <h4>Legal y Privacidad</h4>
+            <ul>
+              <li><a href="#terms" onclick="openInfoModal('terms'); return false;">📄 Términos y Condiciones</a></li>
+              <li><a href="#privacy" onclick="openInfoModal('privacy'); return false;">🔒 Políticas de Privacidad</a></li>
+              <li><a href="#guarantee" onclick="openInfoModal('guarantee'); return false;">🛡️ Garantía de Satisfacción VIP</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Barra Visual de Pagos 100% Seguros -->
+        <div class="footer-security-bar">
+          <div class="security-title">
+            <span class="lock-icon">🔒</span>
+            <div>
+              <strong>Pagos 100% Seguros y Encriptados</strong>
+              <span>Todas las transacciones están protegidas con cifrado bancario de extremo a extremo.</span>
+            </div>
+          </div>
+
+          <div class="payment-badges-row" aria-label="Métodos de pago y certificaciones de seguridad">
+            <!-- Placeholder / Badge Stripe -->
+            <div class="trust-payment-badge" title="Pagos procesados de forma segura con Stripe">
+              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="3" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+              <span><strong>Stripe</strong> Verified</span>
+            </div>
+
+            <!-- Placeholder / Badge PayPal -->
+            <div class="trust-payment-badge" title="Protección al comprador con PayPal">
+              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 19h3l1.5-6H15a4 4 0 0 0 0-8H7.5L5 19Z" />
+              </svg>
+              <span><strong>PayPal</strong> Checkout</span>
+            </div>
+
+            <!-- Placeholder / Badge SSL 256-Bit -->
+            <div class="trust-payment-badge ssl-badge" title="Certificado de Encriptación SSL 256-Bit">
+              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <span><strong>SSL 256-Bit</strong> Encriptación</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom-copy">
+          <span>© 2026 <strong>SkillVault Academy</strong>. Todos los derechos reservados.</span>
+          <span>Diseñado para estudiantes de alto rendimiento • Tema Oscuro Gamificado ⚡</span>
+        </div>
+      </footer>
     </main>
   </div>
 
@@ -471,6 +749,203 @@
       <div class="lesson-stepper" id="lesson-stepper"></div>
       <div class="modal-body" id="modal-body"></div>
       <div class="modal-footer" id="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- MODAL INFORMATIVO DEL FOOTER (FAQ, Centro de Ayuda, Términos, Privacidad) -->
+  <div class="modal-overlay" id="info-modal">
+    <div class="modal-window" style="max-width: 680px;">
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="modal-cat-badge" id="info-modal-badge">Información Oficial SkillVault</span>
+        </div>
+        <button class="modal-close" onclick="closeInfoModal()">✕</button>
+      </div>
+      <h2 id="info-modal-title">Centro de Confianza SkillVault</h2>
+      <div class="modal-body" id="info-modal-body" style="margin-top: 12px;"></div>
+      <div class="modal-footer">
+        <button class="btn-primary-full" onclick="closeInfoModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEJORA MOBILE 1: BOTTOM NAVIGATION BAR (Anclado abajo en móviles con 4 íconos táctiles) -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Navegación principal móvil">
+    <button type="button" class="mob-nav-item active" data-mob-tab="explore" onclick="switchAppTab('explore')">
+      <span class="mob-nav-icon">🏠</span>
+      <span class="mob-nav-label">Inicio</span>
+    </button>
+    <button type="button" class="mob-nav-item" data-mob-tab="certificates" onclick="switchAppTab('certificates')">
+      <span class="mob-nav-icon">🎓</span>
+      <span class="mob-nav-label">Mis Cursos</span>
+    </button>
+    <button type="button" class="mob-nav-item" data-mob-tab="rewards" onclick="switchAppTab('rewards')">
+      <span class="mob-nav-icon">💎</span>
+      <span class="mob-nav-label">Bóveda VIP</span>
+    </button>
+    <button type="button" class="mob-nav-item" data-mob-tab="profile" onclick="switchAppTab('profile')">
+      <span class="mob-nav-icon">👤</span>
+      <span class="mob-nav-label">Perfil</span>
+    </button>
+  </nav>
+
+  <!-- MEJORA MOBILE 2: MODAL DE LISTA DE ESPERA (Cuando cursos activos === 0) -->
+  <div class="modal-overlay" id="waitlist-modal">
+    <div class="modal-window mobile-friendly-modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="modal-cat-badge" style="background: rgba(251, 191, 36, 0.18); color: #fde68a;">⏳ Cupos en Apertura • Prioridad VIP</span>
+        </div>
+        <button class="modal-close" type="button" onclick="closeWaitlistModal()">✕</button>
+      </div>
+
+      <h2 id="waitlist-modal-title">Unirse a la Lista de Espera Prioritaria</h2>
+      <p class="modal-sponsor" id="waitlist-modal-subtitle">
+        Regístrate gratis hoy y recibe acceso anticipado + un bono de <strong>+100 PTS</strong> apenas se habiliten las nuevas vacantes de <strong id="waitlist-plan-name">SkillVault Academy</strong>.
+      </p>
+
+      <form id="waitlist-form" class="mobile-modal-form">
+        <div class="form-group">
+          <label for="waitlist-name">Tu Nombre Completo</label>
+          <input type="text" id="waitlist-name" placeholder="Ej: Sofía Martínez" autocomplete="name" required />
+        </div>
+        <div class="form-group">
+          <label for="waitlist-email">Tu Correo Electrónico</label>
+          <input type="email" id="waitlist-email" placeholder="tu@correo.com" autocomplete="email" required />
+        </div>
+        <button type="submit" class="btn-primary-full gold-vip-cta" style="margin-top: 8px;">
+          🚀 Reservar mi Lugar y Reclamar +100 PTS
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MEJORA MOBILE 3: MODAL FULLSCREEN DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-window auth-fullscreen-modal" style="max-width: 460px;">
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="modal-cat-badge">⚡ Cuenta SkillVault</span>
+        </div>
+        <button class="modal-close" type="button" onclick="closeAuthModal()">✕</button>
+      </div>
+
+      <!-- Selector de Pestañas Login / Registro -->
+      <div class="auth-tabs-switcher" role="tablist">
+        <button type="button" class="auth-tab-btn active" id="auth-tab-login" onclick="switchAuthMode('login')">
+          Iniciar Sesión
+        </button>
+        <button type="button" class="auth-tab-btn" id="auth-tab-register" onclick="switchAuthMode('register')">
+          Crear Cuenta
+        </button>
+      </div>
+
+      <h2 id="auth-modal-heading" style="margin-bottom: 6px;">Bienvenido de nuevo a SkillVault</h2>
+      <p id="auth-modal-subtext" style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 18px;">
+        Ingresa para guardar tus Puntos Estándar (PTS), Puntos Exclusivos VIP (👑 VP) y diplomas.
+      </p>
+
+      <!-- Botón Continuar con Google -->
+      <button type="button" class="btn-google-oauth" onclick="handleGoogleAuth()">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.5 12 2.5 6.8 2.5 2.5 6.8 2.5 12s4.3 9.5 9.5 9.5c5.5 0 9.1-3.9 9.1-9.3 0-.6-.1-1.1-.2-1.6H12z"/>
+        </svg>
+        <span>Continuar con Google</span>
+      </button>
+
+      <div class="auth-divider"><span>o con tu correo electrónico</span></div>
+
+      <form id="auth-form" class="mobile-modal-form">
+        <div class="form-group" id="auth-name-group" style="display: none;">
+          <label for="auth-name">Nombre y Apellido</label>
+          <input type="text" id="auth-name" placeholder="Ej: Lucas Gómez" autocomplete="name" />
+        </div>
+
+        <div class="form-group">
+          <label for="auth-email">Correo Electrónico</label>
+          <input type="email" id="auth-email" placeholder="alumno@correo.com" autocomplete="email" required />
+        </div>
+
+        <div class="form-group">
+          <div class="auth-label-row">
+            <label for="auth-password">Contraseña</label>
+            <a href="#forgot" class="forgot-pass-link" id="forgot-pass-link" onclick="handleForgotPassword(); return false;">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+          <input type="password" id="auth-password" placeholder="••••••••" minlength="6" autocomplete="current-password" required />
+        </div>
+
+        <button type="submit" class="btn-primary-full" id="auth-submit-btn" style="margin-top: 8px;">
+          🚀 Iniciar Sesión en mi Cuenta
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MEJORA MOBILE 4: MODAL DE SIMULACIÓN DE CHECKOUT (PASARELA DE PAGO) -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-window mobile-friendly-modal" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="modal-cat-badge" style="background: rgba(16, 185, 129, 0.16); color: #34d399;">🔒 Checkout Seguro SSL 256-Bit</span>
+        </div>
+        <button class="modal-close" type="button" onclick="closeCheckoutModal()">✕</button>
+      </div>
+
+      <h2>Confirmación de Pedido</h2>
+      <p class="modal-sponsor">Desbloqueo instantáneo en tu cuenta al confirmar el pago.</p>
+
+      <!-- Resumen del Pedido -->
+      <div class="checkout-summary-card">
+        <div class="checkout-summary-row">
+          <div>
+            <span class="checkout-item-tag" id="checkout-item-badge">PLAN SELECCIONADO</span>
+            <h3 id="checkout-item-title">Pase VIP PRO Mensual</h3>
+            <p id="checkout-item-desc">Los 14 cursos completos desbloqueados + Puntos Exclusivos VIP (👑 VP).</p>
+          </div>
+          <div class="checkout-price-box">
+            <span id="checkout-item-price">$49.00</span>
+            <small>USD</small>
+          </div>
+        </div>
+        <div class="checkout-bonus-strip" id="checkout-item-bonus">
+          🎁 Bono inmediato incluido: <strong>+120 VP Exclusivos + 300 PTS</strong>
+        </div>
+      </div>
+
+      <!-- Selector de Pasarela (Stripe / PayPal / MercadoPago) -->
+      <form id="checkout-payment-form" class="mobile-modal-form">
+        <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Elige tu pasarela de pago preferida:</label>
+        <div class="checkout-gateway-grid">
+          <label class="gateway-pill active">
+            <input type="radio" name="checkout-gateway" value="Stripe (Tarjeta Internacional)" checked />
+            <span>💳 Stripe</span>
+          </label>
+          <label class="gateway-pill">
+            <input type="radio" name="checkout-gateway" value="PayPal Express Checkout" />
+            <span>🅿️ PayPal</span>
+          </label>
+          <label class="gateway-pill">
+            <input type="radio" name="checkout-gateway" value="MercadoPago" />
+            <span>🏦 MercadoPago</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="checkout-cardholder">Nombre del Titular / Correo de Facturación</label>
+          <input type="text" id="checkout-cardholder" placeholder="Ej: Nombre como figura en la tarjeta o email" required />
+        </div>
+
+        <div class="checkout-total-bar">
+          <span>Total a pagar hoy:</span>
+          <strong id="checkout-total-amount">$49.00 USD</strong>
+        </div>
+
+        <button type="submit" class="btn-primary-full gold-vip-cta" id="checkout-pay-now-btn">
+          🔒 Pagar ahora ($49.00 USD)
+        </button>
+      </form>
     </div>
   </div>
 

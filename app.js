@@ -5379,8 +5379,17 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+let simulateZeroCourses = false;
+
 function getAllSkills() {
+  if (simulateZeroCourses) {
+    return [];
+  }
   return [...DEFAULT_SKILLS, ...(state.customSkills || [])];
+}
+
+function getActiveCoursesCount() {
+  return getAllSkills().length;
 }
 
 function showToast(message) {
@@ -5448,6 +5457,8 @@ function formatCourseDuration(minutes) {
 // Actualizar UI general
 function renderHeaderAndStats() {
   const lvl = getLevelInfo();
+  const isZeroCatalog = getActiveCoursesCount() === 0;
+
   document.getElementById('user-level').textContent = lvl.level;
   document.getElementById('user-rank-title').textContent = lvl.rankTitle;
   document.getElementById('user-streak').textContent = state.streak;
@@ -5458,6 +5469,84 @@ function renderHeaderAndStats() {
   document.getElementById('vip-status-tag').textContent = state.isProMember
     ? '👑 VIP Activo (+VP)'
     : 'Cuenta Estándar';
+
+  // Sincronizar tarjeta de Rango y XP en la vista móvil "Perfil" (#view-profile)
+  const mobLvl = document.getElementById('mob-user-level');
+  if (mobLvl) {
+    mobLvl.textContent = lvl.level;
+    document.getElementById('mob-user-rank-title').textContent = lvl.rankTitle;
+    document.getElementById('mob-user-streak').textContent = state.streak;
+    document.getElementById('mob-user-xp').textContent = lvl.xpInLevel;
+    document.getElementById('mob-user-next-xp').textContent = lvl.nextXp;
+    document.getElementById('mob-xp-bar-fill').style.width = `${(lvl.xpInLevel / lvl.nextXp) * 100}%`;
+    document.getElementById('mob-vip-status-tag').textContent = state.isProMember
+      ? '👑 VIP Activo (+VP)'
+      : 'Cuenta Estándar';
+  }
+
+  // Sincronizar estado de Autenticación (Header + Vista Perfil)
+  const currentUser = state.userAccount || null;
+  const headerAuthBtn = document.getElementById('header-auth-btn');
+  const mobileTopAuthBtn = document.getElementById('mobile-top-auth-btn');
+  const profName = document.getElementById('profile-user-name');
+  const profEmail = document.getElementById('profile-user-email');
+  const profAvatar = document.getElementById('profile-avatar-circle');
+  const profActions = document.getElementById('profile-auth-actions');
+
+  if (currentUser) {
+    const shortName = currentUser.name.split(' ')[0];
+    if (headerAuthBtn) {
+      headerAuthBtn.textContent = `👤 ${shortName}`;
+      headerAuthBtn.onclick = () => switchAppTab('profile');
+    }
+    if (mobileTopAuthBtn) {
+      mobileTopAuthBtn.textContent = `👤 ${shortName}`;
+      mobileTopAuthBtn.onclick = () => switchAppTab('profile');
+    }
+    if (profName) profName.textContent = currentUser.name;
+    if (profEmail) profEmail.textContent = `${currentUser.email} • Sesión activa ✅`;
+    if (profAvatar) {
+      profAvatar.textContent = currentUser.name
+        .split(' ')
+        .map(w => w[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase();
+    }
+    if (profActions) {
+      profActions.innerHTML = `
+        <button type="button" class="btn-secondary" style="grid-column: 1/-1;" onclick="logoutUser()">
+          🚪 Cerrar Sesión (${currentUser.email})
+        </button>
+      `;
+    }
+  } else {
+    if (headerAuthBtn) {
+      headerAuthBtn.textContent = '👤 Iniciar Sesión';
+      headerAuthBtn.onclick = () => openAuthModal('login');
+    }
+    if (mobileTopAuthBtn) {
+      mobileTopAuthBtn.textContent = '👤 Entrar';
+      mobileTopAuthBtn.onclick = () => openAuthModal('login');
+    }
+    if (profName) profName.textContent = 'Estudiante Invitado';
+    if (profEmail) profEmail.textContent = 'Inicia sesión para sincronizar tus puntos en la nube';
+    if (profAvatar) profAvatar.textContent = 'SV';
+    if (profActions) {
+      profActions.innerHTML = `
+        <button type="button" class="btn-primary-full" onclick="openAuthModal('login')">🔐 Iniciar Sesión</button>
+        <button type="button" class="btn-secondary" style="width: 100%;" onclick="openAuthModal('register')">✨ Crear Cuenta Gratis</button>
+      `;
+    }
+  }
+
+  // Actualizar estado del botón de simulación de Catálogo Vacío
+  const simCatalogBtn = document.getElementById('toggle-empty-catalog-btn');
+  const simCatalogLabel = document.getElementById('catalog-sim-status');
+  if (simCatalogBtn && simCatalogLabel) {
+    simCatalogLabel.textContent = isZeroCatalog ? '0 Cursos (Lista de Espera)' : 'Activo (14)';
+    simCatalogBtn.classList.toggle('empty-active', isZeroCatalog);
+  }
 
   document.getElementById('user-points').innerHTML = `${state.points} <small>PTS</small>`;
   document.getElementById('user-vip-points').innerHTML = `${state.vipPoints} <small>VP</small>`;
@@ -5472,16 +5561,48 @@ function renderHeaderAndStats() {
   document.getElementById('owner-sales-count').textContent = `${state.ownerSalesCount} ventas`;
   document.getElementById('owner-subs-count').textContent = `${state.ownerSubsCount} miembros`;
 
+  // MEJORA MOBILE 2: Si la cantidad de cursos activos es 0, los botones de compra de la sección de precios
+  // cambian automáticamente por "Unirse a la Lista de Espera"
+  const buyIndivBtn = document.getElementById('buy-individual-btn');
   const buyProBtn = document.getElementById('buy-pro-btn');
-  if (buyProBtn && state.isProMember) {
-    buyProBtn.textContent = '👑 Membresía VIP PRO Activa (Ganas Puntos Exclusivos VP)';
-    buyProBtn.disabled = true;
-  }
-
   const buyFounderBtn = document.getElementById('buy-founder-btn');
-  if (buyFounderBtn && state.isProMember) {
-    buyFounderBtn.textContent = '👑 Cuenta VIP Activa (Todos los Cursos Desbloqueados)';
-    buyFounderBtn.disabled = true;
+
+  if (isZeroCatalog) {
+    if (buyIndivBtn) {
+      buyIndivBtn.textContent = '⏳ Unirse a la Lista de Espera';
+      buyIndivBtn.disabled = false;
+    }
+    if (buyProBtn) {
+      buyProBtn.textContent = '⏳ Unirse a la Lista de Espera';
+      buyProBtn.disabled = false;
+    }
+    if (buyFounderBtn) {
+      buyFounderBtn.textContent = '⏳ Unirse a la Lista de Espera';
+      buyFounderBtn.disabled = false;
+    }
+  } else {
+    if (buyIndivBtn) {
+      buyIndivBtn.textContent = '💳 Comprar Curso Individual ($24.99 USD)';
+      buyIndivBtn.disabled = false;
+    }
+    if (buyProBtn) {
+      if (state.isProMember) {
+        buyProBtn.textContent = '👑 Membresía VIP PRO Activa (Ganas Puntos Exclusivos VP)';
+        buyProBtn.disabled = true;
+      } else {
+        buyProBtn.textContent = '👑 Hacerse VIP PRO — $49.00 USD / mes';
+        buyProBtn.disabled = false;
+      }
+    }
+    if (buyFounderBtn) {
+      if (state.isProMember) {
+        buyFounderBtn.textContent = '👑 Cuenta VIP Activa (Todos los Cursos Desbloqueados)';
+        buyFounderBtn.disabled = true;
+      } else {
+        buyFounderBtn.textContent = '💎 Activar VIP Founder Anual — $129.00 USD';
+        buyFounderBtn.disabled = false;
+      }
+    }
   }
 
   const topVipBtn = document.getElementById('top-vip-cta-btn');
@@ -5493,8 +5614,15 @@ function renderHeaderAndStats() {
   const heroVipBtn = document.getElementById('hero-vip-btn');
   if (heroVipBtn) {
     heroVipBtn.textContent = state.isProMember
-      ? '👑 Pase VIP PRO Activo — Todos los Cursos Desbloqueados'
-      : '👑 Hacerse VIP PRO Ahora ($49 USD — Todo Desbloqueado)';
+      ? '👑 Pase VIP PRO Activo — Ver Beneficios'
+      : '👑 Ver Pase VIP PRO y Planes 💎';
+  }
+
+  const freeHookBtn = document.getElementById('hero-free-module-btn');
+  if (freeHookBtn) {
+    freeHookBtn.textContent = state.freeTrialBonusClaimed
+      ? '🎓 Continuar Módulo 1 Gratis (+50 PTS Acreditados ✅)'
+      : '🚀 Prueba el primer módulo gratis y gana tus primeros 50 PTS';
   }
 
   const sidebarVipBtn = document.getElementById('sidebar-vip-btn');
@@ -5510,8 +5638,27 @@ function renderHeaderAndStats() {
 
 function renderFeaturedSkill() {
   const all = getAllSkills();
-  const nextSkill = all.find(s => !state.completedCourses.includes(s.id) && !s.secretCourse) || all[0];
   const box = document.getElementById('featured-skill-box');
+  if (!box) return;
+
+  if (all.length === 0) {
+    box.innerHTML = `
+      <div class="card-top">
+        <span class="skill-cat-tag gold-tag">⏳ NUEVA COHORTE EN PREPARACIÓN</span>
+        <span class="points-pill">+100 PTS Bono</span>
+      </div>
+      <h3 style="margin-bottom: 8px; font-size: 18px;">Próxima Apertura de Cursos Completos</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+        Actualmente hay 0 cursos activos mientras actualizamos los laboratorios prácticos. Únete a la Lista de Espera para recibir acceso prioritario y +100 PTS gratis.
+      </p>
+      <button class="btn-start-skill gold-btn" onclick="openWaitlistModal('Acceso Prioritario Catálogo SkillVault')">
+        ⏳ Unirse a la Lista de Espera
+      </button>
+    `;
+    return;
+  }
+
+  const nextSkill = all.find(s => !state.completedCourses.includes(s.id) && !s.secretCourse) || all[0];
   const unlocked = hasAccessToCourse(nextSkill);
   const completed = state.completedCourses.includes(nextSkill.id);
   const qCount = getSkillQuestions(nextSkill).length;
@@ -5538,7 +5685,7 @@ function renderFeaturedSkill() {
         : `<button class="btn-start-skill buy-btn" onclick="buyCourse('${nextSkill.id}')">
             🔓 Comprar Curso Completo por $${nextSkill.priceUSD.toFixed(2)} USD
            </button>
-           <button class="btn-card-vip-upsell" onclick="document.querySelector('[data-tab=plans]').click()">
+           <button class="btn-card-vip-upsell" onclick="handlePlanCTA('monthly')">
             👑 O desbloquéalo con Pase VIP PRO ($49 USD • Incluye los 14 cursos)
            </button>`
     }
@@ -6182,6 +6329,27 @@ function renderSkillsGrid() {
     skills.sort((a, b) => a.duration - b.duration);
   }
 
+  if (getActiveCoursesCount() === 0) {
+    grid.innerHTML = `
+      <div class="empty-catalog-card">
+        <div class="empty-catalog-icon">⏳</div>
+        <h3>Actualmente hay 0 cursos activos en el catálogo</h3>
+        <p>
+          Estamos abriendo una nueva cohorte con laboratorios actualizados de <strong>Programación, Inteligencia Artificial, Finanzas y Marketing Digital</strong>. Únete a la Lista de Espera prioritaria y recibe <strong>+100 PTS gratis</strong> apenas abramos inscripciones.
+        </p>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <button type="button" class="btn-primary-full gold-vip-cta" style="max-width: 320px;" onclick="openWaitlistModal('Catálogo Completo SkillVault')">
+            ⏳ Unirse a la Lista de Espera (+100 PTS)
+          </button>
+          <button type="button" class="btn-secondary" onclick="toggleZeroCoursesSimulation()">
+            🔄 Restaurar los 14 Cursos Activos
+          </button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   if (skills.length === 0) {
     grid.innerHTML = `
       <div class="certificate-card" style="grid-column: 1/-1; text-align: center;">
@@ -6206,7 +6374,7 @@ function renderSkillsGrid() {
       let actionButton = '';
       if (skill.secretCourse && !unlocked) {
         const reqRw = EXCLUSIVE_VIP_REWARDS.find(r => r.id === skill.requiredRewardId) || EXCLUSIVE_VIP_REWARDS[0];
-        actionButton = `<button class="btn-start-skill gold-btn" onclick="document.querySelector('[data-tab=rewards]').click()">👑 Desbloquear con ${reqRw.costVIPPoints} VP en Bóveda VIP</button>`;
+        actionButton = `<button class="btn-start-skill gold-btn" onclick="switchAppTab('rewards')">👑 Desbloquear con ${reqRw.costVIPPoints} VP en Bóveda VIP</button>`;
       } else if (unlocked) {
         actionButton = `<button class="btn-start-skill ${completed ? 'done' : ''}" onclick="openSkillModal('${skill.id}')">
           ${
@@ -6222,7 +6390,7 @@ function renderSkillsGrid() {
           <button class="btn-start-skill buy-btn" onclick="buyCourse('${skill.id}')">
             💳 Desbloquear Curso Completo por $${skill.priceUSD.toFixed(2)} USD
           </button>
-          <button class="btn-card-vip-upsell" onclick="document.querySelector('[data-tab=plans]').click()">
+          <button class="btn-card-vip-upsell" onclick="handlePlanCTA('monthly')">
             👑 O desbloquéalo haciéndote VIP ($49 USD • Todos los cursos)
           </button>
         `;
@@ -6293,44 +6461,97 @@ function renderSkillsGrid() {
     .join('');
 }
 
-// Compra de un curso individual -> Dinero para ti
+// Compra de un curso individual -> Abre el Modal de Checkout (o Lista de Espera si hay 0 cursos)
 window.buyCourse = function (skillId) {
+  if (getActiveCoursesCount() === 0) {
+    openWaitlistModal('Curso Completo Individual');
+    return;
+  }
   const skill = getAllSkills().find(s => s.id === skillId);
   if (!skill) return;
 
-  state.ownedCourses.push(skill.id);
-  state.ownerBalanceUSD += skill.priceUSD;
-  state.ownerSalesCount += 1;
-
-  state.ownerTransactions.unshift({
-    id: 'otx-' + Date.now(),
-    title: `🎓 Venta de Curso: "${skill.title}"`,
-    date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    amount: skill.priceUSD,
-    type: 'positive'
+  openCheckoutModal({
+    type: 'course',
+    skillId: skill.id,
+    badge: `CURSO INDIVIDUAL • ${skill.category.toUpperCase()}`,
+    title: skill.title,
+    description: `Acceso ilimitado a los ${skill.lessons.length} módulos prácticos y examen final.`,
+    priceUSD: skill.priceUSD,
+    bonusText: `💎 Suma +${skill.pointsReward} PTS al aprobar el examen final`
   });
-
-  saveState();
-  renderHeaderAndStats();
-  renderSkillsGrid();
-  showToast(`🎉 ¡Curso completo "${skill.title}" desbloqueado! Ya puedes comenzar el Módulo 1.`);
 };
 
 window.handleVipQuickButton = function () {
   if (state.isProMember) {
-    document.querySelector('[data-tab="rewards"]').click();
+    switchAppTab('rewards');
     showToast('👑 Ya eres miembro VIP PRO activo. Aquí puedes canjear tus Puntos Exclusivos VIP (VP).');
     return;
   }
-  document.querySelector('[data-tab="plans"]').click();
+  switchAppTab('plans');
 };
 
-// Suscripción al Pase VIP PRO -> Dinero para ti ($49 USD mensual o $129 USD anual) + Habilita los Puntos Exclusivos VIP (VP)
-window.purchaseProMembership = function (tier = 'monthly') {
+// Función unificada de los botones de Planes ("Curso Individual", "Pase VIP PRO", "Pase VIP Founder")
+window.handlePlanCTA = function (planKey) {
+  const planNames = {
+    individual: 'Curso Completo Individual',
+    monthly: 'Pase VIP PRO Mensual',
+    annual: 'Pase VIP Founder Anual'
+  };
+
+  // Si la cantidad de cursos activos es 0, abre automáticamente el Modal de Lista de Espera
+  if (getActiveCoursesCount() === 0) {
+    openWaitlistModal(planNames[planKey] || 'Membresía SkillVault');
+    return;
+  }
+
+  if (planKey === 'individual') {
+    const firstLocked = getAllSkills().find(s => !hasAccessToCourse(s) && !s.secretCourse) || getAllSkills()[1] || getAllSkills()[0];
+    openCheckoutModal({
+      type: 'course',
+      skillId: firstLocked.id,
+      badge: 'CUENTA ESTÁNDAR • PAGO POR CURSO',
+      title: `Curso Individual: ${firstLocked.title}`,
+      description: 'Acceso permanente a los 6 módulos prácticos, casos de estudio y glosario.',
+      priceUSD: firstLocked.priceUSD || 24.99,
+      bonusText: `💎 Suma +${firstLocked.pointsReward || 250} PTS al completar el curso`
+    });
+    return;
+  }
+
   if (state.isProMember) {
     showToast('👑 Ya tienes tu Pase VIP PRO activo con todos los cursos completos desbloqueados.');
     return;
   }
+
+  if (planKey === 'annual') {
+    openCheckoutModal({
+      type: 'vip',
+      tier: 'annual',
+      badge: '💎 ACCESO TOTAL ANUAL + BONO MÁXIMO VP',
+      title: 'Pase VIP Founder (1 Año Completo)',
+      description: 'Todos los cursos actuales y futuros desbloqueados por 12 meses + multiplicador x1.5.',
+      priceUSD: 129.00,
+      bonusText: '🚀 Bono inmediato: +350 VP Exclusivos + 800 PTS de bienvenida'
+    });
+  } else {
+    openCheckoutModal({
+      type: 'vip',
+      tier: 'monthly',
+      badge: '🔥 PLAN MÁS ELEGIDO • ACCESO TOTAL',
+      title: 'Pase VIP PRO Mensual',
+      description: 'Desbloquea los 14 cursos completos al instante y habilita los Puntos Exclusivos VIP (👑 VP).',
+      priceUSD: 49.00,
+      bonusText: '🎁 Bono inmediato: +120 VP Exclusivos + 300 PTS de bienvenida'
+    });
+  }
+};
+
+// Suscripción al Pase VIP PRO -> Ejecuta la acreditación real tras confirmar en el Checkout
+window.purchaseProMembership = function (tier = 'monthly') {
+  window.handlePlanCTA(tier);
+};
+
+function completeVipMembershipPurchase(tier = 'monthly', gateway = 'Stripe') {
   const isAnnual = tier === 'annual';
   const price = isAnnual ? 129.00 : 49.00;
   const bonusPts = isAnnual ? 800 : 300;
@@ -6345,7 +6566,7 @@ window.purchaseProMembership = function (tier = 'monthly') {
 
   state.ownerTransactions.unshift({
     id: 'otx-pro-' + Date.now(),
-    title: `👑 Nueva Suscripción: ${planLabel} (+${bonusVp} VP entregados al alumno)`,
+    title: `👑 Suscripción vía ${gateway}: ${planLabel} (+${bonusVp} VP entregados)`,
     date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     amount: price,
     type: 'positive'
@@ -6354,8 +6575,8 @@ window.purchaseProMembership = function (tier = 'monthly') {
   saveState();
   renderHeaderAndStats();
   renderSkillsGrid();
-  showToast(`👑 ¡Bienvenido a ${planLabel}! Tienes todos los cursos completos desbloqueados + ${bonusVp} VP y +${bonusPts} PTS.`);
-};
+  showToast(`👑 ¡Pago confirmado vía ${gateway}! Bienvenido a ${planLabel} (+${bonusVp} VP y +${bonusPts} PTS).`);
+}
 
 window.simulateStudentPurchase = function () {
   const names = ['Valentina S.', 'Nicolás M.', 'Camila T.', 'Facundo B.', 'Julián K.'];
@@ -6994,43 +7215,347 @@ function renderOwnerTransactions() {
     .join('');
 }
 
+// ==========================================================================
+// MEJORA 1: LÓGICA DE SEPARACIÓN DE ROLES (ALUMNO VS ADMINISTRADOR)
+// ==========================================================================
 let isAdminModeActive = false;
-window.toggleAdminMode = function () {
-  isAdminModeActive = !isAdminModeActive;
+
+window.setRoleView = function (role, silent = false) {
+  isAdminModeActive = role === 'admin';
+  document.body.classList.toggle('role-student', !isAdminModeActive);
+  document.body.classList.toggle('role-admin', isAdminModeActive);
+
+  // Ocultar o mostrar por completo todos los elementos exclusivos de Administrador
+  // ("Panel del Creador", "Ingresos" y "Publicar Nuevo Curso")
   document.querySelectorAll('.owner-only-el').forEach(el => {
+    el.hidden = !isAdminModeActive;
     el.style.display = isAdminModeActive ? '' : 'none';
   });
-  const btn = document.getElementById('toggle-admin-btn');
-  if (btn) {
-    btn.textContent = isAdminModeActive ? '👤 Volver a Vista Cliente' : '🔐 Modo Administrador';
-    btn.classList.toggle('active', isAdminModeActive);
+
+  // Actualizar estado del Toggle en el Header
+  const studentPill = document.getElementById('role-btn-student');
+  const adminPill = document.getElementById('role-btn-admin');
+  if (studentPill) studentPill.classList.toggle('active', !isAdminModeActive);
+  if (adminPill) adminPill.classList.toggle('active', isAdminModeActive);
+
+  // Sincronizar botón secundario del Sidebar
+  const sidebarBtn = document.getElementById('toggle-admin-btn');
+  if (sidebarBtn) {
+    sidebarBtn.textContent = isAdminModeActive
+      ? 'Simular vista: Administrador (Cambiar a Alumno)'
+      : 'Simular vista: Alumno (Cambiar a Admin)';
+    sidebarBtn.classList.toggle('active', isAdminModeActive);
   }
+
+  // Si pasa a modo Alumno mientras estaba en Panel del Creador o Publicar Curso, expulsar al Catálogo
   if (!isAdminModeActive) {
+    const ownerView = document.getElementById('view-owner');
+    const createView = document.getElementById('view-create');
+    if (ownerView) ownerView.classList.remove('active');
+    if (createView) createView.classList.remove('active');
+
     const activeTab = document.querySelector('.nav-item.active');
-    if (activeTab && (activeTab.dataset.tab === 'owner' || activeTab.dataset.tab === 'create')) {
+    if (!activeTab || activeTab.dataset.tab === 'owner' || activeTab.dataset.tab === 'create') {
       const exploreBtn = document.querySelector('.nav-item[data-tab="explore"]');
       if (exploreBtn) exploreBtn.click();
     }
   }
+
+  if (!silent) {
+    showToast(
+      isAdminModeActive
+        ? '🔐 Simulación de Vista: Administrador (Panel del Creador, Ingresos y Publicar Curso habilitados).'
+        : '🎓 Simulación de Vista: Alumno (Panel del Creador, Ingresos y Publicar Curso ocultos por completo).'
+    );
+  }
+};
+
+window.toggleAdminMode = function () {
+  window.setRoleView(isAdminModeActive ? 'student' : 'admin');
+};
+
+// ==========================================================================
+// MEJORA 2: GANCHO GRATUITO DEL HERO (PRIMER MÓDULO GRATIS + 50 PTS)
+// ==========================================================================
+window.startFreeTrialModule = function () {
+  const freeSkillId = 'py-automation';
+  if (!state.ownedCourses.includes(freeSkillId)) {
+    state.ownedCourses.push(freeSkillId);
+  }
+
+  if (!state.freeTrialBonusClaimed) {
+    state.points += 50;
+    state.xp += 50;
+    state.freeTrialBonusClaimed = true;
+    saveState();
+    renderHeaderAndStats();
+    showToast('🎉 ¡Ganaste tus primeros +50 PTS y +50 XP! Comienza ahora el Módulo 1 gratuito.');
+  } else {
+    showToast('🚀 Abriendo tu Módulo 1 gratuito de Python y Automatización...');
+  }
+
+  openSkillModal(freeSkillId);
+  jumpToModalStep(0);
+};
+
+// ==========================================================================
+// MEJORA 4: FUNCIONES DEL FOOTER DE CONFIANZA (FAQ, AYUDA, LEGAL)
+// ==========================================================================
+const FOOTER_INFO_CONTENT = {
+  faq: {
+    badge: '❓ Preguntas Frecuentes (FAQ)',
+    title: 'Preguntas Frecuentes sobre SkillVault Academy',
+    html: `
+      <div class="lesson-box">
+        <h4>1. ¿Cuál es la diferencia entre Puntos Estándar (PTS) y Puntos Exclusivos VIP (👑 VP)?</h4>
+        <p style="color:var(--text-muted); margin-bottom:14px;">Los <strong>PTS</strong> los ganan todos los estudiantes al superar los módulos prácticos y aprobar el examen final de cada curso. Sirven para abrir cofres estándar en la Bóveda (plantillas, guías y UI kits). Los <strong>👑 VP</strong> son puntos de élite exclusivos para miembros con <strong>Pase VIP PRO</strong> o <strong>VIP Founder</strong> y permiten desbloquear Masterclasses Secretas, código fuente Full-Stack y mentorías 1 a 1.</p>
+        <h4>2. ¿Realmente puedo probar el primer módulo gratis?</h4>
+        <p style="color:var(--text-muted); margin-bottom:14px;">¡Sí! Al hacer clic en el botón del Hero desbloqueas sin costo el Módulo 1 interactivo y recibes tus primeros <strong>+50 PTS</strong> para experimentar la plataforma antes de elegir un plan.</p>
+        <h4>3. ¿Por qué el Pase VIP PRO conviene más que comprar cursos por separado?</h4>
+        <p style="color:var(--text-muted);">Cada curso individual cuesta entre $24.99 y $39.99 USD. Con el <strong>Pase VIP PRO ($49 USD/mes)</strong> desbloqueas los 14 cursos completos al instante, recibes un multiplicador x1.5 de PTS y habilitas la ganancia de Puntos Exclusivos VIP (VP).</p>
+      </div>
+    `
+  },
+  help: {
+    badge: '🛟 Centro de Ayuda',
+    title: 'Centro de Soporte al Estudiante 24/7',
+    html: `
+      <div class="lesson-box">
+        <h4>¿Necesitas asistencia con tu cuenta, tus puntos o tus cursos?</h4>
+        <p style="color:var(--text-muted); margin-bottom:14px;">Nuestro equipo de soporte académico y técnico responde en menos de 2 horas hábiles.</p>
+        <ul style="color:var(--text-main); line-height:1.8; margin-left:18px;">
+          <li>📧 <strong>Soporte Técnico y Pagos:</strong> soporte@skillvault.academy</li>
+          <li>👑 <strong>Atención Prioritaria Miembros VIP:</strong> vip@skillvault.academy</li>
+          <li>💬 <strong>Comunidad Discord Oficial:</strong> Canal #ayuda-en-vivo habilitado para todos los rangos.</li>
+        </ul>
+      </div>
+    `
+  },
+  terms: {
+    badge: '📄 Términos y Condiciones',
+    title: 'Términos y Condiciones de Uso',
+    html: `
+      <div class="lesson-box">
+        <h4>Condiciones Generales de la Academia</h4>
+        <p style="color:var(--text-muted); margin-bottom:12px;">1. <strong>Licencia de Uso Personal:</strong> El acceso a los cursos completos, plantillas descargables y repositorios de la Bóveda es personal e intransferible para cada estudiante registrado.</p>
+        <p style="color:var(--text-muted); margin-bottom:12px;">2. <strong>Sistema de Puntos (PTS y VP):</strong> Los Puntos Estándar (PTS) y Puntos Exclusivos VIP (VP) son unidades de recompensa gamificada internas para canjear por recursos educativos, cursos secretos y herramientas dentro de SkillVault.</p>
+        <p style="color:var(--text-muted);">3. <strong>Pagos y Renovaciones:</strong> Los cursos individuales otorgan acceso vitalicio. Las membresías VIP pueden cancelarse en cualquier momento desde tu panel sin cargos ocultos.</p>
+      </div>
+    `
+  },
+  privacy: {
+    badge: '🔒 Políticas de Privacidad',
+    title: 'Política de Privacidad y Protección de Datos',
+    html: `
+      <div class="lesson-box">
+        <h4>Tu privacidad y seguridad son nuestra prioridad</h4>
+        <p style="color:var(--text-muted); margin-bottom:12px;">• <strong>Encriptación SSL de 256 bits:</strong> Toda la comunicación entre tu navegador y SkillVault viaja cifrada bajo estándares bancarios.</p>
+        <p style="color:var(--text-muted); margin-bottom:12px;">• <strong>Procesamiento Seguro (Stripe & PayPal):</strong> SkillVault nunca almacena los datos completos de tus tarjetas de crédito; los pagos son procesados directamente por pasarelas certificadas PCI-DSS Nivel 1.</p>
+        <p style="color:var(--text-muted);">• <strong>Cero Spam:</strong> Tus datos de progreso académico y correo jamás se venden ni comparten con terceros.</p>
+      </div>
+    `
+  },
+  guarantee: {
+    badge: '🛡️ Garantía Oficial SkillVault',
+    title: 'Garantía de Satisfacción de 7 Días',
+    html: `
+      <div class="lesson-box">
+        <h4>Estudia sin riesgo</h4>
+        <p style="color:var(--text-muted);">Si activas tu membresía o adquieres un curso completo y sientes que la metodología práctica de 6 módulos con checkpoints no es para ti, puedes solicitar el reembolso dentro de los primeros 7 días con un solo clic.</p>
+      </div>
+    `
+  }
+};
+
+window.openInfoModal = function (topicKey) {
+  const data = FOOTER_INFO_CONTENT[topicKey] || FOOTER_INFO_CONTENT.faq;
+  document.getElementById('info-modal-badge').textContent = data.badge;
+  document.getElementById('info-modal-title').textContent = data.title;
+  document.getElementById('info-modal-body').innerHTML = data.html;
+  document.getElementById('info-modal').classList.add('open');
+};
+
+window.closeInfoModal = function () {
+  document.getElementById('info-modal').classList.remove('open');
+};
+
+window.filterByFooterCategory = function (catName) {
+  window.switchAppTab('explore');
+  const catBtn = document.querySelector(`#category-filters .cat-btn[data-cat="${catName}"]`);
+  if (catBtn) {
+    catBtn.click();
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ==========================================================================
+// MEJORA MOBILE 1: NAVEGACIÓN UNIFICADA (SIDEBAR DESKTOP + BOTTOM NAV MÓVIL)
+// ==========================================================================
+window.switchAppTab = function (tabName) {
+  if (!isAdminModeActive && (tabName === 'owner' || tabName === 'create')) {
+    showToast('🔒 Esta sección solo está disponible en la vista de Administrador.');
+    return;
+  }
+
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
+  });
+  document.querySelectorAll('.mob-nav-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mobTab === tabName);
+  });
+  document.querySelectorAll('.tab-view').forEach(v => {
+    v.classList.toggle('active', v.id === `view-${tabName}`);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ==========================================================================
+// MEJORA MOBILE 2: ESTADO VACÍO (0 CURSOS ACTIVOS) Y LISTA DE ESPERA
+// ==========================================================================
+window.toggleZeroCoursesSimulation = function () {
+  simulateZeroCourses = !simulateZeroCourses;
+  renderHeaderAndStats();
+  renderSkillsGrid();
   showToast(
-    isAdminModeActive
-      ? '🔐 Modo Administrador activado: Panel de ganancias y creador de cursos visibles.'
-      : '👤 Vista Cliente activada: Academia lista para tus alumnos.'
+    simulateZeroCourses
+      ? '⏳ Simulación activada: 0 cursos activos. Los botones de planes ahora abren la Lista de Espera.'
+      : '✅ Catálogo restaurado: 14 cursos completos activos y listos para comprar.'
   );
+};
+
+window.openWaitlistModal = function (planOrContext = 'SkillVault Academy') {
+  const planSpan = document.getElementById('waitlist-plan-name');
+  if (planSpan) planSpan.textContent = planOrContext;
+  if (state.userAccount) {
+    document.getElementById('waitlist-name').value = state.userAccount.name || '';
+    document.getElementById('waitlist-email').value = state.userAccount.email || '';
+  }
+  document.getElementById('waitlist-modal').classList.add('open');
+};
+
+window.closeWaitlistModal = function () {
+  document.getElementById('waitlist-modal').classList.remove('open');
+};
+
+// ==========================================================================
+// MEJORA MOBILE 3: FLUJO DE AUTENTICACIÓN (LOGIN / REGISTRO / GOOGLE)
+// ==========================================================================
+let currentAuthMode = 'login';
+
+window.openAuthModal = function (mode = 'login') {
+  switchAuthMode(mode);
+  document.getElementById('auth-modal').classList.add('open');
+};
+
+window.closeAuthModal = function () {
+  document.getElementById('auth-modal').classList.remove('open');
+};
+
+window.switchAuthMode = function (mode) {
+  currentAuthMode = mode === 'register' ? 'register' : 'login';
+  const isRegister = currentAuthMode === 'register';
+
+  document.getElementById('auth-tab-login').classList.toggle('active', !isRegister);
+  document.getElementById('auth-tab-register').classList.toggle('active', isRegister);
+
+  const nameGroup = document.getElementById('auth-name-group');
+  const nameInput = document.getElementById('auth-name');
+  const heading = document.getElementById('auth-modal-heading');
+  const subtext = document.getElementById('auth-modal-subtext');
+  const submitBtn = document.getElementById('auth-submit-btn');
+  const forgotLink = document.getElementById('forgot-pass-link');
+
+  if (nameGroup) nameGroup.style.display = isRegister ? 'block' : 'none';
+  if (nameInput) nameInput.required = isRegister;
+
+  if (heading) {
+    heading.textContent = isRegister
+      ? 'Crea tu Cuenta Gratis en SkillVault'
+      : 'Bienvenido de nuevo a SkillVault';
+  }
+  if (subtext) {
+    subtext.textContent = isRegister
+      ? 'Regístrate en segundos para guardar tus puntos PTS, subir de rango y desbloquear cofres.'
+      : 'Ingresa para sincronizar tus Puntos Estándar (PTS), Puntos Exclusivos VIP (👑 VP) y diplomas.';
+  }
+  if (submitBtn) {
+    submitBtn.textContent = isRegister
+      ? '✨ Crear mi Cuenta y Reclamar Rango Bronce'
+      : '🚀 Iniciar Sesión en mi Cuenta';
+  }
+  if (forgotLink) {
+    forgotLink.style.display = isRegister ? 'none' : 'inline';
+  }
+};
+
+window.handleGoogleAuth = function () {
+  state.userAccount = {
+    name: 'Gonzalo Estudiante VIP',
+    email: 'gonzalo.google@skillvault.academy',
+    provider: 'Google'
+  };
+  saveState();
+  renderHeaderAndStats();
+  closeAuthModal();
+  showToast('✅ ¡Autenticado con Google! Tus puntos PTS y progreso están sincronizados.');
+};
+
+window.handleForgotPassword = function () {
+  const emailInput = document.getElementById('auth-email');
+  const emailVal = emailInput && emailInput.value.trim();
+  if (!emailVal) {
+    showToast('📧 Escribe primero tu correo electrónico arriba para enviarte el enlace de recuperación.');
+    if (emailInput) emailInput.focus();
+    return;
+  }
+  showToast(`🔑 Enlace de recuperación enviado a ${emailVal}. Revisa tu bandeja de entrada.`);
+};
+
+window.logoutUser = function () {
+  state.userAccount = null;
+  saveState();
+  renderHeaderAndStats();
+  showToast('👋 Sesión cerrada correctamente.');
+};
+
+// ==========================================================================
+// MEJORA MOBILE 4: SIMULACIÓN DE CHECKOUT (STRIPE / PAYPAL / MERCADOPAGO)
+// ==========================================================================
+let pendingCheckoutConfig = null;
+
+window.openCheckoutModal = function (config) {
+  pendingCheckoutConfig = config;
+  document.getElementById('checkout-item-badge').textContent = config.badge || 'RESUMEN DEL PEDIDO';
+  document.getElementById('checkout-item-title').textContent = config.title;
+  document.getElementById('checkout-item-desc').textContent = config.description;
+  document.getElementById('checkout-item-price').textContent = `$${config.priceUSD.toFixed(2)}`;
+  document.getElementById('checkout-item-bonus').innerHTML = config.bonusText || '🎁 Acceso inmediato al confirmar';
+  document.getElementById('checkout-total-amount').textContent = `$${config.priceUSD.toFixed(2)} USD`;
+  document.getElementById('checkout-pay-now-btn').textContent = `🔒 Pagar ahora ($${config.priceUSD.toFixed(2)} USD)`;
+
+  if (state.userAccount) {
+    document.getElementById('checkout-cardholder').value = state.userAccount.name || state.userAccount.email || '';
+  }
+
+  document.getElementById('checkout-modal').classList.add('open');
+};
+
+window.closeCheckoutModal = function () {
+  document.getElementById('checkout-modal').classList.remove('open');
 };
 
 // Eventos principales
 document.addEventListener('DOMContentLoaded', () => {
+  // Inicializar siempre en Modo Alumno estricto (ocultando Panel del Creador, Ingresos y Publicar Curso)
+  window.setRoleView('student', true);
   renderHeaderAndStats();
   renderSkillsGrid();
   renderDictionary();
 
   const navButtons = document.querySelectorAll('.nav-item');
-  const views = document.querySelectorAll('.tab-view');
 
   function switchTab(tabName) {
-    navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabName));
-    views.forEach(v => v.classList.toggle('active', v.id === `view-${tabName}`));
+    window.switchAppTab(tabName);
   }
 
   navButtons.forEach(btn => {
@@ -7041,6 +7566,122 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('top-points-btn').addEventListener('click', () => switchTab('rewards'));
   document.getElementById('top-vip-points-btn').addEventListener('click', () => switchTab('rewards'));
   document.getElementById('top-owner-btn').addEventListener('click', () => switchTab('owner'));
+
+  // Selector visual de pasarelas en el Checkout Modal
+  document.querySelectorAll('.gateway-pill').forEach(label => {
+    label.addEventListener('click', () => {
+      document.querySelectorAll('.gateway-pill').forEach(l => l.classList.remove('active'));
+      label.classList.add('active');
+    });
+  });
+
+  // Submit de Lista de Espera (#waitlist-form)
+  const waitlistForm = document.getElementById('waitlist-form');
+  if (waitlistForm) {
+    waitlistForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('waitlist-name').value.trim();
+      const email = document.getElementById('waitlist-email').value.trim();
+      const planName = document.getElementById('waitlist-plan-name').textContent;
+
+      if (!state.waitlistEntries) state.waitlistEntries = [];
+      state.waitlistEntries.push({
+        name,
+        email,
+        plan: planName,
+        date: new Date().toISOString()
+      });
+
+      state.points += 100;
+      saveState();
+      renderHeaderAndStats();
+      waitlistForm.reset();
+      closeWaitlistModal();
+      showToast(`🎉 ¡${name}, estás en la Lista de Espera de "${planName}"! Te acreditamos +100 PTS de regalo.`);
+    });
+  }
+
+  // Submit de Login / Registro (#auth-form)
+  const authForm = document.getElementById('auth-form');
+  if (authForm) {
+    authForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const rawName = document.getElementById('auth-name').value.trim();
+      const displayName =
+        currentAuthMode === 'register' && rawName
+          ? rawName
+          : email.split('@')[0].replace(/[._-]/g, ' ');
+
+      state.userAccount = {
+        name: displayName.charAt(0).toUpperCase() + displayName.slice(1),
+        email,
+        provider: 'Email'
+      };
+
+      if (currentAuthMode === 'register' && !state.welcomeAuthPtsClaimed) {
+        state.points += 50;
+        state.welcomeAuthPtsClaimed = true;
+        showToast(`✨ ¡Cuenta creada con éxito, ${state.userAccount.name}! Recibiste +50 PTS de bienvenida.`);
+      } else {
+        showToast(`👋 ¡Bienvenido de nuevo, ${state.userAccount.name}! Sesión iniciada.`);
+      }
+
+      saveState();
+      renderHeaderAndStats();
+      authForm.reset();
+      closeAuthModal();
+    });
+  }
+
+  // Submit de Checkout (#checkout-payment-form)
+  const checkoutForm = document.getElementById('checkout-payment-form');
+  if (checkoutForm) {
+    checkoutForm.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!pendingCheckoutConfig) return;
+
+      const selectedGatewayEl = document.querySelector('input[name="checkout-gateway"]:checked');
+      const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'Stripe';
+
+      if (pendingCheckoutConfig.type === 'vip') {
+        completeVipMembershipPurchase(pendingCheckoutConfig.tier, gateway);
+      } else if (pendingCheckoutConfig.type === 'course') {
+        const skill = getAllSkills().find(s => s.id === pendingCheckoutConfig.skillId);
+        if (skill) {
+          if (!state.ownedCourses.includes(skill.id)) {
+            state.ownedCourses.push(skill.id);
+          }
+          state.ownerBalanceUSD += skill.priceUSD;
+          state.ownerSalesCount += 1;
+          state.ownerTransactions.unshift({
+            id: 'otx-' + Date.now(),
+            title: `🎓 Venta vía ${gateway}: "${skill.title}"`,
+            date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            amount: skill.priceUSD,
+            type: 'positive'
+          });
+          saveState();
+          renderHeaderAndStats();
+          renderSkillsGrid();
+          showToast(`🎉 ¡Pago procesado con ${gateway}! Curso "${skill.title}" desbloqueado.`);
+        }
+      }
+
+      checkoutForm.reset();
+      closeCheckoutModal();
+    });
+  }
+
+  // Cerrar modales adicionales con clic afuera
+  ['info-modal', 'waitlist-modal', 'auth-modal', 'checkout-modal'].forEach(modalId => {
+    const m = document.getElementById(modalId);
+    if (m) {
+      m.addEventListener('click', e => {
+        if (e.target === m) m.classList.remove('open');
+      });
+    }
+  });
 
   document.querySelectorAll('#category-filters .cat-btn').forEach(btn => {
     btn.addEventListener('click', () => {
