@@ -5720,12 +5720,11 @@ function renderFeaturedSkill() {
       <span>📚 ${nextSkill.lessons.length} Módulos Extensos (${formatCourseDuration(nextSkill.duration)}) + Examen (${qCount} preg.)</span>
       <span>👑 <strong>+${nextSkill.vipPointsReward || 50} VP</strong></span>
     </div>
-    ${
-      unlocked
-        ? `<button class="btn-start-skill" onclick="openSkillModal('${nextSkill.id}')">
+    ${unlocked
+      ? `<button class="btn-start-skill" onclick="openSkillModal('${nextSkill.id}')">
             ${completed ? '✅ Repasar Módulos' : `▶ Cursar ${nextSkill.lessons.length} Módulos (+${nextSkill.pointsReward} PTS ${state.isProMember ? `y +${nextSkill.vipPointsReward} VP` : ''})`}
            </button>`
-        : `<button class="btn-start-skill buy-btn" onclick="buyCourse('${nextSkill.id}')">
+      : `<button class="btn-start-skill buy-btn" onclick="buyCourse('${nextSkill.id}')">
             🔓 Comprar Curso Completo por $${nextSkill.priceUSD.toFixed(2)} USD
            </button>
            <button class="btn-card-vip-upsell" onclick="handlePlanCTA('monthly')">
@@ -6355,8 +6354,8 @@ function renderSkillsGrid() {
       activeFilter === 'all'
         ? true
         : activeFilter === 'unlocked'
-        ? hasAccessToCourse(skill)
-        : skill.category === activeFilter;
+          ? hasAccessToCourse(skill)
+          : skill.category === activeFilter;
     const matchesSearch =
       skill.title.toLowerCase().includes(searchQuery) ||
       skill.description.toLowerCase().includes(searchQuery) ||
@@ -6420,10 +6419,9 @@ function renderSkillsGrid() {
         actionButton = `<button class="btn-start-skill gold-btn" onclick="switchAppTab('rewards')">👑 Desbloquear con ${reqRw.costVIPPoints} VP en Bóveda VIP</button>`;
       } else if (unlocked) {
         actionButton = `<button class="btn-start-skill ${completed ? 'done' : ''}" onclick="openSkillModal('${skill.id}')">
-          ${
-            completed
-              ? '✅ Completado (Repasar Módulos)'
-              : doneModulesCount > 0
+          ${completed
+            ? '✅ Completado (Repasar Módulos)'
+            : doneModulesCount > 0
               ? `▶ Continuar Curso (${doneModulesCount}/${skill.lessons.length} Módulos)`
               : `🎓 Cursar ${skill.lessons.length} Módulos (+${skill.pointsReward} PTS ${state.isProMember ? `+ ${vpAmount} VP` : ''})`
           }
@@ -6487,13 +6485,12 @@ function renderSkillsGrid() {
             <div class="skill-meta">
               <span>⏱️ ${formatCourseDuration(skill.duration)} • ⚡ +${skill.xp} XP</span>
               <span class="price-badge">
-                ${
-                  skill.secretCourse
-                    ? '👑 Exclusivo VIP'
-                    : unlocked
-                    ? '🔓 Desbloqueado'
-                    : `$${skill.priceUSD.toFixed(2)} USD`
-                }
+                ${skill.secretCourse
+          ? '👑 Exclusivo VIP'
+          : unlocked
+            ? '🔓 Desbloqueado'
+            : `$${skill.priceUSD.toFixed(2)} USD`
+        }
               </span>
             </div>
             ${actionButton}
@@ -6632,8 +6629,8 @@ window.simulateStudentPurchase = function () {
   const label = isAnnualVip
     ? `💎 Suscripción Pase VIP Founder Anual de ${randomStudent}`
     : isMonthlyVip
-    ? `👑 Suscripción Pase VIP PRO Mensual de ${randomStudent}`
-    : `💳 Compra de Curso Completo por ${randomStudent}`;
+      ? `👑 Suscripción Pase VIP PRO Mensual de ${randomStudent}`
+      : `💳 Compra de Curso Completo por ${randomStudent}`;
 
   state.ownerBalanceUSD += amount;
   if (isAnnualVip || isMonthlyVip) state.ownerSubsCount += 1;
@@ -6848,15 +6845,15 @@ function renderModalStep() {
           </div>
           <div class="lesson-glossary-grid">
             ${moduleGlossary
-              .map(
-                g => `
+        .map(
+          g => `
                 <div class="lesson-glossary-item">
                   <strong>📘 ${g.term}</strong>
                   <span>${g.meaning}</span>
                 </div>
               `
-              )
-              .join('')}
+        )
+        .join('')}
           </div>
         </div>
       `
@@ -6872,18 +6869,18 @@ function renderModalStep() {
           <div class="checkpoint-question">${lesson.checkpoint.question}</div>
           <div class="checkpoint-options">
             ${lesson.checkpoint.options
-              .map((opt, idx) => {
-                let statusClass = '';
-                if (chosenIdx === idx) {
-                  statusClass = idx === lesson.checkpoint.correctIndex ? 'correct' : 'wrong';
-                }
-                return `
+        .map((opt, idx) => {
+          let statusClass = '';
+          if (chosenIdx === idx) {
+            statusClass = idx === lesson.checkpoint.correctIndex ? 'correct' : 'wrong';
+          }
+          return `
                   <button class="checkpoint-btn ${statusClass}" onclick="answerLessonCheckpoint(${idx})">
                     <strong>${String.fromCharCode(65 + idx)})</strong> ${opt}
                   </button>
                 `;
-              })
-              .join('')}
+        })
+        .join('')}
           </div>
         </div>
       `
@@ -6910,13 +6907,12 @@ function renderModalStep() {
     footer.innerHTML = `
       <button class="btn-secondary" ${currentStepIndex === 0 ? 'disabled style="opacity:0.4"' : ''} onclick="prevLessonStep()">⬅ Módulo Anterior</button>
       <button class="btn-primary-full" style="max-width: 310px; ${!checkpointSolved ? 'opacity: 0.5;' : ''}" onclick="nextLessonStep()">
-        ${
-          !checkpointSolved
-            ? '🔒 Responde el reto del módulo para avanzar'
-            : currentStepIndex === currentSkill.lessons.length - 1
-            ? 'Ir al Examen Final del Curso Completo 🎯'
-            : 'Siguiente Módulo ➡'
-        }
+        ${!checkpointSolved
+        ? '🔒 Responde el reto del módulo para avanzar'
+        : currentStepIndex === currentSkill.lessons.length - 1
+          ? 'Ir al Examen Final del Curso Completo 🎯'
+          : 'Siguiente Módulo ➡'
+      }
       </button>
     `;
   } else {
@@ -6936,25 +6932,25 @@ function renderModalStep() {
         </p>
 
         ${questions
-          .map(
-            (q, qIdx) => `
+        .map(
+          (q, qIdx) => `
             <div class="exam-question-card">
               <h5>${q.question}</h5>
               <div class="quiz-options">
                 ${q.options
-                  .map(
-                    (opt, optIdx) => `
+              .map(
+                (opt, optIdx) => `
                     <button class="quiz-option-btn ${examAnswers[qIdx] === optIdx ? 'selected' : ''}" onclick="selectExamAnswer(${qIdx}, ${optIdx})">
                       <strong>${String.fromCharCode(65 + optIdx)})</strong> ${opt}
                     </button>
                   `
-                  )
-                  .join('')}
+              )
+              .join('')}
               </div>
             </div>
           `
-          )
-          .join('')}
+        )
+        .join('')}
       </div>
     `;
 
@@ -7086,15 +7082,14 @@ function renderRewardsVault() {
           <p>${rw.description}</p>
         </div>
         <div>
-          ${
-            unlocked
-              ? `<button class="btn-start-skill done" onclick="document.querySelector('[data-tab=certificates]').click()">✅ Desbloqueado (Ver en Cursos Completos & VIP)</button>`
-              : !state.isProMember
-              ? `<button class="btn-start-skill gold-btn" onclick="document.querySelector('[data-tab=plans]').click()">👑 Hazte Miembro VIP para Desbloquear (${rw.costVIPPoints} VP)</button>`
-              : `<button class="btn-start-skill gold-btn" style="${!canAfford ? 'opacity:0.65' : ''}" onclick="redeemVIPReward('${rw.id}')">
+          ${unlocked
+        ? `<button class="btn-start-skill done" onclick="document.querySelector('[data-tab=certificates]').click()">✅ Desbloqueado (Ver en Cursos Completos & VIP)</button>`
+        : !state.isProMember
+          ? `<button class="btn-start-skill gold-btn" onclick="document.querySelector('[data-tab=plans]').click()">👑 Hazte Miembro VIP para Desbloquear (${rw.costVIPPoints} VP)</button>`
+          : `<button class="btn-start-skill gold-btn" style="${!canAfford ? 'opacity:0.65' : ''}" onclick="redeemVIPReward('${rw.id}')">
                   👑 Canjear con ${rw.costVIPPoints} Puntos VIP (VP)
                  </button>`
-          }
+      }
         </div>
       </article>
     `;
@@ -7116,13 +7111,12 @@ function renderRewardsVault() {
           <p>${rw.description}</p>
         </div>
         <div>
-          ${
-            unlocked
-              ? `<button class="btn-start-skill done" onclick="document.querySelector('[data-tab=certificates]').click()">✅ Desbloqueado (Ver en Cursos Completos & VIP)</button>`
-              : `<button class="btn-start-skill" style="${!canAfford ? 'opacity:0.65' : ''}" onclick="redeemStandardReward('${rw.id}')">
+          ${unlocked
+        ? `<button class="btn-start-skill done" onclick="document.querySelector('[data-tab=certificates]').click()">✅ Desbloqueado (Ver en Cursos Completos & VIP)</button>`
+        : `<button class="btn-start-skill" style="${!canAfford ? 'opacity:0.65' : ''}" onclick="redeemStandardReward('${rw.id}')">
                   🔓 Canjear por ${rw.costPoints} PTS
                  </button>`
-          }
+      }
         </div>
       </article>
     `;
@@ -7565,22 +7559,22 @@ window.switchAuthMode = function (mode) {
     heading.textContent = isRegister
       ? 'Crea tu Cuenta Gratis en SkillVault'
       : isReset
-      ? 'Restablecer Contraseña de tu Cuenta'
-      : 'Bienvenido de nuevo a SkillVault';
+        ? 'Restablecer Contraseña de tu Cuenta'
+        : 'Bienvenido de nuevo a SkillVault';
   }
   if (subtext) {
     subtext.textContent = isRegister
       ? 'Regístrate para crear tu perfil real, guardar tus puntos PTS y desbloquear cofres.'
       : isReset
-      ? 'Ingresa el correo de tu cuenta registrada y escribe tu nueva contraseña.'
-      : 'Ingresa con tu correo y contraseña registrados para cargar tu progreso.';
+        ? 'Ingresa el correo de tu cuenta registrada y escribe tu nueva contraseña.'
+        : 'Ingresa con tu correo y contraseña registrados para cargar tu progreso.';
   }
   if (submitBtn) {
     submitBtn.textContent = isRegister
       ? '✨ Crear mi Cuenta (+50 PTS de Bienvenida)'
       : isReset
-      ? '🔑 Guardar Nueva Contraseña e Iniciar Sesión'
-      : '🚀 Iniciar Sesión en mi Cuenta';
+        ? '🔑 Guardar Nueva Contraseña e Iniciar Sesión'
+        : '🚀 Iniciar Sesión en mi Cuenta';
   }
   if (forgotLink) {
     forgotLink.style.display = currentAuthMode === 'login' ? 'inline' : 'none';
@@ -7789,8 +7783,126 @@ window.logoutUser = function () {
 };
 
 // ==========================================================================
-// MEJORA MOBILE 4: SIMULACIÓN DE CHECKOUT (STRIPE / PAYPAL / MERCADOPAGO)
+// MEJORA MOBILE 4: PASARELA DE COBROS REALES (MERCADOPAGO / PAYPAL / STRIPE)
 // ==========================================================================
+const PAYMENT_CONFIG_KEY = 'skillvault_payment_config_v1';
+const DEFAULT_PAYMENT_CONFIG = {
+  mpLink: '',
+  mpAlias: '',
+  paypal: '',
+  stripeLink: ''
+};
+
+function loadPaymentConfig() {
+  try {
+    const raw = localStorage.getItem(PAYMENT_CONFIG_KEY);
+    if (!raw) return { ...DEFAULT_PAYMENT_CONFIG };
+    return { ...DEFAULT_PAYMENT_CONFIG, ...JSON.parse(raw) };
+  } catch (e) {
+    return { ...DEFAULT_PAYMENT_CONFIG };
+  }
+}
+
+function savePaymentConfig(cfg) {
+  localStorage.setItem(PAYMENT_CONFIG_KEY, JSON.stringify(cfg));
+}
+
+window.openPaymentSettingsModal = function () {
+  const cfg = loadPaymentConfig();
+  const mpLinkEl = document.getElementById('pay-cfg-mp-link');
+  const mpAliasEl = document.getElementById('pay-cfg-mp-alias');
+  const paypalEl = document.getElementById('pay-cfg-paypal');
+  const stripeEl = document.getElementById('pay-cfg-stripe');
+
+  if (mpLinkEl) mpLinkEl.value = cfg.mpLink || '';
+  if (mpAliasEl) mpAliasEl.value = cfg.mpAlias || '';
+  if (paypalEl) paypalEl.value = cfg.paypal || '';
+  if (stripeEl) stripeEl.value = cfg.stripeLink || '';
+
+  const modal = document.getElementById('payment-settings-modal');
+  if (modal) modal.classList.add('open');
+};
+
+window.closePaymentSettingsModal = function () {
+  const modal = document.getElementById('payment-settings-modal');
+  if (modal) modal.classList.remove('open');
+};
+
+window.copyOwnerAlias = function (aliasText) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(aliasText).catch(() => {});
+  }
+  showToast(`📋 Alias copiado: ${aliasText}`);
+};
+
+function buildRealPaymentUrl(gateway, priceUSD) {
+  const cfg = loadPaymentConfig();
+  if (gateway.includes('MercadoPago') && cfg.mpLink) {
+    return cfg.mpLink;
+  }
+  if (gateway.includes('PayPal') && cfg.paypal) {
+    let base = cfg.paypal.trim();
+    if (!base.startsWith('http')) {
+      base = `https://www.paypal.com/paypalme/${base.replace(/^@/, '')}`;
+    }
+    return `${base.replace(/\/$/, '')}/${priceUSD.toFixed(2)}USD`;
+  }
+  if (gateway.includes('Stripe') && cfg.stripeLink) {
+    return cfg.stripeLink;
+  }
+  return '';
+}
+
+function updateCheckoutGatewayLiveBox() {
+  const box = document.getElementById('checkout-gateway-live-box');
+  if (!box || !pendingCheckoutConfig) return;
+  const selectedGatewayEl = document.querySelector('input[name="checkout-gateway"]:checked');
+  const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'MercadoPago';
+  const cfg = loadPaymentConfig();
+  const payBtn = document.getElementById('checkout-pay-now-btn');
+
+  if (gateway.includes('MercadoPago')) {
+    if (cfg.mpLink || cfg.mpAlias) {
+      box.style.display = 'block';
+      box.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <strong>🏦 Pago directo por MercadoPago</strong>
+          ${
+            cfg.mpAlias
+              ? `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; background:rgba(0,0,0,0.25); padding:8px 10px; border-radius:8px;">
+                  <span>Alias/CVU: <strong style="color:#34d399;">${cfg.mpAlias}</strong></span>
+                  <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="copyOwnerAlias('${cfg.mpAlias}')">📋 Copiar</button>
+                 </div>`
+              : ''
+          }
+          ${cfg.mpLink ? `<span style="color:var(--text-muted);">Al tocar el botón se abrirá tu checkout oficial de MercadoPago.</span>` : ''}
+        </div>
+      `;
+      if (payBtn) {
+        payBtn.textContent = cfg.mpLink
+          ? `🏦 Ir a MercadoPago ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`
+          : `✅ Ya transferí al Alias ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+      }
+      return;
+    }
+  } else if (gateway.includes('PayPal') && cfg.paypal) {
+    box.style.display = 'block';
+    box.innerHTML = `<strong>🅿️ Checkout oficial de PayPal (${cfg.paypal})</strong><br/><span style="color:var(--text-muted);">Se abrirá PayPal con el monto exacto de $${pendingCheckoutConfig.priceUSD.toFixed(2)} USD.</span>`;
+    if (payBtn) payBtn.textContent = `🅿️ Pagar con PayPal ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+    return;
+  } else if (gateway.includes('Stripe') && cfg.stripeLink) {
+    box.style.display = 'block';
+    box.innerHTML = `<strong>💳 Checkout seguro de Stripe</strong><br/><span style="color:var(--text-muted);">Se abrirá el enlace oficial de pago con tarjeta.</span>`;
+    if (payBtn) payBtn.textContent = `💳 Pagar con Stripe ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+    return;
+  }
+
+  box.style.display = 'none';
+  if (payBtn) {
+    payBtn.textContent = `🔒 Pagar ahora ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+  }
+}
+
 let pendingCheckoutConfig = null;
 
 window.openCheckoutModal = function (config) {
@@ -7807,6 +7919,7 @@ window.openCheckoutModal = function (config) {
     document.getElementById('checkout-cardholder').value = state.userAccount.name || state.userAccount.email || '';
   }
 
+  updateCheckoutGatewayLiveBox();
   document.getElementById('checkout-modal').classList.add('open');
 };
 
@@ -8086,6 +8199,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Actualizar vista de pasarela al cambiar entre MercadoPago / PayPal / Stripe
+  document.querySelectorAll('input[name="checkout-gateway"]').forEach(radio => {
+    radio.addEventListener('change', updateCheckoutGatewayLiveBox);
+  });
+
+  // Guardar configuración de links de cobro reales del creador (#payment-settings-form)
+  const paySettingsForm = document.getElementById('payment-settings-form');
+  if (paySettingsForm) {
+    paySettingsForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const newCfg = {
+        mpLink: (document.getElementById('pay-cfg-mp-link')?.value || '').trim(),
+        mpAlias: (document.getElementById('pay-cfg-mp-alias')?.value || '').trim(),
+        paypal: (document.getElementById('pay-cfg-paypal')?.value || '').trim(),
+        stripeLink: (document.getElementById('pay-cfg-stripe')?.value || '').trim()
+      };
+      savePaymentConfig(newCfg);
+      closePaymentSettingsModal();
+      showToast('✅ ¡Tus métodos de cobro reales (MercadoPago / PayPal / Stripe) fueron guardados!');
+    });
+  }
+
   // Submit de Checkout (#checkout-payment-form)
   const checkoutForm = document.getElementById('checkout-payment-form');
   if (checkoutForm) {
@@ -8094,7 +8229,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!pendingCheckoutConfig) return;
 
       const selectedGatewayEl = document.querySelector('input[name="checkout-gateway"]:checked');
-      const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'Stripe';
+      const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'MercadoPago';
+      const realPaymentUrl = buildRealPaymentUrl(gateway, pendingCheckoutConfig.priceUSD);
+
+      if (realPaymentUrl) {
+        window.open(realPaymentUrl, '_blank', 'noopener,noreferrer');
+      }
 
       if (pendingCheckoutConfig.type === 'vip') {
         completeVipMembershipPurchase(pendingCheckoutConfig.tier, gateway);
@@ -8126,7 +8266,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Cerrar modales adicionales con clic afuera
-  ['info-modal', 'waitlist-modal', 'auth-modal', 'google-oauth-modal', 'checkout-modal'].forEach(modalId => {
+  ['info-modal', 'waitlist-modal', 'auth-modal', 'google-oauth-modal', 'checkout-modal', 'pwa-install-modal', 'payment-settings-modal'].forEach(modalId => {
     const m = document.getElementById(modalId);
     if (m) {
       m.addEventListener('click', e => {
@@ -8318,6 +8458,6 @@ window.closePwaInstallModal = function () {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
+    navigator.serviceWorker.register('/sw.js').catch(() => { });
+    --  });
 }

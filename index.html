@@ -496,6 +496,9 @@
               <button type="button" class="btn-secondary" style="width: 100%;" onclick="toggleZeroCoursesSimulation()">
                 ⏳ Alternar Catálogo Vacío (0 Cursos / Lista de Espera)
               </button>
+              <button type="button" class="btn-primary-full" style="width: 100%;" onclick="openPaymentSettingsModal()">
+                💳 Configurar Mis Links de Cobro (MercadoPago / PayPal / Stripe)
+              </button>
             </div>
           </div>
         </div>
@@ -536,7 +539,8 @@
             </div>
 
             <div class="w-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button class="btn-secondary" onclick="simulateStudentPurchase()">🔔 Simular Compra / Suscripción VIP de un Alumno (+$$$)</button>
+              <button type="button" class="btn-primary-full" style="width: auto; padding: 11px 18px;" onclick="openPaymentSettingsModal()">💳 Configurar Mis Links de Cobro (MercadoPago / PayPal / Stripe)</button>
+              <button type="button" class="btn-secondary" onclick="simulateStudentPurchase()">🔔 Simular Compra / Suscripción VIP de un Alumno (+$$$)</button>
             </div>
 
             <hr class="divider" />
@@ -1004,22 +1008,24 @@
         <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Elige tu pasarela de pago preferida:</label>
         <div class="checkout-gateway-grid">
           <label class="gateway-pill active">
-            <input type="radio" name="checkout-gateway" value="Stripe (Tarjeta Internacional)" checked />
-            <span>💳 Stripe</span>
+            <input type="radio" name="checkout-gateway" value="MercadoPago" checked />
+            <span>🏦 MercadoPago</span>
           </label>
           <label class="gateway-pill">
             <input type="radio" name="checkout-gateway" value="PayPal Express Checkout" />
             <span>🅿️ PayPal</span>
           </label>
           <label class="gateway-pill">
-            <input type="radio" name="checkout-gateway" value="MercadoPago" />
-            <span>🏦 MercadoPago</span>
+            <input type="radio" name="checkout-gateway" value="Stripe (Tarjeta Internacional)" />
+            <span>💳 Stripe</span>
           </label>
         </div>
 
+        <div id="checkout-gateway-live-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.28); border-radius: 12px; padding: 12px; font-size: 12.5px; color: var(--text-main);"></div>
+
         <div class="form-group">
-          <label for="checkout-cardholder">Nombre del Titular / Correo de Facturación</label>
-          <input type="text" id="checkout-cardholder" placeholder="Ej: Nombre como figura en la tarjeta o email" required />
+          <label for="checkout-cardholder">Tu Nombre o Correo de Cuenta</label>
+          <input type="text" id="checkout-cardholder" placeholder="Ej: tu@correo.com" required />
         </div>
 
         <div class="checkout-total-bar">
@@ -1066,6 +1072,45 @@
       </div>
 
       <button type="button" class="btn-primary-full" onclick="closePwaInstallModal()">¡Entendido!</button>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIGURACIÓN DE COBROS REALES DEL CREADOR (MERCADOPAGO / PAYPAL / STRIPE) -->
+  <div class="modal-overlay" id="payment-settings-modal">
+    <div class="modal-window mobile-friendly-modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="modal-cat-badge" style="background: rgba(16, 185, 129, 0.16); color: #34d399;">💳 Pasarela de Cobros Reales</span>
+        </div>
+        <button class="modal-close" type="button" onclick="closePaymentSettingsModal()">✕</button>
+      </div>
+
+      <h2>Conectar Tus Cobros (MercadoPago & PayPal)</h2>
+      <p class="modal-sponsor">Pega aquí tus links de cobro o tu Alias/CVU. Cuando un alumno toque "Pagar ahora", será enviado directamente a tu cuenta para pagarte.</p>
+
+      <form id="payment-settings-form" class="mobile-modal-form">
+        <div class="form-group">
+          <label for="pay-cfg-mp-link">🏦 Link de Pago de MercadoPago (Opcional)</label>
+          <input type="url" id="pay-cfg-mp-link" placeholder="Ej: https://mpago.la/2xyz... o https://link.mercadopago.com.ar/..." />
+        </div>
+
+        <div class="form-group">
+          <label for="pay-cfg-mp-alias">🇦🇷 Tu Alias o CVU de MercadoPago / Banco (Transferencia Directa)</label>
+          <input type="text" id="pay-cfg-mp-alias" placeholder="Ej: gonza.skillvault.mp" />
+        </div>
+
+        <div class="form-group">
+          <label for="pay-cfg-paypal">🅿️ Tu Usuario o Link de PayPal.me (Cobros en USD)</label>
+          <input type="text" id="pay-cfg-paypal" placeholder="Ej: gonzaloramirez o https://paypal.me/tuusuario" />
+        </div>
+
+        <div class="form-group">
+          <label for="pay-cfg-stripe">💳 Link de Pago de Stripe (Opcional)</label>
+          <input type="url" id="pay-cfg-stripe" placeholder="Ej: https://buy.stripe.com/..." />
+        </div>
+
+        <button type="submit" class="btn-primary-full">💾 Guardar Mis Métodos de Cobro</button>
+      </form>
     </div>
   </div>
 
