@@ -82,7 +82,7 @@
           <span class="bonus-rate" id="vip-status-tag">Cuenta Estándar</span>
         </div>
         <button type="button" id="sidebar-vip-btn" class="btn-sidebar-vip" onclick="document.querySelector('[data-tab=plans]').click()">👑 Hacerse VIP PRO</button>
-        <button type="button" id="toggle-admin-btn" class="admin-mode-toggle" onclick="toggleAdminMode()">Simular vista: Alumno (Cambiar a Admin)</button>
+        <button type="button" id="toggle-admin-btn" class="admin-mode-toggle dev-sim-control" hidden style="display: none;" onclick="toggleAdminMode()">Simular vista: Alumno (Cambiar a Admin)</button>
       </div>
     </aside>
 
@@ -92,7 +92,7 @@
       <header class="topbar">
         <!-- Marca compacta visible solo en móvil -->
         <div class="mobile-brand-bar">
-          <div class="brand-logo" style="width: 36px; height: 36px; font-size: 18px;">⚡</div>
+          <div class="brand-logo" style="width: 36px; height: 36px; font-size: 18px; cursor: pointer;" onclick="handleSecretAdminTap()" title="SkillVault Academy">⚡</div>
           <div>
             <span class="brand-name" style="font-size: 18px;">Skill<span class="accent">Vault</span></span>
             <span class="brand-tag" style="font-size: 9px;">ACADEMIA GAMIFICADA</span>
@@ -108,8 +108,8 @@
         </div>
 
         <div class="wallet-summary">
-          <!-- MEJORA 1: Toggle de Separación de Roles en el Header -->
-          <div class="role-switcher-toggle" id="header-role-switcher" role="group" aria-label="Simular vista de rol">
+          <!-- Controles de Simulación Ocultos para el Público (Solo visibles con ?admin=1 o 5 toques en el logo ⚡) -->
+          <div class="role-switcher-toggle dev-sim-control" id="header-role-switcher" hidden style="display: none;" role="group" aria-label="Simular vista de rol">
             <span class="role-switcher-label">Simular vista:</span>
             <div class="role-switcher-pills">
               <button type="button" class="role-pill active" id="role-btn-student" onclick="setRoleView('student')">
@@ -121,8 +121,7 @@
             </div>
           </div>
 
-          <!-- Simulador de Estado Vacío (0 Cursos Activos vs Catálogo Activo) -->
-          <button type="button" class="empty-state-sim-btn" id="toggle-empty-catalog-btn" onclick="toggleZeroCoursesSimulation()" title="Alternar entre Catálogo con Cursos y Estado Vacío (0 cursos) para probar la Lista de Espera">
+          <button type="button" class="empty-state-sim-btn dev-sim-control" id="toggle-empty-catalog-btn" hidden style="display: none;" onclick="toggleZeroCoursesSimulation()" title="Alternar entre Catálogo con Cursos y Estado Vacío (0 cursos) para probar la Lista de Espera">
             📦 Catálogo: <span id="catalog-sim-status">Activo</span>
           </button>
 
@@ -454,8 +453,8 @@
             </div>
           </div>
 
-          <!-- Tarjeta de Controles de Simulación (Roles + Empty State Lista de Espera) -->
-          <div class="profile-card">
+          <!-- Tarjeta de Controles de Simulación Oculta para el Público -->
+          <div class="profile-card dev-sim-control" hidden style="display: none;">
             <span class="level-label">🛠️ CONTROLES DE SIMULACIÓN & QA</span>
             <h3 style="margin: 4px 0 10px;">Probar Vistas y Estados</h3>
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">

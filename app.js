@@ -7544,10 +7544,46 @@ window.closeCheckoutModal = function () {
   document.getElementById('checkout-modal').classList.remove('open');
 };
 
+// Acceso secreto de dueño a los controles de simulación (5 toques en el logo ⚡ o agregando ?admin=1 a la URL)
+let secretLogoTapCount = 0;
+let secretLogoTimer = null;
+let devControlsVisible = false;
+
+window.setDevControlsVisibility = function (visible) {
+  devControlsVisible = Boolean(visible);
+  document.querySelectorAll('.dev-sim-control').forEach(el => {
+    el.hidden = !devControlsVisible;
+    el.style.display = devControlsVisible ? '' : 'none';
+  });
+};
+
+window.handleSecretAdminTap = function () {
+  secretLogoTapCount += 1;
+  clearTimeout(secretLogoTimer);
+  secretLogoTimer = setTimeout(() => {
+    secretLogoTapCount = 0;
+  }, 2000);
+
+  if (secretLogoTapCount >= 5) {
+    secretLogoTapCount = 0;
+    window.setDevControlsVisibility(!devControlsVisible);
+    if (!devControlsVisible && isAdminModeActive) {
+      window.setRoleView('student', true);
+    }
+    showToast(
+      devControlsVisible
+        ? '🔓 Modo Creador desbloqueado: Controles de Administrador visibles.'
+        : '🔒 Controles de Creador ocultos: Vista pública limpia activada.'
+    );
+  }
+};
+
 // Eventos principales
 document.addEventListener('DOMContentLoaded', () => {
-  // Inicializar siempre en Modo Alumno estricto (ocultando Panel del Creador, Ingresos y Publicar Curso)
+  // Inicializar siempre en Modo Alumno estricto y ocultar botones de simulación para el público
   window.setRoleView('student', true);
+  const urlParams = new URLSearchParams(window.location.search);
+  window.setDevControlsVisibility(urlParams.get('admin') === '1');
   renderHeaderAndStats();
   renderSkillsGrid();
   renderDictionary();
