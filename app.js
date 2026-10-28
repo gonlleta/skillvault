@@ -7587,51 +7587,70 @@ window.switchAuthMode = function (mode) {
 };
 
 window.handleGoogleAuth = function () {
-  const emailInput = document.getElementById('auth-email');
-  const typedEmail = emailInput && emailInput.value.trim().toLowerCase();
-  const googleEmail =
-    typedEmail && typedEmail.includes('@')
-      ? typedEmail
-      : window.prompt('Ingresa tu correo de Google para conectar tu cuenta:', 'tu.correo@gmail.com');
+  closeAuthModal();
+  renderSavedGoogleAccounts();
+  const fb = document.getElementById('google-oauth-feedback');
+  if (fb) fb.style.display = 'none';
+  document.getElementById('google-oauth-modal').classList.add('open');
+};
 
-  if (!googleEmail || !googleEmail.includes('@')) {
-    showAuthFeedback('⚠️ Ingresa un correo válido de Google para continuar.', 'error');
+window.closeGoogleOAuthModal = function () {
+  document.getElementById('google-oauth-modal').classList.remove('open');
+};
+
+function renderSavedGoogleAccounts() {
+  const listEl = document.getElementById('google-saved-accounts-list');
+  if (!listEl) return;
+  const db = loadUsersDB();
+  const googleUsers = Object.values(db).filter(u => u.provider === 'Google' || u.email.endsWith('@gmail.com'));
+
+  if (googleUsers.length === 0) {
+    listEl.innerHTML = '';
     return;
   }
 
-  const cleanEmail = googleEmail.trim().toLowerCase();
-  const db = loadUsersDB();
+  listEl.innerHTML = `
+    <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Cuentas guardadas en este dispositivo:</span>
+    ${googleUsers
+      .map(u => {
+        const initials = (u.name || u.email)
+          .split(' ')
+          .map(w => w[0])
+          .join('')
+          .slice(0, 2)
+          .toUpperCase();
+        return `
+          <button type="button" class="google-account-item" onclick="quickSelectGoogleAccount('${u.email}')">
+            <div class="author-avatar avatar-violet" style="width: 36px; height: 36px; font-size: 13px;">${initials}</div>
+            <div>
+              <strong>${u.name}</strong>
+              <span>${u.email} • ${(u.profile && u.profile.points) || 150} PTS</span>
+            </div>
+          </button>
+        `;
+      })
+      .join('')}
+  `;
+}
 
-  if (!db[cleanEmail]) {
-    const rawUser = cleanEmail.split('@')[0].replace(/[._-]/g, ' ');
-    const formattedName = rawUser.charAt(0).toUpperCase() + rawUser.slice(1);
-    db[cleanEmail] = {
-      name: formattedName,
-      email: cleanEmail,
-      provider: 'Google',
-      passwordHash: hashPassword('google_oauth_' + cleanEmail),
-      createdAt: new Date().toISOString(),
-      profile: {
-        points: state.points + 50,
-        vipPoints: state.vipPoints,
-        xp: state.xp,
-        streak: state.streak || 1,
-        isProMember: state.isProMember,
-        ownedCourses: state.ownedCourses || ['py-automation'],
-        completedCourses: state.completedCourses || [],
-        courseProgress: state.courseProgress || {},
-        unlockedRewards: state.unlockedRewards || [],
-        freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed)
-      }
-    };
-    saveUsersDB(db);
-    applyUserProfileToState(db[cleanEmail]);
-    closeAuthModal();
-    showToast(`✅ ¡Cuenta Google (${cleanEmail}) creada y conectada! +50 PTS acreditados.`);
-  } else {
-    applyUserProfileToState(db[cleanEmail]);
-    closeAuthModal();
-    showToast(`👋 ¡Conectado con Google como ${db[cleanEmail].name}! Se cargaron tus puntos y cursos.`);
+window.quickSelectGoogleAccount = function (email) {
+  const emailIn = document.getElementById('google-email-input');
+  const nameIn = document.getElementById('google-name-input');
+  const passIn = document.getElementById('google-pass-input');
+  const db = loadUsersDB();
+  const acc = db[email.toLowerCase()];
+  if (!acc) return;
+  if (emailIn) emailIn.value = acc.email;
+  if (nameIn) nameIn.value = acc.name;
+  if (passIn) {
+    passIn.value = '';
+    passIn.focus();
+  }
+  const fb = document.getElementById('google-oauth-feedback');
+  if (fb) {
+    fb.className = 'auth-feedback-box success';
+    fb.innerHTML = `🔐 Ingresa la contraseña de <strong>${acc.email}</strong> para confirmar el acceso.`;
+    fb.style.display = 'block';
   }
 };
 
@@ -7894,6 +7913,73 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Submit de Conexión de Cuenta Google (#google-oauth-form)
+  const googleForm = document.getElementById('google-oauth-form');
+  if (googleForm) {
+    googleForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('google-email-input').value.trim().toLowerCase();
+      const rawName = document.getElementById('google-name-input').value.trim();
+      const pass = document.getElementById('google-pass-input').value;
+      const fb = document.getElementById('google-oauth-feedback');
+
+      if (!email.includes('@')) {
+        if (fb) {
+          fb.className = 'auth-feedback-box error';
+          fb.innerHTML = '⚠️ Ingresa un correo de Google válido.';
+          fb.style.display = 'block';
+        }
+        return;
+      }
+
+      const db = loadUsersDB();
+      const existing = db[email];
+
+      if (existing) {
+        if (existing.passwordHash !== hashPassword(pass)) {
+          if (fb) {
+            fb.className = 'auth-feedback-box error';
+            fb.innerHTML = '❌ La contraseña no coincide con esta cuenta de Google registrada.';
+            fb.style.display = 'block';
+          }
+          return;
+        }
+        applyUserProfileToState(existing);
+        googleForm.reset();
+        closeGoogleOAuthModal();
+        showToast(`✅ ¡Conectado con tu cuenta de Google (${existing.email})!`);
+      } else {
+        const fallbackName = email.split('@')[0].replace(/[._-]/g, ' ');
+        const finalName = rawName || fallbackName.charAt(0).toUpperCase() + fallbackName.slice(1);
+        const newGoogleAcc = {
+          name: finalName,
+          email,
+          provider: 'Google',
+          passwordHash: hashPassword(pass),
+          createdAt: new Date().toISOString(),
+          profile: {
+            points: 150,
+            vipPoints: 0,
+            xp: 100,
+            streak: 1,
+            isProMember: false,
+            ownedCourses: ['py-automation'],
+            completedCourses: [],
+            courseProgress: {},
+            unlockedRewards: [],
+            freeTrialBonusClaimed: false
+          }
+        };
+        db[email] = newGoogleAcc;
+        saveUsersDB(db);
+        applyUserProfileToState(newGoogleAcc);
+        googleForm.reset();
+        closeGoogleOAuthModal();
+        showToast(`🎉 ¡Cuenta de Google (${email}) vinculada con éxito! +50 PTS acreditados.`);
+      }
+    });
+  }
+
   // Submit de Checkout (#checkout-payment-form)
   const checkoutForm = document.getElementById('checkout-payment-form');
   if (checkoutForm) {
@@ -7934,7 +8020,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Cerrar modales adicionales con clic afuera
-  ['info-modal', 'waitlist-modal', 'auth-modal', 'checkout-modal'].forEach(modalId => {
+  ['info-modal', 'waitlist-modal', 'auth-modal', 'google-oauth-modal', 'checkout-modal'].forEach(modalId => {
     const m = document.getElementById(modalId);
     if (m) {
       m.addEventListener('click', e => {
