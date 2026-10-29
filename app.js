@@ -8680,7 +8680,7 @@ window.handleGoogleCredentialResponse = function (response) {
   if (!payload || !payload.email) {
     showToast('❌ No se pudo verificar la respuesta de Google.');
     return;
-  } ier
+  }
 
   const email = payload.email.toLowerCase();
   const name = payload.name || email.split('@')[0];
@@ -8695,7 +8695,6 @@ window.handleGoogleCredentialResponse = function (response) {
       passwordHash: hashPassword('google_verified_' + payload.sub),
       createdAt: new Date().toISOString(),
       profile: {
-        ier
         points: 150,
         vipPoints: 0,
         xp: 100,
