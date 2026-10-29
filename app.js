@@ -5228,6 +5228,72 @@ const DEFAULT_SKILLS = [
   }
 ];
 
+// Normalizador pedagógico para que todos los 84 módulos sean 100% claros desde cero absoluto y sin textos truncados
+function normalizeBeginnerFriendlyLessons(skillsList) {
+  if (!Array.isArray(skillsList)) return;
+
+  const firstStepByCourse = {
+    'py-automation': 'Paso 1 (Preparar tu cuaderno gratis): Abre Google Colab (colab.research.google.com) o tu editor de código y ten listo tu archivo de datos de prueba.',
+    'fullstack-apis-sql': 'Paso 1 (Preparar tu entorno de base de datos/servidor): Abre tu editor SQL en Supabase.com o tu archivo de servidor en Visual Studio Code.',
+    'secret-saas-masterclass': 'Paso 1 (Definir el problema rentable): Anota en una hoja el dolor principal que hoy le hace perder tiempo o dinero a tu cliente ideal.',
+    'cybersec-ethical-web': 'Paso 1 (Inspeccionar el punto de entrada): Abre tu aplicación web en el navegador con F12 (DevTools) y localiza dónde ingresan datos los usuarios.',
+    'ai-rag-embeddings': 'Paso 1 (Preparar los documentos fuente): Reúne los PDFs, manuales o textos limpios que quieres que tu Inteligencia Artificial consulte sin inventar respuestas.',
+    'js-react-modern': 'Paso 1 (Abrir el componente en vivo): Abre tu proyecto React en Vite o vite.new/react y ubica el componente donde se mostrará la información al usuario.',
+    'fin-b2b-pricing': 'Paso 1 (Reunir tus números reales): Abre una hoja de Google Sheets y anota tus costos fijos mensuales y cuánto te cuesta entregar cada venta.',
+    'mkt-copywriting-funnels': 'Paso 1 (Conocer el dolor y deseo del cliente): Escribe en una frase qué problema urgente quiere resolver tu comprador hoy mismo.',
+    'secret-high-ticket-agency': 'Paso 1 (Elegir el tipo de empresa cliente): Selecciona un rubro concreto de negocios (clínicas, inmobiliarias, estudios o tiendas online) que facture todos los meses.',
+    'nocode-n8n-whatsapp': 'Paso 1 (Crear el flujo en blanco): Entra a tu panel de n8n o Make.com, haz clic en crear nuevo flujo y agrega el primer bloque disparador (Webhook).',
+    'viral-video-retention': 'Paso 1 (Escribir los primeros 3 segundos antes de grabar): Anota en el bloc de notas la frase inicial de impacto visual y auditivo con la que abrirás el video.',
+    'meta-ads-roas': 'Paso 1 (Abrir el Administrador de Anuncios): Entra a adsmanager.facebook.com desde la computadora y verifica que tu método de medición esté activo.',
+    'closer-high-ticket-sales': 'Paso 1 (Revisar el perfil antes de hablar): Lee de dónde viene el contacto y qué servicio busca antes de enviarle el primer mensaje o abrir el Zoom.',
+    'english-remote-tech': 'Paso 1 (Preparar tu documento en limpio): Abre un archivo de Google Docs en blanco donde armarás tus frases y plantillas listas para copiar y usar.'
+  };
+
+  skillsList.forEach(skill => {
+    if (!Array.isArray(skill.lessons)) return;
+    skill.lessons.forEach((lesson, idx) => {
+      // 1. Limpiar párrafos repetitivos o demasiado robóticos y dejar solo explicaciones naturales
+      if (Array.isArray(lesson.paragraphs)) {
+        lesson.paragraphs = lesson.paragraphs.map(p =>
+          String(p || '')
+            .replace(/Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría:\s*/gi, '💡 Un consejo muy importante si estás empezando desde cero: ')
+            .replace(/Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos\./gi, 'Aquí abajo tienes el ejemplo práctico explicado paso a paso para que puedas copiarlo y adaptarlo fácilmente.')
+        );
+      }
+
+      // 2. Limpiar el último keyPoint genérico si se repite en los módulos 1-4
+      if (Array.isArray(lesson.keyPoints)) {
+        lesson.keyPoints = lesson.keyPoints.map(kp =>
+          kp.includes('Verifica siempre el ejemplo práctico de este módulo antes de responder')
+            ? 'Puedes copiar la plantilla de ejemplo de abajo y probarla gratis hoy mismo aunque nunca hayas hecho esto antes.'
+            : kp
+        );
+      }
+
+      // 3. Reemplazar el Paso 1 genérico por un paso inicial claro y específico para principiantes
+      if (Array.isArray(lesson.stepByStep) && lesson.stepByStep.length > 0) {
+        if (lesson.stepByStep[0].includes('Identifica los datos o elementos de entrada antes de ejecutar')) {
+          lesson.stepByStep[0] = firstStepByCourse[skill.id] || 'Paso 1 (Preparación inicial desde cero): Abre la herramienta gratuita recomendada en este módulo y ten a mano la plantilla de ejemplo.';
+        }
+      }
+
+      // 4. Eliminar cualquier texto truncado con "(...)" en los Casos de Estudio y redactarlos de forma clara y completa
+      if (lesson.caseStudy) {
+        const cleanWarn = String(lesson.warning || '').replace(/^⚠️\s*(Error común:|Error crítico común:)?\s*/i, '').trim();
+        const firstKeyPoint = (lesson.keyPoints && lesson.keyPoints[0]) || 'la metodología paso a paso de este módulo';
+        if (String(lesson.caseStudy.scenario || '').includes('Un equipo que trabajaba en') || String(lesson.caseStudy.scenario || '').includes('...)')) {
+          lesson.caseStudy.scenario = `Antes de aplicar este módulo, quien intentaba hacer esto desde cero solía cometer un error muy común: ${cleanWarn}`;
+        }
+        if (String(lesson.caseStudy.result || '').includes('Al implementar la estructura paso a paso de este Módulo') || String(lesson.caseStudy.result || '').includes('...)')) {
+          lesson.caseStudy.result = `Al seguir la guía paso a paso del Módulo ${idx + 1} (${firstKeyPoint}), el proceso quedó ordenado, sin errores y funcionando desde la primera semana.`;
+        }
+      }
+    });
+  });
+}
+
+normalizeBeginnerFriendlyLessons(DEFAULT_SKILLS);
+
 // Recompensas EXCLUSIVAS VIP (Solo se pueden comprar con Puntos Exclusivos VIP `VP`)
 const EXCLUSIVE_VIP_REWARDS = [
   {
@@ -7924,6 +7990,116 @@ window.jumpToModalStep = function (targetIdx) {
   document.getElementById('modal-body').scrollTop = 0;
 };
 
+function buildBeginnerZeroIntroHtml(lesson, skill, moduleIdx) {
+  const cleanTitle = (lesson.heading || `Módulo ${moduleIdx + 1}`).replace(/^Módulo \d+:\s*/i, '');
+  const analogiesByCourse = {
+    'py-automation': 'Imagina que tienes un asistente invisible en tu computadora: en lugar de que tú abras 50 archivos de Excel, copies y pegues celdas durante 3 horas, le escribes una receta de 5 líneas en Python y tu computadora hace todo el trabajo sucio en 2 segundos sin equivocarse.',
+    'fullstack-apis-sql': 'Piensa en un restaurante: la pantalla que ve el usuario (Frontend) es el menú, la base de datos SQL es la despensa donde se guarda todo con llave, y la API es el camarero que lleva el pedido de la mesa a la cocina y vuelve con el plato exacto.',
+    'secret-saas-masterclass': 'Crear un Micro-SaaS es como construir una pequeña herramienta automática en internet (por ejemplo, un generador de presupuestos o recordatorios por WhatsApp) y alquilarla a cientos de negocios por una cuota mensual en dólares.',
+    'cybersec-ethical-web': 'La seguridad web funciona igual que las cerraduras de un banco: nunca dejas que alguien entre a la bóveda solo porque dice llamarse "el dueño". Aquí aprenderás a poner guardias automáticos que revisan cada dato antes de dejarlo pasar.',
+    'ai-rag-embeddings': 'Normalmente ChatGPT responde de memoria y a veces inventa datos. Con un sistema RAG es como darle a la IA un libro abierto con los PDFs privados de tu empresa y decirle: "Solo puedes responder leyendo estas páginas exactas".',
+    'js-react-modern': 'Antes las páginas web eran como hojas de papel que había que recargar enteras con cada clic. React convierte tu web en bloques tipo LEGO independientes: si cambia un número en el carrito, solo se actualiza ese bloque al instante.',
+    'fin-b2b-pricing': 'Poner precios a ojo es la razón principal por la que muchos negocios trabajan todo el mes y no ven ganancias. Aquí aprenderás a calcular con una cuenta simple cuánto te queda limpio en el bolsillo y cómo presentar 3 planes para que el cliente elija el del medio.',
+    'mkt-copywriting-funnels': 'El Copywriting no es escribir bonito ni usar palabras difíciles: es hablarle al cliente exactamente del problema que no lo deja dormir y guiarlo paso a paso (como un embudo) desde que te conoce hasta que confía y compra.',
+    'secret-high-ticket-agency': 'En vez de cobrar barato haciendo tareas sueltas, una Agencia B2B le instala a una empresa un sistema que le ahorra sueldos o le trae ventas todos los meses, cobrando una instalación inicial más un abono fijo mensual.',
+    'nocode-n8n-whatsapp': 'Automatizar sin código (No-Code) con n8n es como unir piezas con flechas en la pantalla: cuando entra un mensaje de WhatsApp en la pieza 1, la pieza 2 lo lee con Inteligencia Artificial y la pieza 3 agenda al cliente sola.',
+    'viral-video-retention': 'Cuando alguien desliza el dedo en TikTok o Reels, decide en los primeros 2 segundos si se queda o sigue de largo. Aquí aprenderás la fórmula exacta para atrapar la atención al inicio y mantener a la gente mirando hasta el final.',
+    'meta-ads-roas': 'Hacer anuncios profesionales en Instagram y Facebook no es tocar el botón "Promocionar publicación": es usar el panel avanzado de Meta para decirle al algoritmo exactamente qué tipo de comprador buscas y medir cuántos dólares vuelven por cada dólar invertido.',
+    'closer-high-ticket-sales': 'Vender servicios de alto valor por videollamada no es insistir ni convencer a la fuerza: es hacer las preguntas correctas como un médico para diagnosticar qué problema tiene el cliente y mostrarle cómo tu solución se paga sola.',
+    'english-remote-tech': 'Para trabajar remoto cobrando en dólares NO necesitas hablar inglés perfecto como en una película: solo necesitas saber armar tu CV en formato estadounidense y dominar las 20 estructuras de frases que se repiten en todas las entrevistas y reuniones.'
+  };
+
+  const analogy = analogiesByCourse[skill.id] || 'Piensa en este módulo como una receta paso a paso: primero entendemos qué problema resuelve en la vida cotidiana, luego vemos qué herramienta gratis abrir y finalmente copiamos la plantilla lista para usar.';
+  const firstGoal = (lesson.keyPoints && lesson.keyPoints[0]) || 'Aplicar el ejemplo práctico de esta clase paso a paso en tu propio proyecto.';
+
+  return `
+    <div class="lesson-steps-guide" style="border-left: 4px solid #a855f7; background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(59, 130, 246, 0.07)); margin-bottom: 18px;">
+      <h5 style="color: #e9d5ff; margin-bottom: 8px; display:flex; align-items:center; gap:8px;">
+        <span>🌱 Explicado desde Cero Absoluto (En Español Simple — Sin Tecnicismos)</span>
+      </h5>
+      <p style="font-size: 13.5px; color: #f8fafc; line-height: 1.6; margin-bottom: 10px;">
+        <strong>💡 ¿Qué es "${cleanTitle}" en la vida real?</strong><br>
+        ${analogy}
+      </p>
+      <p style="font-size: 13px; color: #cbd5e1; line-height: 1.55; margin: 0;">
+        <strong>🎯 Tu meta práctica en este módulo:</strong> ${firstGoal}
+      </p>
+    </div>
+  `;
+}
+
+function buildLineByLineBeginnerCodeHtml(lesson) {
+  if (!lesson || !lesson.code) return '';
+  const rawLines = String(lesson.code)
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 2 && !/^[=\-_#/*]{4,}$/.test(l));
+
+  const explainedRows = [];
+  let pendingComment = '';
+
+  for (let i = 0; i < rawLines.length; i++) {
+    const ln = rawLines[i];
+    if (ln.startsWith('#') || ln.startsWith('//') || ln.startsWith('--')) {
+      pendingComment = ln.replace(/^(#|\/\/|--)\s*/, '').trim();
+      continue;
+    }
+    let meaning = pendingComment;
+    pendingComment = '';
+
+    if (!meaning) {
+      if (/^(import|from|require|const\s+.*require)/i.test(ln)) {
+        meaning = 'Traemos la herramienta o librería externa para no tener que programar todo desde cero.';
+      } else if (/^(def|function|async\s+function|export\s+function)/i.test(ln)) {
+        meaning = 'Creamos un bloque reutilizable (función) que ejecutará esta tarea cada vez que lo llamemos.';
+      } else if (/^(SELECT|INSERT|UPDATE|DELETE|CREATE\s+TABLE|ALTER\s+TABLE|BEGIN|COMMIT)\b/i.test(ln)) {
+        meaning = 'Le damos una instrucción directa a la base de datos para consultar o guardar la información de forma segura.';
+      } else if (/\b(useState|useEffect|useMemo|return\s*\()/i.test(ln)) {
+        meaning = 'Actualizamos lo que el usuario ve en su pantalla automáticamente cuando cambian los datos.';
+      } else if (/\b(if|else|elif|try|catch|while|for)\b/i.test(ln)) {
+        meaning = 'Ponemos una condición de control: revisamos si el dato es válido antes de seguir avanzando.';
+      } else if (/\b(print|console\.log|to_excel|to_csv|res\.status|res\.json|return)\b/i.test(ln)) {
+        meaning = 'Entregamos o guardamos el resultado final ya procesado y limpio.';
+      } else if (ln.includes('=')) {
+        const varName = ln.split('=')[0].trim().slice(0, 32);
+        meaning = `Guardamos dentro de "${varName}" el valor o configuración que usaremos en el siguiente paso.`;
+      } else if (ln.includes(':')) {
+        const keyName = ln.split(':')[0].trim().slice(0, 35);
+        meaning = `Definimos el apartado "${keyName}" con los datos concretos de tu caso o cliente.`;
+      } else {
+        meaning = `Aplicamos esta línea de la plantilla: ${humanizeTextForSpeech(ln).slice(0, 110)}.`;
+      }
+    }
+
+    explainedRows.push({
+      lineNum: explainedRows.length + 1,
+      codeSnippet: ln.slice(0, 85),
+      meaning
+    });
+    if (explainedRows.length >= 5) break;
+  }
+
+  if (explainedRows.length === 0) return '';
+
+  return `
+    <div class="lesson-steps-guide" style="border-left: 3px solid #38bdf8; background: rgba(14, 165, 233, 0.07); margin-top: -6px; margin-bottom: 18px;">
+      <h5 style="color: #7dd3fc; margin-bottom: 8px;">🔍 ¿Nunca viste esto antes? Qué significa cada parte del ejemplo en español simple:</h5>
+      <div class="steps-list">
+        ${explainedRows
+          .map(
+            r => `
+              <div class="step-item" style="font-size: 12.8px; line-height: 1.5;">
+                <code style="background: rgba(15, 23, 42, 0.85); color: #38bdf8; padding: 2px 6px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">${r.codeSnippet.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>
+                <div style="margin-top: 4px; color: #e2e8f0;">👉 <strong>En simple:</strong> ${r.meaning}</div>
+              </div>
+            `
+          )
+          .join('')}
+      </div>
+    </div>
+  `;
+}
+
 function renderModalStep() {
   stopMicroVideoPlayback();
   currentMicroVideoScene = 0;
@@ -8205,6 +8381,9 @@ function renderModalStep() {
       `
       : '';
 
+    const beginnerIntroHtml = buildBeginnerZeroIntroHtml(lesson, currentSkill, currentStepIndex);
+    const lineByLineCodeHtml = buildLineByLineBeginnerCodeHtml(lesson);
+
     body.innerHTML = `
       <div class="lesson-box">
         <div class="lesson-header-bar">
@@ -8212,13 +8391,14 @@ function renderModalStep() {
           <span class="lesson-read-time">⏱️ ${lesson.readTime || '1h 15m de estudio + práctica'}</span>
         </div>
         <h4>${lesson.heading}</h4>
+        ${beginnerIntroHtml}
         <div class="lesson-paragraphs">${paragraphsHtml}</div>
         ${microVideoHtml}
         ${zeroToOneHtml}
         ${stepByStepHtml}
         ${caseStudyHtml}
         ${keyPointsHtml}
-        ${lesson.code ? `<div class="code-block-title">💻 Ejemplo Práctico / Plantilla de Trabajo:</div><pre class="lesson-code">${lesson.code}</pre>` : ''}
+        ${lesson.code ? `<div class="code-block-title">💻 Ejemplo Práctico / Plantilla de Trabajo:</div><pre class="lesson-code">${lesson.code}</pre>${lineByLineCodeHtml}` : ''}
         ${warningHtml}
         ${glossaryHtml}
         ${checkpointHtml}
