@@ -7788,7 +7788,7 @@ window.logoutUser = function () {
 const PAYMENT_CONFIG_KEY = 'skillvault_payment_config_v1';
 const DEFAULT_PAYMENT_CONFIG = {
   mpLink: '',
-  mpAlias: '',
+  mpAlias: 'gonlletaa',
   paypal: 'gonzaloramirez.mail@gmail.com',
   stripeLink: ''
 };
@@ -7797,7 +7797,13 @@ function loadPaymentConfig() {
   try {
     const raw = localStorage.getItem(PAYMENT_CONFIG_KEY);
     if (!raw) return { ...DEFAULT_PAYMENT_CONFIG };
-    return { ...DEFAULT_PAYMENT_CONFIG, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    return {
+      mpLink: parsed.mpLink || DEFAULT_PAYMENT_CONFIG.mpLink,
+      mpAlias: parsed.mpAlias || DEFAULT_PAYMENT_CONFIG.mpAlias,
+      paypal: parsed.paypal || DEFAULT_PAYMENT_CONFIG.paypal,
+      stripeLink: parsed.stripeLink || DEFAULT_PAYMENT_CONFIG.stripeLink
+    };
   } catch (e) {
     return { ...DEFAULT_PAYMENT_CONFIG };
   }
