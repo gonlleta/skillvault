@@ -9454,9 +9454,7 @@ window.closeCheckoutModal = function () {
   document.getElementById('checkout-modal').classList.remove('open');
 };
 
-// Acceso secreto de dueño a los controles de simulación (5 toques en el logo ⚡ o agregando ?admin=1 a la URL)
-let secretLogoTapCount = 0;
-let secretLogoTimer = null;
+// Acceso exclusivo de propietario mediante la página con ?admin=1 en la URL
 let devControlsVisible = false;
 
 window.grantFullAdminSuperpowers = function (silent = false) {
@@ -9551,27 +9549,6 @@ window.setDevControlsVisibility = function (visible) {
       `;
       mainEl.prepend(adminBar);
     }
-  }
-};
-
-window.handleSecretAdminTap = function () {
-  secretLogoTapCount += 1;
-  clearTimeout(secretLogoTimer);
-  secretLogoTimer = setTimeout(() => {
-    secretLogoTapCount = 0;
-  }, 2000);
-
-  if (secretLogoTapCount >= 5) {
-    secretLogoTapCount = 0;
-    window.setDevControlsVisibility(!devControlsVisible);
-    if (!devControlsVisible && isAdminModeActive) {
-      window.setRoleView('student', true);
-    }
-    showToast(
-      devControlsVisible
-        ? '🔓 Modo Creador desbloqueado: Controles de Administrador visibles.'
-        : '🔒 Controles de Creador ocultos: Vista pública limpia activada.'
-    );
   }
 };
 
