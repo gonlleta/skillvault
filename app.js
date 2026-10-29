@@ -6312,7 +6312,6 @@ const COURSE_ZERO_TO_ONE_GUIDES = {
 };
 
 function getZeroToOneGuideForCourse(courseId) {
-function getZeroToOneGuideForCourse(courseId) {
   return (
     COURSE_ZERO_TO_ONE_GUIDES[courseId] || {
       tools: 'Navegador Web, Google Docs / Sheets (gratis) y las plantillas incluidas en este módulo.',
