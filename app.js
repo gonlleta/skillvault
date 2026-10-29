@@ -6312,6 +6312,7 @@ const COURSE_ZERO_TO_ONE_GUIDES = {
 };
 
 function getZeroToOneGuideForCourse(courseId) {
+function getZeroToOneGuideForCourse(courseId) {
   return (
     COURSE_ZERO_TO_ONE_GUIDES[courseId] || {
       tools: 'Navegador Web, Google Docs / Sheets (gratis) y las plantillas incluidas en este módulo.',
@@ -6323,6 +6324,188 @@ function getZeroToOneGuideForCourse(courseId) {
     }
   );
 }
+
+// ==========================================================================
+// REPRODUCTOR DE VIDEOS CORTOS EXPLICATIVOS POR MÓDULO (PARA TEMAS DIFÍCILES)
+// ==========================================================================
+let currentMicroVideoScene = 0;
+let microVideoPlaying = false;
+let microVideoVoiceEnabled = true;
+let microVideoTimer = null;
+
+function stopMicroVideoPlayback() {
+  microVideoPlaying = false;
+  if (microVideoTimer) {
+    clearTimeout(microVideoTimer);
+    microVideoTimer = null;
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+function buildLessonMicroVideoData(lesson, skill, moduleIdx) {
+  const cleanHeading = (lesson.heading || `Módulo ${moduleIdx + 1}`).replace(/^Módulo \d+:\s*/i, '');
+  const codeLines = (lesson.code || '')
+    .split('\n')
+    .filter(l => l.trim().length > 0)
+    .slice(0, 4)
+    .join('\n');
+  const firstStep = (lesson.stepByStep && lesson.stepByStep[1]) || (lesson.keyPoints && lesson.keyPoints[0]) || '';
+  const secondStep = (lesson.stepByStep && lesson.stepByStep[2]) || (lesson.keyPoints && lesson.keyPoints[1]) || '';
+  const warnText = (lesson.warning || 'Revisa siempre los datos de entrada antes de ejecutar.').replace(/^⚠️\s*(Error común:|Error crítico común:)?\s*/i, '');
+  const caseRes = (lesson.caseStudy && lesson.caseStudy.result) || 'Proceso automatizado sin errores y listo para producción.';
+
+  const ytQuery = encodeURIComponent(`${skill.category} ${cleanHeading} tutorial español paso a paso`);
+  const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
+
+  const scenes = [
+    {
+      tag: 'Escena 1 de 4 • 0:00 / 0:48 — Lo difícil explicado en simple',
+      shortLabel: '1. En Simple',
+      title: `¿Qué es lo que más suele costar de "${cleanHeading}"?`,
+      visual: `🎯 META DE ESTE MÓDULO:\n${firstStep}\n\n💡 REGLA CLAVE:\n${secondStep}`,
+      narration: `Vamos a destrabar la parte más difícil de ${cleanHeading} en menos de un minuto. La clave principal aquí es: ${firstStep}. Además, recuerda: ${secondStep}.`
+    },
+    {
+      tag: 'Escena 2 de 4 • 0:12 / 0:48 — Cómo se hace en pantalla',
+      shortLabel: '2. En Pantalla',
+      title: 'Lo que debes escribir o configurar exactamente:',
+      visual: codeLines || `1. ${firstStep}\n2. ${secondStep}`,
+      narration: `En la práctica, fíjate en estas líneas clave del ejemplo del módulo. Copias esta estructura base en tu herramienta gratuita y reemplazas solo los valores de entrada por los tuyos.`
+    },
+    {
+      tag: 'Escena 3 de 4 • 0:26 / 0:48 — El error donde falla la mayoría',
+      shortLabel: '3. Error a Evitar',
+      title: '⚠️ Cuidado con esta trampa frecuente:',
+      visual: `❌ ERROR FRECUENTE QUE DEBES EVITAR:\n${warnText}\n\n✅ SOLUCIÓN:\nVerifica esta regla antes de ejecutar tu código o campaña.`,
+      narration: `Mucho cuidado con el error donde suele trabarse la mayoría: ${warnText}. Si evitas este fallo, tu implementación funcionará al primer intento.`
+    },
+    {
+      tag: 'Escena 4 de 4 • 0:38 / 0:48 — Resultado real funcionando',
+      shortLabel: '4. Resultado Real',
+      title: '🚀 Así queda cuando lo aplicas bien:',
+      visual: `✅ RESULTADO EN PRODUCCIÓN:\n${caseRes}`,
+      narration: `Al aplicarlo paso a paso, este es el resultado real: ${caseRes}. Ya estás listo para responder la verificación de abajo.`
+    }
+  ];
+
+  return {
+    cleanHeading,
+    youtubeSearchUrl,
+    scenes
+  };
+}
+
+function updateMicroVideoDOM() {
+  if (!currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
+  const lesson = currentSkill.lessons[currentStepIndex];
+  const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+  const scene = vData.scenes[currentMicroVideoScene] || vData.scenes[0];
+  const pct = Math.round(((currentMicroVideoScene + 1) / vData.scenes.length) * 100);
+
+  const tagEl = document.getElementById('mv-scene-tag');
+  const titleEl = document.getElementById('mv-scene-title');
+  const visualEl = document.getElementById('mv-scene-visual');
+  const capEl = document.getElementById('mv-scene-caption');
+  const barEl = document.getElementById('mv-progress-bar');
+  const playBtn = document.getElementById('mv-play-btn');
+  const voiceBtn = document.getElementById('mv-voice-btn');
+
+  if (tagEl) tagEl.innerHTML = `<span>🎬 ${scene.tag}</span><span>${microVideoPlaying ? '🔴 REPRODUCIENDO' : '⏸ PAUSADO'}</span>`;
+  if (titleEl) titleEl.textContent = scene.title;
+  if (visualEl) visualEl.textContent = scene.visual;
+  if (capEl) capEl.innerHTML = `<strong>🗣️ Explicación guiada:</strong> "${scene.narration}"`;
+  if (barEl) barEl.style.width = `${pct}%`;
+  if (playBtn) {
+    playBtn.innerHTML = microVideoPlaying ? '⏸ Pausar Video Corto' : '▶ Reproducir Video Explicativo (48s)';
+  }
+  if (voiceBtn) {
+    voiceBtn.textContent = microVideoVoiceEnabled ? '🔊 Voz: Activada' : '🔇 Voz: Silenciada';
+  }
+
+  document.querySelectorAll('.micro-scene-pill').forEach((btn, idx) => {
+    btn.classList.toggle('active', idx === currentMicroVideoScene);
+  });
+}
+
+function playCurrentMicroScene() {
+  if (!microVideoPlaying || !currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
+  const lesson = currentSkill.lessons[currentStepIndex];
+  const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+  const scene = vData.scenes[currentMicroVideoScene];
+  if (!scene) {
+    stopMicroVideoPlayback();
+    updateMicroVideoDOM();
+    return;
+  }
+
+  updateMicroVideoDOM();
+
+  const advanceToNext = () => {
+    if (!microVideoPlaying) return;
+    if (currentMicroVideoScene < vData.scenes.length - 1) {
+      currentMicroVideoScene += 1;
+      playCurrentMicroScene();
+    } else {
+      microVideoPlaying = false;
+      updateMicroVideoDOM();
+    }
+  };
+
+  if (microVideoVoiceEnabled && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(scene.narration);
+    utter.lang = 'es-ES';
+    utter.rate = 1.04;
+    utter.onend = () => {
+      if (microVideoPlaying) {
+        microVideoTimer = setTimeout(advanceToNext, 600);
+      }
+    };
+    utter.onerror = () => {
+      if (microVideoPlaying) {
+        microVideoTimer = setTimeout(advanceToNext, 5500);
+      }
+    };
+    window.speechSynthesis.speak(utter);
+  } else {
+    microVideoTimer = setTimeout(advanceToNext, 6000);
+  }
+}
+
+window.toggleMicroVideoPlay = function () {
+  if (microVideoPlaying) {
+    stopMicroVideoPlayback();
+    updateMicroVideoDOM();
+    return;
+  }
+  if (currentMicroVideoScene >= 3) {
+    currentMicroVideoScene = 0;
+  }
+  microVideoPlaying = true;
+  playCurrentMicroScene();
+};
+
+window.selectMicroVideoScene = function (sceneIdx) {
+  const wasPlaying = microVideoPlaying;
+  stopMicroVideoPlayback();
+  currentMicroVideoScene = sceneIdx;
+  if (wasPlaying) {
+    microVideoPlaying = true;
+    playCurrentMicroScene();
+  } else {
+    updateMicroVideoDOM();
+  }
+};
+
+window.toggleMicroVideoVoice = function () {
+  microVideoVoiceEnabled = !microVideoVoiceEnabled;
+  if (!microVideoVoiceEnabled && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  updateMicroVideoDOM();
+};
 
 let activeDictFilter = 'all';
 
@@ -6981,6 +7164,8 @@ window.jumpToModalStep = function (targetIdx) {
 };
 
 function renderModalStep() {
+  stopMicroVideoPlayback();
+  currentMicroVideoScene = 0;
   const totalSteps = currentSkill.lessons.length + 1;
   const stepper = document.getElementById('lesson-stepper');
   const body = document.getElementById('modal-body');
@@ -7073,6 +7258,56 @@ function renderModalStep() {
         </p>
         <div class="steps-list">
           ${zeroGuide.howToStart.map(st => `<div class="step-item">${st}</div>`).join('')}
+        </div>
+      </div>
+    `;
+
+    const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+    const initialScene = vData.scenes[0];
+    const microVideoHtml = `
+      <div class="micro-video-box" role="region" aria-label="Video corto explicativo del módulo">
+        <div class="micro-video-top">
+          <span class="micro-video-badge">🎬 Video Corto Explicativo (48s) • Para destrabar lo más difícil</span>
+          <a href="${vData.youtubeSearchUrl}" target="_blank" rel="noopener noreferrer" class="micro-video-yt-link">
+            📺 Ver videos complementarios en YouTube ↗
+          </a>
+        </div>
+        <div class="micro-video-screen">
+          <div>
+            <div class="micro-video-scene-tag" id="mv-scene-tag">
+              <span>🎬 ${initialScene.tag}</span>
+              <span>⏸ LISTO PARA REPRODUCIR</span>
+            </div>
+            <div class="micro-video-scene-title" id="mv-scene-title">${initialScene.title}</div>
+            <pre class="micro-video-visual-code" id="mv-scene-visual">${initialScene.visual}</pre>
+          </div>
+          <div class="micro-video-caption" id="mv-scene-caption">
+            <strong>🗣️ Explicación guiada:</strong> "${initialScene.narration}"
+          </div>
+        </div>
+        <div class="micro-video-progress-track">
+          <div class="micro-video-progress-bar" id="mv-progress-bar" style="width: 25%;"></div>
+        </div>
+        <div class="micro-video-controls">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="micro-video-play-btn" id="mv-play-btn" onclick="toggleMicroVideoPlay()">
+              ▶ Reproducir Video Explicativo (48s)
+            </button>
+            <button type="button" class="btn-secondary" id="mv-voice-btn" style="padding: 7px 11px; font-size: 12px;" onclick="toggleMicroVideoVoice()">
+              🔊 Voz: Activada
+            </button>
+          </div>
+          <div class="micro-video-scene-pills">
+            ${vData.scenes
+              .map(
+                (sc, sIdx) => `
+                  <button type="button" class="micro-scene-pill ${sIdx === 0 ? 'active' : ''}" onclick="selectMicroVideoScene(${sIdx})">
+                    ${sc.shortLabel}
+                  </button>
+                `
+              )
+              .join('')}
+          </div>
         </div>
       </div>
     `;
@@ -7180,6 +7415,7 @@ function renderModalStep() {
         </div>
         <h4>${lesson.heading}</h4>
         <div class="lesson-paragraphs">${paragraphsHtml}</div>
+        ${microVideoHtml}
         ${zeroToOneHtml}
         ${stepByStepHtml}
         ${caseStudyHtml}
@@ -8703,15 +8939,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const lessonModal = document.getElementById('lesson-modal');
   document.getElementById('close-modal-btn').addEventListener('click', () => {
+    stopMicroVideoPlayback();
     lessonModal.classList.remove('open');
   });
   lessonModal.addEventListener('click', e => {
     if (e.target === lessonModal) {
+      stopMicroVideoPlayback();
       lessonModal.classList.remove('open');
     }
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && lessonModal.classList.contains('open')) {
+      stopMicroVideoPlayback();
       lessonModal.classList.remove('open');
     }
   });
