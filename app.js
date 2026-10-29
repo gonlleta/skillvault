@@ -6325,18 +6325,26 @@ function getZeroToOneGuideForCourse(courseId) {
 }
 
 // ==========================================================================
-// REPRODUCTOR DE VIDEOS CORTOS EXPLICATIVOS POR MÓDULO (PARA TEMAS DIFÍCILES)
+// REPRODUCTOR DE VIDEOS CORTOS EXPLICATIVOS POR MÓDULO (MOTOR DE VIDEO 100% PROPIO EN CANVAS HD)
 // ==========================================================================
 let currentMicroVideoScene = 0;
 let microVideoPlaying = false;
 let microVideoVoiceEnabled = true;
+let microVideoSpeed = 1;
 let microVideoTimer = null;
+let microVideoRafId = null;
+let microVideoSceneStartMs = 0;
+let microVideoSceneProgress = 0;
 
 function stopMicroVideoPlayback() {
   microVideoPlaying = false;
   if (microVideoTimer) {
     clearTimeout(microVideoTimer);
     microVideoTimer = null;
+  }
+  if (microVideoRafId) {
+    cancelAnimationFrame(microVideoRafId);
+    microVideoRafId = null;
   }
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
@@ -6348,52 +6356,384 @@ function buildLessonMicroVideoData(lesson, skill, moduleIdx) {
   const codeLines = (lesson.code || '')
     .split('\n')
     .filter(l => l.trim().length > 0)
-    .slice(0, 4)
+    .slice(0, 6)
     .join('\n');
-  const firstStep = (lesson.stepByStep && lesson.stepByStep[1]) || (lesson.keyPoints && lesson.keyPoints[0]) || '';
-  const secondStep = (lesson.stepByStep && lesson.stepByStep[2]) || (lesson.keyPoints && lesson.keyPoints[1]) || '';
+  const firstStep = (lesson.stepByStep && lesson.stepByStep[1]) || (lesson.keyPoints && lesson.keyPoints[0]) || 'Preparar los datos de entrada y validar el formato.';
+  const secondStep = (lesson.stepByStep && lesson.stepByStep[2]) || (lesson.keyPoints && lesson.keyPoints[1]) || 'Ejecutar la estructura paso a paso y medir el resultado.';
   const warnText = (lesson.warning || 'Revisa siempre los datos de entrada antes de ejecutar.').replace(/^⚠️\s*(Error común:|Error crítico común:)?\s*/i, '');
+  const caseScenario = (lesson.caseStudy && lesson.caseStudy.scenario) || 'Proceso manual lento y propenso a errores humanos.';
   const caseRes = (lesson.caseStudy && lesson.caseStudy.result) || 'Proceso automatizado sin errores y listo para producción.';
-
-  const ytQuery = encodeURIComponent(`${skill.category} ${cleanHeading} tutorial español paso a paso`);
-  const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${ytQuery}`;
 
   const scenes = [
     {
-      tag: 'Escena 1 de 4 • 0:00 / 0:48 — Lo difícil explicado en simple',
+      tag: 'Escena 1/4 • Concepto Difícil en Simple',
       shortLabel: '1. En Simple',
-      title: `¿Qué es lo que más suele costar de "${cleanHeading}"?`,
-      visual: `🎯 META DE ESTE MÓDULO:\n${firstStep}\n\n💡 REGLA CLAVE:\n${secondStep}`,
-      narration: `Vamos a destrabar la parte más difícil de ${cleanHeading} en menos de un minuto. La clave principal aquí es: ${firstStep}. Además, recuerda: ${secondStep}.`
+      title: `¿Cómo entender "${cleanHeading}" sin trabarte?`,
+      stepA: firstStep,
+      stepB: secondStep,
+      visual: `🎯 META PRINCIPAL:\n${firstStep}\n\n💡 REGLA CLAVE:\n${secondStep}`,
+      narration: `Bienvenido al video explicativo de ${cleanHeading}. Para entender la parte más difícil sin complicarte, enfócate primero en esto: ${firstStep}. Y aplica siempre esta regla clave: ${secondStep}.`
     },
     {
-      tag: 'Escena 2 de 4 • 0:12 / 0:48 — Cómo se hace en pantalla',
+      tag: 'Escena 2/4 • Demostración en Pantalla Paso a Paso',
       shortLabel: '2. En Pantalla',
-      title: 'Lo que debes escribir o configurar exactamente:',
+      title: 'Simulación en vivo: Qué escribir y cómo configurarlo',
+      codeSample: codeLines || `# Paso 1:\n${firstStep}\n\n# Paso 2:\n${secondStep}`,
       visual: codeLines || `1. ${firstStep}\n2. ${secondStep}`,
-      narration: `En la práctica, fíjate en estas líneas clave del ejemplo del módulo. Copias esta estructura base en tu herramienta gratuita y reemplazas solo los valores de entrada por los tuyos.`
+      narration: `Mira en pantalla cómo se escribe paso a paso. Copias este bloque en tu programa gratuito y reemplazas únicamente los datos de ejemplo por los de tu propio proyecto.`
     },
     {
-      tag: 'Escena 3 de 4 • 0:26 / 0:48 — El error donde falla la mayoría',
+      tag: 'Escena 3/4 • Error Crítico vs. Solución Correcta',
       shortLabel: '3. Error a Evitar',
-      title: '⚠️ Cuidado con esta trampa frecuente:',
-      visual: `❌ ERROR FRECUENTE QUE DEBES EVITAR:\n${warnText}\n\n✅ SOLUCIÓN:\nVerifica esta regla antes de ejecutar tu código o campaña.`,
-      narration: `Mucho cuidado con el error donde suele trabarse la mayoría: ${warnText}. Si evitas este fallo, tu implementación funcionará al primer intento.`
+      title: '⚠️ Dónde falla la mayoría vs. Cómo resolverlo al 1er intento',
+      warnText,
+      solutionText: secondStep,
+      visual: `❌ ERROR FRECUENTE QUE DEBES EVITAR:\n${warnText}\n\n✅ SOLUCIÓN:\n${secondStep}`,
+      narration: `Atención a este punto porque aquí es donde más cuesta avanzar: ${warnText}. Si verificas esto antes de ejecutar, te ahorrarás horas de frustración.`
     },
     {
-      tag: 'Escena 4 de 4 • 0:38 / 0:48 — Resultado real funcionando',
+      tag: 'Escena 4/4 • Resultado Real Funcionando en Producción',
       shortLabel: '4. Resultado Real',
-      title: '🚀 Así queda cuando lo aplicas bien:',
+      title: '🚀 Antes vs. Después al aplicar este módulo',
+      caseScenario,
+      caseRes,
       visual: `✅ RESULTADO EN PRODUCCIÓN:\n${caseRes}`,
-      narration: `Al aplicarlo paso a paso, este es el resultado real: ${caseRes}. Ya estás listo para responder la verificación de abajo.`
+      narration: `Cuando lo aplicas correctamente, pasas de un proceso trabado a este resultado real: ${caseRes}. Ya tienes todo claro para superar el reto del módulo.`
     }
   ];
 
   return {
     cleanHeading,
-    youtubeSearchUrl,
+    category: skill.category || 'SkillVault',
+    moduleNumber: moduleIdx + 1,
     scenes
   };
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
+  const words = String(text || '').split(/\s+/);
+  let line = '';
+  let linesDrawn = 0;
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {
+      linesDrawn++;
+      if (linesDrawn >= maxLines) {
+        ctx.fillText(line.trim() + '...', x, y);
+        return y + lineHeight;
+      }
+      ctx.fillText(line.trim(), x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  if (line.trim()) {
+    ctx.fillText(line.trim(), x, y);
+    y += lineHeight;
+  }
+  return y;
+}
+
+function drawRoundedRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function drawMicroVideoCanvasFrame(vData, sceneIdx, progress01) {
+  const canvas = document.getElementById('mv-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  const scene = vData.scenes[sceneIdx] || vData.scenes[0];
+  const now = performance.now();
+
+  // Fondo de estudio oscuro con gradiente dinámico
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0, '#050814');
+  bgGrad.addColorStop(0.55, '#0d152c');
+  bgGrad.addColorStop(1, '#171136');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grilla sutil animada de fondo
+  ctx.strokeStyle = 'rgba(168, 85, 247, 0.07)';
+  ctx.lineWidth = 1;
+  const offset = (now * 0.015) % 40;
+  for (let gx = -40 + offset; gx < W; gx += 40) {
+    ctx.beginPath();
+    ctx.moveTo(gx, 0);
+    ctx.lineTo(gx, H);
+    ctx.stroke();
+  }
+  for (let gy = 0; gy < H; gy += 40) {
+    ctx.beginPath();
+    ctx.moveTo(0, gy);
+    ctx.lineTo(W, gy);
+    ctx.stroke();
+  }
+
+  // Barra superior HUD del video
+  ctx.fillStyle = 'rgba(8, 12, 26, 0.85)';
+  ctx.fillRect(0, 0, W, 54);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.beginPath();
+  ctx.moveTo(0, 54);
+  ctx.lineTo(W, 54);
+  ctx.stroke();
+
+  // Punto indicador y título de estudio
+  ctx.fillStyle = microVideoPlaying ? '#10b981' : '#f59e0b';
+  ctx.beginPath();
+  ctx.arc(26, 27, 6, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.font = 'bold 14px Inter, sans-serif';
+  ctx.fillStyle = '#e2e8f0';
+  ctx.fillText(`SKILLVAULT VIDEO STUDIO  •  MÓDULO ${vData.moduleNumber}: ${vData.cleanHeading.slice(0, 46)}`, 42, 32);
+
+  // Ondas de audio animadas en la esquina superior derecha
+  const eqBaseX = W - 180;
+  for (let b = 0; b < 10; b++) {
+    const barH = microVideoPlaying
+      ? 6 + Math.abs(Math.sin(now * 0.012 + b * 0.7)) * 20
+      : 6;
+    ctx.fillStyle = b % 2 === 0 ? '#10b981' : '#a855f7';
+    ctx.fillRect(eqBaseX + b * 7, 27 - barH / 2, 4, barH);
+  }
+
+  ctx.font = 'bold 13px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#a7f3d0';
+  ctx.fillText(scene.shortLabel.toUpperCase(), W - 100, 32);
+
+  // Título de la escena actual
+  ctx.font = 'bold 21px Inter, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(scene.title, 36, 92);
+
+  // Contenido gráfico animado según cuál de las 4 escenas está activa
+  if (sceneIdx === 0) {
+    // Escena 1: Diagrama de flujo animado de 3 nodos + 2 tarjetas explicativas
+    const nodes = [
+      { label: '1. DATO DE ENTRADA', sub: 'Lo que tienes hoy', x: 50, color: '#38bdf8' },
+      { label: '2. REGLA DEL MÓDULO', sub: 'Proceso paso a paso', x: 365, color: '#a855f7' },
+      { label: '3. RESULTADO LIMPIO', sub: 'Listo sin errores', x: 680, color: '#10b981' }
+    ];
+
+    // Flechas conectoras y partículas viajando
+    for (let i = 0; i < 2; i++) {
+      const startX = nodes[i].x + 230;
+      const endX = nodes[i + 1].x;
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(startX, 148);
+      ctx.lineTo(endX, 148);
+      ctx.stroke();
+
+      const particleX = startX + ((now * 0.08 + i * 40) % Math.max(10, endX - startX));
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.arc(particleX, 148, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    nodes.forEach((nd, idx) => {
+      const activePulse = progress01 >= idx * 0.28;
+      drawRoundedRect(ctx, nd.x, 114, 230, 68, 10);
+      ctx.fillStyle = activePulse ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.55)';
+      ctx.fill();
+      ctx.lineWidth = activePulse ? 2.2 : 1;
+      ctx.strokeStyle = activePulse ? nd.color : 'rgba(255,255,255,0.15)';
+      ctx.stroke();
+
+      ctx.font = 'bold 13px "JetBrains Mono", monospace';
+      ctx.fillStyle = nd.color;
+      ctx.fillText(nd.label, nd.x + 16, 142);
+      ctx.font = '13px Inter, sans-serif';
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText(nd.sub, nd.x + 16, 165);
+    });
+
+    // Dos tarjetas grandes con el paso 1 y la regla clave
+    drawRoundedRect(ctx, 48, 204, 420, 165, 12);
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.1)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.font = 'bold 15px Inter, sans-serif';
+    ctx.fillStyle = '#34d399';
+    ctx.fillText('🎯 PASO CLAVE PARA EMPEZAR:', 68, 234);
+    ctx.font = '15px Inter, sans-serif';
+    ctx.fillStyle = '#f1f5f9';
+    wrapCanvasText(ctx, scene.stepA, 68, 262, 380, 23, 4);
+
+    drawRoundedRect(ctx, 492, 204, 420, 165, 12);
+    ctx.fillStyle = 'rgba(168, 85, 247, 0.11)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(168, 85, 247, 0.45)';
+    ctx.stroke();
+
+    ctx.font = 'bold 15px Inter, sans-serif';
+    ctx.fillStyle = '#d8b4fe';
+    ctx.fillText('💡 REGLA DE ORO DEL MÓDULO:', 512, 234);
+    ctx.font = '15px Inter, sans-serif';
+    ctx.fillStyle = '#f1f5f9';
+    wrapCanvasText(ctx, scene.stepB, 512, 262, 380, 23, 4);
+  } else if (sceneIdx === 1) {
+    // Escena 2: Ventana de código/configuración con escritura en vivo (typewriter)
+    drawRoundedRect(ctx, 46, 112, 868, 258, 12);
+    ctx.fillStyle = '#090d16';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Barra de ventana tipo editor
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(48, 114, 864, 34);
+    ['#ef4444', '#f59e0b', '#10b981'].forEach((c, i) => {
+      ctx.fillStyle = c;
+      ctx.beginPath();
+      ctx.arc(70 + i * 18, 131, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.font = '12.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(`practica_modulo_${vData.moduleNumber}. workspace — Escribiendo paso a paso...`, 135, 136);
+
+    // Efecto máquina de escribir proporcional al progreso de la escena
+    const fullCode = scene.codeSample;
+    const charRatio = microVideoPlaying ? Math.min(1, 0.25 + progress01 * 0.9) : 1;
+    const visibleChars = Math.max(18, Math.floor(fullCode.length * charRatio));
+    const typedCode = fullCode.slice(0, visibleChars);
+    const lines = typedCode.split('\n').slice(0, 6);
+
+    ctx.font = '14.5px "JetBrains Mono", monospace';
+    lines.forEach((ln, idx) => {
+      const yPos = 178 + idx * 27;
+      ctx.fillStyle = '#475569';
+      ctx.fillText(`${idx + 1}`, 66, yPos);
+      ctx.fillStyle = ln.trim().startsWith('#') || ln.trim().startsWith('//') ? '#6ee7b7' : '#e2e8f0';
+      const clipped = ln.length > 78 ? ln.slice(0, 78) + '...' : ln;
+      ctx.fillText(clipped, 98, yPos);
+      if (idx === lines.length - 1 && Math.floor(now / 400) % 2 === 0) {
+        const cursorX = 98 + ctx.measureText(clipped).width + 4;
+        ctx.fillStyle = '#10b981';
+        ctx.fillRect(cursorX, yPos - 14, 9, 17);
+      }
+    });
+
+    // Etiqueta inferior de estado dentro de la terminal
+    drawRoundedRect(ctx, 640, 326, 254, 30, 7);
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
+    ctx.fill();
+    ctx.font = 'bold 12.5px Inter, sans-serif';
+    ctx.fillStyle = '#34d399';
+    ctx.fillText('✅ Plantilla lista para copiar y usar', 654, 346);
+  } else if (sceneIdx === 2) {
+    // Escena 3: Comparativa visual Error Común vs Solución
+    drawRoundedRect(ctx, 46, 118, 420, 250, 12);
+    ctx.fillStyle = 'rgba(239, 68, 68, 0.11)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.55)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.font = 'bold 16px Inter, sans-serif';
+    ctx.fillStyle = '#fca5a5';
+    ctx.fillText('❌ ERROR QUE TRABA A LA MAYORÍA:', 68, 154);
+    ctx.font = '15px Inter, sans-serif';
+    ctx.fillStyle = '#fee2e2';
+    wrapCanvasText(ctx, scene.warnText, 68, 188, 376, 24, 6);
+
+    drawRoundedRect(ctx, 494, 118, 420, 250, 12);
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.55)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.font = 'bold 16px Inter, sans-serif';
+    ctx.fillStyle = '#6ee7b7';
+    ctx.fillText('✅ CÓMO RESOLVERLO AL 1ER INTENTO:', 516, 154);
+    ctx.font = '15px Inter, sans-serif';
+    ctx.fillStyle = '#ecfdf5';
+    wrapCanvasText(ctx, scene.solutionText, 516, 188, 376, 24, 6);
+  } else {
+    // Escena 4: Resultado Real en Producción + barra de impacto al 100%
+    drawRoundedRect(ctx, 46, 116, 868, 96, 12);
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.85)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.font = 'bold 14px Inter, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('ANTES DE APLICAR ESTE MÓDULO (ESCENARIO INICIAL):', 68, 144);
+    ctx.font = '14.5px Inter, sans-serif';
+    ctx.fillStyle = '#e2e8f0';
+    wrapCanvasText(ctx, scene.caseScenario, 68, 170, 820, 21, 2);
+
+    drawRoundedRect(ctx, 46, 228, 868, 142, 12);
+    ctx.fillStyle = 'rgba(6, 78, 59, 0.45)';
+    ctx.fill();
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.font = 'bold 15px Inter, sans-serif';
+    ctx.fillStyle = '#34d399';
+    ctx.fillText('🚀 DESPUÉS DE APLICARLO (RESULTADO EN PRODUCCIÓN):', 68, 258);
+    ctx.font = '15px Inter, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    wrapCanvasText(ctx, scene.caseRes, 68, 286, 820, 22, 3);
+
+    // Barra animada de eficiencia completada
+    const barFillW = Math.round(820 * (microVideoPlaying ? Math.min(1, 0.35 + progress01 * 0.65) : 1));
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillRect(68, 344, 820, 10);
+    ctx.fillStyle = '#10b981';
+    ctx.fillRect(68, 344, barFillW, 10);
+  }
+
+  // Franja inferior de subtítulos integrados dentro del video
+  ctx.fillStyle = 'rgba(4, 7, 17, 0.92)';
+  ctx.fillRect(0, H - 86, W, 86);
+  ctx.strokeStyle = 'rgba(168, 85, 247, 0.35)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, H - 86);
+  ctx.lineTo(W, H - 86);
+  ctx.stroke();
+
+  ctx.font = 'bold 12px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#c084fc';
+  ctx.fillText(`🗣️ SUBTÍTULOS EN ESPAÑOL (${scene.tag.toUpperCase()}):`, 36, H - 60);
+
+  ctx.font = '14.5px Inter, sans-serif';
+  ctx.fillStyle = '#f8fafc';
+  wrapCanvasText(ctx, `"${scene.narration}"`, 36, H - 36, W - 72, 20, 2);
+}
+
+function formatMicroVideoSec(sec) {
+  const s = Math.max(0, Math.min(48, Math.round(sec)));
+  return `00:${s < 10 ? '0' + s : s}`;
 }
 
 function updateMicroVideoDOM() {
@@ -6401,31 +6741,63 @@ function updateMicroVideoDOM() {
   const lesson = currentSkill.lessons[currentStepIndex];
   const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
   const scene = vData.scenes[currentMicroVideoScene] || vData.scenes[0];
-  const pct = Math.round(((currentMicroVideoScene + 1) / vData.scenes.length) * 100);
 
-  const tagEl = document.getElementById('mv-scene-tag');
-  const titleEl = document.getElementById('mv-scene-title');
-  const visualEl = document.getElementById('mv-scene-visual');
+  const totalProgress01 = Math.min(
+    1,
+    (currentMicroVideoScene + microVideoSceneProgress) / vData.scenes.length
+  );
+  const pct = Math.max(4, Math.round(totalProgress01 * 100));
+  const elapsedSec = totalProgress01 * 48;
+
+  const timeEl = document.getElementById('mv-time-pill');
   const capEl = document.getElementById('mv-scene-caption');
   const barEl = document.getElementById('mv-progress-bar');
   const playBtn = document.getElementById('mv-play-btn');
   const voiceBtn = document.getElementById('mv-voice-btn');
+  const speedBtn = document.getElementById('mv-speed-btn');
+  const bigPlayEl = document.getElementById('mv-big-play');
 
-  if (tagEl) tagEl.innerHTML = `<span>🎬 ${scene.tag}</span><span>${microVideoPlaying ? '🔴 REPRODUCIENDO' : '⏸ PAUSADO'}</span>`;
-  if (titleEl) titleEl.textContent = scene.title;
-  if (visualEl) visualEl.textContent = scene.visual;
-  if (capEl) capEl.innerHTML = `<strong>🗣️ Explicación guiada:</strong> "${scene.narration}"`;
+  if (timeEl) {
+    timeEl.textContent = `${microVideoPlaying ? '🔴 EN VIVO' : '⏸ PAUSADO'} • ${formatMicroVideoSec(elapsedSec)} / 00:48`;
+  }
+  if (capEl) {
+    capEl.innerHTML = `<strong>🎬 ${scene.tag}:</strong> "${scene.narration}"`;
+  }
   if (barEl) barEl.style.width = `${pct}%`;
   if (playBtn) {
-    playBtn.innerHTML = microVideoPlaying ? '⏸ Pausar Video Corto' : '▶ Reproducir Video Explicativo (48s)';
+    playBtn.innerHTML = microVideoPlaying ? '⏸ Pausar Video' : '▶ Reproducir Video Explicativo (48s)';
   }
   if (voiceBtn) {
     voiceBtn.textContent = microVideoVoiceEnabled ? '🔊 Voz: Activada' : '🔇 Voz: Silenciada';
+  }
+  if (speedBtn) {
+    speedBtn.textContent = `⚡ Velocidad: ${microVideoSpeed}x`;
+  }
+  if (bigPlayEl) {
+    bigPlayEl.classList.toggle('playing', microVideoPlaying);
   }
 
   document.querySelectorAll('.micro-scene-pill').forEach((btn, idx) => {
     btn.classList.toggle('active', idx === currentMicroVideoScene);
   });
+
+  drawMicroVideoCanvasFrame(vData, currentMicroVideoScene, microVideoSceneProgress);
+}
+
+function startMicroVideoAnimationLoop() {
+  if (microVideoRafId) cancelAnimationFrame(microVideoRafId);
+  const sceneDurationMs = 12000 / microVideoSpeed;
+
+  const tick = () => {
+    if (!microVideoPlaying || !currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
+    const elapsed = performance.now() - microVideoSceneStartMs;
+    microVideoSceneProgress = Math.min(1, elapsed / sceneDurationMs);
+    updateMicroVideoDOM();
+    if (microVideoPlaying) {
+      microVideoRafId = requestAnimationFrame(tick);
+    }
+  };
+  microVideoRafId = requestAnimationFrame(tick);
 }
 
 function playCurrentMicroScene() {
@@ -6439,7 +6811,10 @@ function playCurrentMicroScene() {
     return;
   }
 
+  microVideoSceneStartMs = performance.now();
+  microVideoSceneProgress = 0;
   updateMicroVideoDOM();
+  startMicroVideoAnimationLoop();
 
   const advanceToNext = () => {
     if (!microVideoPlaying) return;
@@ -6447,29 +6822,32 @@ function playCurrentMicroScene() {
       currentMicroVideoScene += 1;
       playCurrentMicroScene();
     } else {
-      microVideoPlaying = false;
+      microVideoSceneProgress = 1;
+      stopMicroVideoPlayback();
       updateMicroVideoDOM();
     }
   };
+
+  const fallbackDuration = Math.round(11500 / microVideoSpeed);
 
   if (microVideoVoiceEnabled && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(scene.narration);
     utter.lang = 'es-ES';
-    utter.rate = 1.04;
+    utter.rate = Math.min(1.6, 1.04 * microVideoSpeed);
     utter.onend = () => {
       if (microVideoPlaying) {
-        microVideoTimer = setTimeout(advanceToNext, 600);
+        microVideoTimer = setTimeout(advanceToNext, 450);
       }
     };
     utter.onerror = () => {
       if (microVideoPlaying) {
-        microVideoTimer = setTimeout(advanceToNext, 5500);
+        microVideoTimer = setTimeout(advanceToNext, fallbackDuration);
       }
     };
     window.speechSynthesis.speak(utter);
   } else {
-    microVideoTimer = setTimeout(advanceToNext, 6000);
+    microVideoTimer = setTimeout(advanceToNext, fallbackDuration);
   }
 }
 
@@ -6479,8 +6857,9 @@ window.toggleMicroVideoPlay = function () {
     updateMicroVideoDOM();
     return;
   }
-  if (currentMicroVideoScene >= 3) {
+  if (currentMicroVideoScene >= 3 && microVideoSceneProgress >= 0.95) {
     currentMicroVideoScene = 0;
+    microVideoSceneProgress = 0;
   }
   microVideoPlaying = true;
   playCurrentMicroScene();
@@ -6490,6 +6869,26 @@ window.selectMicroVideoScene = function (sceneIdx) {
   const wasPlaying = microVideoPlaying;
   stopMicroVideoPlayback();
   currentMicroVideoScene = sceneIdx;
+  microVideoSceneProgress = 0;
+  if (wasPlaying) {
+    microVideoPlaying = true;
+    playCurrentMicroScene();
+  } else {
+    updateMicroVideoDOM();
+  }
+};
+
+window.seekMicroVideo = function (event) {
+  const track = document.getElementById('mv-progress-track');
+  if (!track) return;
+  const rect = track.getBoundingClientRect();
+  const clickRatio = Math.max(0, Math.min(0.999, (event.clientX - rect.left) / rect.width));
+  const targetScene = Math.floor(clickRatio * 4);
+  const withinScene = (clickRatio * 4) - targetScene;
+  const wasPlaying = microVideoPlaying;
+  stopMicroVideoPlayback();
+  currentMicroVideoScene = targetScene;
+  microVideoSceneProgress = withinScene;
   if (wasPlaying) {
     microVideoPlaying = true;
     playCurrentMicroScene();
@@ -6502,8 +6901,22 @@ window.toggleMicroVideoVoice = function () {
   microVideoVoiceEnabled = !microVideoVoiceEnabled;
   if (!microVideoVoiceEnabled && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
+  } else if (microVideoPlaying) {
+    playCurrentMicroScene();
+    return;
   }
   updateMicroVideoDOM();
+};
+
+window.cycleMicroVideoSpeed = function () {
+  const speeds = [1, 1.25, 1.5];
+  const idx = speeds.indexOf(microVideoSpeed);
+  microVideoSpeed = speeds[(idx + 1) % speeds.length];
+  if (microVideoPlaying) {
+    playCurrentMicroScene();
+  } else {
+    updateMicroVideoDOM();
+  }
 };
 
 let activeDictFilter = 'all';
@@ -7165,6 +7578,7 @@ window.jumpToModalStep = function (targetIdx) {
 function renderModalStep() {
   stopMicroVideoPlayback();
   currentMicroVideoScene = 0;
+  microVideoSceneProgress = 0;
   const totalSteps = currentSkill.lessons.length + 1;
   const stepper = document.getElementById('lesson-stepper');
   const body = document.getElementById('modal-body');
@@ -7264,28 +7678,22 @@ function renderModalStep() {
     const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
     const initialScene = vData.scenes[0];
     const microVideoHtml = `
-      <div class="micro-video-box" role="region" aria-label="Video corto explicativo del módulo">
+      <div class="micro-video-box" role="region" aria-label="Video corto explicativo creado por SkillVault">
         <div class="micro-video-top">
-          <span class="micro-video-badge">🎬 Video Corto Explicativo (48s) • Para destrabar lo más difícil</span>
-          <a href="${vData.youtubeSearchUrl}" target="_blank" rel="noopener noreferrer" class="micro-video-yt-link">
-            📺 Ver videos complementarios en YouTube ↗
-          </a>
+          <span class="micro-video-badge">🎬 Video Corto Original (48s) • Creado para destrabar lo más difícil de este módulo</span>
+          <span class="micro-video-time-pill" id="mv-time-pill">⏸ PAUSADO • 00:00 / 00:48</span>
         </div>
-        <div class="micro-video-screen">
-          <div>
-            <div class="micro-video-scene-tag" id="mv-scene-tag">
-              <span>🎬 ${initialScene.tag}</span>
-              <span>⏸ LISTO PARA REPRODUCIR</span>
-            </div>
-            <div class="micro-video-scene-title" id="mv-scene-title">${initialScene.title}</div>
-            <pre class="micro-video-visual-code" id="mv-scene-visual">${initialScene.visual}</pre>
-          </div>
-          <div class="micro-video-caption" id="mv-scene-caption">
-            <strong>🗣️ Explicación guiada:</strong> "${initialScene.narration}"
+        <div class="micro-video-canvas-wrap" onclick="toggleMicroVideoPlay()" title="Haz clic para reproducir o pausar el video">
+          <canvas id="mv-canvas" class="micro-video-canvas" width="960" height="480"></canvas>
+          <div class="micro-video-big-play" id="mv-big-play">
+            <div class="micro-video-big-play-circle">▶</div>
           </div>
         </div>
-        <div class="micro-video-progress-track">
-          <div class="micro-video-progress-bar" id="mv-progress-bar" style="width: 25%;"></div>
+        <div class="micro-video-caption" id="mv-scene-caption">
+          <strong>🎬 ${initialScene.tag}:</strong> "${initialScene.narration}"
+        </div>
+        <div class="micro-video-progress-track" id="mv-progress-track" onclick="seekMicroVideo(event)" title="Haz clic para adelantar o retroceder el video">
+          <div class="micro-video-progress-bar" id="mv-progress-bar" style="width: 4%;"></div>
         </div>
         <div class="micro-video-controls">
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -7293,7 +7701,10 @@ function renderModalStep() {
               ▶ Reproducir Video Explicativo (48s)
             </button>
             <button type="button" class="btn-secondary" id="mv-voice-btn" style="padding: 7px 11px; font-size: 12px;" onclick="toggleMicroVideoVoice()">
-              🔊 Voz: Activada
+              🔊 Voz: ${microVideoVoiceEnabled ? 'Activada' : 'Silenciada'}
+            </button>
+            <button type="button" class="btn-secondary" id="mv-speed-btn" style="padding: 7px 11px; font-size: 12px;" onclick="cycleMicroVideoSpeed()">
+              ⚡ Velocidad: ${microVideoSpeed}x
             </button>
           </div>
           <div class="micro-video-scene-pills">
@@ -7425,6 +7836,8 @@ function renderModalStep() {
         ${checkpointHtml}
       </div>
     `;
+
+    updateMicroVideoDOM();
 
     footer.innerHTML = `
       <button class="btn-secondary" ${currentStepIndex === 0 ? 'disabled style="opacity:0.4"' : ''} onclick="prevLessonStep()">⬅ Módulo Anterior</button>
