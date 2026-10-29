@@ -5625,8 +5625,8 @@ function renderHeaderAndStats() {
   const freeHookBtn = document.getElementById('hero-free-module-btn');
   if (freeHookBtn) {
     freeHookBtn.textContent = state.freeTrialBonusClaimed
-      ? '🎓 Continuar Curso de Prueba: Mitad Gratis (Mód. 1-3 ✅)'
-      : '🚀 Probar Curso hasta la Mitad Gratis (+50 PTS)';
+      ? '🎓 Continuar Misión 1 (+50 PTS Acreditados ✅)'
+      : '🚀 Empezar mi primera misión (+50 PTS Gratis)';
   }
 
   const sidebarVipBtn = document.getElementById('sidebar-vip-btn');
@@ -5664,13 +5664,12 @@ function renderFeaturedSkill() {
   const nextSkill = all.find(s => !state.completedCourses.includes(s.id) && !s.secretCourse) || all[0];
   const unlocked = hasAccessToCourse(nextSkill);
   const trialHalf = isTrialHalfOnly(nextSkill);
-  const trialLimit = getTrialModulesLimit(nextSkill);
   const completed = state.completedCourses.includes(nextSkill.id);
   const qCount = getSkillQuestions(nextSkill).length;
 
   box.innerHTML = `
     <div class="card-top">
-      <span class="skill-cat-tag">${trialHalf ? `🎁 CURSO DE PRUEBA • 1RA MITAD GRATIS (MÓD. 1-${trialLimit})` : `⭐ CURSO DESTACADO • ${nextSkill.lessons.length} MÓDULOS`}</span>
+      <span class="skill-cat-tag">⭐ CURSO DESTACADO • ${nextSkill.lessons.length} MÓDULOS</span>
       <div style="display:flex; gap:6px;">
         <span class="points-pill">+${nextSkill.pointsReward} PTS</span>
         <span class="vip-points-pill">👑 +${nextSkill.vipPointsReward || 50} VP</span>
@@ -5679,21 +5678,14 @@ function renderFeaturedSkill() {
     <h3 style="margin-bottom: 8px; font-size: 18px;">${nextSkill.title}</h3>
     <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">${nextSkill.description}</p>
     <div class="vip-bonus-banner">
-      <span>${trialHalf ? `🎁 <b>Mitad Gratis (${trialLimit} de ${nextSkill.lessons.length} módulos)</b> • Oferta compra completa: <b>$${nextSkill.priceUSD.toFixed(2)} USD</b>` : `📚 ${nextSkill.lessons.length} Módulos Extensos (${formatCourseDuration(nextSkill.duration)}) + Examen (${qCount} preg.)`}</span>
+      <span>📚 ${nextSkill.lessons.length} Módulos Extensos (${formatCourseDuration(nextSkill.duration)}) + Examen (${qCount} preg.)</span>
       <span>👑 <strong>+${nextSkill.vipPointsReward || 50} VP</strong></span>
     </div>
-    ${unlocked
+    ${unlocked || trialHalf
       ? `<button class="btn-start-skill" onclick="openSkillModal('${nextSkill.id}')">
             ${completed ? '✅ Repasar Módulos' : `▶ Cursar ${nextSkill.lessons.length} Módulos (+${nextSkill.pointsReward} PTS ${state.isProMember ? `y +${nextSkill.vipPointsReward} VP` : ''})`}
            </button>`
-      : trialHalf
-        ? `<button class="btn-start-skill" onclick="startFreeTrialModule()">
-            🚀 Cursar 1ra Mitad Gratis (Módulos 1 al ${trialLimit}) + 50 PTS
-           </button>
-           <button class="btn-card-vip-upsell" onclick="buyCourse('${nextSkill.id}')">
-            🏷️ ¿Quieres comprarlo completo? Oferta especial: $${nextSkill.priceUSD.toFixed(2)} USD (50% más barato que el resto)
-           </button>`
-        : `<button class="btn-start-skill buy-btn" onclick="buyCourse('${nextSkill.id}')">
+      : `<button class="btn-start-skill buy-btn" onclick="buyCourse('${nextSkill.id}')">
             🔓 Comprar Curso Completo por $${nextSkill.priceUSD.toFixed(2)} USD
            </button>
            <button class="btn-card-vip-upsell" onclick="handlePlanCTA('monthly')">
@@ -6466,16 +6458,10 @@ function renderSkillsGrid() {
       if (skill.secretCourse && !unlocked) {
         const reqRw = EXCLUSIVE_VIP_REWARDS.find(r => r.id === skill.requiredRewardId) || EXCLUSIVE_VIP_REWARDS[0];
         actionButton = `<button type="button" class="btn-start-skill gold-btn" onclick="switchAppTab('rewards')">👑 Canjear (${reqRw.costVIPPoints} VP)</button>`;
-      } else if (unlocked) {
+      } else if (unlocked || trialHalf) {
         actionButton = `<button type="button" class="btn-start-skill ${completed ? 'done' : ''}" onclick="openSkillModal('${skill.id}')">
           ${completed ? '✅ Repasar' : doneModulesCount > 0 ? `▶ Continuar (${doneModulesCount}/${skill.lessons.length})` : '🚀 Cursar Ahora'}
         </button>`;
-      } else if (trialHalf) {
-        actionButton = `
-          <button type="button" class="btn-start-skill buy-btn" onclick="buyCourse('${skill.id}')">
-            🏷️ Comprar ($${skill.priceUSD.toFixed(2)})
-          </button>
-        `;
       } else {
         actionButton = `
           <button type="button" class="btn-start-skill buy-btn" onclick="buyCourse('${skill.id}')">
@@ -6484,7 +6470,7 @@ function renderSkillsGrid() {
         `;
       }
 
-      const progressHtml = unlocked
+      const progressHtml = (unlocked || trialHalf)
         ? `
           <div class="course-progress-wrap">
             <div class="course-progress-header">
@@ -6496,19 +6482,7 @@ function renderSkillsGrid() {
             </div>
           </div>
         `
-        : trialHalf
-          ? `
-          <div class="course-progress-wrap">
-            <div class="course-progress-header">
-              <span>🎁 Prueba Gratis (Hasta la mitad): ${Math.min(doneModulesCount, trialLimit)}/${trialLimit} módulos libres (${skill.lessons.length} totales)</span>
-              <span>${Math.min(50, pct)}%</span>
-            </div>
-            <div class="course-progress-bar">
-              <div class="course-progress-fill" style="width: ${Math.min(50, pct)}%;"></div>
-            </div>
-          </div>
-        `
-          : '';
+        : '';
 
       const bioListHtml = Array.isArray(skill.bioHighlights) && skill.bioHighlights.length > 0
         ? `
@@ -6518,17 +6492,13 @@ function renderSkillsGrid() {
         `
         : '';
 
-      const detailsBtnLabel = trialHalf
-        ? (doneModulesCount >= trialLimit ? `🔓 Ver 2da Mitad` : `🚀 Probar Mitad Gratis (1-${trialLimit})`)
-        : '🔎 Ver detalles';
-
       return `
         <article class="skill-card ${skill.secretCourse ? 'vip-exclusive-card' : ''}">
           <div>
             <!-- Imagen de Portada (Placeholder Visual Gamificado) -->
             <div class="course-cover-placeholder" style="background: ${cover.coverGradient};" role="img" aria-label="Portada del curso ${skill.title}">
               <div class="course-cover-top">
-                <span class="skill-cat-tag ${skill.secretCourse ? 'gold-tag' : ''}">${trialHalf ? `🎁 CURSO DE PRUEBA (MITAD GRATIS)` : skill.category}</span>
+                <span class="skill-cat-tag ${skill.secretCourse ? 'gold-tag' : ''}">${skill.category}</span>
                 <span class="course-reward-pill">🏆 Gana ${skill.pointsReward} PTS</span>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:flex-end; position:relative; z-index:1;">
@@ -6547,7 +6517,7 @@ function renderSkillsGrid() {
           <div>
             ${progressHtml}
             <div class="vip-bonus-banner">
-              <span>📚 <b>${trialHalf ? `${trialLimit}/${skill.lessons.length} Módulos Gratis` : `${skill.lessons.length} Módulos`}</b> + 📝 <b>Examen (${qCount} preg.)</b></span>
+              <span>📚 <b>${skill.lessons.length} Módulos</b> + 📝 <b>Examen (${qCount} preg.)</b></span>
               <span>⚡ <b>+${skill.xp} XP</b></span>
             </div>
             <div class="skill-meta">
@@ -6555,17 +6525,15 @@ function renderSkillsGrid() {
               <span class="price-badge">
                 ${skill.secretCourse
           ? '👑 Exclusivo VIP'
-          : unlocked
-            ? '🔓 Curso Completo'
-            : trialHalf
-              ? `<s style="opacity:0.6; font-size:11px; margin-right:4px;">$${(skill.originalPriceUSD || 24.99).toFixed(2)}</s> 🏷️ $${skill.priceUSD.toFixed(2)} USD (Oferta)`
-              : `$${skill.priceUSD.toFixed(2)} USD`
+          : (unlocked || trialHalf)
+            ? '🔓 Desbloqueado'
+            : `$${skill.priceUSD.toFixed(2)} USD`
         }
               </span>
             </div>
             <div class="course-card-actions">
               <button type="button" class="btn-course-details" onclick="viewCourseDetails('${skill.id}')">
-                ${detailsBtnLabel}
+                🔎 Ver detalles
               </button>
               ${actionButton}
             </div>
@@ -6817,12 +6785,8 @@ window.openSkillModal = function (skillId) {
   const finalPoints = Math.round(currentSkill.pointsReward * mult);
   const vpAmount = currentSkill.vipPointsReward || 50;
   const questions = getSkillQuestions(currentSkill);
-  const trialHalf = isTrialHalfOnly(currentSkill);
-  const trialLimit = getTrialModulesLimit(currentSkill);
 
-  document.getElementById('modal-category').textContent = trialHalf
-    ? `🎁 CURSO DE PRUEBA (Mitad Gratis: Módulos 1 al ${trialLimit} de ${currentSkill.lessons.length}) • Compra completa: $${currentSkill.priceUSD.toFixed(2)} USD`
-    : `${currentSkill.category} • ${currentSkill.lessons.length} Módulos Extensos (${formatCourseDuration(currentSkill.duration)}) + Examen (${questions.length} preguntas)`;
+  document.getElementById('modal-category').textContent = `${currentSkill.category} • ${currentSkill.lessons.length} Módulos Extensos (${formatCourseDuration(currentSkill.duration)}) + Examen (${questions.length} preguntas)`;
   document.getElementById('modal-points').textContent = `💎 +${finalPoints} PTS`;
   document.getElementById('modal-vip-points').textContent = state.isProMember
     ? `👑 +${vpAmount} VP (VIP Activo)`
@@ -6840,27 +6804,10 @@ window.jumpToModalStep = function (targetIdx) {
   const trialHalf = isTrialHalfOnly(currentSkill);
   const trialLimit = getTrialModulesLimit(currentSkill);
 
-  if (trialHalf && targetIdx >= trialLimit) {
-    // Verificar que los módulos de prueba (0..trialLimit-1) estén superados o mostrar el bloqueo de segunda mitad
-    for (let i = 0; i < trialLimit; i++) {
-      const l = currentSkill.lessons[i];
-      if (l && l.checkpoint && !passedCheckpoints[i]) {
-        showToast(`🔒 Completa primero la mitad gratuita (Módulos 1 al ${trialLimit}) o compra el curso completo por $${currentSkill.priceUSD.toFixed(2)} USD.`);
-        currentStepIndex = trialLimit;
-        renderModalStep();
-        document.getElementById('modal-body').scrollTop = 0;
-        return;
-      }
-    }
-    currentStepIndex = trialLimit;
-    renderModalStep();
-    document.getElementById('modal-body').scrollTop = 0;
-    return;
-  }
-
   if (!courseDone && targetIdx > currentStepIndex) {
     // Verificar que todos los módulos previos estén superados
-    for (let i = 0; i < targetIdx; i++) {
+    const checkUntil = trialHalf ? Math.min(targetIdx, trialLimit) : targetIdx;
+    for (let i = 0; i < checkUntil; i++) {
       const l = currentSkill.lessons[i];
       if (l && l.checkpoint && !passedCheckpoints[i]) {
         showToast(`🔒 Primero debes superar la verificación del Módulo ${i + 1} para desbloquear esa etapa.`);
@@ -6868,6 +6815,14 @@ window.jumpToModalStep = function (targetIdx) {
       }
     }
   }
+
+  if (trialHalf && targetIdx >= trialLimit) {
+    currentStepIndex = trialLimit;
+    renderModalStep();
+    document.getElementById('modal-body').scrollTop = 0;
+    return;
+  }
+
   currentStepIndex = targetIdx;
   renderModalStep();
   document.getElementById('modal-body').scrollTop = 0;
@@ -6881,25 +6836,26 @@ function renderModalStep() {
   const courseDone = state.completedCourses.includes(currentSkill.id);
   const trialHalf = isTrialHalfOnly(currentSkill);
   const trialLimit = getTrialModulesLimit(currentSkill);
+  const discoveredPaywall = trialHalf && currentStepIndex >= trialLimit;
 
   stepper.innerHTML = Array.from({ length: totalSteps })
     .map((_, idx) => {
       const isExam = idx === currentSkill.lessons.length;
-      const isLockedHalf = trialHalf && idx >= trialLimit;
-      const isCurrent = isLockedHalf ? (currentStepIndex >= trialLimit && idx === trialLimit) : idx === currentStepIndex;
+      const isLockedHalf = discoveredPaywall && idx >= trialLimit;
+      const isCurrent = (discoveredPaywall && idx === trialLimit) || (!discoveredPaywall && idx === currentStepIndex);
       const isDone = isExam ? courseDone : (courseDone || Boolean(passedCheckpoints[idx]));
       const label = isExam
         ? `${isLockedHalf ? '🔒' : '📝'} Examen Final`
         : `${isLockedHalf ? '🔒 ' : ''}Mód. ${idx + 1} ${isDone ? '✅' : ''}`;
       return `
-        <button type="button" class="step-pill ${isCurrent ? 'current' : ''} ${isDone ? 'done' : ''}" style="${isLockedHalf ? 'opacity:0.75;' : ''}" onclick="jumpToModalStep(${idx})">
+        <button type="button" class="step-pill ${isCurrent ? 'current' : ''} ${isDone ? 'done' : ''}" onclick="jumpToModalStep(${idx})">
           ${label}
         </button>
       `;
     })
     .join('');
 
-  // Si es el curso de prueba sin comprar y el alumno intenta acceder a la segunda mitad (Módulo 4 en adelante)
+  // Solo cuando el alumno llega al Módulo 4 descubre que completó la mitad de prueba
   if (trialHalf && currentStepIndex >= trialLimit) {
     const finalPoints = Math.round(currentSkill.pointsReward * getPointsMultiplier());
     const lockedModulesList = currentSkill.lessons
@@ -6910,12 +6866,12 @@ function renderModalStep() {
     body.innerHTML = `
       <div class="lesson-box" style="border: 1px solid rgba(251, 191, 36, 0.45); background: linear-gradient(145deg, rgba(30, 27, 75, 0.65), rgba(6, 78, 59, 0.35));">
         <div class="lesson-header-bar">
-          <span class="lesson-module-badge" style="background: rgba(251, 191, 36, 0.22); color: #fde68a;">🎁 Fin de la Mitad Gratuita (${trialLimit} de ${currentSkill.lessons.length} Módulos)</span>
+          <span class="lesson-module-badge" style="background: rgba(251, 191, 36, 0.22); color: #fde68a;">🎉 ¡Completaste la 1ra Mitad del Curso (${trialLimit} de ${currentSkill.lessons.length} Módulos)!</span>
           <span class="lesson-read-time">🏷️ Oferta Exclusiva: 50% Más Barato que el resto</span>
         </div>
-        <h4>¡Llegaste a la mitad del curso de prueba! Desbloquea la 2da mitad con descuento especial</h4>
+        <h4>Desbloquea la segunda mitad + Examen Final con precio especial de bienvenida</h4>
         <p style="font-size: 14px; color: var(--text-main); line-height: 1.6; margin-bottom: 14px;">
-          El modo de prueba gratuita incluye <strong>hasta la mitad del curso (Módulos 1 al ${trialLimit})</strong>. Por ser nuestro curso de bienvenida, puedes comprarlo completo por <strong>solo $${currentSkill.priceUSD.toFixed(2)} USD</strong> (en vez de <s style="opacity:0.75;">$${(currentSkill.originalPriceUSD || 24.99).toFixed(2)} USD</s>, siendo <strong>el curso más barato de todo el catálogo</strong>).
+          Acabas de superar la mitad gratuita de este curso. Para continuar con los <strong>Módulos ${trialLimit + 1} al ${currentSkill.lessons.length} y el Examen Final</strong>, tienes un descuento único por haber llegado hasta aquí: cómpralo completo por <strong>solo $${currentSkill.priceUSD.toFixed(2)} USD</strong> (en vez de <s style="opacity:0.75;">$${(currentSkill.originalPriceUSD || 24.99).toFixed(2)} USD</s>, siendo <strong>más barato que todos los demás cursos</strong>).
         </p>
 
         <div class="lesson-keypoints" style="margin-bottom: 16px;">
@@ -6928,7 +6884,7 @@ function renderModalStep() {
 
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:16px;">
           <button type="button" class="btn-primary-full gold-vip-cta" onclick="buyTrialCourseFromModal('${currentSkill.id}')">
-            🏷️ Comprar Curso Completo por $${currentSkill.priceUSD.toFixed(2)} USD (El más barato del catálogo)
+            🏷️ Comprar Resto del Curso por $${currentSkill.priceUSD.toFixed(2)} USD (Precio Especial)
           </button>
           <button type="button" class="btn-secondary" onclick="document.getElementById('lesson-modal').classList.remove('open'); handlePlanCTA('monthly');">
             👑 O desbloquear los 14 cursos con Pase VIP PRO ($49.00 USD/mes)
@@ -6938,9 +6894,9 @@ function renderModalStep() {
     `;
 
     footer.innerHTML = `
-      <button class="btn-secondary" onclick="jumpToModalStep(${trialLimit - 1})">⬅ Volver al Módulo ${trialLimit} (Gratis)</button>
+      <button class="btn-secondary" onclick="jumpToModalStep(${trialLimit - 1})">⬅ Volver al Módulo ${trialLimit}</button>
       <button class="btn-primary-full" style="max-width: 340px;" onclick="buyTrialCourseFromModal('${currentSkill.id}')">
-        🔓 Desbloquear 2da Mitad por $${currentSkill.priceUSD.toFixed(2)} USD
+        🔓 Desbloquear Curso Completo por $${currentSkill.priceUSD.toFixed(2)} USD
       </button>
     `;
     return;
@@ -7054,7 +7010,7 @@ function renderModalStep() {
     body.innerHTML = `
       <div class="lesson-box">
         <div class="lesson-header-bar">
-          <span class="lesson-module-badge">Módulo ${currentStepIndex + 1} de ${currentSkill.lessons.length}${trialHalf ? ` • 🎁 Prueba Gratis (${currentStepIndex + 1}/${trialLimit})` : ''}</span>
+          <span class="lesson-module-badge">Módulo ${currentStepIndex + 1} de ${currentSkill.lessons.length}</span>
           <span class="lesson-read-time">⏱️ ${lesson.readTime || '1h 15m de estudio + práctica'}</span>
         </div>
         <h4>${lesson.heading}</h4>
@@ -7071,14 +7027,12 @@ function renderModalStep() {
 
     footer.innerHTML = `
       <button class="btn-secondary" ${currentStepIndex === 0 ? 'disabled style="opacity:0.4"' : ''} onclick="prevLessonStep()">⬅ Módulo Anterior</button>
-      <button class="btn-primary-full" style="max-width: 340px; ${!checkpointSolved ? 'opacity: 0.5;' : ''}" onclick="nextLessonStep()">
+      <button class="btn-primary-full" style="max-width: 310px; ${!checkpointSolved ? 'opacity: 0.5;' : ''}" onclick="nextLessonStep()">
         ${!checkpointSolved
         ? '🔒 Responde el reto del módulo para avanzar'
-        : trialHalf && currentStepIndex === trialLimit - 1
-          ? `🔓 Desbloquear 2da Mitad por $${currentSkill.priceUSD.toFixed(2)} USD ➡`
-          : currentStepIndex === currentSkill.lessons.length - 1
-            ? 'Ir al Examen Final del Curso Completo 🎯'
-            : 'Siguiente Módulo ➡'
+        : currentStepIndex === currentSkill.lessons.length - 1
+          ? 'Ir al Examen Final del Curso Completo 🎯'
+          : 'Siguiente Módulo ➡'
       }
       </button>
     `;
@@ -7479,7 +7433,7 @@ window.toggleAdminMode = function () {
 };
 
 // ==========================================================================
-// MEJORA 2: GANCHO GRATUITO DEL HERO (CURSO DE PRUEBA HASTA LA MITAD + 50 PTS)
+// MEJORA 2: GANCHO GRATUITO DEL HERO (+50 PTS)
 // ==========================================================================
 window.startFreeTrialModule = function () {
   const freeSkillId = 'py-automation';
@@ -7490,9 +7444,9 @@ window.startFreeTrialModule = function () {
     state.freeTrialBonusClaimed = true;
     saveState();
     renderHeaderAndStats();
-    showToast('🎉 ¡Ganaste +50 PTS! Tienes acceso gratis hasta la mitad del curso (Módulos 1 al 3).');
+    showToast('🎉 ¡Ganaste tus primeros +50 PTS y +50 XP! Comienza ahora el curso.');
   } else {
-    showToast('🚀 Abriendo tu Curso de Prueba (Módulos 1 al 3 gratis • Compra completa en oferta a $12.99 USD)...');
+    showToast('🚀 Abriendo tu curso de Python y Automatización...');
   }
 
   openSkillModal(freeSkillId);
@@ -7509,10 +7463,10 @@ const FOOTER_INFO_CONTENT = {
       <div class="lesson-box">
         <h4>1. ¿Cuál es la diferencia entre Puntos Estándar (PTS) y Puntos Exclusivos VIP (👑 VP)?</h4>
         <p style="color:var(--text-muted); margin-bottom:14px;">Los <strong>PTS</strong> los ganan todos los estudiantes al superar los módulos prácticos y aprobar el examen final de cada curso. Sirven para abrir cofres estándar en la Bóveda (plantillas, guías y UI kits). Los <strong>👑 VP</strong> son puntos de élite exclusivos para miembros con <strong>Pase VIP PRO</strong> o <strong>VIP Founder</strong> y permiten desbloquear Masterclasses Secretas, código fuente Full-Stack y mentorías 1 a 1.</p>
-        <h4>2. ¿Cómo funciona el Curso de Prueba hasta la mitad y su precio especial?</h4>
-        <p style="color:var(--text-muted); margin-bottom:14px;">¡Puedes cursar <strong>hasta la mitad gratis (Módulos 1, 2 y 3 de 6)</strong> del curso de Python & Automatización y recibir <strong>+50 PTS</strong> de regalo! Y si quieres desbloquear la segunda mitad (Módulos 4 al 6 + Examen Final), tiene un <strong>precio promocional de solo $12.99 USD</strong> (50% más barato que el resto de los cursos del catálogo).</p>
+        <h4>2. ¿Puedo empezar sin tarjeta de crédito?</h4>
+        <p style="color:var(--text-muted); margin-bottom:14px;">¡Sí! Al hacer clic en el botón del Hero recibes tus primeros <strong>+50 PTS</strong> y puedes comenzar a estudiar en el aula interactiva al instante.</p>
         <h4>3. ¿Por qué el Pase VIP PRO conviene más que comprar cursos por separado?</h4>
-        <p style="color:var(--text-muted);">El curso de prueba cuesta $12.99 USD y el resto de los cursos individuales cuesta entre $24.99 y $39.99 USD. Con el <strong>Pase VIP PRO ($49 USD/mes)</strong> desbloqueas los 14 cursos completos al instante, recibes un multiplicador x1.5 de PTS y habilitas la ganancia de Puntos Exclusivos VIP (VP).</p>
+        <p style="color:var(--text-muted);">Con el <strong>Pase VIP PRO ($49 USD/mes)</strong> desbloqueas los 14 cursos completos al instante, recibes un multiplicador x1.5 de PTS y habilitas la ganancia de Puntos Exclusivos VIP (VP).</p>
       </div>
     `
   },
