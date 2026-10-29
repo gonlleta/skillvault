@@ -6789,6 +6789,10 @@ function updateMicroVideoDOM() {
   const bigPlayEl = document.getElementById('mv-big-play');
 
   if (boxEl) {
+    const isVipGlow = Boolean(state.isProMember || !currentSkill.isTrialCourse || state.trialCoursePurchased);
+    boxEl.classList.toggle('mv-glow-vip', isVipGlow);
+    boxEl.classList.toggle('mv-glow-standard', !isVipGlow);
+    boxEl.classList.toggle('mv-playing-glow', microVideoPlaying);
     boxEl.classList.toggle('mv-theater-active', microVideoTheaterMode);
     boxEl.classList.toggle('mv-fullscreen-active', microVideoFullscreenMode);
   }
@@ -6996,12 +7000,12 @@ window.toggleMicroVideoFullscreen = function () {
   if (!microVideoFullscreenMode && !document.fullscreenElement) {
     microVideoFullscreenMode = true;
     if (box.requestFullscreen) {
-      box.requestFullscreen().catch(() => {});
+      box.requestFullscreen().catch(() => { });
     }
   } else {
     microVideoFullscreenMode = false;
     if (document.fullscreenElement && document.exitFullscreen) {
-      document.exitFullscreen().catch(() => {});
+      document.exitFullscreen().catch(() => { });
     }
   }
   updateMicroVideoDOM();
@@ -7772,10 +7776,15 @@ function renderModalStep() {
 
     const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
     const initialScene = vData.scenes[0];
+    const isVipGlow = Boolean(state.isProMember || !currentSkill.isTrialCourse || state.trialCoursePurchased);
+    const glowClass = isVipGlow ? 'mv-glow-vip' : 'mv-glow-standard';
+    const badgeLabel = isVipGlow
+      ? '👑 HOLOGRAMA VIP ⚡ Misión en Video (48s) • Destraba lo más difícil del módulo'
+      : '⚡ MISIÓN HOLOGRÁFICA • Video Corto Original (48s) • Destraba lo más difícil';
     const microVideoHtml = `
-      <div class="micro-video-box ${microVideoTheaterMode ? 'mv-theater-active' : ''} ${microVideoFullscreenMode ? 'mv-fullscreen-active' : ''}" id="micro-video-box" role="region" aria-label="Video corto explicativo creado por SkillVault">
+      <div class="micro-video-box ${glowClass} ${microVideoTheaterMode ? 'mv-theater-active' : ''} ${microVideoFullscreenMode ? 'mv-fullscreen-active' : ''}" id="micro-video-box" role="region" aria-label="Video corto explicativo creado por SkillVault">
         <div class="micro-video-top">
-          <span class="micro-video-badge">🎬 Video Corto Original (48s) • Creado para destrabar lo más difícil de este módulo</span>
+          <span class="micro-video-badge">${badgeLabel}</span>
           <span class="micro-video-time-pill" id="mv-time-pill">⏸ PAUSADO • 00:00 / 00:48</span>
         </div>
         <div class="micro-video-canvas-wrap" onclick="toggleMicroVideoPlay()" ondblclick="handleMicroVideoCanvasDblClick(event)" title="Clic para reproducir/pausar • Doble clic izquierda/derecha para retroceder/adelantar 5s">
@@ -7810,14 +7819,14 @@ function renderModalStep() {
             <div class="yt-controls-right">
               <div class="yt-speed-group" title="Velocidad de reproducción">
                 ${[0.75, 1, 1.25, 1.5, 2]
-                  .map(
-                    spd => `
+        .map(
+          spd => `
                       <button type="button" class="yt-speed-pill ${Math.abs(microVideoSpeed - spd) < 0.01 ? 'active' : ''}" data-speed="${spd}" onclick="setMicroVideoSpeed(${spd})">
                         ${spd}x
                       </button>
                     `
-                  )
-                  .join('')}
+        )
+        .join('')}
               </div>
               <button type="button" class="yt-icon-btn" id="mv-theater-btn" onclick="toggleMicroVideoTheater()" title="Agrandar modo cine">
                 ${microVideoTheaterMode ? '🗗 Tamaño Normal' : '▭ Agrandar'}
@@ -7835,14 +7844,14 @@ function renderModalStep() {
           <span style="font-size:11.5px; color:var(--text-muted); font-weight:700;">📌 Capítulos del video:</span>
           <div class="micro-video-scene-pills">
             ${vData.scenes
-              .map(
-                (sc, sIdx) => `
+        .map(
+          (sc, sIdx) => `
                   <button type="button" class="micro-scene-pill ${sIdx === 0 ? 'active' : ''}" onclick="selectMicroVideoScene(${sIdx})">
                     ${sc.shortLabel}
                   </button>
                 `
-              )
-              .join('')}
+        )
+        .join('')}
           </div>
         </div>
       </div>
@@ -8671,7 +8680,7 @@ window.handleGoogleCredentialResponse = function (response) {
   if (!payload || !payload.email) {
     showToast('❌ No se pudo verificar la respuesta de Google.');
     return;
-  }
+  } ier
 
   const email = payload.email.toLowerCase();
   const name = payload.name || email.split('@')[0];
@@ -8686,6 +8695,7 @@ window.handleGoogleCredentialResponse = function (response) {
       passwordHash: hashPassword('google_verified_' + payload.sub),
       createdAt: new Date().toISOString(),
       profile: {
+        ier
         points: 150,
         vipPoints: 0,
         xp: 100,
@@ -8897,7 +8907,7 @@ window.closePaymentSettingsModal = function () {
 
 window.copyOwnerAlias = function (aliasText) {
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(aliasText).catch(() => {});
+    navigator.clipboard.writeText(aliasText).catch(() => { });
   }
   showToast(`📋 Alias copiado: ${aliasText}`);
 };
@@ -8949,14 +8959,13 @@ function updateCheckoutGatewayLiveBox() {
       box.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:6px;">
           <strong>🏦 Pago directo por MercadoPago</strong>
-          ${
-            cfg.mpAlias
-              ? `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; background:rgba(0,0,0,0.25); padding:8px 10px; border-radius:8px;">
+          ${cfg.mpAlias
+          ? `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; background:rgba(0,0,0,0.25); padding:8px 10px; border-radius:8px;">
                   <span>Alias/CVU: <strong style="color:#34d399;">${cfg.mpAlias}</strong></span>
                   <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="copyOwnerAlias('${cfg.mpAlias}')">📋 Copiar</button>
                  </div>`
-              : ''
-          }
+          : ''
+        }
           ${cfg.mpLink ? `<span style="color:var(--text-muted);">Al tocar el botón se abrirá tu checkout oficial de MercadoPago.</span>` : ''}
         </div>
       `;
@@ -9110,7 +9119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let pendingOrder = null;
     try {
       if (savedPendingRaw) pendingOrder = JSON.parse(savedPendingRaw);
-    } catch (e) {}
+    } catch (e) { }
 
     if (pendingOrder && pendingOrder.type === 'course') {
       const skill = getAllSkills().find(s => s.id === pendingOrder.skillId);
@@ -9532,6 +9541,6 @@ window.closePwaInstallModal = function () {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => { });
   });
 }

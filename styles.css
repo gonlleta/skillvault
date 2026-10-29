@@ -2795,15 +2795,64 @@ body.role-student .owner-only-el {
   color: var(--text-muted);
 }
 
-/* Reproductor de Videos Cortos Estilo YouTube (100% Propio en Canvas HD) */
+/* Reproductor de Videos Cortos Estilo YouTube con Resplandor (Glow) Holograma / Misión */
 .micro-video-box {
-  background: linear-gradient(145deg, rgba(10, 15, 29, 0.98), rgba(24, 21, 58, 0.88));
-  border: 1px solid rgba(168, 85, 247, 0.45);
+  position: relative;
+  background: linear-gradient(145deg, rgba(10, 15, 29, 0.98), rgba(24, 21, 58, 0.9));
+  border: 1px solid rgba(226, 232, 240, 0.42);
   border-radius: 14px;
   padding: 14px;
-  margin: 18px 0;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
-  transition: all 0.22s ease;
+  margin: 20px 0;
+  box-shadow:
+    0 0 22px rgba(226, 232, 240, 0.2),
+    0 0 46px rgba(148, 163, 184, 0.12),
+    0 14px 34px rgba(0, 0, 0, 0.55),
+    inset 0 0 18px rgba(226, 232, 240, 0.07);
+  transition: all 0.28s ease;
+}
+
+.micro-video-box.mv-glow-standard:hover,
+.micro-video-box.mv-glow-standard.mv-playing-glow {
+  border-color: rgba(241, 245, 249, 0.72);
+  box-shadow:
+    0 0 28px rgba(226, 232, 240, 0.32),
+    0 0 58px rgba(148, 163, 184, 0.18),
+    0 16px 38px rgba(0, 0, 0, 0.65),
+    inset 0 0 22px rgba(226, 232, 240, 0.11);
+}
+
+.micro-video-box.mv-glow-vip {
+  background: linear-gradient(145deg, rgba(15, 18, 34, 0.98), rgba(42, 29, 10, 0.55));
+  border: 1px solid rgba(251, 191, 36, 0.62);
+  box-shadow:
+    0 0 25px rgba(251, 191, 36, 0.32),
+    0 0 54px rgba(245, 158, 11, 0.18),
+    0 14px 36px rgba(0, 0, 0, 0.6),
+    inset 0 0 22px rgba(251, 191, 36, 0.1);
+}
+
+.micro-video-box.mv-glow-vip:hover,
+.micro-video-box.mv-glow-vip.mv-playing-glow {
+  border-color: rgba(253, 224, 71, 0.88);
+  box-shadow:
+    0 0 34px rgba(251, 191, 36, 0.45),
+    0 0 68px rgba(245, 158, 11, 0.25),
+    0 16px 40px rgba(0, 0, 0, 0.7),
+    inset 0 0 26px rgba(251, 191, 36, 0.15);
+}
+
+.micro-video-box.mv-glow-vip .micro-video-badge {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.25), rgba(245, 158, 11, 0.18));
+  border: 1px solid rgba(251, 191, 36, 0.48);
+  color: #fde68a;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.35);
+}
+
+.micro-video-box.mv-glow-standard .micro-video-badge {
+  background: rgba(226, 232, 240, 0.14);
+  border: 1px solid rgba(226, 232, 240, 0.35);
+  color: #f8fafc;
+  text-shadow: 0 0 8px rgba(226, 232, 240, 0.25);
 }
 
 .micro-video-box.mv-theater-active {
@@ -2892,12 +2941,21 @@ body.role-student .owner-only-el {
   position: relative;
   width: 100%;
   background: #05070e;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(226, 232, 240, 0.28);
   border-radius: 12px 12px 0 0;
   overflow: hidden;
   cursor: pointer;
   user-select: none;
-  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.7);
+  box-shadow:
+    0 0 18px rgba(226, 232, 240, 0.12),
+    inset 0 0 28px rgba(0, 0, 0, 0.75);
+}
+
+.micro-video-box.mv-glow-vip .micro-video-canvas-wrap {
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow:
+    0 0 22px rgba(251, 191, 36, 0.22),
+    inset 0 0 28px rgba(0, 0, 0, 0.75);
 }
 
 .micro-video-canvas {
