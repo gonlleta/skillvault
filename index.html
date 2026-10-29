@@ -17,13 +17,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/sw.js');
-      });
-    }
-  </script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
@@ -34,7 +27,7 @@
     <!-- Barra Lateral -->
     <aside class="sidebar">
       <div class="brand">
-        <div class="brand-logo">⚡</div>
+        <div class="brand-logo" onclick="handleSecretAdminTap()" style="cursor: pointer;" title="SkillVault Academy">⚡</div>
         <div>
           <span class="brand-name">Skill<span class="accent">Vault</span></span>
           <span class="brand-tag">ACADEMIA & PUNTOS VIP</span>
@@ -94,7 +87,7 @@
       <header class="topbar" role="banner">
         <!-- Marca compacta visible en móvil -->
         <div class="mobile-brand-bar">
-          <div class="brand-logo" style="width: 36px; height: 36px; font-size: 18px;" aria-hidden="true">⚡</div>
+          <div class="brand-logo" onclick="handleSecretAdminTap()" style="width: 36px; height: 36px; font-size: 18px; cursor: pointer;" aria-hidden="true">⚡</div>
           <div>
             <span class="brand-name" style="font-size: 18px;">Skill<span class="accent">Vault</span></span>
             <span class="brand-tag" style="font-size: 9px;">ACADEMIA GAMIFICADA</span>
@@ -323,7 +316,7 @@
               <h3>Pase VIP Founder (1 Año)</h3>
               <div class="plan-old-price">12 meses ($588 USD) -> Ahorras 78%</div>
               <div class="plan-price">$129.00 <small>USD / año</small></div>
-              <p>Acceso total durante 12 meses a todos los cursos actuales y futuros + <strong>350 VP imediatos</strong> para abrir un Curso Secreto hoy mismo.</p>
+              <p>Acceso total durante 12 meses a todos los cursos actuales y futuros + <strong>350 VP inmediatos</strong> para abrir un Curso Secreto hoy mismo.</p>
               <ul class="plan-features">
                 <li>👑 <strong>Todo lo incluido en el Pase VIP PRO</strong> por 1 año entero</li>
                 <li>🚀 <strong>+350 VP Exclusivos de regalo hoy</strong> (alcanza para 1 Curso Secreto ya)</li>

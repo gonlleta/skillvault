@@ -8865,9 +8865,8 @@ const FOOTER_INFO_CONTENT = {
         <h4>¿Necesitas asistencia con tu cuenta, tus puntos o tus cursos?</h4>
         <p style="color:var(--text-muted); margin-bottom:14px;">Nuestro equipo de soporte académico y técnico responde en menos de 2 horas hábiles.</p>
         <ul style="color:var(--text-main); line-height:1.8; margin-left:18px;">
-          <li>📧 <strong>Soporte Técnico y Pagos:</strong> soporte@skillvault.academy</li>
-          <li>👑 <strong>Atención Prioritaria Miembros VIP:</strong> vip@skillvault.academy</li>
-          <li>💬 <strong>Comunidad Discord Oficial:</strong> Canal #ayuda-en-vivo habilitado para todos los rangos.</li>
+          <li>📧 <strong>Soporte Técnico y Pagos:</strong> <a href="mailto:gonzaloramirez.mail@gmail.com" style="color:#6ee7b7;">gonzaloramirez.mail@gmail.com</a></li>
+          <li>👑 <strong>Atención Prioritaria Miembros VIP:</strong> Respuesta directa por correo electrónico y prioridad en soporte.</li>
         </ul>
       </div>
     `
