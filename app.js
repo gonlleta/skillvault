@@ -6443,60 +6443,116 @@ function stopMicroVideoPlayback() {
   }
 }
 
+function extractExplainedScreenLines(lesson) {
+  const rawLines = (lesson.code || '')
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 2 && !/^[=\-_#/*]{4,}$/.test(l));
+
+  const items = [];
+  let pendingComment = '';
+
+  for (let i = 0; i < rawLines.length; i++) {
+    const ln = rawLines[i];
+    if (ln.startsWith('#') || ln.startsWith('//')) {
+      pendingComment = ln.replace(/^(#|\/\/)\s*/, '').trim();
+      continue;
+    }
+    let explain = pendingComment;
+    pendingComment = '';
+
+    if (!explain) {
+      if (/^(import|from)\s+/i.test(ln)) {
+        explain = 'Cargamos la herramienta o librería necesaria para empezar';
+      } else if (/^(def|function|async)\s+/i.test(ln)) {
+        explain = 'Definimos la función automática que hará el proceso';
+      } else if (/\b(print|return|to_excel|to_csv|save|send)\b/i.test(ln)) {
+        explain = 'Guardamos o mostramos el resultado final ya listo';
+      } else if (/\b(if|for|while|try)\b/i.test(ln)) {
+        explain = 'Verificamos la condición para evitar errores al ejecutar';
+      } else if (ln.includes('=')) {
+        const leftSide = ln.split('=')[0].trim().slice(0, 28);
+        explain = `Configuramos "${leftSide}" con los datos de tu proyecto`;
+      } else {
+        explain = humanizeTextForSpeech(ln).slice(0, 95);
+      }
+    }
+
+    items.push({
+      code: ln.slice(0, 74),
+      explain: humanizeTextForSpeech(explain)
+    });
+    if (items.length >= 3) break;
+  }
+
+  const fallbackSteps = lesson.stepByStep || lesson.keyPoints || [];
+  while (items.length < 3) {
+    const idx = items.length;
+    const rawStep = fallbackSteps[idx] || `Paso ${idx + 1}: Aplicar la configuración del módulo`;
+    const cleanStep = humanizeTextForSpeech(rawStep);
+    items.push({
+      code: rawStep.replace(/^Paso\s*\d+\s*(\([^)]*\))?\s*:\s*/i, '').slice(0, 74),
+      explain: cleanStep
+    });
+  }
+
+  return items;
+}
+
 function buildLessonMicroVideoData(lesson, skill, moduleIdx) {
   const cleanHeading = (lesson.heading || `Módulo ${moduleIdx + 1}`).replace(/^Módulo \d+:\s*/i, '');
-  const codeLines = (lesson.code || '')
-    .split('\n')
-    .filter(l => l.trim().length > 0)
-    .slice(0, 6)
-    .join('\n');
-  const firstStep = (lesson.stepByStep && lesson.stepByStep[1]) || (lesson.keyPoints && lesson.keyPoints[0]) || 'Preparar los datos de entrada y validar el formato.';
-  const secondStep = (lesson.stepByStep && lesson.stepByStep[2]) || (lesson.keyPoints && lesson.keyPoints[1]) || 'Ejecutar la estructura paso a paso y medir el resultado.';
+  const firstStepRaw = (lesson.stepByStep && lesson.stepByStep[0]) || (lesson.keyPoints && lesson.keyPoints[0]) || 'Preparar los datos de entrada y validar el formato.';
+  const secondStepRaw = (lesson.stepByStep && lesson.stepByStep[1]) || (lesson.keyPoints && lesson.keyPoints[1]) || 'Ejecutar la estructura paso a paso y medir el resultado.';
+  const thirdStepRaw = (lesson.stepByStep && lesson.stepByStep[2]) || secondStepRaw;
   const warnText = (lesson.warning || 'Revisa siempre los datos de entrada antes de ejecutar.').replace(/^⚠️\s*(Error común:|Error crítico común:)?\s*/i, '');
   const caseScenario = (lesson.caseStudy && lesson.caseStudy.scenario) || 'Proceso manual lento y propenso a errores humanos.';
   const caseRes = (lesson.caseStudy && lesson.caseStudy.result) || 'Proceso automatizado sin errores y listo para producción.';
 
+  const stepA = firstStepRaw.replace(/^Paso\s*\d+\s*(\([^)]*\))?\s*:\s*/i, '');
+  const stepB = secondStepRaw.replace(/^Paso\s*\d+\s*(\([^)]*\))?\s*:\s*/i, '');
+  const solutionText = thirdStepRaw.replace(/^Paso\s*\d+\s*(\([^)]*\))?\s*:\s*/i, '');
+
+  const screenItems = extractExplainedScreenLines(lesson);
+
   const spokenHeading = humanizeTextForSpeech(cleanHeading);
-  const spokenFirst = humanizeTextForSpeech(firstStep);
-  const spokenSecond = humanizeTextForSpeech(secondStep);
+  const spokenFirst = humanizeTextForSpeech(stepA);
+  const spokenSecond = humanizeTextForSpeech(stepB);
   const spokenWarn = humanizeTextForSpeech(warnText);
+  const spokenSolution = humanizeTextForSpeech(solutionText);
+  const spokenScenario = humanizeTextForSpeech(caseScenario);
   const spokenRes = humanizeTextForSpeech(caseRes);
 
   const scenes = [
     {
-      tag: 'Escena 1/4 • Concepto Difícil en Simple',
+      tag: 'Escena 1/4 • Explicación de los 2 Bloques en Pantalla',
       shortLabel: '1. En Simple',
-      title: `¿Cómo entender "${cleanHeading}" sin trabarte?`,
-      stepA: firstStep,
-      stepB: secondStep,
-      visual: `🎯 META PRINCIPAL:\n${firstStep}\n\n💡 REGLA CLAVE:\n${secondStep}`,
-      narration: `Vamos a ver ${spokenHeading} de forma súper clara y sencilla. Lo primero que vas a hacer es esto: ${spokenFirst}. Además, ten siempre presente esta regla práctica: ${spokenSecond}.`
+      title: `Lo que ves en pantalla: Cómo funciona "${cleanHeading}"`,
+      stepA,
+      stepB,
+      narration: `En este módulo sobre ${spokenHeading}, mira los dos recuadros en pantalla. Primero, en el recuadro uno de la izquierda: ${spokenFirst}. Segundo, en el recuadro dos de la derecha: ${spokenSecond}.`
     },
     {
-      tag: 'Escena 2/4 • Demostración en Pantalla Paso a Paso',
+      tag: 'Escena 2/4 • Explicación Línea por Línea en Pantalla',
       shortLabel: '2. En Pantalla',
-      title: 'Simulación en vivo: Qué escribir y cómo configurarlo',
-      codeSample: codeLines || `# Paso 1:\n${firstStep}\n\n# Paso 2:\n${secondStep}`,
-      visual: codeLines || `1. ${firstStep}\n2. ${secondStep}`,
-      narration: `Ahora fíjate en la pantalla. No necesitas memorizar todo de golpe. Simplemente copia esta plantilla base en tu programa gratuito, y cambia los datos de ejemplo por los de tu propio proyecto.`
+      title: 'Explicación línea por línea de lo que tienes en pantalla',
+      screenItems,
+      narration: `Ahora mira las tres líneas marcadas en la ventana. En la línea uno de arriba: ${screenItems[0].explain}. En la línea dos del medio: ${screenItems[1].explain}. Y en la línea tres de abajo: ${screenItems[2].explain}.`
     },
     {
-      tag: 'Escena 3/4 • Error Crítico vs. Solución Correcta',
+      tag: 'Escena 3/4 • Recuadro Rojo (Error) vs. Recuadro Verde (Solución)',
       shortLabel: '3. Error a Evitar',
-      title: '⚠️ Dónde falla la mayoría vs. Cómo resolverlo al 1er intento',
+      title: '⚠️ Mira a la izquierda el error y a la derecha la solución',
       warnText,
-      solutionText: secondStep,
-      visual: `❌ ERROR FRECUENTE QUE DEBES EVITAR:\n${warnText}\n\n✅ SOLUCIÓN:\n${secondStep}`,
-      narration: `Un consejo clave antes de probarlo. Mucha gente se traba aquí por este detalle: ${spokenWarn}. Si lo revisas antes de empezar, te va a funcionar perfecto al primer intento.`
+      solutionText,
+      narration: `Fíjate primero en el recuadro rojo de la izquierda, este es el error que debes evitar: ${spokenWarn}. Ahora mira el recuadro verde de la derecha con la forma correcta de hacerlo: ${spokenSolution}.`
     },
     {
-      tag: 'Escena 4/4 • Resultado Real Funcionando en Producción',
+      tag: 'Escena 4/4 • Caso Real: Arriba el Antes y Abajo el Después',
       shortLabel: '4. Resultado Real',
-      title: '🚀 Antes vs. Después al aplicar este módulo',
+      title: '🚀 Caso real en pantalla: Problema inicial vs. Resultado logrado',
       caseScenario,
       caseRes,
-      visual: `✅ RESULTADO EN PRODUCCIÓN:\n${caseRes}`,
-      narration: `Y mira el cambio cuando lo aplicas bien en un caso real: ${spokenRes}. Cuando quieras, responde la pregunta de abajo para pasar al siguiente módulo.`
+      narration: `Por último, mira el caso real en pantalla. En el bloque de arriba ves lo que pasaba antes: ${spokenScenario}. Y en el bloque verde de abajo ves el resultado al aplicar este módulo: ${spokenRes}.`
     }
   ];
 
@@ -6621,193 +6677,220 @@ function drawMicroVideoCanvasFrame(vData, sceneIdx, progress01) {
   ctx.fillStyle = '#ffffff';
   ctx.fillText(scene.title, 36, 92);
 
-  // Contenido gráfico animado según cuál de las 4 escenas está activa
+  // Contenido gráfico animado y sincronizado 100% con lo que la voz explica en pantalla
   if (sceneIdx === 0) {
-    // Escena 1: Diagrama de flujo animado de 3 nodos + 2 tarjetas explicativas
-    const nodes = [
-      { label: '1. DATO DE ENTRADA', sub: 'Lo que tienes hoy', x: 50, color: '#38bdf8' },
-      { label: '2. REGLA DEL MÓDULO', sub: 'Proceso paso a paso', x: 365, color: '#a855f7' },
-      { label: '3. RESULTADO LIMPIO', sub: 'Listo sin errores', x: 680, color: '#10b981' }
-    ];
+    // Escena 1: Foco visual sincronizado entre Recuadro 1 (Izquierda) y Recuadro 2 (Derecha)
+    const focusFirst = progress01 < 0.52;
 
-    // Flechas conectoras y partículas viajando
-    for (let i = 0; i < 2; i++) {
-      const startX = nodes[i].x + 230;
-      const endX = nodes[i + 1].x;
-      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(startX, 148);
-      ctx.lineTo(endX, 148);
-      ctx.stroke();
+    // Recuadro 1 (Izquierda)
+    drawRoundedRect(ctx, 46, 114, 422, 254, 12);
+    ctx.fillStyle = focusFirst ? 'rgba(16, 185, 129, 0.17)' : 'rgba(15, 23, 42, 0.65)';
+    ctx.fill();
+    ctx.strokeStyle = focusFirst ? '#10b981' : 'rgba(255, 255, 255, 0.16)';
+    ctx.lineWidth = focusFirst ? 3 : 1.2;
+    ctx.stroke();
 
-      const particleX = startX + ((now * 0.08 + i * 40) % Math.max(10, endX - startX));
+    if (focusFirst) {
+      drawRoundedRect(ctx, 64, 128, 255, 26, 6);
       ctx.fillStyle = '#10b981';
-      ctx.beginPath();
-      ctx.arc(particleX, 148, 5, 0, Math.PI * 2);
       ctx.fill();
+      ctx.font = 'bold 12px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#032219';
+      ctx.fillText('👉 EXPLICANDO ESTE BLOQUE AHORA', 74, 146);
     }
 
-    nodes.forEach((nd, idx) => {
-      const activePulse = progress01 >= idx * 0.28;
-      drawRoundedRect(ctx, nd.x, 114, 230, 68, 10);
-      ctx.fillStyle = activePulse ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.55)';
+    ctx.font = 'bold 16px Inter, sans-serif';
+    ctx.fillStyle = focusFirst ? '#34d399' : '#94a3b8';
+    ctx.fillText('1️⃣ RECUADRO 1 (IZQUIERDA): PRIMER PASO', 66, 182);
+    ctx.font = '15.5px Inter, sans-serif';
+    ctx.fillStyle = focusFirst ? '#ffffff' : '#cbd5e1';
+    wrapCanvasText(ctx, scene.stepA, 66, 214, 382, 24, 5);
+
+    // Recuadro 2 (Derecha)
+    drawRoundedRect(ctx, 492, 114, 422, 254, 12);
+    ctx.fillStyle = !focusFirst ? 'rgba(168, 85, 247, 0.2)' : 'rgba(15, 23, 42, 0.65)';
+    ctx.fill();
+    ctx.strokeStyle = !focusFirst ? '#c084fc' : 'rgba(255, 255, 255, 0.16)';
+    ctx.lineWidth = !focusFirst ? 3 : 1.2;
+    ctx.stroke();
+
+    if (!focusFirst) {
+      drawRoundedRect(ctx, 510, 128, 255, 26, 6);
+      ctx.fillStyle = '#c084fc';
       ctx.fill();
-      ctx.lineWidth = activePulse ? 2.2 : 1;
-      ctx.strokeStyle = activePulse ? nd.color : 'rgba(255,255,255,0.15)';
-      ctx.stroke();
+      ctx.font = 'bold 12px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#1e1b4b';
+      ctx.fillText('👉 EXPLICANDO ESTE BLOQUE AHORA', 520, 146);
+    }
 
-      ctx.font = 'bold 13px "JetBrains Mono", monospace';
-      ctx.fillStyle = nd.color;
-      ctx.fillText(nd.label, nd.x + 16, 142);
-      ctx.font = '13px Inter, sans-serif';
-      ctx.fillStyle = '#cbd5e1';
-      ctx.fillText(nd.sub, nd.x + 16, 165);
-    });
-
-    // Dos tarjetas grandes con el paso 1 y la regla clave
-    drawRoundedRect(ctx, 48, 204, 420, 165, 12);
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.1)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    ctx.font = 'bold 15px Inter, sans-serif';
-    ctx.fillStyle = '#34d399';
-    ctx.fillText('🎯 PASO CLAVE PARA EMPEZAR:', 68, 234);
-    ctx.font = '15px Inter, sans-serif';
-    ctx.fillStyle = '#f1f5f9';
-    wrapCanvasText(ctx, scene.stepA, 68, 262, 380, 23, 4);
-
-    drawRoundedRect(ctx, 492, 204, 420, 165, 12);
-    ctx.fillStyle = 'rgba(168, 85, 247, 0.11)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(168, 85, 247, 0.45)';
-    ctx.stroke();
-
-    ctx.font = 'bold 15px Inter, sans-serif';
-    ctx.fillStyle = '#d8b4fe';
-    ctx.fillText('💡 REGLA DE ORO DEL MÓDULO:', 512, 234);
-    ctx.font = '15px Inter, sans-serif';
-    ctx.fillStyle = '#f1f5f9';
-    wrapCanvasText(ctx, scene.stepB, 512, 262, 380, 23, 4);
+    ctx.font = 'bold 16px Inter, sans-serif';
+    ctx.fillStyle = !focusFirst ? '#e9d5ff' : '#94a3b8';
+    ctx.fillText('2️⃣ RECUADRO 2 (DERECHA): SEGUNDO PASO', 512, 182);
+    ctx.font = '15.5px Inter, sans-serif';
+    ctx.fillStyle = !focusFirst ? '#ffffff' : '#cbd5e1';
+    wrapCanvasText(ctx, scene.stepB, 512, 214, 382, 24, 5);
   } else if (sceneIdx === 1) {
-    // Escena 2: Ventana de código/configuración con escritura en vivo (typewriter)
-    drawRoundedRect(ctx, 46, 112, 868, 258, 12);
+    // Escena 2: Explicación línea por línea de las 3 líneas mostradas en la ventana
+    const items = scene.screenItems || [];
+    const activeLineIdx = progress01 < 0.34 ? 0 : progress01 < 0.67 ? 1 : 2;
+    const activeItem = items[activeLineIdx] || items[0] || { code: '', explain: '' };
+
+    drawRoundedRect(ctx, 46, 108, 868, 264, 12);
     ctx.fillStyle = '#090d16';
     ctx.fill();
-    ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
+    ctx.strokeStyle = 'rgba(52, 211, 153, 0.45)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Barra de ventana tipo editor
+    // Barra superior de la ventana
     ctx.fillStyle = '#111827';
-    ctx.fillRect(48, 114, 864, 34);
+    ctx.fillRect(48, 110, 864, 32);
     ['#ef4444', '#f59e0b', '#10b981'].forEach((c, i) => {
       ctx.fillStyle = c;
       ctx.beginPath();
-      ctx.arc(70 + i * 18, 131, 5.5, 0, Math.PI * 2);
+      ctx.arc(70 + i * 18, 126, 5.5, 0, Math.PI * 2);
       ctx.fill();
     });
-    ctx.font = '12.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText(`practica_modulo_${vData.moduleNumber}. workspace — Escribiendo paso a paso...`, 135, 136);
+    ctx.font = 'bold 12.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText(`VENTANA EN PANTALLA — EXPLICANDO LÍNEA ${activeLineIdx + 1} DE 3`, 135, 131);
 
-    // Efecto máquina de escribir proporcional al progreso de la escena
-    const fullCode = scene.codeSample;
-    const charRatio = microVideoPlaying ? Math.min(1, 0.25 + progress01 * 0.9) : 1;
-    const visibleChars = Math.max(18, Math.floor(fullCode.length * charRatio));
-    const typedCode = fullCode.slice(0, visibleChars);
-    const lines = typedCode.split('\n').slice(0, 6);
+    // Dibujar las 3 líneas y resaltar la que se está explicando en este segundo
+    items.slice(0, 3).forEach((it, idx) => {
+      const isHighlighted = idx === activeLineIdx;
+      const rowY = 152 + idx * 44;
 
-    ctx.font = '14.5px "JetBrains Mono", monospace';
-    lines.forEach((ln, idx) => {
-      const yPos = 178 + idx * 27;
-      ctx.fillStyle = '#475569';
-      ctx.fillText(`${idx + 1}`, 66, yPos);
-      ctx.fillStyle = ln.trim().startsWith('#') || ln.trim().startsWith('//') ? '#6ee7b7' : '#e2e8f0';
-      const clipped = ln.length > 78 ? ln.slice(0, 78) + '...' : ln;
-      ctx.fillText(clipped, 98, yPos);
-      if (idx === lines.length - 1 && Math.floor(now / 400) % 2 === 0) {
-        const cursorX = 98 + ctx.measureText(clipped).width + 4;
-        ctx.fillStyle = '#10b981';
-        ctx.fillRect(cursorX, yPos - 14, 9, 17);
+      drawRoundedRect(ctx, 62, rowY, 836, 38, 8);
+      ctx.fillStyle = isHighlighted ? 'rgba(16, 185, 129, 0.22)' : 'rgba(255, 255, 255, 0.03)';
+      ctx.fill();
+      if (isHighlighted) {
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      ctx.font = 'bold 13px "JetBrains Mono", monospace';
+      ctx.fillStyle = isHighlighted ? '#34d399' : '#64748b';
+      ctx.fillText(`LÍNEA ${idx + 1}:`, 76, rowY + 24);
+
+      ctx.font = '14px "JetBrains Mono", monospace';
+      ctx.fillStyle = isHighlighted ? '#ffffff' : '#94a3b8';
+      const clippedCode = (it.code || '').length > 58 ? it.code.slice(0, 58) + '...' : it.code;
+      ctx.fillText(clippedCode, 152, rowY + 24);
+
+      if (isHighlighted) {
+        ctx.font = 'bold 12px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#fde047';
+        ctx.fillText('👈 EXPLICANDO AHORA', 730, rowY + 24);
       }
     });
 
-    // Etiqueta inferior de estado dentro de la terminal
-    drawRoundedRect(ctx, 640, 326, 254, 30, 7);
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
+    // Caja inferior dentro de la ventana que explica en español qué hace la línea resaltada
+    drawRoundedRect(ctx, 62, 290, 836, 70, 9);
+    ctx.fillStyle = 'rgba(30, 27, 75, 0.78)';
     ctx.fill();
-    ctx.font = 'bold 12.5px Inter, sans-serif';
-    ctx.fillStyle = '#34d399';
-    ctx.fillText('✅ Plantilla lista para copiar y usar', 654, 346);
-  } else if (sceneIdx === 2) {
-    // Escena 3: Comparativa visual Error Común vs Solución
-    drawRoundedRect(ctx, 46, 118, 420, 250, 12);
-    ctx.fillStyle = 'rgba(239, 68, 68, 0.11)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(239, 68, 68, 0.55)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.font = 'bold 16px Inter, sans-serif';
-    ctx.fillStyle = '#fca5a5';
-    ctx.fillText('❌ ERROR QUE TRABA A LA MAYORÍA:', 68, 154);
-    ctx.font = '15px Inter, sans-serif';
-    ctx.fillStyle = '#fee2e2';
-    wrapCanvasText(ctx, scene.warnText, 68, 188, 376, 24, 6);
-
-    drawRoundedRect(ctx, 494, 118, 420, 250, 12);
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(16, 185, 129, 0.55)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.font = 'bold 16px Inter, sans-serif';
-    ctx.fillStyle = '#6ee7b7';
-    ctx.fillText('✅ CÓMO RESOLVERLO AL 1ER INTENTO:', 516, 154);
-    ctx.font = '15px Inter, sans-serif';
-    ctx.fillStyle = '#ecfdf5';
-    wrapCanvasText(ctx, scene.solutionText, 516, 188, 376, 24, 6);
-  } else {
-    // Escena 4: Resultado Real en Producción + barra de impacto al 100%
-    drawRoundedRect(ctx, 46, 116, 868, 96, 12);
-    ctx.fillStyle = 'rgba(30, 41, 59, 0.85)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
+    ctx.strokeStyle = '#a855f7';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    ctx.font = 'bold 14px Inter, sans-serif';
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText('ANTES DE APLICAR ESTE MÓDULO (ESCENARIO INICIAL):', 68, 144);
+    ctx.font = 'bold 13.5px Inter, sans-serif';
+    ctx.fillStyle = '#e9d5ff';
+    ctx.fillText(`💡 QUÉ SIGNIFICA LA LÍNEA ${activeLineIdx + 1} QUE VES ARRIBA:`, 78, 314);
     ctx.font = '14.5px Inter, sans-serif';
-    ctx.fillStyle = '#e2e8f0';
-    wrapCanvasText(ctx, scene.caseScenario, 68, 170, 820, 21, 2);
+    ctx.fillStyle = '#ffffff';
+    wrapCanvasText(ctx, activeItem.explain, 78, 338, 800, 20, 2);
+  } else if (sceneIdx === 2) {
+    // Escena 3: Foco sincronizado entre Recuadro Rojo (Izquierda) y Recuadro Verde (Derecha)
+    const focusError = progress01 < 0.52;
 
-    drawRoundedRect(ctx, 46, 228, 868, 142, 12);
-    ctx.fillStyle = 'rgba(6, 78, 59, 0.45)';
+    drawRoundedRect(ctx, 46, 116, 420, 252, 12);
+    ctx.fillStyle = focusError ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.07)';
     ctx.fill();
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = focusError ? '#ef4444' : 'rgba(239, 68, 68, 0.3)';
+    ctx.lineWidth = focusError ? 3 : 1.2;
+    ctx.stroke();
+
+    if (focusError) {
+      drawRoundedRect(ctx, 66, 130, 270, 26, 6);
+      ctx.fillStyle = '#ef4444';
+      ctx.fill();
+      ctx.font = 'bold 12px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('👉 MIRA ESTE RECUADRO ROJO AHORA', 76, 148);
+    }
+
+    ctx.font = 'bold 15.5px Inter, sans-serif';
+    ctx.fillStyle = '#fca5a5';
+    ctx.fillText('❌ RECUADRO ROJO: ERROR A EVITAR', 68, 182);
+    ctx.font = '15px Inter, sans-serif';
+    ctx.fillStyle = focusError ? '#ffffff' : '#cbd5e1';
+    wrapCanvasText(ctx, scene.warnText, 68, 212, 376, 24, 5);
+
+    drawRoundedRect(ctx, 494, 116, 420, 252, 12);
+    ctx.fillStyle = !focusError ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.07)';
+    ctx.fill();
+    ctx.strokeStyle = !focusError ? '#10b981' : 'rgba(16, 185, 129, 0.3)';
+    ctx.lineWidth = !focusError ? 3 : 1.2;
+    ctx.stroke();
+
+    if (!focusError) {
+      drawRoundedRect(ctx, 514, 130, 280, 26, 6);
+      ctx.fillStyle = '#10b981';
+      ctx.fill();
+      ctx.font = 'bold 12px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#032219';
+      ctx.fillText('👉 MIRA ESTE RECUADRO VERDE AHORA', 524, 148);
+    }
+
+    ctx.font = 'bold 15.5px Inter, sans-serif';
+    ctx.fillStyle = '#6ee7b7';
+    ctx.fillText('✅ RECUADRO VERDE: FORMA CORRECTA', 516, 182);
+    ctx.font = '15px Inter, sans-serif';
+    ctx.fillStyle = !focusError ? '#ffffff' : '#cbd5e1';
+    wrapCanvasText(ctx, scene.solutionText, 516, 212, 376, 24, 5);
+  } else {
+    // Escena 4: Foco sincronizado entre Bloque de Arriba (Antes) y Bloque de Abajo (Después)
+    const focusBefore = progress01 < 0.5;
+
+    drawRoundedRect(ctx, 46, 114, 868, 114, 12);
+    ctx.fillStyle = focusBefore ? 'rgba(30, 41, 59, 0.95)' : 'rgba(15, 23, 42, 0.6)';
+    ctx.fill();
+    ctx.strokeStyle = focusBefore ? '#38bdf8' : 'rgba(148, 163, 184, 0.25)';
+    ctx.lineWidth = focusBefore ? 2.8 : 1.2;
+    ctx.stroke();
+
+    ctx.font = 'bold 14px Inter, sans-serif';
+    ctx.fillStyle = focusBefore ? '#38bdf8' : '#94a3b8';
+    ctx.fillText(
+      focusBefore
+        ? '👉 EXPLICANDO AHORA — BLOQUE DE ARRIBA (QUÉ PASABA ANTES):'
+        : 'BLOQUE DE ARRIBA (QUÉ PASABA ANTES):',
+      68,
+      142
+    );
+    ctx.font = '14.5px Inter, sans-serif';
+    ctx.fillStyle = focusBefore ? '#ffffff' : '#cbd5e1';
+    wrapCanvasText(ctx, scene.caseScenario, 68, 168, 820, 22, 2);
+
+    drawRoundedRect(ctx, 46, 240, 868, 130, 12);
+    ctx.fillStyle = !focusBefore ? 'rgba(6, 78, 59, 0.6)' : 'rgba(6, 78, 59, 0.22)';
+    ctx.fill();
+    ctx.strokeStyle = !focusBefore ? '#10b981' : 'rgba(16, 185, 129, 0.35)';
+    ctx.lineWidth = !focusBefore ? 3 : 1.2;
     ctx.stroke();
 
     ctx.font = 'bold 15px Inter, sans-serif';
     ctx.fillStyle = '#34d399';
-    ctx.fillText('🚀 DESPUÉS DE APLICARLO (RESULTADO EN PRODUCCIÓN):', 68, 258);
+    ctx.fillText(
+      !focusBefore
+        ? '👉 EXPLICANDO AHORA — BLOQUE VERDE DE ABAJO (RESULTADO LOGRADO):'
+        : '🚀 BLOQUE VERDE DE ABAJO (RESULTADO LOGRADO):',
+      68,
+      268
+    );
     ctx.font = '15px Inter, sans-serif';
     ctx.fillStyle = '#ffffff';
-    wrapCanvasText(ctx, scene.caseRes, 68, 286, 820, 22, 3);
-
-    // Barra animada de eficiencia completada
-    const barFillW = Math.round(820 * (microVideoPlaying ? Math.min(1, 0.35 + progress01 * 0.65) : 1));
-    ctx.fillStyle = 'rgba(255,255,255,0.12)';
-    ctx.fillRect(68, 344, 820, 10);
-    ctx.fillStyle = '#10b981';
-    ctx.fillRect(68, 344, barFillW, 10);
+    wrapCanvasText(ctx, scene.caseRes, 68, 294, 820, 22, 3);
   }
 
   // Franja inferior de subtítulos integrados dentro del video
@@ -6851,29 +6934,51 @@ function speakCurrentSceneFromProgress(scene, progress01) {
   window.speechSynthesis.cancel();
   const cleanText = humanizeTextForSpeech(scene.narration || '');
   const words = cleanText.split(/\s+/);
-  const startWord = Math.min(words.length - 1, Math.max(0, Math.floor(words.length * Math.min(0.88, progress01 || 0))));
+  const startRatio = Math.min(0.88, Math.max(0, progress01 || 0));
+  const startWord = Math.min(words.length - 1, Math.max(0, Math.floor(words.length * startRatio)));
   const remainingText = words.slice(startWord).join(' ');
   if (!remainingText.trim()) return;
 
   const bestVoice = getSelectedNaturalVoice();
-  // Dividir por oraciones para dar pausas de respiración naturales entre frases
-  const sentences = remainingText
-    .split(/(?<=[.!?])\s+/)
-    .map(s => s.trim())
-    .filter(Boolean);
+  const utter = new SpeechSynthesisUtterance(remainingText);
+  if (bestVoice) {
+    utter.voice = bestVoice;
+    utter.lang = bestVoice.lang || 'es-MX';
+  } else {
+    utter.lang = 'es-MX';
+  }
+  utter.rate = Math.min(1.85, Math.max(0.75, 0.96 * microVideoSpeed));
+  utter.pitch = 1.0;
 
-  sentences.forEach(sentence => {
-    const utter = new SpeechSynthesisUtterance(sentence);
-    if (bestVoice) {
-      utter.voice = bestVoice;
-      utter.lang = bestVoice.lang || 'es-MX';
+  // Sincronizar el foco visual de la pantalla palabra por palabra con lo que dice el locutor
+  utter.onboundary = ev => {
+    if (!microVideoPlaying || typeof ev.charIndex !== 'number') return;
+    const frac = Math.min(1, Math.max(0, ev.charIndex / Math.max(1, remainingText.length)));
+    microVideoSceneProgress = Math.min(0.98, startRatio + (1 - startRatio) * frac);
+  };
+
+  // Avanzar a la siguiente escena SOLO cuando el locutor terminó toda la frase (cero cortes bruscos)
+  utter.onend = () => {
+    if (!microVideoPlaying || !currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
+    const lesson = currentSkill.lessons[currentStepIndex];
+    const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+    if (currentMicroVideoScene < vData.scenes.length - 1) {
+      microVideoTimer = setTimeout(() => {
+        if (!microVideoPlaying) return;
+        currentMicroVideoScene += 1;
+        microVideoSceneProgress = 0;
+        microVideoLastFrameMs = performance.now();
+        speakCurrentSceneFromProgress(vData.scenes[currentMicroVideoScene], 0);
+        updateMicroVideoDOM();
+      }, 320);
     } else {
-      utter.lang = 'es-MX';
+      microVideoSceneProgress = 1;
+      stopMicroVideoPlayback();
+      updateMicroVideoDOM();
     }
-    utter.rate = Math.min(1.85, Math.max(0.75, 0.97 * microVideoSpeed));
-    utter.pitch = 1.0;
-    window.speechSynthesis.speak(utter);
-  });
+  };
+
+  window.speechSynthesis.speak(utter);
 }
 
 function updateMicroVideoDOM() {
@@ -6962,19 +7067,29 @@ function startMicroVideoAnimationLoop() {
 
     const lesson = currentSkill.lessons[currentStepIndex];
     const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+    const activeScene = vData.scenes[currentMicroVideoScene] || vData.scenes[0];
+    const wordCount = String(activeScene.narration || '').split(/\s+/).length;
+    const estimatedDurationSec = Math.max(11, wordCount / 2.35);
 
-    microVideoSceneProgress += dtSec / 12;
+    const isVoiceActivelySpeaking =
+      microVideoVoiceEnabled && 'speechSynthesis' in window && window.speechSynthesis.speaking;
 
-    if (microVideoSceneProgress >= 1) {
-      if (currentMicroVideoScene < vData.scenes.length - 1) {
-        currentMicroVideoScene += 1;
-        microVideoSceneProgress = 0;
-        speakCurrentSceneFromProgress(vData.scenes[currentMicroVideoScene], 0);
-      } else {
-        microVideoSceneProgress = 1;
-        stopMicroVideoPlayback();
-        updateMicroVideoDOM();
-        return;
+    if (isVoiceActivelySpeaking) {
+      // Mientras la voz está hablando, avanzamos suave sin cortar nunca la frase antes de tiempo
+      microVideoSceneProgress = Math.min(0.97, microVideoSceneProgress + dtSec / estimatedDurationSec);
+    } else {
+      microVideoSceneProgress += dtSec / estimatedDurationSec;
+      if (microVideoSceneProgress >= 1) {
+        if (currentMicroVideoScene < vData.scenes.length - 1) {
+          currentMicroVideoScene += 1;
+          microVideoSceneProgress = 0;
+          speakCurrentSceneFromProgress(vData.scenes[currentMicroVideoScene], 0);
+        } else {
+          microVideoSceneProgress = 1;
+          stopMicroVideoPlayback();
+          updateMicroVideoDOM();
+          return;
+        }
       }
     }
 
