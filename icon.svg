@@ -19,3 +19,4 @@
   <rect x="16" y="16" width="480" height="480" rx="102" fill="none" stroke="#6366f1" stroke-opacity="0.35" stroke-width="6" />
   <path d="M294 76L134 278h110l-26 158 160-202H268L294 76z" fill="url(#bolt)" filter="url(#glow)" />
 </svg>
+
