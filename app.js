@@ -7967,6 +7967,31 @@ document.addEventListener('DOMContentLoaded', () => {
   window.setRoleView('student', true);
   const urlParams = new URLSearchParams(window.location.search);
   window.setDevControlsVisibility(urlParams.get('admin') === '1');
+
+  // Detector automático de retorno tras Pago Exitoso en MercadoPago / Stripe / PayPal (?pago_exitoso=vip_pro)
+  const pagoExitoso = urlParams.get('pago_exitoso') || urlParams.get('payment_status');
+  if (pagoExitoso === 'vip_pro' || pagoExitoso === 'vip_founder' || pagoExitoso === 'approved' || pagoExitoso === '1') {
+    const savedPendingRaw = localStorage.getItem('skillvault_pending_checkout_v1');
+    let pendingOrder = null;
+    try {
+      if (savedPendingRaw) pendingOrder = JSON.parse(savedPendingRaw);
+    } catch (e) {}
+
+    if (pendingOrder && pendingOrder.type === 'course') {
+      const skill = getAllSkills().find(s => s.id === pendingOrder.skillId);
+      if (skill && !state.ownedCourses.includes(skill.id)) {
+        state.ownedCourses.push(skill.id);
+        saveState();
+        setTimeout(() => showToast(`🎉 ¡Pago verificado! Curso "${skill.title}" desbloqueado en tu cuenta.`), 400);
+      }
+    } else {
+      const tier = pagoExitoso === 'vip_founder' || (pendingOrder && pendingOrder.tier === 'founder') ? 'founder' : 'monthly';
+      setTimeout(() => completeVipMembershipPurchase(tier, 'MercadoPago Verificado'), 400);
+    }
+    localStorage.removeItem('skillvault_pending_checkout_v1');
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
   renderHeaderAndStats();
   renderSkillsGrid();
   renderDictionary();
@@ -8233,7 +8258,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const realPaymentUrl = buildRealPaymentUrl(gateway, pendingCheckoutConfig.priceUSD);
 
       if (realPaymentUrl) {
-        window.open(realPaymentUrl, '_blank', 'noopener,noreferrer');
+        localStorage.setItem('skillvault_pending_checkout_v1', JSON.stringify(pendingCheckoutConfig));
+        showToast(`🔒 Redirigiendo al pago seguro de ${gateway}...`);
+        window.location.href = realPaymentUrl;
+        return;
       }
 
       if (pendingCheckoutConfig.type === 'vip') {
