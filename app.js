@@ -6331,10 +6331,13 @@ let currentMicroVideoScene = 0;
 let microVideoPlaying = false;
 let microVideoVoiceEnabled = true;
 let microVideoSpeed = 1;
+let microVideoTheaterMode = false;
+let microVideoFullscreenMode = false;
 let microVideoTimer = null;
 let microVideoRafId = null;
-let microVideoSceneStartMs = 0;
+let microVideoLastFrameMs = 0;
 let microVideoSceneProgress = 0;
+let microVideoSeekToastTimer = null;
 
 function stopMicroVideoPlayback() {
   microVideoPlaying = false;
@@ -6736,6 +6739,31 @@ function formatMicroVideoSec(sec) {
   return `00:${s < 10 ? '0' + s : s}`;
 }
 
+function showMicroVideoSeekToast(text, side) {
+  const toastEl = document.getElementById('mv-seek-toast');
+  if (!toastEl) return;
+  toastEl.textContent = text;
+  toastEl.classList.remove('left', 'right');
+  toastEl.classList.add(side === 'left' ? 'left' : 'right', 'show');
+  if (microVideoSeekToastTimer) clearTimeout(microVideoSeekToastTimer);
+  microVideoSeekToastTimer = setTimeout(() => {
+    toastEl.classList.remove('show');
+  }, 650);
+}
+
+function speakCurrentSceneFromProgress(scene, progress01) {
+  if (!microVideoVoiceEnabled || !('speechSynthesis' in window) || !scene) return;
+  window.speechSynthesis.cancel();
+  const words = String(scene.narration || '').split(/\s+/);
+  const startWord = Math.min(words.length - 1, Math.max(0, Math.floor(words.length * Math.min(0.88, progress01 || 0))));
+  const remainingText = words.slice(startWord).join(' ');
+  if (!remainingText.trim()) return;
+  const utter = new SpeechSynthesisUtterance(remainingText);
+  utter.lang = 'es-ES';
+  utter.rate = Math.min(2.0, Math.max(0.75, 1.04 * microVideoSpeed));
+  window.speechSynthesis.speak(utter);
+}
+
 function updateMicroVideoDOM() {
   if (!currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
   const lesson = currentSkill.lessons[currentStepIndex];
@@ -6744,38 +6772,56 @@ function updateMicroVideoDOM() {
 
   const totalProgress01 = Math.min(
     1,
-    (currentMicroVideoScene + microVideoSceneProgress) / vData.scenes.length
+    Math.max(0, (currentMicroVideoScene + microVideoSceneProgress) / vData.scenes.length)
   );
-  const pct = Math.max(4, Math.round(totalProgress01 * 100));
+  const pct = Math.max(1, Math.round(totalProgress01 * 100));
   const elapsedSec = totalProgress01 * 48;
 
+  const boxEl = document.getElementById('micro-video-box');
   const timeEl = document.getElementById('mv-time-pill');
+  const ytTimeEl = document.getElementById('mv-yt-time');
   const capEl = document.getElementById('mv-scene-caption');
   const barEl = document.getElementById('mv-progress-bar');
   const playBtn = document.getElementById('mv-play-btn');
   const voiceBtn = document.getElementById('mv-voice-btn');
-  const speedBtn = document.getElementById('mv-speed-btn');
+  const theaterBtn = document.getElementById('mv-theater-btn');
+  const fsBtn = document.getElementById('mv-fullscreen-btn');
   const bigPlayEl = document.getElementById('mv-big-play');
 
+  if (boxEl) {
+    boxEl.classList.toggle('mv-theater-active', microVideoTheaterMode);
+    boxEl.classList.toggle('mv-fullscreen-active', microVideoFullscreenMode);
+  }
   if (timeEl) {
-    timeEl.textContent = `${microVideoPlaying ? '🔴 EN VIVO' : '⏸ PAUSADO'} • ${formatMicroVideoSec(elapsedSec)} / 00:48`;
+    timeEl.textContent = `${microVideoPlaying ? '🔴 REPRODUCIENDO' : '⏸ PAUSADO'} • ${formatMicroVideoSec(elapsedSec)} / 00:48`;
+  }
+  if (ytTimeEl) {
+    ytTimeEl.textContent = `${formatMicroVideoSec(elapsedSec)} / 00:48`;
   }
   if (capEl) {
     capEl.innerHTML = `<strong>🎬 ${scene.tag}:</strong> "${scene.narration}"`;
   }
   if (barEl) barEl.style.width = `${pct}%`;
   if (playBtn) {
-    playBtn.innerHTML = microVideoPlaying ? '⏸ Pausar Video' : '▶ Reproducir Video Explicativo (48s)';
+    playBtn.innerHTML = microVideoPlaying ? '⏸ Pausar' : '▶ Reproducir';
   }
   if (voiceBtn) {
-    voiceBtn.textContent = microVideoVoiceEnabled ? '🔊 Voz: Activada' : '🔇 Voz: Silenciada';
+    voiceBtn.textContent = microVideoVoiceEnabled ? '🔊 Voz' : '🔇 Silencio';
   }
-  if (speedBtn) {
-    speedBtn.textContent = `⚡ Velocidad: ${microVideoSpeed}x`;
+  if (theaterBtn) {
+    theaterBtn.textContent = microVideoTheaterMode ? '🗗 Tamaño Normal' : '▭ Agrandar';
+  }
+  if (fsBtn) {
+    fsBtn.textContent = microVideoFullscreenMode ? '✕ Salir Pantalla Completa' : '⛶ Pantalla Completa';
   }
   if (bigPlayEl) {
     bigPlayEl.classList.toggle('playing', microVideoPlaying);
   }
+
+  document.querySelectorAll('.yt-speed-pill').forEach(btn => {
+    const spd = parseFloat(btn.dataset.speed || '1');
+    btn.classList.toggle('active', Math.abs(spd - microVideoSpeed) < 0.01);
+  });
 
   document.querySelectorAll('.micro-scene-pill').forEach((btn, idx) => {
     btn.classList.toggle('active', idx === currentMicroVideoScene);
@@ -6786,12 +6832,32 @@ function updateMicroVideoDOM() {
 
 function startMicroVideoAnimationLoop() {
   if (microVideoRafId) cancelAnimationFrame(microVideoRafId);
-  const sceneDurationMs = 12000 / microVideoSpeed;
+  microVideoLastFrameMs = performance.now();
 
   const tick = () => {
     if (!microVideoPlaying || !currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
-    const elapsed = performance.now() - microVideoSceneStartMs;
-    microVideoSceneProgress = Math.min(1, elapsed / sceneDurationMs);
+    const now = performance.now();
+    const dtSec = Math.min(0.25, ((now - microVideoLastFrameMs) / 1000) * microVideoSpeed);
+    microVideoLastFrameMs = now;
+
+    const lesson = currentSkill.lessons[currentStepIndex];
+    const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+
+    microVideoSceneProgress += dtSec / 12;
+
+    if (microVideoSceneProgress >= 1) {
+      if (currentMicroVideoScene < vData.scenes.length - 1) {
+        currentMicroVideoScene += 1;
+        microVideoSceneProgress = 0;
+        speakCurrentSceneFromProgress(vData.scenes[currentMicroVideoScene], 0);
+      } else {
+        microVideoSceneProgress = 1;
+        stopMicroVideoPlayback();
+        updateMicroVideoDOM();
+        return;
+      }
+    }
+
     updateMicroVideoDOM();
     if (microVideoPlaying) {
       microVideoRafId = requestAnimationFrame(tick);
@@ -6800,55 +6866,16 @@ function startMicroVideoAnimationLoop() {
   microVideoRafId = requestAnimationFrame(tick);
 }
 
-function playCurrentMicroScene() {
-  if (!microVideoPlaying || !currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
+function resumeOrStartMicroVideo() {
+  if (!currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
   const lesson = currentSkill.lessons[currentStepIndex];
   const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
-  const scene = vData.scenes[currentMicroVideoScene];
-  if (!scene) {
-    stopMicroVideoPlayback();
-    updateMicroVideoDOM();
-    return;
-  }
+  const scene = vData.scenes[currentMicroVideoScene] || vData.scenes[0];
 
-  microVideoSceneStartMs = performance.now();
-  microVideoSceneProgress = 0;
+  microVideoPlaying = true;
+  speakCurrentSceneFromProgress(scene, microVideoSceneProgress);
   updateMicroVideoDOM();
   startMicroVideoAnimationLoop();
-
-  const advanceToNext = () => {
-    if (!microVideoPlaying) return;
-    if (currentMicroVideoScene < vData.scenes.length - 1) {
-      currentMicroVideoScene += 1;
-      playCurrentMicroScene();
-    } else {
-      microVideoSceneProgress = 1;
-      stopMicroVideoPlayback();
-      updateMicroVideoDOM();
-    }
-  };
-
-  const fallbackDuration = Math.round(11500 / microVideoSpeed);
-
-  if (microVideoVoiceEnabled && 'speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(scene.narration);
-    utter.lang = 'es-ES';
-    utter.rate = Math.min(1.6, 1.04 * microVideoSpeed);
-    utter.onend = () => {
-      if (microVideoPlaying) {
-        microVideoTimer = setTimeout(advanceToNext, 450);
-      }
-    };
-    utter.onerror = () => {
-      if (microVideoPlaying) {
-        microVideoTimer = setTimeout(advanceToNext, fallbackDuration);
-      }
-    };
-    window.speechSynthesis.speak(utter);
-  } else {
-    microVideoTimer = setTimeout(advanceToNext, fallbackDuration);
-  }
 }
 
 window.toggleMicroVideoPlay = function () {
@@ -6857,12 +6884,45 @@ window.toggleMicroVideoPlay = function () {
     updateMicroVideoDOM();
     return;
   }
-  if (currentMicroVideoScene >= 3 && microVideoSceneProgress >= 0.95) {
+  if (currentMicroVideoScene >= 3 && microVideoSceneProgress >= 0.96) {
     currentMicroVideoScene = 0;
     microVideoSceneProgress = 0;
   }
-  microVideoPlaying = true;
-  playCurrentMicroScene();
+  resumeOrStartMicroVideo();
+};
+
+window.skipMicroVideo = function (deltaSec) {
+  if (!currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
+  const lesson = currentSkill.lessons[currentStepIndex];
+  const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+
+  const curTotalSec = (currentMicroVideoScene + microVideoSceneProgress) * 12;
+  const nextTotalSec = Math.max(0, Math.min(47.9, curTotalSec + deltaSec));
+
+  currentMicroVideoScene = Math.min(3, Math.floor(nextTotalSec / 12));
+  microVideoSceneProgress = (nextTotalSec - currentMicroVideoScene * 12) / 12;
+
+  showMicroVideoSeekToast(deltaSec < 0 ? `⏪ ${deltaSec}s` : `⏩ +${deltaSec}s`, deltaSec < 0 ? 'left' : 'right');
+
+  if (microVideoPlaying) {
+    microVideoLastFrameMs = performance.now();
+    speakCurrentSceneFromProgress(vData.scenes[currentMicroVideoScene], microVideoSceneProgress);
+  }
+  updateMicroVideoDOM();
+};
+
+window.handleMicroVideoCanvasDblClick = function (event) {
+  const wrap = event.currentTarget;
+  if (!wrap) return;
+  const rect = wrap.getBoundingClientRect();
+  const relX = (event.clientX - rect.left) / rect.width;
+  if (relX < 0.35) {
+    window.skipMicroVideo(-5);
+  } else if (relX > 0.65) {
+    window.skipMicroVideo(5);
+  } else {
+    window.toggleMicroVideoFullscreen();
+  }
 };
 
 window.selectMicroVideoScene = function (sceneIdx) {
@@ -6871,8 +6931,7 @@ window.selectMicroVideoScene = function (sceneIdx) {
   currentMicroVideoScene = sceneIdx;
   microVideoSceneProgress = 0;
   if (wasPlaying) {
-    microVideoPlaying = true;
-    playCurrentMicroScene();
+    resumeOrStartMicroVideo();
   } else {
     updateMicroVideoDOM();
   }
@@ -6880,7 +6939,7 @@ window.selectMicroVideoScene = function (sceneIdx) {
 
 window.seekMicroVideo = function (event) {
   const track = document.getElementById('mv-progress-track');
-  if (!track) return;
+  if (!track || !currentSkill || currentStepIndex >= currentSkill.lessons.length) return;
   const rect = track.getBoundingClientRect();
   const clickRatio = Math.max(0, Math.min(0.999, (event.clientX - rect.left) / rect.width));
   const targetScene = Math.floor(clickRatio * 4);
@@ -6890,8 +6949,7 @@ window.seekMicroVideo = function (event) {
   currentMicroVideoScene = targetScene;
   microVideoSceneProgress = withinScene;
   if (wasPlaying) {
-    microVideoPlaying = true;
-    playCurrentMicroScene();
+    resumeOrStartMicroVideo();
   } else {
     updateMicroVideoDOM();
   }
@@ -6901,23 +6959,60 @@ window.toggleMicroVideoVoice = function () {
   microVideoVoiceEnabled = !microVideoVoiceEnabled;
   if (!microVideoVoiceEnabled && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
-  } else if (microVideoPlaying) {
-    playCurrentMicroScene();
-    return;
+  } else if (microVideoPlaying && currentSkill && currentStepIndex < currentSkill.lessons.length) {
+    const lesson = currentSkill.lessons[currentStepIndex];
+    const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+    speakCurrentSceneFromProgress(vData.scenes[currentMicroVideoScene], microVideoSceneProgress);
+  }
+  updateMicroVideoDOM();
+};
+
+window.setMicroVideoSpeed = function (spd) {
+  microVideoSpeed = spd;
+  if (microVideoPlaying && currentSkill && currentStepIndex < currentSkill.lessons.length) {
+    microVideoLastFrameMs = performance.now();
+    const lesson = currentSkill.lessons[currentStepIndex];
+    const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+    speakCurrentSceneFromProgress(vData.scenes[currentMicroVideoScene], microVideoSceneProgress);
   }
   updateMicroVideoDOM();
 };
 
 window.cycleMicroVideoSpeed = function () {
-  const speeds = [1, 1.25, 1.5];
+  const speeds = [0.75, 1, 1.25, 1.5, 2];
   const idx = speeds.indexOf(microVideoSpeed);
-  microVideoSpeed = speeds[(idx + 1) % speeds.length];
-  if (microVideoPlaying) {
-    playCurrentMicroScene();
+  const nextSpd = speeds[(idx + 1) % speeds.length];
+  window.setMicroVideoSpeed(nextSpd);
+};
+
+window.toggleMicroVideoTheater = function () {
+  microVideoTheaterMode = !microVideoTheaterMode;
+  updateMicroVideoDOM();
+};
+
+window.toggleMicroVideoFullscreen = function () {
+  const box = document.getElementById('micro-video-box');
+  if (!box) return;
+  if (!microVideoFullscreenMode && !document.fullscreenElement) {
+    microVideoFullscreenMode = true;
+    if (box.requestFullscreen) {
+      box.requestFullscreen().catch(() => {});
+    }
   } else {
+    microVideoFullscreenMode = false;
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+  updateMicroVideoDOM();
+};
+
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement && microVideoFullscreenMode) {
+    microVideoFullscreenMode = false;
     updateMicroVideoDOM();
   }
-};
+});
 
 let activeDictFilter = 'all';
 
@@ -7678,35 +7773,66 @@ function renderModalStep() {
     const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
     const initialScene = vData.scenes[0];
     const microVideoHtml = `
-      <div class="micro-video-box" role="region" aria-label="Video corto explicativo creado por SkillVault">
+      <div class="micro-video-box ${microVideoTheaterMode ? 'mv-theater-active' : ''} ${microVideoFullscreenMode ? 'mv-fullscreen-active' : ''}" id="micro-video-box" role="region" aria-label="Video corto explicativo creado por SkillVault">
         <div class="micro-video-top">
           <span class="micro-video-badge">🎬 Video Corto Original (48s) • Creado para destrabar lo más difícil de este módulo</span>
           <span class="micro-video-time-pill" id="mv-time-pill">⏸ PAUSADO • 00:00 / 00:48</span>
         </div>
-        <div class="micro-video-canvas-wrap" onclick="toggleMicroVideoPlay()" title="Haz clic para reproducir o pausar el video">
+        <div class="micro-video-canvas-wrap" onclick="toggleMicroVideoPlay()" ondblclick="handleMicroVideoCanvasDblClick(event)" title="Clic para reproducir/pausar • Doble clic izquierda/derecha para retroceder/adelantar 5s">
           <canvas id="mv-canvas" class="micro-video-canvas" width="960" height="480"></canvas>
           <div class="micro-video-big-play" id="mv-big-play">
             <div class="micro-video-big-play-circle">▶</div>
+          </div>
+          <div class="micro-video-seek-toast" id="mv-seek-toast">⏪ -5s</div>
+        </div>
+        <div class="yt-control-bar-wrap">
+          <div class="micro-video-progress-track" id="mv-progress-track" onclick="seekMicroVideo(event)" title="Haz clic en cualquier punto de la barra para adelantar o retroceder">
+            <div class="micro-video-progress-bar" id="mv-progress-bar" style="width: 1%;">
+              <span class="micro-video-scrubber-dot"></span>
+            </div>
+          </div>
+          <div class="yt-controls-row">
+            <div class="yt-controls-left">
+              <button type="button" class="yt-icon-btn primary-play" id="mv-play-btn" onclick="toggleMicroVideoPlay()">
+                ▶ Reproducir
+              </button>
+              <button type="button" class="yt-icon-btn" onclick="skipMicroVideo(-5)" title="Retroceder 5 segundos">
+                ⏪ -5s
+              </button>
+              <button type="button" class="yt-icon-btn" onclick="skipMicroVideo(5)" title="Adelantar 5 segundos">
+                ⏩ +5s
+              </button>
+              <button type="button" class="yt-icon-btn" id="mv-voice-btn" onclick="toggleMicroVideoVoice()" title="Activar o silenciar voz">
+                ${microVideoVoiceEnabled ? '🔊 Voz' : '🔇 Silencio'}
+              </button>
+              <span id="mv-yt-time" style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#cbd5e1; margin-left:4px;">00:00 / 00:48</span>
+            </div>
+            <div class="yt-controls-right">
+              <div class="yt-speed-group" title="Velocidad de reproducción">
+                ${[0.75, 1, 1.25, 1.5, 2]
+                  .map(
+                    spd => `
+                      <button type="button" class="yt-speed-pill ${Math.abs(microVideoSpeed - spd) < 0.01 ? 'active' : ''}" data-speed="${spd}" onclick="setMicroVideoSpeed(${spd})">
+                        ${spd}x
+                      </button>
+                    `
+                  )
+                  .join('')}
+              </div>
+              <button type="button" class="yt-icon-btn" id="mv-theater-btn" onclick="toggleMicroVideoTheater()" title="Agrandar modo cine">
+                ${microVideoTheaterMode ? '🗗 Tamaño Normal' : '▭ Agrandar'}
+              </button>
+              <button type="button" class="yt-icon-btn" id="mv-fullscreen-btn" onclick="toggleMicroVideoFullscreen()" title="Ver en pantalla completa">
+                ${microVideoFullscreenMode ? '✕ Salir Pantalla Completa' : '⛶ Pantalla Completa'}
+              </button>
+            </div>
           </div>
         </div>
         <div class="micro-video-caption" id="mv-scene-caption">
           <strong>🎬 ${initialScene.tag}:</strong> "${initialScene.narration}"
         </div>
-        <div class="micro-video-progress-track" id="mv-progress-track" onclick="seekMicroVideo(event)" title="Haz clic para adelantar o retroceder el video">
-          <div class="micro-video-progress-bar" id="mv-progress-bar" style="width: 4%;"></div>
-        </div>
         <div class="micro-video-controls">
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button type="button" class="micro-video-play-btn" id="mv-play-btn" onclick="toggleMicroVideoPlay()">
-              ▶ Reproducir Video Explicativo (48s)
-            </button>
-            <button type="button" class="btn-secondary" id="mv-voice-btn" style="padding: 7px 11px; font-size: 12px;" onclick="toggleMicroVideoVoice()">
-              🔊 Voz: ${microVideoVoiceEnabled ? 'Activada' : 'Silenciada'}
-            </button>
-            <button type="button" class="btn-secondary" id="mv-speed-btn" style="padding: 7px 11px; font-size: 12px;" onclick="cycleMicroVideoSpeed()">
-              ⚡ Velocidad: ${microVideoSpeed}x
-            </button>
-          </div>
+          <span style="font-size:11.5px; color:var(--text-muted); font-weight:700;">📌 Capítulos del video:</span>
           <div class="micro-video-scene-pills">
             ${vData.scenes
               .map(
@@ -9352,16 +9478,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const lessonModal = document.getElementById('lesson-modal');
   document.getElementById('close-modal-btn').addEventListener('click', () => {
     stopMicroVideoPlayback();
+    microVideoFullscreenMode = false;
     lessonModal.classList.remove('open');
   });
   lessonModal.addEventListener('click', e => {
     if (e.target === lessonModal) {
       stopMicroVideoPlayback();
+      microVideoFullscreenMode = false;
       lessonModal.classList.remove('open');
     }
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && lessonModal.classList.contains('open')) {
+      if (microVideoFullscreenMode) {
+        microVideoFullscreenMode = false;
+        updateMicroVideoDOM();
+        return;
+      }
       stopMicroVideoPlayback();
       lessonModal.classList.remove('open');
     }
