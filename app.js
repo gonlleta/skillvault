@@ -6338,6 +6338,95 @@ let microVideoRafId = null;
 let microVideoLastFrameMs = 0;
 let microVideoSceneProgress = 0;
 let microVideoSeekToastTimer = null;
+let selectedNaturalVoiceIndex = 0;
+let cachedNaturalSpanishVoices = [];
+
+function getRankedNaturalSpanishVoices() {
+  if (!('speechSynthesis' in window)) return [];
+  const allVoices = window.speechSynthesis.getVoices() || [];
+  const esVoices = allVoices.filter(v => {
+    const lang = (v.lang || '').toLowerCase();
+    const name = (v.name || '').toLowerCase();
+    return lang.startsWith('es') || name.includes('spanish') || name.includes('español');
+  });
+
+  const scoreVoice = v => {
+    const name = (v.name || '').toLowerCase();
+    const lang = (v.lang || '').toLowerCase();
+    let score = 0;
+    // Prioridad máxima: voces neuronales naturales (Azure Online Natural / WaveNet / Siri / Enhanced)
+    if (name.includes('natural') || name.includes('neural')) score += 140;
+    if (name.includes('online')) score += 95;
+    if (name.includes('google')) score += 85;
+    if (name.includes('premium') || name.includes('enhanced') || name.includes('siri')) score += 80;
+    if (name.includes('elena') || name.includes('tomas') || name.includes('dalia') || name.includes('jorge') || name.includes('alvaro') || name.includes('paulina') || name.includes('mónica')) {
+      score += 35;
+    }
+    if (!v.localService) score += 30;
+    if (lang.includes('ar') || lang.includes('mx') || lang.includes('us') || lang.includes('419') || lang.includes('co')) {
+      score += 20;
+    }
+    // Penalizar fuertemente las voces robóticas antiguas de escritorio (SAPI5 Desktop)
+    if (name.includes('desktop') || name.includes('helena') || name.includes('sabina') || name.includes('espeak')) {
+      score -= 120;
+    }
+    return score;
+  };
+
+  return esVoices.slice().sort((a, b) => scoreVoice(b) - scoreVoice(a));
+}
+
+function refreshNaturalSpanishVoices() {
+  cachedNaturalSpanishVoices = getRankedNaturalSpanishVoices();
+}
+
+if ('speechSynthesis' in window) {
+  refreshNaturalSpanishVoices();
+  window.speechSynthesis.addEventListener('voiceschanged', refreshNaturalSpanishVoices);
+}
+
+function getSelectedNaturalVoice() {
+  if (!cachedNaturalSpanishVoices.length) {
+    refreshNaturalSpanishVoices();
+  }
+  if (!cachedNaturalSpanishVoices.length) return null;
+  const idx = selectedNaturalVoiceIndex % cachedNaturalSpanishVoices.length;
+  return cachedNaturalSpanishVoices[idx];
+}
+
+function getShortNaturalVoiceLabel() {
+  const v = getSelectedNaturalVoice();
+  if (!v) return 'Voz Natural IA';
+  const raw = v.name
+    .replace(/Microsoft\s+/i, '')
+    .replace(/Online\s*\(Natural\)\s*-?\s*/i, 'Natural ')
+    .replace(/Desktop\s*-?\s*/i, '')
+    .replace(/Spanish\s*\(([^)]+)\)/i, '$1')
+    .replace(/Google\s+español\s+de\s+Estados\s+Unidos/i, 'Google LatAm IA')
+    .replace(/Google\s+español/i, 'Google Español IA')
+    .trim();
+  return raw.slice(0, 22);
+}
+
+function humanizeTextForSpeech(raw) {
+  if (!raw) return '';
+  return String(raw)
+    .replace(/^Paso\s*\d+\s*(\([^)]*\))?\s*:\s*/i, '')
+    .replace(/^[0-9]️⃣\s*/, '')
+    .replace(/\([^)]*\)/g, '')
+    .replace(/\$(\d+(?:[.,]\d+)?)\s*USD\/mes/gi, '$1 dólares al mes')
+    .replace(/\$(\d+(?:[.,]\d+)?)\s*USD/gi, '$1 dólares')
+    .replace(/\bUSD\b/g, 'dólares')
+    .replace(/%/g, ' por ciento')
+    .replace(/\b1er\b/gi, 'primer')
+    .replace(/\b1ra\b/gi, 'primera')
+    .replace(/\b2da\b/gi, 'segunda')
+    .replace(/\s*\/\s*/g, ' o ')
+    .replace(/[`*_~>#"“”]/g, '')
+    .replace(/[🎯💡⚠️❌✅🚀🎬👑⚡🔒🔓]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
 
 function stopMicroVideoPlayback() {
   microVideoPlaying = false;
@@ -6367,6 +6456,12 @@ function buildLessonMicroVideoData(lesson, skill, moduleIdx) {
   const caseScenario = (lesson.caseStudy && lesson.caseStudy.scenario) || 'Proceso manual lento y propenso a errores humanos.';
   const caseRes = (lesson.caseStudy && lesson.caseStudy.result) || 'Proceso automatizado sin errores y listo para producción.';
 
+  const spokenHeading = humanizeTextForSpeech(cleanHeading);
+  const spokenFirst = humanizeTextForSpeech(firstStep);
+  const spokenSecond = humanizeTextForSpeech(secondStep);
+  const spokenWarn = humanizeTextForSpeech(warnText);
+  const spokenRes = humanizeTextForSpeech(caseRes);
+
   const scenes = [
     {
       tag: 'Escena 1/4 • Concepto Difícil en Simple',
@@ -6375,7 +6470,7 @@ function buildLessonMicroVideoData(lesson, skill, moduleIdx) {
       stepA: firstStep,
       stepB: secondStep,
       visual: `🎯 META PRINCIPAL:\n${firstStep}\n\n💡 REGLA CLAVE:\n${secondStep}`,
-      narration: `Bienvenido al video explicativo de ${cleanHeading}. Para entender la parte más difícil sin complicarte, enfócate primero en esto: ${firstStep}. Y aplica siempre esta regla clave: ${secondStep}.`
+      narration: `Vamos a ver ${spokenHeading} de forma súper clara y sencilla. Lo primero que vas a hacer es esto: ${spokenFirst}. Además, ten siempre presente esta regla práctica: ${spokenSecond}.`
     },
     {
       tag: 'Escena 2/4 • Demostración en Pantalla Paso a Paso',
@@ -6383,7 +6478,7 @@ function buildLessonMicroVideoData(lesson, skill, moduleIdx) {
       title: 'Simulación en vivo: Qué escribir y cómo configurarlo',
       codeSample: codeLines || `# Paso 1:\n${firstStep}\n\n# Paso 2:\n${secondStep}`,
       visual: codeLines || `1. ${firstStep}\n2. ${secondStep}`,
-      narration: `Mira en pantalla cómo se escribe paso a paso. Copias este bloque en tu programa gratuito y reemplazas únicamente los datos de ejemplo por los de tu propio proyecto.`
+      narration: `Ahora fíjate en la pantalla. No necesitas memorizar todo de golpe. Simplemente copia esta plantilla base en tu programa gratuito, y cambia los datos de ejemplo por los de tu propio proyecto.`
     },
     {
       tag: 'Escena 3/4 • Error Crítico vs. Solución Correcta',
@@ -6392,7 +6487,7 @@ function buildLessonMicroVideoData(lesson, skill, moduleIdx) {
       warnText,
       solutionText: secondStep,
       visual: `❌ ERROR FRECUENTE QUE DEBES EVITAR:\n${warnText}\n\n✅ SOLUCIÓN:\n${secondStep}`,
-      narration: `Atención a este punto porque aquí es donde más cuesta avanzar: ${warnText}. Si verificas esto antes de ejecutar, te ahorrarás horas de frustración.`
+      narration: `Un consejo clave antes de probarlo. Mucha gente se traba aquí por este detalle: ${spokenWarn}. Si lo revisas antes de empezar, te va a funcionar perfecto al primer intento.`
     },
     {
       tag: 'Escena 4/4 • Resultado Real Funcionando en Producción',
@@ -6401,7 +6496,7 @@ function buildLessonMicroVideoData(lesson, skill, moduleIdx) {
       caseScenario,
       caseRes,
       visual: `✅ RESULTADO EN PRODUCCIÓN:\n${caseRes}`,
-      narration: `Cuando lo aplicas correctamente, pasas de un proceso trabado a este resultado real: ${caseRes}. Ya tienes todo claro para superar el reto del módulo.`
+      narration: `Y mira el cambio cuando lo aplicas bien en un caso real: ${spokenRes}. Cuando quieras, responde la pregunta de abajo para pasar al siguiente módulo.`
     }
   ];
 
@@ -6754,14 +6849,31 @@ function showMicroVideoSeekToast(text, side) {
 function speakCurrentSceneFromProgress(scene, progress01) {
   if (!microVideoVoiceEnabled || !('speechSynthesis' in window) || !scene) return;
   window.speechSynthesis.cancel();
-  const words = String(scene.narration || '').split(/\s+/);
+  const cleanText = humanizeTextForSpeech(scene.narration || '');
+  const words = cleanText.split(/\s+/);
   const startWord = Math.min(words.length - 1, Math.max(0, Math.floor(words.length * Math.min(0.88, progress01 || 0))));
   const remainingText = words.slice(startWord).join(' ');
   if (!remainingText.trim()) return;
-  const utter = new SpeechSynthesisUtterance(remainingText);
-  utter.lang = 'es-ES';
-  utter.rate = Math.min(2.0, Math.max(0.75, 1.04 * microVideoSpeed));
-  window.speechSynthesis.speak(utter);
+
+  const bestVoice = getSelectedNaturalVoice();
+  // Dividir por oraciones para dar pausas de respiración naturales entre frases
+  const sentences = remainingText
+    .split(/(?<=[.!?])\s+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  sentences.forEach(sentence => {
+    const utter = new SpeechSynthesisUtterance(sentence);
+    if (bestVoice) {
+      utter.voice = bestVoice;
+      utter.lang = bestVoice.lang || 'es-MX';
+    } else {
+      utter.lang = 'es-MX';
+    }
+    utter.rate = Math.min(1.85, Math.max(0.75, 0.97 * microVideoSpeed));
+    utter.pitch = 1.0;
+    window.speechSynthesis.speak(utter);
+  });
 }
 
 function updateMicroVideoDOM() {
@@ -6811,6 +6923,10 @@ function updateMicroVideoDOM() {
   }
   if (voiceBtn) {
     voiceBtn.textContent = microVideoVoiceEnabled ? '🔊 Voz' : '🔇 Silencio';
+  }
+  const voiceModelBtn = document.getElementById('mv-voice-model-btn');
+  if (voiceModelBtn) {
+    voiceModelBtn.textContent = `🎙️ ${getShortNaturalVoiceLabel()}`;
   }
   if (theaterBtn) {
     theaterBtn.textContent = microVideoTheaterMode ? '🗗 Tamaño Normal' : '▭ Agrandar';
@@ -6964,6 +7080,21 @@ window.toggleMicroVideoVoice = function () {
   if (!microVideoVoiceEnabled && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
   } else if (microVideoPlaying && currentSkill && currentStepIndex < currentSkill.lessons.length) {
+    const lesson = currentSkill.lessons[currentStepIndex];
+    const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
+    speakCurrentSceneFromProgress(vData.scenes[currentMicroVideoScene], microVideoSceneProgress);
+  }
+  updateMicroVideoDOM();
+};
+
+window.cycleMicroVideoVoiceModel = function () {
+  refreshNaturalSpanishVoices();
+  if (cachedNaturalSpanishVoices.length > 1) {
+    selectedNaturalVoiceIndex = (selectedNaturalVoiceIndex + 1) % cachedNaturalSpanishVoices.length;
+  }
+  const label = getShortNaturalVoiceLabel();
+  showToast(`🎙️ Locutor cambiado a: ${label}`);
+  if (microVideoPlaying && currentSkill && currentStepIndex < currentSkill.lessons.length) {
     const lesson = currentSkill.lessons[currentStepIndex];
     const vData = buildLessonMicroVideoData(lesson, currentSkill, currentStepIndex);
     speakCurrentSceneFromProgress(vData.scenes[currentMicroVideoScene], microVideoSceneProgress);
@@ -7813,6 +7944,9 @@ function renderModalStep() {
               </button>
               <button type="button" class="yt-icon-btn" id="mv-voice-btn" onclick="toggleMicroVideoVoice()" title="Activar o silenciar voz">
                 ${microVideoVoiceEnabled ? '🔊 Voz' : '🔇 Silencio'}
+              </button>
+              <button type="button" class="yt-icon-btn" id="mv-voice-model-btn" onclick="cycleMicroVideoVoiceModel()" title="Cambiar entre las voces naturales en español disponibles">
+                🎙️ ${getShortNaturalVoiceLabel()}
               </button>
               <span id="mv-yt-time" style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#cbd5e1; margin-left:4px;">00:00 / 00:48</span>
             </div>
