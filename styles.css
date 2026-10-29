@@ -2562,276 +2562,178 @@ body.role-student .owner-only-el {
 }
 
 /* ==========================================================================
-   MODO 100% APP DE CELULAR (MOBILE-ONLY SHELL EN TODAS LAS PANTALLAS)
+   SISTEMA RESPONSIVO COMPLETO (DESKTOP 3 COLUMNAS / TABLET 2 / MÓVIL 1)
    ========================================================================== */
-body {
-  background: radial-gradient(circle at top, #131c31 0%, #05080f 100%);
-  display: flex;
-  justify-content: center;
-  min-height: 100dvh;
-  overflow-x: hidden;
-}
 
-.app-layout {
-  display: flex !important;
-  flex-direction: column;
-  width: 100%;
-  max-width: 480px;
-  min-height: 100dvh;
-  margin: 0 auto;
-  background: var(--bg-dark);
-  border-left: 1px solid rgba(168, 85, 247, 0.22);
-  border-right: 1px solid rgba(168, 85, 247, 0.22);
-  box-shadow: 0 0 65px rgba(0, 0, 0, 0.85);
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* 1. Ocultar el Sidebar por completo siempre (experiencia 100% app móvil) */
-.sidebar {
-  display: none !important;
-}
-
-/* 2. Mostrar el Bottom Navigation Bar fijo abajo dentro del marco del celular */
-.mobile-bottom-nav {
-  display: grid !important;
-  width: 100%;
-  max-width: 480px;
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
-}
-
-/* 3. Mostrar barra superior de marca móvil y ocultar botón duplicado de escritorio */
-.mobile-brand-bar {
-  display: flex !important;
-}
-
-#header-auth-btn {
-  display: none !important;
-}
-
-/* 4. Contenido principal optimizado para pulgar y sin desbordamiento */
-.main-content {
-  padding: 12px 14px 98px !important;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.topbar {
-  flex-direction: column !important;
-  align-items: stretch !important;
-  gap: 10px !important;
-  padding: 12px !important;
-  margin-bottom: 14px !important;
-  border-radius: 16px;
-}
-
-.search-box {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-.search-box input {
-  font-size: 14px !important;
-  padding: 10px 12px 10px 36px !important;
-}
-
-.wallet-summary {
-  width: 100%;
-  display: grid !important;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px !important;
-}
-
-.role-switcher-toggle,
-.empty-state-sim-btn {
-  grid-column: 1 / -1;
-  width: 100%;
-  justify-content: space-between;
-}
-
-.balance-chip {
-  width: 100%;
-  padding: 8px 10px !important;
-}
-
-.btn-vip-top,
-.btn-withdraw-quick {
-  width: 100%;
-  padding: 10px 12px !important;
-  font-size: 12.5px !important;
-  text-align: center;
-  justify-content: center;
-}
-
-/* 5. Hero 100% adaptado a pantalla de celular */
-.hero-banner {
-  grid-template-columns: 1fr !important;
-  padding: 18px 15px !important;
-  gap: 16px !important;
-  border-radius: 18px;
-}
-
-.hero-kicker {
-  font-size: 10px !important;
-  line-height: 1.4;
-}
-
-.hero-text h1 {
-  font-size: 22px !important;
-  line-height: 1.24 !important;
-  margin: 8px 0 10px !important;
-}
-
-.hero-text p {
-  font-size: 13.5px !important;
-  line-height: 1.55 !important;
-}
-
-.hero-stats {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px !important;
-}
-
-.h-stat {
-  padding: 8px 6px !important;
-  text-align: center;
-}
-
-.h-stat strong {
-  font-size: 15px !important;
-}
-
-.h-stat span {
-  font-size: 10.5px !important;
-}
-
-.hero-cta-row {
-  flex-direction: column !important;
-  align-items: stretch !important;
-  gap: 10px !important;
-}
-
-.btn-hero-free-hook,
-.btn-hero-plans {
-  width: 100% !important;
-  text-align: center;
-  justify-content: center;
-  font-size: 13px !important;
-  padding: 13px 14px !important;
-  line-height: 1.35;
-}
-
-/* 6. Todas las grillas en 1 sola columna vertical estilo App Móvil */
-.skills-grid,
-.plans-grid,
-.testimonials-grid,
-.dictionary-grid,
-.profile-mobile-grid,
-.wallet-grid,
-.form-row,
-.footer-top-grid,
-.case-study-grid,
-.lesson-glossary-grid {
-  grid-template-columns: 1fr !important;
-  gap: 14px !important;
-}
-
-.category-bar {
-  flex-direction: column !important;
-  align-items: stretch !important;
-  gap: 10px !important;
-}
-
-.categories {
-  display: flex;
-  overflow-x: auto;
-  flex-wrap: nowrap !important;
-  padding-bottom: 6px;
-  gap: 6px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.cat-btn {
+/* Botón muy visible de Iniciar Sesión / Registrarse anclado a la derecha del Header */
+.btn-auth-cta {
+  background: linear-gradient(135deg, var(--violet), var(--indigo));
+  color: #ffffff;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 13.5px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(192, 132, 252, 0.45);
+  cursor: pointer;
   white-space: nowrap;
-  flex-shrink: 0;
-  font-size: 12px !important;
-  padding: 8px 12px !important;
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.32);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  margin-left: auto;
 }
 
-.sort-box {
+.btn-auth-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(139, 92, 246, 0.48);
+}
+
+/* Botón secundario en el Hero ("Explorar Catálogo") */
+.btn-hero-explore {
+  background: rgba(99, 102, 241, 0.16);
+  color: #e0e7ff;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 14px 22px;
+  border-radius: 14px;
+  border: 1px solid rgba(99, 102, 241, 0.45);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-hero-explore:hover {
+  background: rgba(99, 102, 241, 0.28);
+  border-color: #818cf8;
+  transform: translateY(-2px);
+}
+
+/* Grilla de Cursos Responsiva: 3 columnas en Desktop, 2 en Tablet, 1 en Móvil */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+@media (max-width: 1180px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Imagen de Portada (Placeholder Visual Gamificado) en Tarjetas de Curso */
+.course-cover-placeholder {
+  position: relative;
   width: 100%;
+  height: 148px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.course-cover-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.14), transparent 60%);
+  pointer-events: none;
+}
+
+.course-cover-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
 }
 
-.sort-box select {
-  flex: 1;
-  margin-left: 8px;
+.course-cover-icon {
+  font-size: 38px;
+  line-height: 1;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+  position: relative;
+  z-index: 1;
 }
 
-/* 7. Footer compacto para móvil */
-.trust-footer {
-  padding: 24px 14px 20px !important;
-  margin-top: 32px !important;
+.course-reward-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(16, 185, 129, 0.22);
+  border: 1px solid rgba(52, 211, 153, 0.55);
+  color: #6ee7b7;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 11px;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
 }
 
-.footer-security-bar {
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  padding: 14px !important;
+.course-card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
 }
 
-.payment-badges-row {
-  width: 100%;
-  display: grid !important;
-  grid-template-columns: 1fr;
-  gap: 8px !important;
-}
-
-.trust-payment-badge {
-  width: 100%;
-  justify-content: center;
-}
-
-.footer-bottom-copy {
-  flex-direction: column;
+.btn-course-details {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.18s ease;
   text-align: center;
-  gap: 6px;
 }
 
-/* 8. Modales adaptados al ancho del teléfono (Fullscreen / App Sheet) */
-.modal-overlay {
-  padding: 0 !important;
-  align-items: flex-end !important;
+.btn-course-details:hover {
+  background: rgba(168, 85, 247, 0.16);
+  border-color: rgba(168, 85, 247, 0.45);
+  color: #ffffff;
 }
 
-.modal-window,
-#auth-modal .auth-fullscreen-modal,
-#checkout-modal .mobile-friendly-modal,
-#waitlist-modal .mobile-friendly-modal {
-  width: 100% !important;
-  max-width: 480px !important;
-  min-height: 94dvh;
-  max-height: 96dvh !important;
-  margin: 0 auto !important;
-  border-radius: 22px 22px 0 0 !important;
-  padding: 20px 16px 32px !important;
-  overflow-y: auto;
+/* Redes Sociales en el Footer */
+.footer-social-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
 }
 
-.modal-footer {
-  flex-direction: column !important;
-  gap: 8px !important;
+.social-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
-.modal-footer button {
-  width: 100% !important;
-  max-width: 100% !important;
+.social-icon-btn:hover {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: var(--violet);
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
 .auth-feedback-box {
