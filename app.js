@@ -6172,6 +6172,158 @@ const ACADEMY_DICTIONARY = [
   }
 ];
 
+const COURSE_ZERO_TO_ONE_GUIDES = {
+  'py-automation': {
+    tools: 'Google Colab (100% gratis en el navegador, sin instalar nada) o Visual Studio Code + Python.org en tu PC.',
+    howToStart: [
+      '1️⃣ Si estás desde cero y no quieres instalar nada hoy: entra gratis a colab.research.google.com con tu cuenta de Google y toca "Nuevo cuaderno" (New Notebook).',
+      '2️⃣ Si prefieres instalarlo en tu PC: entra a python.org/downloads, instala Python marcando la casilla "Add Python to PATH" y usa el editor gratuito Visual Studio Code.',
+      '3️⃣ Copia el código del bloque "💻 Ejemplo Práctico" de este módulo, pégalo en la celda de Google Colab (o en un archivo .py) y presiona el botón ▶ (Play) o Shift + Enter para verlo funcionar en segundos.'
+    ]
+  },
+  'ai-agents-pro': {
+    tools: 'ChatGPT Gratis (chatgpt.com), Claude (claude.ai) o Google AI Studio (aistudio.google.com — gratis).',
+    howToStart: [
+      '1️⃣ Entra gratis desde tu navegador o celular a chatgpt.com, claude.ai o aistudio.google.com y crea tu cuenta sin costo.',
+      '2️⃣ Copia la plantilla estructurada del bloque "💻 Ejemplo Práctico" de este módulo y reemplaza los datos entre corchetes o etiquetas con los de tu propio trabajo o negocio.',
+      '3️⃣ Envíalo en el chat y compara cómo la IA te devuelve una respuesta profesional estructurada en vez de texto genérico.'
+    ]
+  },
+  'fin-crypto-invest': {
+    tools: 'Google Sheets / Excel (gratis para tu planilla automática), Calculator.net (interés compuesto) y un Broker regulado local o internacional (ej. Balanz, IOL, Interactive Brokers o Binance).',
+    howToStart: [
+      '1️⃣ Abre una hoja de cálculo gratis en sheets.google.com para armar tu tablero mensual con la regla 50 / 30 / 20.',
+      '2️⃣ Copia las fórmulas y la estructura del bloque "💻 Ejemplo Práctico" de este módulo con tus propios ingresos y gastos reales.',
+      '3️⃣ Configura en tu banco o billetera virtual una transferencia automática el día 1 de cada mes hacia tu cuenta remunerada o broker.'
+    ]
+  },
+  'ux-growth-convert': {
+    tools: 'Figma (figma.com — gratis para diseñar pantallas), Microsoft Clarity (clarity.microsoft.com — mapas de calor 100% gratis) y tu editor web o tienda.',
+    howToStart: [
+      '1️⃣ Crea una cuenta gratuita en figma.com para bocetar tu primera pantalla (Above the Fold) o abre directamente el editor de tu página web.',
+      '2️⃣ Aplica la estructura exacta del bloque "💻 Ejemplo Práctico" de este módulo (Titular de beneficio + Subtítulo + 1 solo botón CTA + Prueba social).',
+      '3️⃣ Conecta gratis Microsoft Clarity en 2 minutos para ver grabaciones reales de dónde hacen clic tus visitantes.'
+    ]
+  },
+  'fullstack-apis-sql': {
+    tools: 'Node.js (nodejs.org), Visual Studio Code, PostgreSQL gratis en la nube con Supabase.com o Neon.tech, y Postman / Thunder Client.',
+    howToStart: [
+      '1️⃣ Instala gratis Visual Studio Code y Node.js (nodejs.org), o crea una base de datos PostgreSQL gratuita en 1 minuto entrando a supabase.com.',
+      '2️⃣ En Supabase abre la pestaña "SQL Editor" (o tu archivo de servidor en VS Code) y pega el bloque "💻 Ejemplo Práctico" de este módulo.',
+      '3️⃣ Presiona "Run" para crear las tablas, ejecutar las consultas SQL o probar tus endpoints HTTP en tiempo real.'
+    ]
+  },
+  'secret-saas-masterclass': {
+    tools: 'Cursor / VS Code, Supabase (Base de datos + Login gratis), Vercel.com (Hosting gratis) y Stripe / MercadoPago para cobrar suscripciones.',
+    howToStart: [
+      '1️⃣ Crea tu cuenta gratuita en vercel.com y supabase.com para tener servidor y base de datos sin pagar infraestructura inicial.',
+      '2️⃣ Usa el guion y la arquitectura del bloque "💻 Ejemplo Práctico" de este módulo para validar el problema con clientes reales y levantar tu MVP.',
+      '3️⃣ Conecta tu link de cobro recurrente para recibir tus primeras suscripciones mensuales (MRR).'
+    ]
+  },
+  'cybersec-ethical-web': {
+    tools: 'Navegador Chrome/Firefox con DevTools (tecla F12), OWASP ZAP (zaproxy.org — escáner gratuito) y Visual Studio Code.',
+    howToStart: [
+      '1️⃣ Abre cualquier proyecto web propio en tu navegador y presiona F12 (Inspector -> Pestañas Network, Application y Console).',
+      '2️⃣ Revisa en tu código las líneas vulnerables y reemplázalas por el código blindado del bloque "💻 Ejemplo Práctico" de este módulo.',
+      '3️⃣ Verifica en la pestaña Network -> Headers que tus cookies tengan activo HttpOnly, Secure y tus cabeceras CSP/CORS.'
+    ]
+  },
+  'ai-rag-embeddings': {
+    tools: 'Python o Node.js, OpenAI API / Gemini API (con capa gratuita en Google AI Studio) y base vectorial gratis en Supabase (pgvector) o Pinecone.io.',
+    howToStart: [
+      '1️⃣ Obtén tu clave API gratuita en aistudio.google.com o platform.openai.com y abre un cuaderno en Google Colab.',
+      '2️⃣ Sube un documento PDF o texto de prueba y aplica la fragmentación (Chunking + Overlap) del bloque "💻 Ejemplo Práctico" de este módulo.',
+      '3️⃣ Ejecuta la consulta para ver cómo el bot responde citando únicamente tus documentos privados sin inventar datos.'
+    ]
+  },
+  'js-react-modern': {
+    tools: 'StackBlitz.com / CodeSandbox.io (React gratis en el navegador sin instalar nada) o Visual Studio Code + Vite (`npm create vite@latest`).',
+    howToStart: [
+      '1️⃣ Si quieres practicar en 5 segundos sin instalar nada: entra a vite.new/react en tu navegador y tendrás un proyecto React funcionando en vivo.',
+      '2️⃣ Si trabajas en tu PC: abre la terminal en VS Code y ejecuta `npm create vite@latest mi-app -- --template react`.',
+      '3️⃣ Pega el componente del bloque "💻 Ejemplo Práctico" de este módulo en `App.jsx` y guarda para ver la interfaz actualizarse al instante.'
+    ]
+  },
+  'fin-b2b-pricing': {
+    tools: 'Google Sheets / Excel (para calculadora de costos y punto de equilibrio) y Notion / Google Docs para tu tabla de 3 planes (Decoy Pricing).',
+    howToStart: [
+      '1️⃣ Abre una planilla en blanco en sheets.google.com y anota tus costos fijos mensuales y el costo variable de cada venta.',
+      '2️⃣ Usa la fórmula y plantilla del bloque "💻 Ejemplo Práctico" de este módulo para calcular tu Margen de Contribución, Punto de Equilibrio y ROAS mínimo.',
+      '3️⃣ Arma tu oferta en 3 columnas (Básico, Pro Recomendado y VIP) aplicando el Efecto Señuelo explicado en la clase.'
+    ]
+  },
+  'mkt-copywriting-funnels': {
+    tools: 'Google Docs / Notion (para redactar tu página de ventas y correos), Systeme.io o Carrd.co (para publicar tu embudo gratis) y Brevo/MailerLite (emails gratis).',
+    howToStart: [
+      '1️⃣ Abre un documento en Google Docs y copia la estructura del bloque "💻 Ejemplo Práctico" de este módulo (Fórmula PAS / AIDA / Secuencia de Emails).',
+      '2️⃣ Rellena cada sección con el dolor principal de tu cliente, tu prueba social y tu garantía de inversión de riesgo.',
+      '3️⃣ Pega esos textos en tu página web o en una cuenta gratuita de systeme.io para publicar tu embudo listo para convertir.'
+    ]
+  },
+  'secret-high-ticket-agency': {
+    tools: 'LinkedIn / Apollo.io (búsqueda gratuita de empresas), Loom.com (para grabar auditorías en video de 2 min), Google Meet y Notion.',
+    howToStart: [
+      '1️⃣ Define un nicho de empresas (ej. clínicas, inmobiliarias o e-commerce) y busca a sus dueños en LinkedIn o Google Maps.',
+      '2️⃣ Copia la plantilla y calculadora de ROI del bloque "💻 Ejemplo Práctico" de este módulo para armar tu propuesta de Setup + Iguala Mensual.',
+      '3️⃣ Envía tus mensajes de prospección y presenta el retorno de inversión en una videollamada de 20 minutos por Google Meet.'
+    ]
+  },
+  'nocode-n8n-whatsapp': {
+    tools: 'n8n (gratis instalándolo con `npx n8n` en tu PC o versión de prueba en n8n.io) / Make.com (cuenta gratis) y Meta for Developers (WhatsApp Cloud API).',
+    howToStart: [
+      '1️⃣ Crea una cuenta gratuita en make.com o abre n8n en tu computadora ejecutando `npx n8n` en la terminal (o en n8n.io).',
+      '2️⃣ Crea un flujo nuevo ("New Workflow"), agrega un nodo "Webhook" y configura el JSON exactamente como muestra el bloque "💻 Ejemplo Práctico" de este módulo.',
+      '3️⃣ Conecta el nodo de OpenAI / Gemini y el nodo de WhatsApp o Google Sheets y toca "Test Workflow" para ver la automatización en vivo.'
+    ]
+  },
+  'viral-video-retention': {
+    tools: 'CapCut (programa o app 100% gratis en PC y celular), el micrófono de tu teléfono y Google Docs para tus guiones.',
+    howToStart: [
+      '1️⃣ Antes de prender la cámara, copia la plantilla de guion del bloque "💻 Ejemplo Práctico" de este módulo (Gancho en los primeros 3 segundos + Cuerpo + CTA).',
+      '2️⃣ Graba con tu celular en formato vertical (9:16) frente a una ventana o buena luz y abre el video en la app gratuita CapCut.',
+      '3️⃣ Aplica cortes de silencios, subtítulos dinámicos automáticos ("Auto Captions") y un cambio visual (zoom o imagen B-Roll) cada 4 segundos.'
+    ]
+  },
+  'meta-ads-roas': {
+    tools: 'Meta Business Suite / Administrador de Anuncios (adsmanager.facebook.com — crear la cuenta es gratis) y Canva.com (para diseñar los anuncios).',
+    howToStart: [
+      '1️⃣ Entra desde tu computadora a business.facebook.com, abre el "Administrador de Anuncios" y configura tu Píxel en "Orígenes de datos".',
+      '2️⃣ Toca el botón verde "+ Crear" y sigue la estructura exacta del bloque "💻 Ejemplo Práctico" de este módulo (Objetivo Ventas + Campaña CBO).',
+      '3️⃣ Sube 3 anuncios distintos (1 video, 1 imagen comparativa y 1 testimonio) y mide las columnas CTR, CPA y ROAS antes de escalar presupuesto.'
+    ]
+  },
+  'closer-high-ticket-sales': {
+    tools: 'WhatsApp / Instagram DM (para prospección y Setting), Calendly.com o Cal.com (agenda automática 100% gratis) y Zoom / Google Meet.',
+    howToStart: [
+      '1️⃣ Crea tu enlace de agenda gratuito en cal.com o calendly.com conectado a tu Google Calendar con recordatorios automáticos.',
+      '2️⃣ Ten abierto el guion del bloque "💻 Ejemplo Práctico" de este módulo mientras respondes chats (filtro BANT) o durante tu videollamada de cierre.',
+      '3️⃣ Sigue las preguntas en orden para que el cliente calcule cuánto dinero pierde hoy y presenta tu solución al final de la llamada.'
+    ]
+  },
+  'english-remote-tech': {
+    tools: 'Google Docs (para tu CV formato Harvard/ATS), LinkedIn.com, portales remotos (Wellfound.com, WeWorkRemotely.com) y Deel / Wise / Payoneer para cobrar en USD.',
+    howToStart: [
+      '1️⃣ Abre un documento limpio de 1 sola columna en Google Docs (sin fotos ni tablas de Canva) y copia las plantillas en inglés del bloque "💻 Ejemplo Práctico" de este módulo.',
+      '2️⃣ Configura tu perfil de LinkedIn en inglés con palabras clave de tu puesto y crea tu perfil gratis en wellfound.com.',
+      '3️⃣ Practica en voz alta las respuestas con el método S-T-A-R de esta clase y envía tus primeras postulaciones directas a empresas de EE.UU. y Europa.'
+    ]
+  }
+};
+
+function getZeroToOneGuideForCourse(courseId) {
+  return (
+    COURSE_ZERO_TO_ONE_GUIDES[courseId] || {
+      tools: 'Navegador Web, Google Docs / Sheets (gratis) y las plantillas incluidas en este módulo.',
+      howToStart: [
+        '1️⃣ Lee la explicación en español simple y revisa las palabras clave en el diccionario rápido del módulo.',
+        '2️⃣ Copia la plantilla del bloque "💻 Ejemplo Práctico" que tienes más abajo en esta misma clase.',
+        '3️⃣ Reemplaza los datos de ejemplo por los de tu proyecto y sigue los 4 pasos de implementación.'
+      ]
+    }
+  );
+}
+
 let activeDictFilter = 'all';
 
 function getGlossaryTermsForLesson(lesson, courseId) {
@@ -6912,6 +7064,19 @@ function renderModalStep() {
       ? lesson.paragraphs.map(p => `<p>${p}</p>`).join('')
       : `<p>${lesson.text || ''}</p>`;
 
+    const zeroGuide = getZeroToOneGuideForCourse(currentSkill.id);
+    const zeroToOneHtml = `
+      <div class="lesson-steps-guide" style="border-left: 3px solid #10b981; background: rgba(16, 185, 129, 0.08); margin-bottom: 16px;">
+        <h5 style="color: #34d399; margin-bottom: 8px;">🧰 Desde Cero: ¿Con qué programa/página hacerlo y cómo empezar?</h5>
+        <p style="font-size: 13px; color: var(--text-main); margin-bottom: 10px;">
+          <strong>💻 Herramienta gratuita recomendada:</strong> ${zeroGuide.tools}
+        </p>
+        <div class="steps-list">
+          ${zeroGuide.howToStart.map(st => `<div class="step-item">${st}</div>`).join('')}
+        </div>
+      </div>
+    `;
+
     const stepByStepHtml = Array.isArray(lesson.stepByStep) && lesson.stepByStep.length > 0
       ? `
         <div class="lesson-steps-guide">
@@ -7015,6 +7180,7 @@ function renderModalStep() {
         </div>
         <h4>${lesson.heading}</h4>
         <div class="lesson-paragraphs">${paragraphsHtml}</div>
+        ${zeroToOneHtml}
         ${stepByStepHtml}
         ${caseStudyHtml}
         ${keyPointsHtml}
