@@ -7966,12 +7966,65 @@ let secretLogoTapCount = 0;
 let secretLogoTimer = null;
 let devControlsVisible = false;
 
+window.toggleMyVipStatusAdmin = function () {
+  state.isProMember = !state.isProMember;
+  if (state.isProMember && state.vipPoints < 150) {
+    state.vipPoints += 150;
+  }
+  saveState();
+  renderHeaderAndStats();
+  renderSkillsGrid();
+  showToast(
+    state.isProMember
+      ? '👑 Modo VIP PRO activado en tu cuenta para pruebas (+VP y todos los cursos desbloqueados).'
+      : '🎓 Cuenta devuelta a modo Estándar.'
+  );
+};
+
 window.setDevControlsVisibility = function (visible) {
   devControlsVisible = Boolean(visible);
-  document.querySelectorAll('.dev-sim-control').forEach(el => {
-    el.hidden = !devControlsVisible;
-    el.style.display = devControlsVisible ? '' : 'none';
-  });
+  const existingBar = document.getElementById('dynamic-admin-bar');
+
+  if (!devControlsVisible) {
+    if (existingBar) existingBar.remove();
+    return;
+  }
+
+  if (!existingBar) {
+    const mainEl = document.querySelector('.main-content');
+    if (mainEl) {
+      const adminBar = document.createElement('div');
+      adminBar.id = 'dynamic-admin-bar';
+      adminBar.setAttribute('role', 'region');
+      adminBar.setAttribute('aria-label', 'Barra exclusiva del propietario');
+      adminBar.style.cssText =
+        'background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(16, 185, 129, 0.16)); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;';
+      adminBar.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">🔐</span>
+          <div>
+            <strong style="font-size:13.5px; color:#fff; display:block;">Modo Propietario Activo (?admin=1)</strong>
+            <span style="font-size:11.5px; color:var(--text-muted);">Esta barra no existe en el código de los visitantes normales.</span>
+          </div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="openPaymentSettingsModal()">
+            💳 Configurar Cobros (PayPal / Alias MP)
+          </button>
+          <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="toggleMyVipStatusAdmin()">
+            👑 Alternar Mi Estado VIP
+          </button>
+          <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="toggleZeroCoursesSimulation()">
+            ⏳ Probar Lista de Espera (0 Cursos)
+          </button>
+          <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="window.location.href = window.location.pathname">
+            ✕ Salir de Admin
+          </button>
+        </div>
+      `;
+      mainEl.prepend(adminBar);
+    }
+  }
 };
 
 window.handleSecretAdminTap = function () {
