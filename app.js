@@ -5470,6 +5470,9 @@ function getLevelInfo() {
 
 function hasAccessToCourse(skill) {
   if (!skill) return false;
+  if (typeof isAdminModeActive !== 'undefined' && (isAdminModeActive || devControlsVisible)) {
+    return true;
+  }
   if (skill.secretCourse) {
     return state.unlockedRewards.includes(skill.requiredRewardId);
   }
@@ -7892,8 +7895,9 @@ window.openSkillModal = function (skillId) {
 
 window.jumpToModalStep = function (targetIdx) {
   if (targetIdx < 0) return;
-  const courseDone = state.completedCourses.includes(currentSkill.id);
-  const trialHalf = isTrialHalfOnly(currentSkill);
+  const isOwnerBypass = Boolean(isAdminModeActive || devControlsVisible);
+  const courseDone = isOwnerBypass || state.completedCourses.includes(currentSkill.id);
+  const trialHalf = !isOwnerBypass && isTrialHalfOnly(currentSkill);
   const trialLimit = getTrialModulesLimit(currentSkill);
 
   if (!courseDone && targetIdx > currentStepIndex) {
@@ -8615,7 +8619,12 @@ window.setRoleView = function (role, silent = false) {
       const exploreBtn = document.querySelector('.nav-item[data-tab="explore"]');
       if (exploreBtn) exploreBtn.click();
     }
+  } else if (typeof window.grantFullAdminSuperpowers === 'function') {
+    window.grantFullAdminSuperpowers(true);
   }
+
+  renderHeaderAndStats();
+  renderSkillsGrid();
 
   if (!silent) {
     showToast(
@@ -9271,6 +9280,34 @@ let secretLogoTapCount = 0;
 let secretLogoTimer = null;
 let devControlsVisible = false;
 
+window.grantFullAdminSuperpowers = function (silent = false) {
+  state.isProMember = true;
+  state.trialCoursePurchased = true;
+  state.points = Math.max(state.points, 99999);
+  state.vipPoints = Math.max(state.vipPoints, 99999);
+  state.xp = Math.max(state.xp, 25000);
+  state.streak = Math.max(state.streak, 99);
+
+  getAllSkills().forEach(s => {
+    if (!state.ownedCourses.includes(s.id)) {
+      state.ownedCourses.push(s.id);
+    }
+  });
+
+  [...EXCLUSIVE_VIP_REWARDS, ...STANDARD_REWARDS].forEach(rw => {
+    if (!state.unlockedRewards.includes(rw.id)) {
+      state.unlockedRewards.push(rw.id);
+    }
+  });
+
+  saveState();
+  renderHeaderAndStats();
+  renderSkillsGrid();
+  if (!silent) {
+    showToast('⚡ ¡Superpoderes de Admin activados! 99.999 PTS, 99.999 VP, VIP PRO y los 14 cursos + cofres 100% desbloqueados.');
+  }
+};
+
 window.toggleMyVipStatusAdmin = function () {
   state.isProMember = !state.isProMember;
   if (state.isProMember && state.vipPoints < 150) {
@@ -9295,6 +9332,9 @@ window.setDevControlsVisibility = function (visible) {
     return;
   }
 
+  window.setRoleView('admin', true);
+  window.grantFullAdminSuperpowers(true);
+
   if (!existingBar) {
     const mainEl = document.querySelector('.main-content');
     if (mainEl) {
@@ -9308,11 +9348,14 @@ window.setDevControlsVisibility = function (visible) {
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="font-size:18px;">🔐</span>
           <div>
-            <strong style="font-size:13.5px; color:#fff; display:block;">Modo Propietario Activo (?admin=1)</strong>
-            <span style="font-size:11.5px; color:var(--text-muted);">Esta barra no existe en el código de los visitantes normales.</span>
+            <strong style="font-size:13.5px; color:#fff; display:block;">Modo Propietario Activo (?admin=1) • Todo Desbloqueado + 99.999 PTS/VP</strong>
+            <span style="font-size:11.5px; color:var(--text-muted);">Tienes todos los cursos (incluidos secretos), módulos, cofres y puntos al máximo.</span>
           </div>
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px; border-color:#10b981; color:#6ee7b7;" onclick="grantFullAdminSuperpowers(false)">
+            ⚡ Recargar 99.999 PTS / VP + Todo Desbloqueado
+          </button>
           <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="openPaymentSettingsModal()">
             💳 Configurar Cobros (PayPal / Alias MP)
           </button>
