@@ -7789,7 +7789,7 @@ const PAYMENT_CONFIG_KEY = 'skillvault_payment_config_v1';
 const DEFAULT_PAYMENT_CONFIG = {
   mpLink: '',
   mpAlias: '',
-  paypal: '',
+  paypal: 'gonzaloramirez.mail@gmail.com',
   stripeLink: ''
 };
 
@@ -7841,11 +7841,26 @@ function buildRealPaymentUrl(gateway, priceUSD) {
     return cfg.mpLink;
   }
   if (gateway.includes('PayPal') && cfg.paypal) {
-    let base = cfg.paypal.trim();
-    if (!base.startsWith('http')) {
-      base = `https://www.paypal.com/paypalme/${base.replace(/^@/, '')}`;
+    const base = cfg.paypal.trim();
+    const itemName = (pendingCheckoutConfig && pendingCheckoutConfig.title) || 'SkillVault Academy VIP';
+    const returnUrl = 'https://skillvault-umber.vercel.app/?pago_exitoso=vip_pro';
+    const cancelUrl = 'https://skillvault-umber.vercel.app/';
+
+    if (base.includes('@') && !base.startsWith('http')) {
+      return `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${encodeURIComponent(
+        base
+      )}&item_name=${encodeURIComponent(itemName)}&amount=${priceUSD.toFixed(
+        2
+      )}&currency_code=USD&no_shipping=1&return=${encodeURIComponent(
+        returnUrl
+      )}&cancel_return=${encodeURIComponent(cancelUrl)}`;
     }
-    return `${base.replace(/\/$/, '')}/${priceUSD.toFixed(2)}USD`;
+
+    let url = base;
+    if (!url.startsWith('http')) {
+      url = `https://www.paypal.com/paypalme/${url.replace(/^@/, '')}`;
+    }
+    return `${url.replace(/\/$/, '')}/${priceUSD.toFixed(2)}USD`;
   }
   if (gateway.includes('Stripe') && cfg.stripeLink) {
     return cfg.stripeLink;
