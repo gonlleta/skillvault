@@ -9955,6 +9955,22 @@ document.addEventListener('DOMContentLoaded', () => {
       lessonModal.classList.remove('open');
     }
   });
+
+  // Comportamiento interactivo de Acordeón para las secciones de Preguntas Frecuentes (FAQ)
+  document.querySelectorAll('.faq-accordion-item').forEach(item => {
+    item.addEventListener('toggle', () => {
+      if (item.open) {
+        const parentList = item.closest('.faq-accordion-list');
+        if (parentList) {
+          parentList.querySelectorAll('.faq-accordion-item').forEach(sibling => {
+            if (sibling !== item && sibling.open) {
+              sibling.open = false;
+            }
+          });
+        }
+      }
+    });
+  });
 });
 
 // ==========================================================================
