@@ -8908,6 +8908,17 @@ window.startFreeTrialModule = function () {
 // MEJORA 4: FUNCIONES DEL FOOTER DE CONFIANZA (FAQ, AYUDA, LEGAL)
 // ==========================================================================
 const FOOTER_INFO_CONTENT = {
+  about: {
+    badge: '⚡ Quiénes Somos',
+    title: 'Sobre SkillVault Academy',
+    html: `
+      <div class="lesson-box">
+        <h4>Educación Práctica Gamificada</h4>
+        <p style="color:var(--text-muted); margin-bottom:14px;"><strong>SkillVault</strong> es una academia interactiva diseñada para que domines Programación, Inteligencia Artificial, Finanzas y Marketing Digital desde cero absoluto mediante misiones prácticas de 6 módulos.</p>
+        <p style="color:var(--text-muted);">Cada módulo combina explicaciones en español simple, plantillas listas para usar y un sistema de recompensas con <strong>Puntos Estándar (PTS)</strong> y <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
+      </div>
+    `
+  },
   faq: {
     badge: '❓ Preguntas Frecuentes (FAQ)',
     title: 'Preguntas Frecuentes sobre SkillVault Academy',

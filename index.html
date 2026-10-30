@@ -269,93 +269,7 @@
           </div>
         </section>
 
-        <!-- SECCIÓN 1: INSTRUCTORES / AUTORIDAD TÉCNICA (QUIÉNES SOMOS) -->
-        <section class="instructors-section" id="instructors-authority-section" aria-labelledby="instructors-heading">
-          <div class="instructors-header">
-            <span class="instructors-kicker">⚡ AUTORIDAD TÉCNICA REAL • MENTORES EN ACTIVO</span>
-            <h2 id="instructors-heading">Aprende de Expertos que están en la Trinchera</h2>
-            <p>Nada de profesores que solo leen diapositivas. Cada ruta de <strong>SkillVault</strong> fue diseñada por especialistas que programan sistemas en producción, dirigen campañas rentables y cierran negocios digitales todos los días.</p>
-          </div>
-
-          <div class="instructors-grid">
-            <!-- Instructor 1 -->
-            <article class="instructor-card featured-instructor">
-              <div class="instructor-card-top">
-                <div class="instructor-avatar-wrap">
-                  <div class="instructor-avatar avatar-neon-violet">GR</div>
-                  <span class="instructor-level-dot" title="Arquitecto Principal">⚡</span>
-                </div>
-                <span class="instructor-verified-badge">✔ Instructor Verificado</span>
-              </div>
-
-              <div class="instructor-identity">
-                <h3>Gonzalo Ramírez</h3>
-                <span class="instructor-role">Lead AI Developer &amp; Founder de SkillVault</span>
-              </div>
-
-              <p class="instructor-bio">
-                Más de 7 años diseñando arquitecturas Full-Stack, automatizaciones en Python y agentes RAG con Inteligencia Artificial. Ha liderado la implementación de +45 sistemas en producción que hoy ahorran miles de horas operativas en empresas de EE.UU. y Latinoamérica.
-              </p>
-
-              <div class="instructor-stats-row">
-                <span class="inst-stat-pill">🤖 +45 Sistemas IA</span>
-                <span class="inst-stat-pill">💻 Python &amp; Full-Stack</span>
-              </div>
-            </article>
-
-            <!-- Instructor 2 -->
-            <article class="instructor-card">
-              <div class="instructor-card-top">
-                <div class="instructor-avatar-wrap">
-                  <div class="instructor-avatar avatar-neon-gold">LM</div>
-                  <span class="instructor-level-dot" title="Especialista Growth">👑</span>
-                </div>
-                <span class="instructor-verified-badge">✔ Instructor Verificado</span>
-              </div>
-
-              <div class="instructor-identity">
-                <h3>Lucas Mendoza</h3>
-                <span class="instructor-role">Especialista en Growth B2B, Funnels &amp; High-Ticket</span>
-              </div>
-
-              <p class="instructor-bio">
-                Estratega de monetización y adquisición digital con más de <strong>$1.8M USD generados</strong> en ventas auditadas para SaaS, agencias y consultoras B2B mediante psicología de precios, embudos de conversión y campañas de Meta Ads con ROAS medio de 4.6x.
-              </p>
-
-              <div class="instructor-stats-row">
-                <span class="inst-stat-pill">📈 +$1.8M Facturados</span>
-                <span class="inst-stat-pill">🎯 ROAS 4.6x Auditado</span>
-              </div>
-            </article>
-
-            <!-- Instructor 3 -->
-            <article class="instructor-card">
-              <div class="instructor-card-top">
-                <div class="instructor-avatar-wrap">
-                  <div class="instructor-avatar avatar-neon-emerald">SV</div>
-                  <span class="instructor-level-dot" title="SecOps &amp; Cloud">🛡️</span>
-                </div>
-                <span class="instructor-verified-badge">✔ Instructora Verificada</span>
-              </div>
-
-              <div class="instructor-identity">
-                <h3>Sofía Valdés</h3>
-                <span class="instructor-role">Senior Cybersecurity &amp; Remote Tech Advisor</span>
-              </div>
-
-              <p class="instructor-bio">
-                Ingeniera de seguridad web (OWASP) con 8 años trabajando como Contractor internacional para startups de California y Londres. Ha auditado +120 aplicaciones críticas y entrenado a cientos de profesionales hispanos para conseguir su primer contrato remoto en dólares.
-              </p>
-
-              <div class="instructor-stats-row">
-                <span class="inst-stat-pill">🛡️ +120 Auditorías Web</span>
-                <span class="inst-stat-pill">🌎 Mentora en USD</span>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <!-- SECCIÓN 2: PREGUNTAS FRECUENTES (FAQ INTERACTIVO EN LA LANDING ANTES DE PASAR A PLANES) -->
+        <!-- SECCIÓN: PREGUNTAS FRECUENTES (FAQ INTERACTIVO EN LA LANDING ANTES DE PASAR A PLANES) -->
         <section class="faq-accordion-section" id="landing-faq-section" aria-labelledby="faq-landing-heading">
           <div class="faq-section-header">
             <span class="faq-kicker">❓ RESPUESTAS CLARAS Y SIN LETRA CHICA</span>
@@ -696,7 +610,7 @@
           <nav class="footer-links-col" aria-label="Quiénes somos y rutas">
             <h4>Quiénes somos</h4>
             <ul>
-              <li><a href="#instructors-authority-section" onclick="switchAppTab('explore'); setTimeout(() => document.getElementById('instructors-authority-section')?.scrollIntoView({behavior:'smooth'}), 60); return false;">⚡ Quiénes somos (Instructores)</a></li>
+              <li><a href="#about" onclick="openInfoModal('about'); return false;">⚡ Quiénes somos</a></li>
               <li><a href="#view-explore" onclick="filterByFooterCategory('Programación'); return false;">💻 Programación &amp; Python</a></li>
               <li><a href="#view-explore" onclick="filterByFooterCategory('Inteligencia Artificial'); return false;">🤖 IA, Agentes &amp; Prompts</a></li>
               <li><a href="#view-explore" onclick="filterByFooterCategory('Finanzas'); return false;">📈 Finanzas &amp; Ventas B2B</a></li>
