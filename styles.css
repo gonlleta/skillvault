@@ -3802,11 +3802,180 @@ main:focus {
   flex-wrap: wrap;
 }
 
-/* Ajuste responsivo de barra móvil para 6 botones sin desborde horizontal */
-@media (max-width: 768px) {
+/* ==========================================================================
+   ADAPTACIÓN AUTOMÁTICA POR DISPOSITIVO: MODO CELULAR VS MODO PC (ESCRITORIO)
+   ========================================================================== */
+
+/* Modo PC (Escritorio > 960px): Sidebar lateral izquierda + Grilla amplia */
+@media (min-width: 961px) {
+  body.device-desktop .app-layout {
+    grid-template-columns: 278px 1fr;
+  }
+
+  body.device-desktop .sidebar {
+    display: flex;
+  }
+
+  body.device-desktop .mobile-brand-bar,
+  body.device-desktop .mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
+/* Modo Celular (Pantallas <= 960px o Dispositivo Móvil detectado): Formato App Nativa */
+@media (max-width: 960px) {
+  .app-layout {
+    grid-template-columns: 1fr !important;
+    min-height: 100dvh;
+  }
+
+  .sidebar {
+    display: none !important;
+  }
+
+  .mobile-brand-bar {
+    display: flex !important;
+  }
+
   .mobile-bottom-nav {
+    display: grid !important;
     grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
     padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .main-content {
+    padding: 14px 14px calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .topbar > #top-auth-btn {
+    display: none !important;
+  }
+
+  .search-box {
+    max-width: 100% !important;
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .wallet-summary {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .wallet-summary .btn-vip-top,
+  .wallet-summary .role-switcher-toggle {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .hero-banner {
+    grid-template-columns: 1fr !important;
+    padding: 20px 16px !important;
+    gap: 18px !important;
+    border-radius: 16px;
+  }
+
+  .hero-text h1 {
+    font-size: 22px !important;
+    line-height: 1.25;
+  }
+
+  .hero-cta-row {
+    flex-direction: column;
+  }
+
+  .hero-cta-row button,
+  .hero-cta-row a {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .category-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .categories {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .categories::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cat-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .sort-box {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sort-box select {
+    flex: 1;
+  }
+
+  .skills-grid,
+  .plans-grid,
+  .dictionary-grid,
+  .case-study-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .footer-top-grid {
+    grid-template-columns: 1fr !important;
+    gap: 22px !important;
+  }
+
+  .footer-security-bar,
+  .footer-bottom-copy {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .trust-footer {
+    padding: 28px 16px 24px !important;
+    margin-top: 36px;
+  }
+
+  .modal-overlay {
+    padding: 10px !important;
+    align-items: flex-end;
+  }
+
+  .modal-window {
+    padding: 18px 15px !important;
+    border-radius: 20px 20px 14px 14px !important;
+    max-height: 92dvh !important;
+    width: 100% !important;
+  }
+
+  .toast-container {
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 12px !important;
+    left: 12px !important;
   }
 
   .mob-nav-item {
@@ -3826,6 +3995,35 @@ main:focus {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* Regla directa cuando el detector JS identifica un Celular físico (incluso en modo horizontal) */
+body.device-mobile .app-layout {
+  grid-template-columns: 1fr !important;
+}
+
+body.device-mobile .sidebar {
+  display: none !important;
+}
+
+body.device-mobile .mobile-brand-bar {
+  display: flex !important;
+}
+
+body.device-mobile .mobile-bottom-nav {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+body.device-mobile .main-content {
+  padding: 14px 14px calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body.device-mobile .topbar > #top-auth-btn {
+  display: none !important;
 }
 
 /* Respeto estricto de Preferencias de Movimiento Reducido (WCAG 2.3.3) */

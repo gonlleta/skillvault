@@ -11820,8 +11820,27 @@ window.setDevControlsVisibility = function (visible) {
   }
 };
 
+// Detector automático de Dispositivo (Modo Celular vs Modo PC Escritorio)
+window.detectAndApplyDeviceLayoutMode = function () {
+  const ua = navigator.userAgent || '';
+  const isMobileUA =
+    Boolean(navigator.userAgentData && navigator.userAgentData.mobile) ||
+    /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+  const isMobileViewport = window.innerWidth <= 960;
+  const useMobileLayout = isMobileUA || isMobileViewport;
+
+  document.body.classList.toggle('device-mobile', useMobileLayout);
+  document.body.classList.toggle('device-desktop', !useMobileLayout);
+  document.documentElement.setAttribute('data-device-layout', useMobileLayout ? 'mobile' : 'desktop');
+};
+
 // Eventos principales
 document.addEventListener('DOMContentLoaded', () => {
+  // Detectar y aplicar formato de Celular o PC según el dispositivo en el que se abra
+  window.detectAndApplyDeviceLayoutMode();
+  window.addEventListener('resize', window.detectAndApplyDeviceLayoutMode);
+  window.addEventListener('orientationchange', window.detectAndApplyDeviceLayoutMode);
+
   // Inicializar siempre en Modo Alumno estricto y ocultar botones de simulación para el público
   window.setRoleView('student', true);
   const urlParams = new URLSearchParams(window.location.search);
