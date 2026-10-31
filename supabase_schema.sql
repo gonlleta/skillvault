@@ -77,3 +77,4 @@ CREATE POLICY "Permitir acceso desde API SkillVault tickets"
   FOR ALL
   USING (true)
   WITH CHECK (true);
+
