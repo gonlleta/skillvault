@@ -11834,6 +11834,28 @@ window.detectAndApplyDeviceLayoutMode = function () {
   document.documentElement.setAttribute('data-device-layout', useMobileLayout ? 'mobile' : 'desktop');
 };
 
+window.scrollCatalogMobile = function (direction = 1) {
+  const grid = document.getElementById('skills-grid');
+  if (!grid) return;
+  if (grid.classList.contains('mobile-list-mode')) {
+    grid.classList.remove('mobile-list-mode');
+    const modeBtn = document.getElementById('mob-catalog-mode-btn');
+    if (modeBtn) modeBtn.textContent = '↕️ Ver en lista';
+  }
+  const step = Math.max(260, Math.round(window.innerWidth * 0.82));
+  grid.scrollBy({ left: direction * step, behavior: 'smooth' });
+};
+
+window.toggleMobileCatalogViewMode = function () {
+  const grid = document.getElementById('skills-grid');
+  const modeBtn = document.getElementById('mob-catalog-mode-btn');
+  if (!grid) return;
+  const isList = grid.classList.toggle('mobile-list-mode');
+  if (modeBtn) {
+    modeBtn.textContent = isList ? '↔️ Deslizar al costado' : '↕️ Ver en lista';
+  }
+};
+
 // Eventos principales
 document.addEventListener('DOMContentLoaded', () => {
   // Detectar y aplicar formato de Celular o PC según el dispositivo en el que se abra
