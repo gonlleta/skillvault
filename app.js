@@ -11834,28 +11834,6 @@ window.detectAndApplyDeviceLayoutMode = function () {
   document.documentElement.setAttribute('data-device-layout', useMobileLayout ? 'mobile' : 'desktop');
 };
 
-window.scrollCatalogMobile = function (direction = 1) {
-  const grid = document.getElementById('skills-grid');
-  if (!grid) return;
-  if (grid.classList.contains('mobile-list-mode')) {
-    grid.classList.remove('mobile-list-mode');
-    const modeBtn = document.getElementById('mob-catalog-mode-btn');
-    if (modeBtn) modeBtn.textContent = '↕️ Ver en lista';
-  }
-  const step = Math.max(260, Math.round(window.innerWidth * 0.82));
-  grid.scrollBy({ left: direction * step, behavior: 'smooth' });
-};
-
-window.toggleMobileCatalogViewMode = function () {
-  const grid = document.getElementById('skills-grid');
-  const modeBtn = document.getElementById('mob-catalog-mode-btn');
-  if (!grid) return;
-  const isList = grid.classList.toggle('mobile-list-mode');
-  if (modeBtn) {
-    modeBtn.textContent = isList ? '↔️ Deslizar al costado' : '↕️ Ver en lista';
-  }
-};
-
 // Eventos principales
 document.addEventListener('DOMContentLoaded', () => {
   // Detectar y aplicar formato de Celular o PC según el dispositivo en el que se abra
@@ -12539,6 +12517,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('#category-filters .cat-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeFilter = btn.dataset.cat;
+      btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       renderSkillsGrid();
     });
   });
@@ -12548,7 +12527,34 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('#dict-category-filters .dict-cat-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeDictFilter = btn.dataset.dcat;
+      btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       renderDictionary();
+    });
+  });
+
+  // Habilitar deslizamiento horizontal fluido (touch y arrastre) en las barras de categorías ("Todos", "Programación", etc.)
+  ['category-filters', 'dict-category-filters'].forEach(id => {
+    const bar = document.getElementById(id);
+    if (!bar) return;
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+    bar.addEventListener('mousedown', e => {
+      isDown = true;
+      startX = e.pageX - bar.offsetLeft;
+      scrollLeft = bar.scrollLeft;
+    });
+    bar.addEventListener('mouseleave', () => {
+      isDown = false;
+    });
+    bar.addEventListener('mouseup', () => {
+      isDown = false;
+    });
+    bar.addEventListener('mousemove', e => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - bar.offsetLeft;
+      bar.scrollLeft = scrollLeft - (x - startX) * 1.5;
     });
   });
 

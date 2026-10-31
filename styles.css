@@ -3822,64 +3822,12 @@ main:focus {
   }
 }
 
-/* Barra de control táctil para deslizar el catálogo en Celular (oculta en PC) */
-.mobile-catalog-swipe-bar {
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  background: rgba(17, 23, 38, 0.9);
-  border: 1px solid rgba(168, 85, 247, 0.35);
-  border-radius: 12px;
-  padding: 8px 12px;
-  margin-bottom: 12px;
-}
-
-.mobile-swipe-hint {
-  font-size: 12px;
-  font-weight: 700;
-  color: #e9d5ff;
-}
-
-.mobile-swipe-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.mob-swipe-arrow {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  border: 1px solid rgba(168, 85, 247, 0.45);
-  background: rgba(168, 85, 247, 0.16);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mob-swipe-mode-btn {
-  padding: 7px 11px;
-  border-radius: 9px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.06);
-  color: #f8fafc;
-  font-family: inherit;
-  font-size: 11.5px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
 /* Modo Celular (Pantallas <= 960px o Dispositivo Móvil detectado): Formato App Nativa */
 @media (max-width: 960px) {
   .app-layout {
     display: block !important;
     width: 100% !important;
+    max-width: 100vw !important;
     min-height: 100dvh;
   }
 
@@ -3900,7 +3848,8 @@ main:focus {
   .main-content {
     padding: 14px 14px calc(96px + env(safe-area-inset-bottom, 0px)) !important;
     width: 100% !important;
-    max-width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
   }
 
   .topbar {
@@ -3958,25 +3907,42 @@ main:focus {
     justify-content: center;
   }
 
-  .category-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+  .category-bar,
+  .dictionary-controls {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: calc(100vw - 28px) !important;
+    min-width: 0 !important;
   }
 
-  .categories {
+  .categories,
+  #category-filters,
+  #dict-category-filters {
     display: flex !important;
+    flex-direction: row !important;
     flex-wrap: nowrap !important;
+    width: 100% !important;
+    max-width: calc(100vw - 28px) !important;
+    min-width: 0 !important;
     overflow-x: auto !important;
-    padding-bottom: 8px;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
+    overflow-y: hidden !important;
+    padding: 2px 4px 10px !important;
+    gap: 8px !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x !important;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
     scrollbar-width: thin;
   }
 
   .cat-btn {
-    flex-shrink: 0;
-    white-space: nowrap;
+    flex: 0 0 auto !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    touch-action: pan-x manipulation !important;
   }
 
   .sort-box {
@@ -3988,30 +3954,7 @@ main:focus {
     flex: 1;
   }
 
-  .mobile-catalog-swipe-bar {
-    display: flex !important;
-  }
-
-  /* Catálogo deslizable hacia el costado por defecto en Celular */
-  .skills-grid:not(.mobile-list-mode) {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y;
-    gap: 14px !important;
-    padding: 4px 4px 16px !important;
-    margin: 0 -4px;
-  }
-
-  .skills-grid:not(.mobile-list-mode) > .skill-card {
-    flex: 0 0 85vw !important;
-    max-width: 340px !important;
-    scroll-snap-align: center;
-  }
-
-  .skills-grid.mobile-list-mode,
+  .skills-grid,
   .plans-grid,
   .dictionary-grid,
   .case-study-grid {
@@ -4077,6 +4020,7 @@ main:focus {
 body.device-mobile .app-layout {
   display: block !important;
   width: 100% !important;
+  max-width: 100vw !important;
 }
 
 body.device-mobile .sidebar {
@@ -4096,32 +4040,53 @@ body.device-mobile .mobile-bottom-nav {
 body.device-mobile .main-content {
   padding: 14px 14px calc(96px + env(safe-area-inset-bottom, 0px)) !important;
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: 100vw !important;
+  min-width: 0 !important;
 }
 
 body.device-mobile .topbar > #top-auth-btn {
   display: none !important;
 }
 
-body.device-mobile .mobile-catalog-swipe-bar {
+body.device-mobile .category-bar,
+body.device-mobile .dictionary-controls {
   display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: calc(100vw - 28px) !important;
+  min-width: 0 !important;
 }
 
-body.device-mobile .skills-grid:not(.mobile-list-mode) {
+body.device-mobile .categories,
+body.device-mobile #category-filters,
+body.device-mobile #dict-category-filters {
   display: flex !important;
+  flex-direction: row !important;
   flex-wrap: nowrap !important;
+  width: 100% !important;
+  max-width: calc(100vw - 28px) !important;
+  min-width: 0 !important;
   overflow-x: auto !important;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x pan-y;
-  gap: 14px !important;
-  padding: 4px 4px 16px !important;
+  overflow-y: hidden !important;
+  padding: 2px 4px 10px !important;
+  gap: 8px !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-x !important;
+  overscroll-behavior-x: contain;
 }
 
-body.device-mobile .skills-grid:not(.mobile-list-mode) > .skill-card {
-  flex: 0 0 85vw !important;
-  max-width: 340px !important;
-  scroll-snap-align: center;
+body.device-mobile .cat-btn {
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  touch-action: pan-x manipulation !important;
+}
+
+body.device-mobile .skills-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
 }
 
 /* Respeto estricto de Preferencias de Movimiento Reducido (WCAG 2.3.3) */
