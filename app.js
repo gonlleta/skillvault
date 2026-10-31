@@ -5505,7 +5505,172 @@ function logSecurityAnomaly(type, descriptionOrDetails, extraDetails = {}) {
   saveJSONToStorage(ANOMALY_LOGS_DB_KEY, logs.slice(0, 150));
 }
 
-// Despachador de Correos Transaccionales (Verificación, Reset de Clave, Cancelación VIP, Soporte)
+// ============================================================================
+// MOTOR CLOUD MULTI-DISPOSITIVO (SUPABASE + VERCEL API + RESEND EMAILS)
+// ============================================================================
+const CLOUD_CONFIG_KEY = 'skillvault_cloud_config_v1';
+
+function loadCloudConfig() {
+  return loadJSONFromStorage(CLOUD_CONFIG_KEY, {
+    supabaseUrl: '',
+    supabaseAnonKey: '',
+    resendApiKey: ''
+  });
+}
+
+function saveCloudConfig(cfg) {
+  saveJSONToStorage(CLOUD_CONFIG_KEY, cfg);
+}
+
+function getCloudRequestHeaders() {
+  const cfg = loadCloudConfig();
+  const headers = { 'Content-Type': 'application/json' };
+  if (cfg.supabaseUrl) headers['x-supabase-url'] = cfg.supabaseUrl.trim();
+  if (cfg.supabaseAnonKey) headers['x-supabase-key'] = cfg.supabaseAnonKey.trim();
+  if (cfg.resendApiKey) headers['x-resend-key'] = cfg.resendApiKey.trim();
+  return headers;
+}
+
+let cloudSyncDebounceTimer = null;
+
+async function syncAccountToCloud(accountObj) {
+  if (!accountObj || !accountObj.email) return { ok: false };
+  const cfg = loadCloudConfig();
+  try {
+    const res = await fetch('/api/cloud-sync', {
+      method: 'POST',
+      headers: getCloudRequestHeaders(),
+      body: JSON.stringify({
+        action: 'upsert_user',
+        account: accountObj
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) return { ok: true, mode: 'vercel_api' };
+    }
+  } catch (e) {}
+
+  // Respaldo directo a Supabase REST si el propietario configuró URL y Key en el panel Admin
+  if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
+    try {
+      const sbUrl = cfg.supabaseUrl.trim().replace(/\/$/, '');
+      const sbKey = cfg.supabaseAnonKey.trim();
+      const profile = accountObj.profile || {};
+      const payload = {
+        email: String(accountObj.email).trim().toLowerCase(),
+        name: accountObj.name || accountObj.email.split('@')[0],
+        provider: accountObj.provider || 'Email',
+        email_verified: Boolean(accountObj.emailVerified),
+        password_hash: accountObj.passwordHash || '',
+        is_pro_member: Boolean(profile.isProMember),
+        points: Number(profile.points ?? 150),
+        vip_points: Number(profile.vipPoints ?? 0),
+        xp: Number(profile.xp ?? 100),
+        streak: Number(profile.streak ?? 1),
+        subscription: profile.subscription || null,
+        profile,
+        updated_at: new Date().toISOString()
+      };
+      const directRes = await fetch(`${sbUrl}/rest/v1/skillvault_users?on_conflict=email`, {
+        method: 'POST',
+        headers: {
+          apikey: sbKey,
+          Authorization: `Bearer ${sbKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (directRes.ok) return { ok: true, mode: 'supabase_direct' };
+    } catch (e) {}
+  }
+  return { ok: false };
+}
+
+async function fetchAccountFromCloud(email) {
+  if (!email) return null;
+  const cleanEmail = String(email).trim().toLowerCase();
+  const cfg = loadCloudConfig();
+  try {
+    const res = await fetch(`/api/cloud-sync?email=${encodeURIComponent(cleanEmail)}`, {
+      method: 'GET',
+      headers: getCloudRequestHeaders()
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok && data.user) {
+        return data.user;
+      }
+    }
+  } catch (e) {}
+
+  if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
+    try {
+      const sbUrl = cfg.supabaseUrl.trim().replace(/\/$/, '');
+      const sbKey = cfg.supabaseAnonKey.trim();
+      const directRes = await fetch(
+        `${sbUrl}/rest/v1/skillvault_users?email=eq.${encodeURIComponent(cleanEmail)}&select=*&limit=1`,
+        {
+          headers: {
+            apikey: sbKey,
+            Authorization: `Bearer ${sbKey}`
+          }
+        }
+      );
+      if (directRes.ok) {
+        const rows = await directRes.json();
+        if (Array.isArray(rows) && rows.length > 0) {
+          const r = rows[0];
+          return {
+            email: r.email,
+            name: r.name,
+            provider: r.provider || 'Email',
+            emailVerified: Boolean(r.email_verified),
+            passwordHash: r.password_hash,
+            createdAt: r.created_at,
+            profile: r.profile || {}
+          };
+        }
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
+async function syncSupportTicketToCloud(ticketObj) {
+  if (!ticketObj || !ticketObj.id) return;
+  try {
+    await fetch('/api/cloud-sync', {
+      method: 'POST',
+      headers: getCloudRequestHeaders(),
+      body: JSON.stringify({
+        action: 'upsert_ticket',
+        ticket: ticketObj
+      })
+    });
+  } catch (e) {}
+}
+
+async function recordPurchaseInCloudWebhook({ userEmail, itemType, itemId, amountUSD, gateway, externalPaymentId }) {
+  try {
+    await fetch('/api/payment-webhook', {
+      method: 'POST',
+      headers: getCloudRequestHeaders(),
+      body: JSON.stringify({
+        action: 'record_purchase',
+        userEmail,
+        itemType,
+        itemId,
+        amountUSD,
+        gateway,
+        externalPaymentId
+      })
+    });
+  } catch (e) {}
+}
+
+// Despachador de Correos Transaccionales (Bandeja Local + Envío Real vía Resend API /api/send-email)
 function sendTransactionalEmail({ to, subject, category, bodyHtml, actionLabel = '', actionUrl = '', ctaLabel = '', ctaUrl = '' }) {
   const mailbox = loadJSONFromStorage(MAILBOX_DB_KEY, []);
   const nowIso = new Date().toISOString();
@@ -5528,6 +5693,24 @@ function sendTransactionalEmail({ to, subject, category, bodyHtml, actionLabel =
   mailbox.unshift(msg);
   saveJSONToStorage(MAILBOX_DB_KEY, mailbox.slice(0, 100));
   updateMailboxCounterUI();
+
+  // Despachar correo transaccional real en segundo plano vía Serverless (/api/send-email -> Resend)
+  if (to && String(to).includes('@') && !String(to).endsWith('.local')) {
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: getCloudRequestHeaders(),
+      body: JSON.stringify({
+        to: String(to).trim().toLowerCase(),
+        subject,
+        category: category || 'Seguridad',
+        bodyHtml,
+        ctaLabel: finalLabel,
+        ctaUrl: finalUrl,
+        originUrl: window.location.origin
+      })
+    }).catch(() => {});
+  }
+
   return msg;
 }
 
@@ -5818,6 +6001,11 @@ function saveState() {
         freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed)
       };
       saveUsersDB(db);
+      clearTimeout(cloudSyncDebounceTimer);
+      const accountSnapshot = db[emailKey];
+      cloudSyncDebounceTimer = setTimeout(() => {
+        syncAccountToCloud(accountSnapshot);
+      }, 450);
     }
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -8397,6 +8585,14 @@ function completeVipMembershipPurchase(tier = 'monthly', gateway = 'PayPal') {
     }
 
     saveState();
+    recordPurchaseInCloudWebhook({
+      userEmail,
+      itemType: 'vip',
+      itemId: normalizedTier,
+      amountUSD: price,
+      gateway,
+      externalPaymentId: orderNum
+    });
     renderHeaderAndStats();
     renderSkillsGrid();
     showToast(`👑 ¡Pago confirmado vía ${gateway}! Bienvenido a ${planLabel} (+${bonusVp} VP y +${bonusPts} PTS).`);
@@ -8485,6 +8681,14 @@ function completeIndividualCoursePurchase(skillId, gateway = 'PayPal') {
     }
 
     saveState();
+    recordPurchaseInCloudWebhook({
+      userEmail,
+      itemType: 'course',
+      itemId: skill.id,
+      amountUSD: skill.priceUSD,
+      gateway,
+      externalPaymentId: orderNum
+    });
     renderHeaderAndStats();
     renderSkillsGrid();
     showToast(`🎉 ¡Pago procesado con ${gateway}! Curso "${skill.title}" desbloqueado de por vida.`);
@@ -11380,6 +11584,184 @@ window.toggleMyVipStatusAdmin = function () {
   );
 };
 
+window.openCloudConfigModal = async function () {
+  if (!isAdminModeActive && !devControlsVisible) {
+    showSkillVaultErrorScreen('403');
+    return;
+  }
+
+  let modal = document.getElementById('cloud-config-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'cloud-config-modal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-window mobile-friendly-modal" style="max-width: 600px;">
+        <div class="modal-header">
+          <div class="modal-badge-row">
+            <span class="modal-cat-badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">☁️ Infraestructura Cloud • Supabase + Resend + Webhooks</span>
+          </div>
+          <button class="modal-close" type="button" onclick="closeCloudConfigModal()">✕</button>
+        </div>
+        <h2>Base de Datos en la Nube, Correos Reales y Webhooks</h2>
+        <p class="modal-sponsor">Conecta tu proyecto de <strong>Supabase</strong> (sincronización entre PC/Celular), <strong>Resend</strong> (emails reales) y tus <strong>Webhooks de MercadoPago/PayPal</strong>. También puedes configurarlos como Variables de Entorno en Vercel.</p>
+        <div id="cloud-status-pill-box" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-size: 12.5px; line-height: 1.6;">
+          🔄 Comprobando estado de endpoints Serverless (<code>/api/cloud-sync</code>, <code>/api/send-email</code>, <code>/api/payment-webhook</code>)...
+        </div>
+        <form id="cloud-settings-form" class="mobile-modal-form">
+          <div class="form-group">
+            <label for="cloud-cfg-sb-url">🗄️ SUPABASE_URL (URL de tu proyecto en Supabase)</label>
+            <input type="url" id="cloud-cfg-sb-url" placeholder="https://xyzcompany.supabase.co" />
+          </div>
+          <div class="form-group">
+            <label for="cloud-cfg-sb-key">🔑 SUPABASE_ANON_KEY / SERVICE_ROLE_KEY</label>
+            <input type="password" id="cloud-cfg-sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+          </div>
+          <div class="form-group">
+            <label for="cloud-cfg-resend-key">📨 RESEND_API_KEY (Envío de correos reales en Resend.com)</label>
+            <input type="password" id="cloud-cfg-resend-key" placeholder="re_123456789..." />
+          </div>
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 12px; color: #cbd5e1;">
+            🔗 <strong>URL de tu Webhook para pegar en MercadoPago / PayPal:</strong><br/>
+            <code style="color: #34d399; word-break: break-all;">${window.location.origin}/api/payment-webhook</code>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+            <button type="button" class="btn-secondary" style="flex: 1; font-size: 12px; padding: 10px;" onclick="copySupabaseSchemaSQL()">
+              📋 Copiar SQL para Supabase
+            </button>
+            <button type="button" class="btn-secondary" style="flex: 1; font-size: 12px; padding: 10px; border-color: #10b981; color: #6ee7b7;" onclick="syncAllLocalDataToSupabase()">
+              🔄 Migrar Base Local a la Nube Ahora
+            </button>
+          </div>
+          <button type="submit" class="btn-primary-full">💾 Guardar y Activar Sincronización Cloud</button>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.classList.remove('open');
+    });
+    const form = modal.querySelector('#cloud-settings-form');
+    if (form) {
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        saveCloudConfig({
+          supabaseUrl: (document.getElementById('cloud-cfg-sb-url')?.value || '').trim(),
+          supabaseAnonKey: (document.getElementById('cloud-cfg-sb-key')?.value || '').trim(),
+          resendApiKey: (document.getElementById('cloud-cfg-resend-key')?.value || '').trim()
+        });
+        await window.syncAllLocalDataToSupabase(true);
+        closeCloudConfigModal();
+        showToast('☁️ ¡Configuración Cloud guardada y sincronizada con éxito!');
+      });
+    }
+  }
+
+  const cfg = loadCloudConfig();
+  const sbUrlEl = document.getElementById('cloud-cfg-sb-url');
+  const sbKeyEl = document.getElementById('cloud-cfg-sb-key');
+  const resendEl = document.getElementById('cloud-cfg-resend-key');
+  if (sbUrlEl) sbUrlEl.value = cfg.supabaseUrl || '';
+  if (sbKeyEl) sbKeyEl.value = cfg.supabaseAnonKey || '';
+  if (resendEl) resendEl.value = cfg.resendApiKey || '';
+
+  modal.classList.add('open');
+
+  // Consultar estado de los endpoints Serverless
+  const statusBox = document.getElementById('cloud-status-pill-box');
+  if (statusBox) {
+    try {
+      const [syncRes, whRes] = await Promise.all([
+        fetch('/api/cloud-sync?status=1', { headers: getCloudRequestHeaders() }).catch(() => null),
+        fetch('/api/payment-webhook', { headers: getCloudRequestHeaders() }).catch(() => null)
+      ]);
+      const syncData = syncRes && syncRes.ok ? await syncRes.json() : null;
+      const whData = whRes && whRes.ok ? await whRes.json() : null;
+      const cloudActive = Boolean((syncData && syncData.cloudConfigured) || (cfg.supabaseUrl && cfg.supabaseAnonKey));
+      const whActive = Boolean(whData && whData.webhookActive);
+      const emailActive = Boolean(cfg.resendApiKey);
+
+      statusBox.innerHTML = `
+        <div>🗄️ <strong>Base de Datos Multi-Dispositivo (Supabase):</strong> ${
+          cloudActive
+            ? '<span style="color:#34d399; font-weight:700;">CONECTADA Y ACTIVA</span>'
+            : '<span style="color:#fbbf24;">Modo Local Activo (Pega tu URL y Key de Supabase o configúralas en Vercel)</span>'
+        }</div>
+        <div>💳 <strong>Webhook Oficial Pagos (<code>/api/payment-webhook</code>):</strong> ${
+          whActive
+            ? '<span style="color:#34d399; font-weight:700;">OPERATIVO EN SERVIDOR</span>'
+            : '<span style="color:#38bdf8;">Listo para desplegar en Vercel</span>'
+        }</div>
+        <div>📨 <strong>Correos Transaccionales (Resend + Bandeja Integrada):</strong> ${
+          emailActive
+            ? '<span style="color:#34d399; font-weight:700;">RESEND CLOUD + BANDEJA ACTIVA</span>'
+            : '<span style="color:#38bdf8;">Bandeja Integrada Activa (Agrega RESEND_API_KEY para envío externo)</span>'
+        }</div>
+      `;
+    } catch (e) {}
+  }
+};
+
+window.closeCloudConfigModal = function () {
+  const modal = document.getElementById('cloud-config-modal');
+  if (modal) modal.classList.remove('open');
+};
+
+window.copySupabaseSchemaSQL = async function () {
+  try {
+    const res = await fetch('/supabase_schema.sql');
+    const sqlText = res.ok
+      ? await res.text()
+      : `-- Ejecuta el contenido de supabase_schema.sql en el SQL Editor de tu proyecto Supabase`;
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(sqlText);
+    }
+    showToast('📋 ¡Esquema SQL copiado al portapapeles! Pégalo en el SQL Editor de Supabase.');
+  } catch (e) {
+    showToast('📋 Abre el archivo supabase_schema.sql en la raíz del proyecto para copiar las tablas.');
+  }
+};
+
+window.syncAllLocalDataToSupabase = async function (silent = false) {
+  const users = loadUsersDB();
+  const tickets = loadJsonDB(SUPPORT_TICKETS_DB_KEY, []);
+  try {
+    const res = await fetch('/api/cloud-sync', {
+      method: 'POST',
+      headers: getCloudRequestHeaders(),
+      body: JSON.stringify({
+        action: 'bulk_sync',
+        users,
+        tickets
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok) {
+        if (!silent) {
+          showToast(`☁️ ¡Sincronizados ${data.syncedUsers || 0} alumnos y ${data.syncedTickets || 0} tickets en Supabase!`);
+        }
+        return;
+      }
+    }
+  } catch (e) {}
+
+  // Respaldo directo si se usa Supabase REST desde el navegador
+  const list = Object.values(users);
+  let count = 0;
+  for (const acc of list) {
+    const r = await syncAccountToCloud(acc);
+    if (r.ok) count++;
+  }
+  if (!silent) {
+    if (count > 0) {
+      showToast(`☁️ ¡Sincronizados ${count} perfiles en Supabase correctamente!`);
+    } else {
+      showToast('ℹ️ Configura SUPABASE_URL y SUPABASE_ANON_KEY primero para sincronizar con la nube.');
+    }
+  }
+};
+
 window.setDevControlsVisibility = function (visible) {
   devControlsVisible = Boolean(visible);
   const existingBar = document.getElementById('dynamic-admin-bar');
@@ -11406,12 +11788,15 @@ window.setDevControlsVisibility = function (visible) {
           <span style="font-size:18px;">🔐</span>
           <div>
             <strong style="font-size:13.5px; color:#fff; display:block;">Modo Propietario Activo (?admin=1) • Todo Desbloqueado + 99.999 PTS/VP</strong>
-            <span style="font-size:11.5px; color:var(--text-muted);">Tienes todos los cursos (incluidos secretos), módulos, cofres, soporte admin y auditoría.</span>
+            <span style="font-size:11.5px; color:var(--text-muted);">Tienes todos los cursos (incluidos secretos), módulos, cofres, soporte admin, Cloud DB y auditoría.</span>
           </div>
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:8px;">
           <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px; border-color:#10b981; color:#6ee7b7;" onclick="grantFullAdminSuperpowers(false)">
             ⚡ Recargar 99.999 PTS / VP + Todo Desbloqueado
+          </button>
+          <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px; border-color:#c084fc; color:#e9d5ff;" onclick="openCloudConfigModal()">
+            ☁️ Cloud, Base de Datos & Webhooks
           </button>
           <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="openPaymentSettingsModal()">
             💳 Configurar Cobros (PayPal / Alias MP)
@@ -11542,6 +11927,20 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSkillsGrid();
   renderDictionary();
 
+  // Sincronización automática inicial desde la nube (Supabase) si hay sesión activa
+  if (state.userAccount && state.userAccount.email) {
+    fetchAccountFromCloud(state.userAccount.email)
+      .then(cloudAcc => {
+        if (cloudAcc && cloudAcc.email) {
+          const db = loadUsersDB();
+          db[cloudAcc.email.toLowerCase()] = cloudAcc;
+          saveUsersDB(db);
+          applyUserProfileToState(cloudAcc);
+        }
+      })
+      .catch(() => {});
+  }
+
   const navButtons = document.querySelectorAll('.nav-item');
 
   function switchTab(tabName) {
@@ -11602,10 +12001,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Submit de Login / Registro / Recuperar Contraseña (#auth-form)
+  // Submit de Login / Registro / Recuperar Contraseña (#auth-form) con soporte Cloud Multi-Dispositivo
   const authForm = document.getElementById('auth-form');
   if (authForm) {
-    authForm.addEventListener('submit', e => {
+    authForm.addEventListener('submit', async e => {
       e.preventDefault();
       showAuthFeedback('');
 
@@ -11616,6 +12015,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const resetToken = (document.getElementById('auth-reset-token-input')?.value || '').trim();
 
       const db = loadUsersDB();
+
+      // Si el correo no está aún en este dispositivo, consultar en la nube (Supabase) para login/recuperación multi-dispositivo
+      if (email && email.includes('@') && !db[email]) {
+        const cloudAcc = await fetchAccountFromCloud(email);
+        if (cloudAcc && cloudAcc.email) {
+          db[email] = cloudAcc;
+          saveUsersDB(db);
+        }
+      }
 
       // MODO 1: CREAR CUENTA NUEVA + ENVIAR VERIFICACIÓN DE CORREO
       if (currentAuthMode === 'register') {
@@ -11694,12 +12102,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         db[email] = newAccount;
         saveUsersDB(db);
+        syncAccountToCloud(newAccount);
         applyUserProfileToState(newAccount);
         createAndSendEmailVerificationLink(email, rawName);
 
         authForm.reset();
         closeAuthModal();
-        showToast(`✨ ¡Cuenta creada, ${newAccount.name}! Te enviamos un correo de verificación (revisa 📬 Bandeja de Correos).`);
+        showToast(`✨ ¡Cuenta creada, ${newAccount.name}! Te enviamos un correo de verificación (revisa tu correo o 📬 Bandeja de Correos).`);
         return;
       }
 
@@ -11756,7 +12165,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Mensaje idéntico exista o no exista el correo (Prevención de enumeración de usuarios)
         showAuthFeedback(
-          '✅ Si el correo ingresado está registrado en SkillVault, recibirás un enlace seguro para restablecer tu contraseña en unos instantes (válido por 15 minutos). Revisa tu Bandeja de Correos (📬).',
+          '✅ Si el correo ingresado está registrado en SkillVault, recibirás un enlace seguro para restablecer tu contraseña en unos instantes (válido por 15 minutos). Revisa tu correo o tu Bandeja de Correos (📬).',
           'success'
         );
         return;
@@ -11793,6 +12202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         db[targetEmail].passwordHash = hashPassword(password);
         db[targetEmail].passwordUpdatedAt = new Date().toISOString();
         saveUsersDB(db);
+        syncAccountToCloud(db[targetEmail]);
 
         tokenRecord.used = true;
         tokenRecord.usedAt = Date.now();
@@ -11812,11 +12222,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // MODO 4: INICIAR SESIÓN (LOGIN CON LÍMITE DE INTENTOS Y MENSAJE NO ENUMERADOR)
+      // MODO 4: INICIAR SESIÓN (LOGIN MULTI-DISPOSITIVO CON LÍMITE DE INTENTOS)
       const loginRl = checkAndRecordRateLimit(`login:${email}`, 5, 5 * 60 * 1000);
       if (!loginRl.allowed) {
         showAuthFeedback(`⏳ Demasiados intentos fallidos. Espera ${loginRl.retryAfterSec} segundos o recupera tu contraseña.`, 'error');
         return;
+      }
+
+      // Intentar traer versión más reciente de la nube antes de validar
+      const latestCloudAcc = await fetchAccountFromCloud(email);
+      if (latestCloudAcc && latestCloudAcc.email) {
+        db[email] = latestCloudAcc;
+        saveUsersDB(db);
       }
 
       const existingAccount = db[email];
@@ -11829,6 +12246,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       applyUserProfileToState(existingAccount);
+      syncAccountToCloud(existingAccount);
       authForm.reset();
       closeAuthModal();
       showToast(`👋 ¡Bienvenido de nuevo, ${existingAccount.name}! Se sincronizaron tus ${state.points} PTS y tu progreso.`);
@@ -11888,6 +12306,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const allTickets = loadJsonDB(SUPPORT_TICKETS_DB_KEY, []);
       allTickets.unshift(newTicket);
       saveJsonDB(SUPPORT_TICKETS_DB_KEY, allTickets);
+      syncSupportTicketToCloud(newTicket);
 
       sendTransactionalEmail({
         to: email,
@@ -11915,10 +12334,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Submit de Conexión de Cuenta Google (#google-oauth-form)
+  // Submit de Conexión de Cuenta Google (#google-oauth-form) con soporte Cloud
   const googleForm = document.getElementById('google-oauth-form');
   if (googleForm) {
-    googleForm.addEventListener('submit', e => {
+    googleForm.addEventListener('submit', async e => {
       e.preventDefault();
       const email = document.getElementById('google-email-input').value.trim().toLowerCase();
       const rawName = document.getElementById('google-name-input').value.trim();
@@ -11935,6 +12354,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const db = loadUsersDB();
+      if (!db[email]) {
+        const cloudAcc = await fetchAccountFromCloud(email);
+        if (cloudAcc && cloudAcc.email) {
+          db[email] = cloudAcc;
+          saveUsersDB(db);
+        }
+      }
       const existing = db[email];
 
       if (existing) {
@@ -11948,6 +12374,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         existing.emailVerified = true;
         saveUsersDB(db);
+        syncAccountToCloud(existing);
         applyUserProfileToState(existing);
         googleForm.reset();
         closeGoogleOAuthModal();
@@ -11978,6 +12405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         db[email] = newGoogleAcc;
         saveUsersDB(db);
+        syncAccountToCloud(newGoogleAcc);
         applyUserProfileToState(newGoogleAcc);
         googleForm.reset();
         closeGoogleOAuthModal();
