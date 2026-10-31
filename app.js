@@ -5385,28 +5385,166 @@ const STANDARD_REWARDS = [
 
 const STORAGE_KEY = 'skillvault_academy_v4';
 const USERS_DB_KEY = 'skillvault_accounts_db_v1';
+const RESET_TOKENS_DB_KEY = 'skillvault_reset_tokens_v1';
+const VERIFY_TOKENS_DB_KEY = 'skillvault_verify_tokens_v1';
+const RATE_LIMITS_DB_KEY = 'skillvault_rate_limits_v1';
+const MAILBOX_DB_KEY = 'skillvault_mailbox_db_v1';
+const PURCHASES_DB_KEY = 'skillvault_purchases_db_v1';
+const SUPPORT_TICKETS_DB_KEY = 'skillvault_support_tickets_v1';
+const ANOMALY_LOGS_DB_KEY = 'skillvault_anomaly_logs_v1';
 
-function loadUsersDB() {
+function loadJSONFromStorage(key, fallback = {}) {
   try {
-    const raw = localStorage.getItem(USERS_DB_KEY);
-    return raw ? JSON.parse(raw) : {};
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
   } catch (e) {
-    return {};
+    return fallback;
   }
 }
 
+function saveJSONToStorage(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch (e) {
+    console.error('Error guardando en storage:', e);
+  }
+}
+
+function loadUsersDB() {
+  return loadJSONFromStorage(USERS_DB_KEY, {});
+}
+
 function saveUsersDB(db) {
-  localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
+  saveJSONToStorage(USERS_DB_KEY, db);
 }
 
 function hashPassword(rawPass) {
+  let h1 = 2166136261;
+  let h2 = 16777619;
+  const str = 'sv_salt_2026_v2_' + String(rawPass);
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    h1 ^= c;
+    h1 = Math.imul(h1, 16777619);
+    h2 ^= c + i;
+    h2 = Math.imul(h2, 2166136261);
+  }
+  return 'svh_' + (h1 >>> 0).toString(16) + '_' + (h2 >>> 0).toString(16);
+}
+
+function verifyPasswordHash(rawPass, storedHash) {
+  if (!storedHash) return false;
+  if (storedHash === hashPassword(rawPass)) return true;
+  // Compatibilidad con hashes v1 anteriores
   let h = 2166136261;
   const str = 'sv_salt_2026_' + String(rawPass);
   for (let i = 0; i < str.length; i++) {
     h ^= str.charCodeAt(i);
     h = Math.imul(h, 16777619);
   }
-  return 'svh_' + (h >>> 0).toString(16);
+  return storedHash === 'svh_' + (h >>> 0).toString(16);
+}
+
+function generateSecureToken(prefix = 'svtok') {
+  const arr = new Uint8Array(24);
+  if (window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(arr);
+  } else {
+    for (let i = 0; i < arr.length; i++) arr[i] = Math.floor(Math.random() * 256);
+  }
+  const hex = Array.from(arr, b => ('0' + b.toString(16)).slice(-2)).join('');
+  return `${prefix}_${Date.now().toString(36)}_${hex}`;
+}
+
+const loadJsonDB = loadJSONFromStorage;
+const saveJsonDB = saveJSONToStorage;
+
+function isCurrentUserEmailVerified() {
+  if (!state || !state.userAccount) return true;
+  if (state.userAccount.provider === 'Google') return true;
+  return Boolean(state.userAccount.emailVerified);
+}
+
+// Rate Limiting contra abusos (Login, Recuperación de contraseña, Reenvío de verificación, Soporte)
+function checkAndRecordRateLimit(bucketKey, maxAttempts = 3, windowMs = 15 * 60 * 1000) {
+  const allLimits = loadJSONFromStorage(RATE_LIMITS_DB_KEY, {});
+  const now = Date.now();
+  const timestamps = Array.isArray(allLimits[bucketKey])
+    ? allLimits[bucketKey].filter(ts => now - ts < windowMs)
+    : [];
+
+  if (timestamps.length >= maxAttempts) {
+    const oldest = timestamps[0];
+    const waitSec = Math.max(5, Math.ceil((windowMs - (now - oldest)) / 1000));
+    return { allowed: false, waitSeconds: waitSec, retryAfterSec: waitSec, remaining: 0 };
+  }
+
+  timestamps.push(now);
+  allLimits[bucketKey] = timestamps;
+  saveJSONToStorage(RATE_LIMITS_DB_KEY, allLimits);
+  return { allowed: true, waitSeconds: 0, retryAfterSec: 0, remaining: maxAttempts - timestamps.length };
+}
+
+// Motor criptográfico de integridad para el Sistema de Puntos (PTS, VP, XP)
+function computeWalletSignature(pts, vp, xp, ledgerLength, userEmail = 'guest') {
+  const payload = `sv_ledger_v1|${String(userEmail).toLowerCase()}|pts:${Number(pts)}|vp:${Number(vp)}|xp:${Number(xp)}|len:${Number(ledgerLength)}`;
+  return hashPassword(payload);
+}
+
+function logSecurityAnomaly(type, descriptionOrDetails, extraDetails = {}) {
+  const logs = loadJSONFromStorage(ANOMALY_LOGS_DB_KEY, []);
+  const desc = typeof descriptionOrDetails === 'string' ? descriptionOrDetails : JSON.stringify(descriptionOrDetails || {});
+  logs.unshift({
+    id: 'anom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    timestamp: new Date().toISOString(),
+    userEmail: (state && state.userAccount && state.userAccount.email) || 'invitado_local',
+    type,
+    description: desc,
+    details: extraDetails
+  });
+  saveJSONToStorage(ANOMALY_LOGS_DB_KEY, logs.slice(0, 150));
+}
+
+// Despachador de Correos Transaccionales (Verificación, Reset de Clave, Cancelación VIP, Soporte)
+function sendTransactionalEmail({ to, subject, category, bodyHtml, actionLabel = '', actionUrl = '', ctaLabel = '', ctaUrl = '' }) {
+  const mailbox = loadJSONFromStorage(MAILBOX_DB_KEY, []);
+  const nowIso = new Date().toISOString();
+  const finalLabel = ctaLabel || actionLabel || '';
+  const finalUrl = ctaUrl || actionUrl || '';
+  const msg = {
+    id: 'mail_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+    to: String(to || '').toLowerCase(),
+    subject,
+    category: category || 'Seguridad',
+    bodyHtml,
+    actionLabel: finalLabel,
+    actionUrl: finalUrl,
+    ctaLabel: finalLabel,
+    ctaUrl: finalUrl,
+    sentAt: nowIso,
+    createdAt: nowIso,
+    read: false
+  };
+  mailbox.unshift(msg);
+  saveJSONToStorage(MAILBOX_DB_KEY, mailbox.slice(0, 100));
+  updateMailboxCounterUI();
+  return msg;
+}
+
+function updateMailboxCounterUI() {
+  const pill = document.getElementById('mailbox-count-pill');
+  const shortcut = document.getElementById('auth-mailbox-shortcut');
+  const mailbox = loadJSONFromStorage(MAILBOX_DB_KEY, []);
+  const currentEmail = state && state.userAccount && state.userAccount.email
+    ? state.userAccount.email.toLowerCase()
+    : null;
+  const visibleMails = currentEmail
+    ? mailbox.filter(m => m.to === currentEmail)
+    : mailbox;
+  if (pill) pill.textContent = visibleMails.length;
+  if (shortcut && visibleMails.length > 0) {
+    shortcut.style.display = 'block';
+  }
 }
 
 let state = loadState();
@@ -5416,6 +5554,30 @@ let currentStepIndex = 0;
 let passedCheckpoints = {}; // { stepIndex: true }
 let selectedCheckAnswers = {}; // { stepIndex: optionIdx }
 let examAnswers = {}; // { questionIdx: optionIdx }
+let isRedeemingRewardLock = false;
+let isProcessingPaymentLock = false;
+
+function buildInitialLedgerForState(parsedObj) {
+  const email = (parsedObj.userAccount && parsedObj.userAccount.email) || 'guest';
+  const pts = typeof parsedObj.points === 'number' ? parsedObj.points : 100;
+  const vp = typeof parsedObj.vipPoints === 'number' ? parsedObj.vipPoints : 0;
+  const xp = typeof parsedObj.xp === 'number' ? parsedObj.xp : 100;
+  const initEntry = {
+    txId: 'tx_init_baseline',
+    idempotencyKey: `baseline:${email}`,
+    timestamp: new Date().toISOString(),
+    userEmail: email,
+    type: 'INITIAL_BALANCE',
+    deltaPTS: pts,
+    deltaVP: vp,
+    deltaXP: xp,
+    balanceAfterPTS: pts,
+    balanceAfterVP: vp,
+    balanceAfterXP: xp,
+    reason: 'Balance inicial sincronizado en cuenta'
+  };
+  return [initEntry];
+}
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -5423,26 +5585,47 @@ function loadState() {
     try {
       const parsed = JSON.parse(saved);
       if (!parsed.courseProgress) parsed.courseProgress = {};
+      if (!parsed.lastVisitedByCourse) parsed.lastVisitedByCourse = {};
+      if (!parsed.courseProgressPct) parsed.courseProgressPct = {};
+      if (!Array.isArray(parsed.purchases)) parsed.purchases = [];
       if (!parsed.trialCoursePurchased && Array.isArray(parsed.ownedCourses)) {
         parsed.ownedCourses = parsed.ownedCourses.filter(id => id !== 'py-automation');
+      }
+      if (!Array.isArray(parsed.pointsLedger) || parsed.pointsLedger.length === 0) {
+        parsed.pointsLedger = buildInitialLedgerForState(parsed);
+        const email = (parsed.userAccount && parsed.userAccount.email) || 'guest';
+        parsed.walletSignature = computeWalletSignature(
+          parsed.points,
+          parsed.vipPoints,
+          parsed.xp,
+          parsed.pointsLedger.length,
+          email
+        );
       }
       return parsed;
     } catch (e) {
       console.error(e);
     }
   }
-  return {
+  const defaultState = {
     points: 100,        // Puntos estándar iniciales (PTS)
     vipPoints: 0,       // Puntos Exclusivos VIP (👑 VP)
     xp: 100,
     streak: 4,
     isProMember: false, // Cuando es true, el usuario es VIP y gana VP
+    subscription: null, // { tier, planName, priceUSD, currency, paymentMethod, status, startedAt, currentPeriodEnd, autoRenew, cancelledAt }
+    purchases: [],      // Historial de compras y suscripciones del usuario activo
     ownedCourses: [],
     trialCoursePurchased: false,
     completedCourses: [],
     courseProgress: {}, // { skillId: [0, 1, ...] } módulos superados
+    courseProgressPct: {}, // { skillId: 50 } porcentaje exacto
+    lastVisitedByCourse: {}, // { skillId: { stepIndex: 2, lessonTitle: '...', updatedAt: '...' } }
+    lastActiveCourseId: null,
     unlockedRewards: [],
     customSkills: [],
+    pointsLedger: [],
+    walletSignature: '',
     ownerBalanceUSD: 485.00,
     ownerSalesCount: 14,
     ownerSubsCount: 8,
@@ -5470,6 +5653,142 @@ function loadState() {
       }
     ]
   };
+  defaultState.pointsLedger = buildInitialLedgerForState(defaultState);
+  defaultState.walletSignature = computeWalletSignature(100, 0, 100, 1, 'guest');
+  return defaultState;
+}
+
+// Verifica y protege el saldo de puntos contra manipulación desde el navegador (DevTools / LocalStorage)
+function verifyAndReconcileWallet() {
+  if (!state) return;
+  if (typeof isAdminModeActive !== 'undefined' && (isAdminModeActive || devControlsVisible)) {
+    return;
+  }
+  if (!Array.isArray(state.pointsLedger) || state.pointsLedger.length === 0) {
+    state.pointsLedger = buildInitialLedgerForState(state);
+  }
+  const email = (state.userAccount && state.userAccount.email) || 'guest';
+  const expectedPTS = Math.max(0, state.pointsLedger.reduce((acc, tx) => acc + (Number(tx.deltaPTS) || 0), 0));
+  const expectedVP = Math.max(0, state.pointsLedger.reduce((acc, tx) => acc + (Number(tx.deltaVP) || 0), 0));
+  const expectedXP = Math.max(0, state.pointsLedger.reduce((acc, tx) => acc + (Number(tx.deltaXP) || 0), 0));
+  const expectedSig = computeWalletSignature(expectedPTS, expectedVP, expectedXP, state.pointsLedger.length, email);
+
+  if (
+    state.points !== expectedPTS ||
+    state.vipPoints !== expectedVP ||
+    state.xp !== expectedXP ||
+    state.walletSignature !== expectedSig
+  ) {
+    logSecurityAnomaly(
+      'MANIPULACIÓN_PUNTOS_DETECTADA',
+      `Intento de alterar saldo en cliente detectado (Mostrado: ${state.points} PTS / ${state.vipPoints} VP / ${state.xp} XP vs Ledger: ${expectedPTS} PTS / ${expectedVP} VP / ${expectedXP} XP). Saldo restaurado al valor legítimo del servidor.`
+    );
+    state.points = expectedPTS;
+    state.vipPoints = expectedVP;
+    state.xp = expectedXP;
+    state.walletSignature = expectedSig;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+}
+
+// Registra una transacción atómica e idempotente de puntos (PTS, VP, XP)
+function recordPointsTransaction({ idempotencyKey, type, deltaPTS = 0, deltaVP = 0, deltaXP = 0, reason = '' }) {
+  verifyAndReconcileWallet();
+  if (!Array.isArray(state.pointsLedger)) {
+    state.pointsLedger = buildInitialLedgerForState(state);
+  }
+  const email = (state.userAccount && state.userAccount.email) || 'guest';
+
+  // Idempotencia estricta: impedir duplicación de recompensas o canjes repetidos
+  if (idempotencyKey && state.pointsLedger.some(tx => tx.idempotencyKey === idempotencyKey)) {
+    logSecurityAnomaly(
+      'SOLICITUD_DUPLICADA_IDEMPOTENCIA',
+      `Se bloqueó la repetición de operación con clave única: ${idempotencyKey}`
+    );
+    return { ok: false, duplicate: true, error: 'Esta operación o recompensa ya fue acreditada anteriormente.' };
+  }
+
+  // Verificar fondos suficientes en caso de descuento (canje)
+  if (deltaPTS < 0 && state.points + deltaPTS < 0) {
+    return { ok: false, error: 'Saldo insuficiente de Puntos Estándar (PTS).' };
+  }
+  if (deltaVP < 0 && state.vipPoints + deltaVP < 0) {
+    return { ok: false, error: 'Saldo insuficiente de Puntos Exclusivos VIP (VP).' };
+  }
+
+  // Detección de anomalías por volumen inusual (sin bloquear operaciones legítimas del sistema)
+  if (deltaPTS > 2000 && type !== 'ADMIN_GRANT') {
+    logSecurityAnomaly('MONTO_INUSUAL_BLOQUEADO', `Intento de acreditar ${deltaPTS} PTS en una sola operación (${reason}).`);
+    return { ok: false, error: 'Operación bloqueada por control de seguridad de economía virtual.' };
+  }
+
+  state.points = Math.max(0, state.points + deltaPTS);
+  state.vipPoints = Math.max(0, state.vipPoints + deltaVP);
+  state.xp = Math.max(0, state.xp + deltaXP);
+
+  const txRecord = {
+    txId: 'ptx_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+    idempotencyKey: idempotencyKey || `tx_${Date.now()}_${Math.random()}`,
+    timestamp: new Date().toISOString(),
+    userEmail: email,
+    type,
+    deltaPTS,
+    deltaVP,
+    deltaXP,
+    balancePTS: state.points,
+    balanceVP: state.vipPoints,
+    balanceXP: state.xp,
+    balanceAfterPTS: state.points,
+    balanceAfterVP: state.vipPoints,
+    balanceAfterXP: state.xp,
+    reason
+  };
+
+  state.pointsLedger.unshift(txRecord);
+  state.walletSignature = computeWalletSignature(
+    state.points,
+    state.vipPoints,
+    state.xp,
+    state.pointsLedger.length,
+    email
+  );
+  saveState();
+  return { ok: true, tx: txRecord };
+}
+
+// Verifica si la suscripción VIP sigue vigente o si su período pagado ya terminó tras una cancelación
+function checkAndSyncSubscriptionExpiry() {
+  if (!state || !state.subscription) return;
+  const sub = state.subscription;
+  if (sub.currentPeriodEnd) {
+    const endMs = new Date(sub.currentPeriodEnd).getTime();
+    if (!isNaN(endMs) && Date.now() >= endMs) {
+      if (sub.status === 'cancelled_at_period_end' || !sub.autoRenew) {
+        sub.status = 'expired';
+        state.isProMember = false;
+        saveState();
+      }
+    }
+  }
+}
+
+function isVipSubscriptionActive() {
+  if (typeof isAdminModeActive !== 'undefined' && (isAdminModeActive || devControlsVisible)) {
+    return true;
+  }
+  checkAndSyncSubscriptionExpiry();
+  if (!state.isProMember) return false;
+  if (state.subscription) {
+    const st = state.subscription.status;
+    if (st === 'expired' || st === 'revoked') return false;
+    if (state.subscription.currentPeriodEnd) {
+      const endMs = new Date(state.subscription.currentPeriodEnd).getTime();
+      if (!isNaN(endMs) && Date.now() >= endMs && !state.subscription.autoRenew) {
+        return false;
+      }
+    }
+  }
+  return Boolean(state.isProMember);
 }
 
 function saveState() {
@@ -5477,17 +5796,25 @@ function saveState() {
     const db = loadUsersDB();
     const emailKey = state.userAccount.email.toLowerCase();
     if (db[emailKey]) {
+      db[emailKey].emailVerified = Boolean(state.userAccount.emailVerified);
       db[emailKey].profile = {
         points: state.points,
         vipPoints: state.vipPoints,
         xp: state.xp,
         streak: state.streak,
         isProMember: state.isProMember,
+        subscription: state.subscription || null,
+        purchases: Array.isArray(state.purchases) ? state.purchases : [],
         ownedCourses: state.ownedCourses,
         trialCoursePurchased: Boolean(state.trialCoursePurchased),
         completedCourses: state.completedCourses,
-        courseProgress: state.courseProgress,
+        courseProgress: state.courseProgress || {},
+        courseProgressPct: state.courseProgressPct || {},
+        lastVisitedByCourse: state.lastVisitedByCourse || {},
+        lastActiveCourseId: state.lastActiveCourseId || null,
         unlockedRewards: state.unlockedRewards,
+        pointsLedger: state.pointsLedger || [],
+        walletSignature: state.walletSignature || '',
         freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed)
       };
       saveUsersDB(db);
@@ -5495,6 +5822,21 @@ function saveState() {
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
+
+// Sincronización automática entre pestañas/dispositivos en el mismo navegador
+window.addEventListener('storage', ev => {
+  if (ev.key === STORAGE_KEY && ev.newValue) {
+    try {
+      const updated = JSON.parse(ev.newValue);
+      if (updated) {
+        state = updated;
+        verifyAndReconcileWallet();
+        renderHeaderAndStats();
+        renderSkillsGrid();
+      }
+    } catch (e) {}
+  }
+});
 
 let simulateZeroCourses = false;
 
@@ -5511,6 +5853,7 @@ function getActiveCoursesCount() {
 
 function showToast(message) {
   const container = document.getElementById('toast-container');
+  if (!container) return;
   const toast = document.createElement('div');
   toast.className = 'toast';
   toast.textContent = message;
@@ -5519,6 +5862,7 @@ function showToast(message) {
 }
 
 function getLevelInfo() {
+  verifyAndReconcileWallet();
   const level = Math.floor(state.xp / 500) + 1;
   const xpInLevel = state.xp % 500;
   const ranks = [
@@ -5528,24 +5872,32 @@ function getLevelInfo() {
     'Maestro Platino',
     'Leyenda Diamante'
   ];
-  const rankTitle = state.isProMember
+  const vipActive = isVipSubscriptionActive();
+  const rankTitle = vipActive
     ? '👑 Miembro VIP PRO'
     : ranks[Math.min(level - 1, ranks.length - 1)];
   return { level, xpInLevel, nextXp: 500, rankTitle };
 }
 
+// Protección estricta de permisos de acceso a cursos pagos y exclusivos VIP
 function hasAccessToCourse(skill) {
   if (!skill) return false;
   if (typeof isAdminModeActive !== 'undefined' && (isAdminModeActive || devControlsVisible)) {
     return true;
   }
+  checkAndSyncSubscriptionExpiry();
+  const vipActive = isVipSubscriptionActive();
+
+  // Cursos secretos exclusivos VIP requieren haber canjeado la recompensa correspondiente
   if (skill.secretCourse) {
-    return state.unlockedRewards.includes(skill.requiredRewardId);
+    return Array.isArray(state.unlockedRewards) && state.unlockedRewards.includes(skill.requiredRewardId);
   }
+  // Curso de prueba: completo si tiene VIP activo, o lo compró individualmente, o ya lo completó legítimamente
   if (skill.isTrialCourse) {
-    return Boolean(state.isProMember || state.trialCoursePurchased || state.completedCourses.includes(skill.id));
+    return Boolean(vipActive || state.trialCoursePurchased || (Array.isArray(state.ownedCourses) && state.ownedCourses.includes(skill.id)) || state.completedCourses.includes(skill.id));
   }
-  if (skill.priceUSD === 0 || state.isProMember || state.ownedCourses.includes(skill.id)) {
+  // Cursos pagos individuales se conservan siempre en state.ownedCourses aunque termine una suscripción VIP
+  if (skill.priceUSD === 0 || vipActive || (Array.isArray(state.ownedCourses) && state.ownedCourses.includes(skill.id))) {
     return true;
   }
   return false;
@@ -5562,7 +5914,7 @@ function getTrialModulesLimit(skill) {
 
 function getPointsMultiplier() {
   let mult = 1;
-  if (state.isProMember) mult += 0.5;
+  if (isVipSubscriptionActive()) mult += 0.5;
   if (state.unlockedRewards.includes('rw-vip-badge')) mult += 0.25;
   return mult;
 }
@@ -5587,10 +5939,129 @@ function formatCourseDuration(minutes) {
   return `${mins} min`;
 }
 
+// Guardado automático de progreso por curso (lección completada, % de avance y última lección visitada)
+function autoSaveCourseProgress(skillId, visitedStepIndex = null) {
+  const skill = getAllSkills().find(s => s.id === skillId);
+  if (!skill) return;
+
+  if (!state.courseProgress) state.courseProgress = {};
+  if (!state.courseProgressPct) state.courseProgressPct = {};
+  if (!state.lastVisitedByCourse) state.lastVisitedByCourse = {};
+
+  const completedSteps = Array.isArray(state.courseProgress[skillId]) ? state.courseProgress[skillId] : [];
+  const isCompletedCourse = state.completedCourses.includes(skillId);
+  const totalLessons = skill.lessons.length || 1;
+  const pct = isCompletedCourse
+    ? 100
+    : Math.min(100, Math.round((completedSteps.length / totalLessons) * 100));
+
+  state.courseProgressPct[skillId] = pct;
+
+  if (visitedStepIndex !== null && typeof visitedStepIndex === 'number') {
+    const safeIdx = Math.max(0, Math.min(skill.lessons.length, visitedStepIndex));
+    const lessonObj = skill.lessons[safeIdx];
+    const lessonLabel = safeIdx === skill.lessons.length
+      ? 'Examen Final Integrador'
+      : (lessonObj && lessonObj.heading) || `Módulo ${safeIdx + 1}`;
+
+    state.lastVisitedByCourse[skillId] = {
+      stepIndex: safeIdx,
+      lessonTitle: lessonLabel,
+      progressPct: pct,
+      updatedAt: new Date().toISOString()
+    };
+    state.lastActiveCourseId = skillId;
+  }
+
+  saveState();
+  renderContinueLearningBanner();
+}
+
+function renderEmailVerificationTopBanner() {
+  const banner = document.getElementById('email-verification-top-banner');
+  if (!banner) return;
+
+  if (!state.userAccount || state.userAccount.emailVerified || state.userAccount.provider === 'Google') {
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+    return;
+  }
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="continue-learning-card" style="border-color: rgba(245, 158, 11, 0.5); background: linear-gradient(135deg, rgba(69, 26, 3, 0.65), rgba(15, 23, 42, 0.92));">
+      <div class="continue-learning-info">
+        <span class="status-badge pending">⚠️ Correo Pendiente de Verificación</span>
+        <h3>Verifica tu correo electrónico (${state.userAccount.email})</h3>
+        <p style="margin-bottom:0;">
+          Te enviamos un enlace seguro de confirmación al registrarte. Verifica tu correo para habilitar el canje de recompensas en la Bóveda y proteger tu cuenta.
+        </p>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="btn-secondary" onclick="openMailboxModal()">📬 Abrir Enlace de Verificación</button>
+        <button type="button" class="btn-primary-full gold-vip-cta" style="width:auto; padding:10px 16px;" onclick="resendVerificationEmail()">📩 Reenviar Correo</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderContinueLearningBanner() {
+  const banner = document.getElementById('continue-learning-banner');
+  if (!banner) return;
+
+  if (!state.lastVisitedByCourse || Object.keys(state.lastVisitedByCourse).length === 0) {
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+    return;
+  }
+
+  const targetId = state.lastActiveCourseId || Object.keys(state.lastVisitedByCourse)[0];
+  const skill = getAllSkills().find(s => s.id === targetId);
+  const lastVisit = state.lastVisitedByCourse[targetId];
+  if (!skill || !lastVisit || (!hasAccessToCourse(skill) && !skill.isTrialCourse)) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  const savedSteps = (state.courseProgress && state.courseProgress[skill.id]) || [];
+  const isDone = state.completedCourses.includes(skill.id);
+  const doneCount = isDone ? skill.lessons.length : savedSteps.length;
+  const pct = isDone ? 100 : Math.min(100, Math.round((doneCount / skill.lessons.length) * 100));
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="continue-learning-card">
+      <div class="continue-learning-info">
+        <span class="skill-cat-tag">💾 PROGRESO GUARDADO AUTOMÁTICAMENTE • ${pct}% COMPLETADO</span>
+        <h3>Continuar donde lo dejaste: ${skill.title}</h3>
+        <p>
+          Última lección visitada: <strong>${lastVisit.lessonTitle}</strong> (${doneCount} de ${skill.lessons.length} módulos aprobados).
+        </p>
+        <div class="course-progress-bar" style="max-width: 420px; height: 8px;" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso del curso ${pct}%">
+          <div class="course-progress-fill" style="width: ${pct}%;"></div>
+        </div>
+      </div>
+      <div>
+        <button type="button" class="btn-primary-full" style="white-space: nowrap; padding: 12px 20px;" onclick="resumeCourseAtLastLesson('${skill.id}')">
+          ▶ Continuar desde ${lastVisit.stepIndex === skill.lessons.length ? 'el Examen Final' : `Módulo ${lastVisit.stepIndex + 1}`}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+window.resumeCourseAtLastLesson = function (skillId) {
+  const visit = state.lastVisitedByCourse && state.lastVisitedByCourse[skillId];
+  openSkillModal(skillId, visit && typeof visit.stepIndex === 'number' ? visit.stepIndex : null);
+};
+
 // Actualizar UI general
 function renderHeaderAndStats() {
+  verifyAndReconcileWallet();
+  checkAndSyncSubscriptionExpiry();
   const lvl = getLevelInfo();
   const isZeroCatalog = getActiveCoursesCount() === 0;
+  const vipActive = isVipSubscriptionActive();
 
   document.getElementById('user-level').textContent = lvl.level;
   document.getElementById('user-rank-title').textContent = lvl.rankTitle;
@@ -5599,7 +6070,7 @@ function renderHeaderAndStats() {
   document.getElementById('user-next-xp').textContent = lvl.nextXp;
   document.getElementById('xp-bar-fill').style.width = `${(lvl.xpInLevel / lvl.nextXp) * 100}%`;
 
-  document.getElementById('vip-status-tag').textContent = state.isProMember
+  document.getElementById('vip-status-tag').textContent = vipActive
     ? '👑 VIP Activo (+VP)'
     : 'Cuenta Estándar';
 
@@ -5659,7 +6130,7 @@ function renderHeaderAndStats() {
       buyIndivBtn.disabled = false;
     }
     if (buyProBtn) {
-      if (state.isProMember) {
+      if (vipActive) {
         buyProBtn.textContent = '👑 Membresía VIP PRO Activa (Ganas Puntos Exclusivos VP)';
         buyProBtn.disabled = true;
       } else {
@@ -5668,7 +6139,7 @@ function renderHeaderAndStats() {
       }
     }
     if (buyFounderBtn) {
-      if (state.isProMember) {
+      if (vipActive) {
         buyFounderBtn.textContent = '👑 Cuenta VIP Activa (Todos los Cursos Desbloqueados)';
         buyFounderBtn.disabled = true;
       } else {
@@ -5680,13 +6151,13 @@ function renderHeaderAndStats() {
 
   const topVipBtn = document.getElementById('top-vip-cta-btn');
   if (topVipBtn) {
-    topVipBtn.textContent = state.isProMember ? '👑 Miembro VIP Activo' : '👑 Hacerse VIP';
-    topVipBtn.classList.toggle('vip-active-btn', state.isProMember);
+    topVipBtn.textContent = vipActive ? '👑 Miembro VIP Activo' : '👑 Hacerse VIP';
+    topVipBtn.classList.toggle('vip-active-btn', vipActive);
   }
 
   const heroVipBtn = document.getElementById('hero-vip-btn');
   if (heroVipBtn) {
-    heroVipBtn.textContent = state.isProMember
+    heroVipBtn.textContent = vipActive
       ? '👑 Pase VIP PRO Activo — Ver Beneficios'
       : '👑 Ver Pase VIP PRO';
   }
@@ -5700,12 +6171,18 @@ function renderHeaderAndStats() {
 
   const sidebarVipBtn = document.getElementById('sidebar-vip-btn');
   if (sidebarVipBtn) {
-    sidebarVipBtn.style.display = state.isProMember ? 'none' : '';
+    sidebarVipBtn.style.display = vipActive ? 'none' : '';
   }
 
+  updateMailboxCounterUI();
+  renderEmailVerificationTopBanner();
+  renderContinueLearningBanner();
   renderFeaturedSkill();
   renderRewardsVault();
   renderUnlockedItems();
+  if (typeof renderHelpCenterAndSupport === 'function') {
+    renderHelpCenterAndSupport();
+  }
 }
 
 function renderFeaturedSkill() {
@@ -5752,7 +6229,7 @@ function renderFeaturedSkill() {
     </div>
     ${unlocked || trialHalf
       ? `<button class="btn-start-skill" onclick="openSkillModal('${nextSkill.id}')">
-            ${completed ? '✅ Repasar Módulos' : `▶ Cursar ${nextSkill.lessons.length} Módulos (+${nextSkill.pointsReward} PTS ${state.isProMember ? `y +${nextSkill.vipPointsReward} VP` : ''})`}
+            ${completed ? '✅ Repasar Módulos' : `▶ Cursar ${nextSkill.lessons.length} Módulos (+${nextSkill.pointsReward} PTS ${isVipSubscriptionActive() ? `y +${nextSkill.vipPointsReward} VP` : ''})`}
            </button>`
       : `<button class="btn-start-skill buy-btn" onclick="buyCourse('${nextSkill.id}')">
             🔓 Comprar Curso Completo por $${nextSkill.priceUSD.toFixed(2)} USD
@@ -6449,9 +6926,11 @@ function refreshNaturalSpanishVoices() {
   cachedNaturalSpanishVoices = getRankedNaturalSpanishVoices();
 }
 
-if ('speechSynthesis' in window) {
+if ('speechSynthesis' in window && window.speechSynthesis) {
   refreshNaturalSpanishVoices();
-  window.speechSynthesis.addEventListener('voiceschanged', refreshNaturalSpanishVoices);
+  if (typeof window.speechSynthesis.addEventListener === 'function') {
+    window.speechSynthesis.addEventListener('voiceschanged', refreshNaturalSpanishVoices);
+  }
 }
 
 function getSelectedNaturalVoice() {
@@ -7802,31 +8281,217 @@ window.purchaseProMembership = function (tier = 'monthly') {
   window.handlePlanCTA(tier);
 };
 
-function completeVipMembershipPurchase(tier = 'monthly', gateway = 'Stripe') {
-  const isAnnual = tier === 'annual';
+function recordPurchaseAndInvoice(purchaseEntry) {
+  if (!Array.isArray(state.purchases)) state.purchases = [];
+  if (state.purchases.some(p => p.id === purchaseEntry.id)) return purchaseEntry;
+  state.purchases.unshift(purchaseEntry);
+
+  const globalPurchases = loadJsonDB(PURCHASES_DB_KEY, []);
+  if (!globalPurchases.some(p => p.id === purchaseEntry.id)) {
+    globalPurchases.unshift(purchaseEntry);
+    saveJsonDB(PURCHASES_DB_KEY, globalPurchases);
+  }
+  return purchaseEntry;
+}
+
+function completeVipMembershipPurchase(tier = 'monthly', gateway = 'PayPal') {
+  if (isProcessingPaymentLock) {
+    showToast('⏳ Procesando pago en curso, por favor espera...');
+    return;
+  }
+  const isAnnual = tier === 'annual' || tier === 'founder';
+  const normalizedTier = isAnnual ? 'annual' : 'monthly';
   const price = isAnnual ? 129.00 : 49.00;
   const bonusPts = isAnnual ? 800 : 300;
   const bonusVp = isAnnual ? 350 : 120;
   const planLabel = isAnnual ? 'Pase VIP Founder Anual' : 'Pase VIP PRO Mensual';
 
-  state.isProMember = true;
-  state.points += bonusPts;
-  state.vipPoints += bonusVp;
-  state.ownerBalanceUSD += price;
-  state.ownerSubsCount += 1;
+  // Evitar compras duplicadas de la misma suscripción activa
+  if (
+    state.subscription &&
+    state.subscription.status === 'active' &&
+    state.subscription.autoRenew !== false &&
+    state.subscription.tier === normalizedTier &&
+    isVipSubscriptionActive()
+  ) {
+    showToast(`ℹ️ Ya tienes una suscripción activa de "${planLabel}". No se realizó un cobro duplicado.`);
+    return;
+  }
 
-  state.ownerTransactions.unshift({
-    id: 'otx-pro-' + Date.now(),
-    title: `👑 Suscripción vía ${gateway}: ${planLabel} (+${bonusVp} VP entregados)`,
-    date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    amount: price,
-    type: 'positive'
-  });
+  isProcessingPaymentLock = true;
+  try {
+    const nowMs = Date.now();
+    const durationDays = isAnnual ? 365 : 30;
+    const periodEndIso = new Date(nowMs + durationDays * 24 * 60 * 60 * 1000).toISOString();
+    const userEmail = (state.userAccount && state.userAccount.email) || 'invitado@skillvault.local';
+    const orderNum = 'SV-ORD-' + String(nowMs).slice(-6);
+    const invoiceNum = 'FAC-2026-' + String(nowMs).slice(-6);
 
-  saveState();
-  renderHeaderAndStats();
-  renderSkillsGrid();
-  showToast(`👑 ¡Pago confirmado vía ${gateway}! Bienvenido a ${planLabel} (+${bonusVp} VP y +${bonusPts} PTS).`);
+    state.isProMember = true;
+    state.subscription = {
+      id: 'sub_' + normalizedTier + '_' + nowMs,
+      tier: normalizedTier,
+      planName: planLabel,
+      priceUSD: price,
+      currency: 'USD',
+      paymentMethod: gateway,
+      status: 'active',
+      startedAt: new Date(nowMs).toISOString(),
+      currentPeriodEnd: periodEndIso,
+      autoRenew: true,
+      cancelledAt: null
+    };
+
+    recordPointsTransaction({
+      idempotencyKey: `vip_bonus:${userEmail}:${state.subscription.id}`,
+      type: 'VIP_BONUS',
+      deltaPTS: bonusPts,
+      deltaVP: bonusVp,
+      deltaXP: isAnnual ? 500 : 200,
+      reason: `Bono de suscripción ${planLabel} (${gateway})`
+    });
+
+    const purchaseRecord = recordPurchaseAndInvoice({
+      id: 'pur_' + nowMs,
+      orderNumber: orderNum,
+      invoiceNumber: invoiceNum,
+      userEmail,
+      userName: (state.userAccount && state.userAccount.name) || 'Estudiante SkillVault',
+      itemType: 'subscription',
+      itemId: 'vip_' + normalizedTier,
+      title: planLabel,
+      amount: price,
+      currency: 'USD',
+      paymentMethod: gateway,
+      status: 'approved',
+      date: new Date(nowMs).toISOString()
+    });
+
+    state.ownerBalanceUSD += price;
+    state.ownerSubsCount += 1;
+    state.ownerTransactions.unshift({
+      id: 'otx-pro-' + nowMs,
+      title: `👑 Suscripción vía ${gateway}: ${planLabel} (+${bonusVp} VP entregados)`,
+      date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      amount: price,
+      type: 'positive'
+    });
+
+    if (state.userAccount && state.userAccount.email) {
+      sendTransactionalEmail({
+        to: state.userAccount.email,
+        subject: `Recibo Oficial ${invoiceNum} — ${planLabel} Activo`,
+        category: 'FACTURACIÓN VIP',
+        bodyHtml: `
+          <p>Hola <strong>${state.userAccount.name || 'Estudiante'}</strong>,</p>
+          <p>Tu suscripción <strong>${planLabel}</strong> ha sido activada correctamente.</p>
+          <ul>
+            <li><strong>Comprobante:</strong> ${invoiceNum} (${orderNum})</li>
+            <li><strong>Importe:</strong> $${price.toFixed(2)} USD vía ${gateway}</li>
+            <li><strong>Próxima renovación:</strong> ${new Date(periodEndIso).toLocaleDateString('es-ES')}</li>
+          </ul>
+        `,
+        ctaLabel: 'Ver Comprobante en Mis Compras',
+        ctaUrl: '?tab=profile'
+      });
+    }
+
+    saveState();
+    renderHeaderAndStats();
+    renderSkillsGrid();
+    showToast(`👑 ¡Pago confirmado vía ${gateway}! Bienvenido a ${planLabel} (+${bonusVp} VP y +${bonusPts} PTS).`);
+    return purchaseRecord;
+  } finally {
+    isProcessingPaymentLock = false;
+  }
+}
+
+function completeIndividualCoursePurchase(skillId, gateway = 'PayPal') {
+  if (isProcessingPaymentLock) {
+    showToast('⏳ Procesando pago en curso, por favor espera...');
+    return;
+  }
+  const skill = getAllSkills().find(s => s.id === skillId);
+  if (!skill) {
+    showSkillVaultErrorScreen('course_load');
+    return;
+  }
+
+  // Evitar compras duplicadas del mismo curso individual
+  const alreadyOwnedIndividually =
+    state.ownedCourses.includes(skill.id) && (!skill.isTrialCourse || state.trialCoursePurchased);
+  if (alreadyOwnedIndividually) {
+    showToast(`ℹ️ Ya compraste "${skill.title}" anteriormente. Tu acceso vitalicio está activo.`);
+    return;
+  }
+
+  isProcessingPaymentLock = true;
+  try {
+    const nowMs = Date.now();
+    const userEmail = (state.userAccount && state.userAccount.email) || 'invitado@skillvault.local';
+    const orderNum = 'SV-ORD-' + String(nowMs).slice(-6);
+    const invoiceNum = 'FAC-2026-' + String(nowMs).slice(-6);
+
+    if (skill.isTrialCourse) {
+      state.trialCoursePurchased = true;
+    }
+    if (!state.ownedCourses.includes(skill.id)) {
+      state.ownedCourses.push(skill.id);
+    }
+
+    const purchaseRecord = recordPurchaseAndInvoice({
+      id: 'pur_course_' + skill.id + '_' + nowMs,
+      orderNumber: orderNum,
+      invoiceNumber: invoiceNum,
+      userEmail,
+      userName: (state.userAccount && state.userAccount.name) || 'Estudiante SkillVault',
+      itemType: 'course',
+      itemId: skill.id,
+      title: `Curso Completo: ${skill.title}`,
+      amount: skill.priceUSD,
+      currency: 'USD',
+      paymentMethod: gateway,
+      status: 'approved',
+      date: new Date(nowMs).toISOString()
+    });
+
+    state.ownerBalanceUSD += skill.priceUSD;
+    state.ownerSalesCount += 1;
+    state.ownerTransactions.unshift({
+      id: 'otx-' + nowMs,
+      title: `🎓 Venta vía ${gateway}: "${skill.title}"`,
+      date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      amount: skill.priceUSD,
+      type: 'positive'
+    });
+
+    if (state.userAccount && state.userAccount.email) {
+      sendTransactionalEmail({
+        to: state.userAccount.email,
+        subject: `Recibo Oficial ${invoiceNum} — Curso "${skill.title}"`,
+        category: 'COMPRA DE CURSO',
+        bodyHtml: `
+          <p>Hola <strong>${state.userAccount.name || 'Estudiante'}</strong>,</p>
+          <p>Confirmamos tu compra vitalicia del curso <strong>${skill.title}</strong>.</p>
+          <ul>
+            <li><strong>Comprobante:</strong> ${invoiceNum} (${orderNum})</li>
+            <li><strong>Importe:</strong> $${skill.priceUSD.toFixed(2)} USD vía ${gateway}</li>
+            <li><strong>Condición:</strong> Acceso vitalicio permanente (independiente de suscripciones VIP)</li>
+          </ul>
+        `,
+        ctaLabel: 'Ver Comprobante en Mis Compras',
+        ctaUrl: '?tab=profile'
+      });
+    }
+
+    saveState();
+    renderHeaderAndStats();
+    renderSkillsGrid();
+    showToast(`🎉 ¡Pago procesado con ${gateway}! Curso "${skill.title}" desbloqueado de por vida.`);
+    return purchaseRecord;
+  } finally {
+    isProcessingPaymentLock = false;
+  }
 }
 
 window.simulateStudentPurchase = function () {
@@ -7888,10 +8553,40 @@ function shuffleQuestionOptions(qObj, avoidIndex = null) {
   };
 }
 
-// Aula Interactiva Completa y Examen Multietapa
-window.openSkillModal = function (skillId) {
+// ==========================================================================
+// 7. PROTECCIÓN DE CURSOS DE PAGO Y 3. GUARDADO AUTOMÁTICO DE PROGRESO
+// ==========================================================================
+window.openSkillModal = function (skillId, requestedStepIdx = null) {
+  checkAndSyncSubscriptionExpiry(true);
   const baseSkill = getAllSkills().find(s => s.id === skillId);
-  if (!baseSkill) return;
+  if (!baseSkill) {
+    showSkillVaultErrorScreen('course_load', {
+      detail: `El curso solicitado ("${skillId || 'desconocido'}") no existe o no se encuentra disponible.`
+    });
+    return;
+  }
+
+  const isOwnerBypass = Boolean(isAdminModeActive || devControlsVisible);
+  const canOpen = isOwnerBypass || hasAccessToCourse(baseSkill) || Boolean(baseSkill.isTrialCourse);
+
+  if (!canOpen) {
+    logSecurityAnomaly('UNAUTHORIZED_COURSE_ACCESS', 'Intento de abrir curso de pago sin permiso ni suscripción activa.', {
+      skillId: baseSkill.id,
+      title: baseSkill.title
+    });
+    if (baseSkill.secretCourse) {
+      showSkillVaultErrorScreen('403', {
+        title: `Curso Exclusivo VIP Bloqueado: ${baseSkill.title}`,
+        detail: 'Este laboratorio secreto requiere una suscripción VIP activa y el canje de su cofre correspondiente en la Bóveda de Recompensas.',
+        primaryActionLabel: '👑 Ver Planes VIP',
+        primaryActionFn: "switchAppTab('plans')"
+      });
+    } else {
+      buyCourse(baseSkill.id);
+      showToast(`🔒 Debes adquirir "${baseSkill.title}" o activar tu Pase VIP PRO para acceder al aula.`);
+    }
+    return;
+  }
 
   // Clonamos el curso y mezclamos las opciones de todos los checkpoints y del examen final
   const skillClone = JSON.parse(JSON.stringify(baseSkill));
@@ -7905,7 +8600,7 @@ window.openSkillModal = function (skillId) {
   });
 
   if (skillClone.quiz && Array.isArray(skillClone.quiz.questions)) {
-    let lastExamIdx = 0; // Evita que la primera pregunta del examen sea siempre A y que dos seguidas tengan la misma letra
+    let lastExamIdx = 0;
     skillClone.quiz.questions = skillClone.quiz.questions.map(q => {
       const shuffled = shuffleQuestionOptions(q, lastExamIdx);
       lastExamIdx = shuffled.correctIndex;
@@ -7929,18 +8624,29 @@ window.openSkillModal = function (skillId) {
     }
   });
 
-  if (state.completedCourses.includes(skillId)) {
-    currentStepIndex = 0;
+  const savedLastVisit = state.lastVisitedByCourse && state.lastVisitedByCourse[skillId];
+
+  if (typeof requestedStepIdx === 'number' && requestedStepIdx >= 0) {
+    currentStepIndex = requestedStepIdx;
+  } else if (state.completedCourses.includes(skillId)) {
+    currentStepIndex = savedLastVisit && typeof savedLastVisit.stepIndex === 'number' ? savedLastVisit.stepIndex : 0;
   } else {
     const firstPending = currentSkill.lessons.findIndex((_, idx) => !passedCheckpoints[idx]);
     const rawStep = firstPending === -1 ? currentSkill.lessons.length : firstPending;
-    if (isTrialHalfOnly(currentSkill)) {
-      const trialLimit = getTrialModulesLimit(currentSkill);
-      currentStepIndex = Math.min(rawStep, trialLimit);
-    } else {
-      currentStepIndex = rawStep;
-    }
+    const candidateStep =
+      savedLastVisit && typeof savedLastVisit.stepIndex === 'number' && savedLastVisit.stepIndex <= rawStep
+        ? savedLastVisit.stepIndex
+        : rawStep;
+    currentStepIndex = candidateStep;
   }
+
+  if (!isOwnerBypass && isTrialHalfOnly(currentSkill)) {
+    const trialLimit = getTrialModulesLimit(currentSkill);
+    currentStepIndex = Math.min(currentStepIndex, trialLimit);
+  }
+
+  // Guardado automático de última lección visitada al abrir
+  autoSaveCourseProgress(skillId, currentStepIndex);
 
   const mult = getPointsMultiplier();
   const finalPoints = Math.round(currentSkill.pointsReward * mult);
@@ -7949,7 +8655,7 @@ window.openSkillModal = function (skillId) {
 
   document.getElementById('modal-category').textContent = `${currentSkill.category} • ${currentSkill.lessons.length} Módulos Extensos (${formatCourseDuration(currentSkill.duration)}) + Examen (${questions.length} preguntas)`;
   document.getElementById('modal-points').textContent = `💎 +${finalPoints} PTS`;
-  document.getElementById('modal-vip-points').textContent = state.isProMember
+  document.getElementById('modal-vip-points').textContent = isVipSubscriptionActive()
     ? `👑 +${vpAmount} VP (VIP Activo)`
     : `🔒 +${vpAmount} VP (Solo VIP)`;
   document.getElementById('modal-title').textContent = currentSkill.title;
@@ -7960,8 +8666,13 @@ window.openSkillModal = function (skillId) {
 };
 
 window.jumpToModalStep = function (targetIdx) {
-  if (targetIdx < 0) return;
+  if (targetIdx < 0 || !currentSkill) return;
   const isOwnerBypass = Boolean(isAdminModeActive || devControlsVisible);
+  if (!isOwnerBypass && !hasAccessToCourse(currentSkill) && !currentSkill.isTrialCourse) {
+    document.getElementById('lesson-modal').classList.remove('open');
+    showSkillVaultErrorScreen('403');
+    return;
+  }
   const courseDone = isOwnerBypass || state.completedCourses.includes(currentSkill.id);
   const trialHalf = !isOwnerBypass && isTrialHalfOnly(currentSkill);
   const trialLimit = getTrialModulesLimit(currentSkill);
@@ -7980,12 +8691,14 @@ window.jumpToModalStep = function (targetIdx) {
 
   if (trialHalf && targetIdx >= trialLimit) {
     currentStepIndex = trialLimit;
+    autoSaveCourseProgress(currentSkill.id, currentStepIndex);
     renderModalStep();
     document.getElementById('modal-body').scrollTop = 0;
     return;
   }
 
   currentStepIndex = targetIdx;
+  autoSaveCourseProgress(currentSkill.id, currentStepIndex);
   renderModalStep();
   document.getElementById('modal-body').scrollTop = 0;
 };
@@ -8467,6 +9180,7 @@ function renderModalStep() {
 }
 
 window.answerLessonCheckpoint = function (optionIdx) {
+  if (!currentSkill) return;
   const lesson = currentSkill.lessons[currentStepIndex];
   if (!lesson || !lesson.checkpoint) return;
 
@@ -8479,10 +9193,10 @@ window.answerLessonCheckpoint = function (optionIdx) {
     }
     if (!state.courseProgress[currentSkill.id].includes(currentStepIndex)) {
       state.courseProgress[currentSkill.id].push(currentStepIndex);
-      saveState();
-      renderSkillsGrid();
     }
-    showToast(`✅ ¡Correcto! Módulo ${currentStepIndex + 1} verificado y progreso guardado.`);
+    autoSaveCourseProgress(currentSkill.id, currentStepIndex);
+    renderSkillsGrid();
+    showToast(`✅ ¡Correcto! Módulo ${currentStepIndex + 1} verificado y progreso guardado automáticamente.`);
   } else {
     passedCheckpoints[currentStepIndex] = false;
     showToast('❌ Respuesta incorrecta. Revisa la explicación del módulo e inténtalo de nuevo.');
@@ -8491,20 +9205,23 @@ window.answerLessonCheckpoint = function (optionIdx) {
 };
 
 window.prevLessonStep = function () {
-  if (currentStepIndex > 0) {
+  if (currentStepIndex > 0 && currentSkill) {
     currentStepIndex--;
+    autoSaveCourseProgress(currentSkill.id, currentStepIndex);
     renderModalStep();
     document.getElementById('modal-body').scrollTop = 0;
   }
 };
 
 window.nextLessonStep = function () {
+  if (!currentSkill) return;
   const lesson = currentSkill.lessons[currentStepIndex];
   if (lesson && lesson.checkpoint && !passedCheckpoints[currentStepIndex]) {
     showToast('⚠️ Debes responder correctamente la verificación del módulo antes de pasar al siguiente.');
     return;
   }
   currentStepIndex++;
+  autoSaveCourseProgress(currentSkill.id, currentStepIndex);
   renderModalStep();
   document.getElementById('modal-body').scrollTop = 0;
 };
@@ -8515,6 +9232,30 @@ window.selectExamAnswer = function (qIdx, optIdx) {
 };
 
 window.submitFinalExam = function () {
+  if (!currentSkill) return;
+  const isOwnerBypass = Boolean(isAdminModeActive || devControlsVisible);
+
+  // Verificar permisos del curso (Protección de cursos de pago)
+  if (!isOwnerBypass && !hasAccessToCourse(currentSkill)) {
+    logSecurityAnomaly('UNAUTHORIZED_EXAM_SUBMIT', 'Intento de enviar examen final sin acceso completo al curso.', {
+      skillId: currentSkill.id
+    });
+    document.getElementById('lesson-modal').classList.remove('open');
+    showSkillVaultErrorScreen('403');
+    return;
+  }
+
+  // Verificar que todos los módulos tengan su checkpoint aprobado
+  if (!isOwnerBypass) {
+    for (let i = 0; i < currentSkill.lessons.length; i++) {
+      const l = currentSkill.lessons[i];
+      if (l && l.checkpoint && !passedCheckpoints[i]) {
+        showToast(`⚠️ Debes completar y verificar el Módulo ${i + 1} antes de enviar el examen final.`);
+        return;
+      }
+    }
+  }
+
   const questions = getSkillQuestions(currentSkill);
   const answeredCount = Object.keys(examAnswers).length;
 
@@ -8524,12 +9265,9 @@ window.submitFinalExam = function () {
   }
 
   let correctCount = 0;
-  let firstWrongNumber = null;
   questions.forEach((q, idx) => {
     if (examAnswers[idx] === q.correctIndex) {
       correctCount++;
-    } else if (firstWrongNumber === null) {
-      firstWrongNumber = idx + 1;
     }
   });
 
@@ -8539,26 +9277,41 @@ window.submitFinalExam = function () {
   }
 
   const alreadyDone = state.completedCourses.includes(currentSkill.id);
+  const userEmail = (state.userAccount && state.userAccount.email) || 'invitado@skillvault.local';
+  const idempotencyKey = `course_exam:${userEmail}:${currentSkill.id}`;
+
   if (!alreadyDone) {
-    const earnedPoints = Math.round(currentSkill.pointsReward * getPointsMultiplier());
-    const earnedVIPPoints = state.isProMember ? (currentSkill.vipPointsReward || 50) : 0;
+    const canonicalSkill = getAllSkills().find(s => s.id === currentSkill.id) || currentSkill;
+    const earnedPoints = Math.round(canonicalSkill.pointsReward * getPointsMultiplier());
+    const earnedVIPPoints = isVipSubscriptionActive() ? (canonicalSkill.vipPointsReward || 50) : 0;
 
     state.completedCourses.push(currentSkill.id);
-    state.points += earnedPoints;
-    state.vipPoints += earnedVIPPoints;
-    state.xp += currentSkill.xp;
+    if (!state.courseProgress) state.courseProgress = {};
+    state.courseProgress[currentSkill.id] = currentSkill.lessons.map((_, idx) => idx);
+    autoSaveCourseProgress(currentSkill.id, currentSkill.lessons.length);
+
+    const txRes = recordPointsTransaction({
+      idempotencyKey,
+      type: 'EARN_COURSE',
+      deltaPTS: earnedPoints,
+      deltaVP: earnedVIPPoints,
+      deltaXP: canonicalSkill.xp || 300,
+      reason: `Curso 100% aprobado: ${canonicalSkill.title}`
+    });
 
     saveState();
     renderHeaderAndStats();
     renderSkillsGrid();
 
-    if (state.isProMember) {
+    if (txRes.duplicate) {
+      showToast(`ℹ️ Este curso ya había entregado sus puntos anteriormente. Tu progreso sigue al 100%.`);
+    } else if (isVipSubscriptionActive()) {
       showToast(`👑 ¡Examen superado (${correctCount}/${questions.length})! Ganaste +${earnedPoints} PTS y +${earnedVIPPoints} Puntos Exclusivos VIP (VP).`);
     } else {
-      showToast(`🎉 ¡Examen superado (${correctCount}/${questions.length})! Ganaste +${earnedPoints} PTS. (Activa VIP para ganar también Puntos VIP).`);
+      showToast(`🎉 ¡Examen superado (${correctCount}/${questions.length})! Ganaste +${earnedPoints} PTS.`);
     }
   } else {
-    showToast(`✅ ¡Examen repasado con éxito (${correctCount}/${questions.length})!`);
+    showToast(`✅ ¡Examen repasado con éxito (${correctCount}/${questions.length})! (Los puntos ya fueron acreditados en tu primera aprobación).`);
   }
 
   document.getElementById('lesson-modal').classList.remove('open');
@@ -8568,11 +9321,13 @@ window.submitFinalExam = function () {
 function renderRewardsVault() {
   const vipGrid = document.getElementById('vip-exclusive-rewards-grid');
   const stdGrid = document.getElementById('rewards-grid');
+  if (!vipGrid || !stdGrid) return;
+  const vipActive = isVipSubscriptionActive();
 
   // 1. Recompensas Exclusivas VIP (Solo con VP)
   vipGrid.innerHTML = EXCLUSIVE_VIP_REWARDS.map(rw => {
     const unlocked = state.unlockedRewards.includes(rw.id);
-    const canAfford = state.vipPoints >= rw.costVIPPoints && state.isProMember;
+    const canAfford = state.vipPoints >= rw.costVIPPoints && vipActive;
 
     return `
       <article class="skill-card vip-exclusive-card">
@@ -8587,7 +9342,7 @@ function renderRewardsVault() {
         <div>
           ${unlocked
         ? `<button class="btn-start-skill done" onclick="document.querySelector('[data-tab=certificates]').click()">✅ Desbloqueado (Ver en Cursos Completos & VIP)</button>`
-        : !state.isProMember
+        : !vipActive
           ? `<button class="btn-start-skill gold-btn" onclick="document.querySelector('[data-tab=plans]').click()">👑 Hazte Miembro VIP para Desbloquear (${rw.costVIPPoints} VP)</button>`
           : `<button class="btn-start-skill gold-btn" style="${!canAfford ? 'opacity:0.65' : ''}" onclick="redeemVIPReward('${rw.id}')">
                   👑 Canjear con ${rw.costVIPPoints} Puntos VIP (VP)
@@ -8626,44 +9381,109 @@ function renderRewardsVault() {
   }).join('');
 }
 
-// Canjear recompensa Exclusiva VIP usando `VP`
+// Canjear recompensa Exclusiva VIP usando `VP` con protección transaccional
 window.redeemVIPReward = function (rewardId) {
+  if (isRedeemingRewardLock) {
+    showToast('⏳ Procesando canje anterior, espera un momento...');
+    return;
+  }
   const rw = EXCLUSIVE_VIP_REWARDS.find(r => r.id === rewardId);
   if (!rw || state.unlockedRewards.includes(rewardId)) return;
 
-  if (!state.isProMember) {
-    showToast('👑 Esta recompensa es exclusiva para miembros VIP PRO.');
+  if (state.userAccount && !isCurrentUserEmailVerified()) {
+    showToast('📧 Por seguridad, debes verificar tu correo electrónico antes de canjear recompensas de la Bóveda.');
+    switchAppTab('profile');
     return;
   }
+
+  if (!isVipSubscriptionActive()) {
+    showToast('👑 Esta recompensa es exclusiva para miembros con suscripción VIP activa.');
+    return;
+  }
+
+  verifyAndReconcileWallet(true);
   if (state.vipPoints < rw.costVIPPoints) {
     showToast(`⚠️ Necesitas ${rw.costVIPPoints} Puntos Exclusivos VIP (VP). Tienes ${state.vipPoints} VP.`);
     return;
   }
 
-  state.vipPoints -= rw.costVIPPoints;
-  state.unlockedRewards.push(rw.id);
-  saveState();
-  renderHeaderAndStats();
-  renderSkillsGrid();
-  showToast(`👑 ¡Recompensa Élite "${rw.title}" desbloqueada con tus Puntos VIP!`);
+  isRedeemingRewardLock = true;
+  try {
+    const userEmail = (state.userAccount && state.userAccount.email) || 'invitado@skillvault.local';
+    const txRes = recordPointsTransaction({
+      idempotencyKey: `redeem_vip:${userEmail}:${rw.id}`,
+      type: 'REDEEM_VIP',
+      deltaPTS: 0,
+      deltaVP: -rw.costVIPPoints,
+      deltaXP: 0,
+      reason: `Canje Bóveda Élite VIP: ${rw.title}`
+    });
+
+    if (!txRes.ok) {
+      showToast(`❌ No se pudo completar el canje: ${txRes.error}`);
+      return;
+    }
+
+    if (!state.unlockedRewards.includes(rw.id)) {
+      state.unlockedRewards.push(rw.id);
+    }
+    saveState();
+    renderHeaderAndStats();
+    renderSkillsGrid();
+    showToast(`👑 ¡Recompensa Élite "${rw.title}" desbloqueada con ${rw.costVIPPoints} VP!`);
+  } finally {
+    isRedeemingRewardLock = false;
+  }
 };
 
-// Canjear recompensa Estándar usando `PTS`
+// Canjear recompensa Estándar usando `PTS` con protección transaccional
 window.redeemStandardReward = function (rewardId) {
+  if (isRedeemingRewardLock) {
+    showToast('⏳ Procesando canje anterior, espera un momento...');
+    return;
+  }
   const rw = STANDARD_REWARDS.find(r => r.id === rewardId);
   if (!rw || state.unlockedRewards.includes(rewardId)) return;
 
+  if (state.userAccount && !isCurrentUserEmailVerified()) {
+    showToast('📧 Por seguridad, debes verificar tu correo electrónico antes de canjear recompensas de la Bóveda.');
+    switchAppTab('profile');
+    return;
+  }
+
+  verifyAndReconcileWallet(true);
   if (state.points < rw.costPoints) {
     showToast(`⚠️ Necesitas ${rw.costPoints} PTS (tienes ${state.points} PTS).`);
     return;
   }
 
-  state.points -= rw.costPoints;
-  state.unlockedRewards.push(rw.id);
-  saveState();
-  renderHeaderAndStats();
-  renderSkillsGrid();
-  showToast(`💎 ¡Desbloqueaste "${rw.title}" con tus puntos PTS!`);
+  isRedeemingRewardLock = true;
+  try {
+    const userEmail = (state.userAccount && state.userAccount.email) || 'invitado@skillvault.local';
+    const txRes = recordPointsTransaction({
+      idempotencyKey: `redeem_std:${userEmail}:${rw.id}`,
+      type: 'REDEEM_STD',
+      deltaPTS: -rw.costPoints,
+      deltaVP: 0,
+      deltaXP: 0,
+      reason: `Canje Bóveda Estándar: ${rw.title}`
+    });
+
+    if (!txRes.ok) {
+      showToast(`❌ No se pudo completar el canje: ${txRes.error}`);
+      return;
+    }
+
+    if (!state.unlockedRewards.includes(rw.id)) {
+      state.unlockedRewards.push(rw.id);
+    }
+    saveState();
+    renderHeaderAndStats();
+    renderSkillsGrid();
+    showToast(`💎 ¡Desbloqueaste "${rw.title}" por ${rw.costPoints} PTS!`);
+  } finally {
+    isRedeemingRewardLock = false;
+  }
 };
 
 function renderUnlockedItems() {
@@ -8705,55 +9525,211 @@ function renderUnlockedItems() {
     }
   }
 
-  if (state.unlockedRewards.length === 0) {
-    container.innerHTML = `
-      <div class="certificate-card" style="grid-column: 1/-1;">
-        <h3>Aún no has canjeado recompensas de la bóveda</h3>
-        <p style="color:var(--text-muted); margin: 8px 0 16px;">Completa todos los módulos y exámenes de los cursos para ganar Puntos Estándar (PTS) o hazte miembro VIP para ganar Puntos Exclusivos VIP (👑 VP).</p>
-        <button class="btn-secondary" onclick="document.querySelector('[data-tab=rewards]').click()">Ir a la Bóveda de Canje 💎</button>
-      </div>
-    `;
-  } else {
-    container.innerHTML = state.unlockedRewards
-      .map(id => {
-        const rw = allRewards.find(r => r.id === id);
-        if (!rw) return '';
-        const isVip = Boolean(rw.costVIPPoints);
-        return `
-          <div class="certificate-card ${isVip ? 'gold-cert' : ''}">
-            <div class="card-top">
-              <span class="skill-cat-tag ${isVip ? 'gold-tag' : ''}">${rw.icon} ${rw.type}</span>
-              <span class="price-badge">${isVip ? '👑 ÉLITE VIP' : '✅ ACTIVO'}</span>
+  if (container) {
+    if (state.unlockedRewards.length === 0) {
+      container.innerHTML = `
+        <div class="certificate-card" style="grid-column: 1/-1;">
+          <h3>Aún no has canjeado recompensas de la bóveda</h3>
+          <p style="color:var(--text-muted); margin: 8px 0 16px;">Completa todos los módulos y exámenes de los cursos para ganar Puntos Estándar (PTS) o hazte miembro VIP para ganar Puntos Exclusivos VIP (👑 VP).</p>
+          <button class="btn-secondary" onclick="document.querySelector('[data-tab=rewards]').click()">Ir a la Bóveda de Canje 💎</button>
+        </div>
+      `;
+    } else {
+      container.innerHTML = state.unlockedRewards
+        .map(id => {
+          const rw = allRewards.find(r => r.id === id);
+          if (!rw) return '';
+          const isVip = Boolean(rw.costVIPPoints);
+          return `
+            <div class="certificate-card ${isVip ? 'gold-cert' : ''}">
+              <div class="card-top">
+                <span class="skill-cat-tag ${isVip ? 'gold-tag' : ''}">${rw.icon} ${rw.type}</span>
+                <span class="price-badge">${isVip ? '👑 ÉLITE VIP' : '✅ ACTIVO'}</span>
+              </div>
+              <h3 style="margin-bottom:8px;">${rw.title}</h3>
+              <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">${rw.description}</p>
+              <div class="lesson-code" style="margin-top:0;">${rw.deliverable}</div>
             </div>
-            <h3 style="margin-bottom:8px;">${rw.title}</h3>
-            <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">${rw.description}</p>
-            <div class="lesson-code" style="margin-top:0;">${rw.deliverable}</div>
-          </div>
-        `;
-      })
-      .join('');
+          `;
+        })
+        .join('');
+    }
   }
 
   renderStudentProfileAndSettings();
 }
 
+// ==========================================================================
+// 4. HISTORIAL DE COMPRAS Y 5. ADMINISTRACIÓN / CANCELACIÓN DE SUSCRIPCIONES VIP
+// ==========================================================================
+window.openCancelSubscriptionModal = function () {
+  const sub = state.subscription;
+  if (!sub || !isVipSubscriptionActive()) {
+    showToast('ℹ️ No tienes una suscripción VIP activa para cancelar.');
+    return;
+  }
+  const endStr = sub.currentPeriodEnd
+    ? new Date(sub.currentPeriodEnd).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+    : 'el final de tu ciclo actual';
+  const summaryEl = document.getElementById('cancel-sub-summary-text');
+  const keepUntilEl = document.getElementById('cancel-sub-keep-until');
+  if (summaryEl) {
+    summaryEl.textContent = `Estás por cancelar la renovación automática de tu ${sub.planName} ($${Number(sub.priceUSD || 49).toFixed(2)} USD vía ${sub.paymentMethod || 'PayPal'}).`;
+  }
+  if (keepUntilEl) {
+    keepUntilEl.textContent = endStr;
+  }
+  const modal = document.getElementById('cancel-subscription-modal');
+  if (modal) modal.classList.add('open');
+};
+
+window.closeCancelSubscriptionModal = function () {
+  const modal = document.getElementById('cancel-subscription-modal');
+  if (modal) modal.classList.remove('open');
+};
+
+window.confirmCancelVipSubscription = function () {
+  const sub = state.subscription;
+  if (!sub) {
+    closeCancelSubscriptionModal();
+    return;
+  }
+  if (sub.autoRenew === false) {
+    showToast('ℹ️ Tu suscripción ya tenía las renovaciones automáticas canceladas.');
+    closeCancelSubscriptionModal();
+    return;
+  }
+
+  sub.autoRenew = false;
+  sub.status = 'cancelled_at_period_end';
+  sub.cancelledAt = new Date().toISOString();
+
+  // Conserva los beneficios VIP hasta currentPeriodEnd
+  const endFormatted = sub.currentPeriodEnd
+    ? new Date(sub.currentPeriodEnd).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+    : 'el cierre del período pagado';
+
+  if (state.userAccount && state.userAccount.email) {
+    sendTransactionalEmail({
+      to: state.userAccount.email,
+      subject: `Confirmación de Cancelación de Suscripción VIP — SkillVault`,
+      category: 'SUSCRIPCIONES VIP',
+      bodyHtml: `
+        <p>Hola <strong>${state.userAccount.name || 'Estudiante'}</strong>,</p>
+        <p>Hemos procesado la cancelación de las renovaciones futuras de tu <strong>${sub.planName}</strong> ante el proveedor de pagos (${sub.paymentMethod || 'PayPal'}).</p>
+        <ul>
+          <li><strong>Cobros futuros:</strong> Detenidos ($0.00 USD a cobrar en adelante).</li>
+          <li><strong>Tus beneficios VIP continúan activos hasta:</strong> ${endFormatted}.</li>
+          <li><strong>Cursos individuales comprados por separado:</strong> Se conservan de forma vitalicia.</li>
+        </ul>
+      `,
+      ctaLabel: 'Ver Estado en Mi Suscripción',
+      ctaUrl: '?tab=profile'
+    });
+  }
+
+  saveState();
+  closeCancelSubscriptionModal();
+  renderHeaderAndStats();
+  renderSkillsGrid();
+  showToast(`✅ Renovación cancelada. Conservas todos tus beneficios VIP hasta el ${endFormatted} sin cobros futuros.`);
+};
+
+window.openReceiptModal = function (purchaseId) {
+  const allPurchases = [...(state.purchases || []), ...loadJsonDB(PURCHASES_DB_KEY, [])];
+  const p = allPurchases.find(item => item.id === purchaseId);
+  if (!p) {
+    showToast('⚠️ No se encontró el comprobante solicitado.');
+    return;
+  }
+  const body = document.getElementById('receipt-modal-body');
+  if (!body) return;
+
+  const statusMap = {
+    approved: { label: 'APROBADO', cls: 'approved' },
+    pending: { label: 'PENDIENTE', cls: 'pending' },
+    rejected: { label: 'RECHAZADO', cls: 'rejected' },
+    refunded: { label: 'REEMBOLSADO', cls: 'refunded' }
+  };
+  const st = statusMap[p.status] || statusMap.approved;
+
+  body.innerHTML = `
+    <div class="lesson-box" style="margin-bottom:0;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:14px;">
+        <div>
+          <strong style="font-size:15px; color:#fff; display:block;">⚡ SKILLVAULT ACADEMY INC.</strong>
+          <span style="font-size:12px; color:var(--text-muted);">Factura / Comprobante Electrónico Oficial</span>
+        </div>
+        <span class="status-badge ${st.cls}">${st.label}</span>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12.5px; margin-bottom:14px;">
+        <div><span style="color:var(--text-muted); display:block;">N° de Factura:</span><strong>${p.invoiceNumber || 'FAC-2026-001'}</strong></div>
+        <div><span style="color:var(--text-muted); display:block;">N° de Orden:</span><strong>${p.orderNumber || p.id}</strong></div>
+        <div><span style="color:var(--text-muted); display:block;">Fecha y Hora:</span><strong>${new Date(p.date).toLocaleString('es-ES')}</strong></div>
+        <div><span style="color:var(--text-muted); display:block;">Método de Pago:</span><strong>${p.paymentMethod}</strong></div>
+        <div style="grid-column:1/-1;"><span style="color:var(--text-muted); display:block;">Titular / Alumno:</span><strong>${p.userName || 'Estudiante'} (${p.userEmail || 'Cuenta local'})</strong></div>
+      </div>
+      <div style="background:rgba(15, 23, 42, 0.75); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:13.5px;">
+          <strong>${p.title}</strong>
+          <strong style="color:#34d399;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
+        </div>
+        <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">
+          Tipo de operación: ${p.itemType === 'subscription' ? 'Suscripción VIP con acceso total' : 'Licencia vitalicia de curso individual'}
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; padding-top:8px; border-top:1px solid var(--border);">
+        <span>Total Abonado (${p.currency || 'USD'}):</span>
+        <strong style="font-size:17px; color:#fff;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
+      </div>
+    </div>
+  `;
+  const modal = document.getElementById('receipt-modal');
+  if (modal) modal.classList.add('open');
+};
+
+window.closeReceiptModal = function () {
+  const modal = document.getElementById('receipt-modal');
+  if (modal) modal.classList.remove('open');
+};
+
 function renderStudentProfileAndSettings() {
   const profileBox = document.getElementById('student-profile-summary-box');
   const settingsBox = document.getElementById('student-settings-summary-box');
+  const subBox = document.getElementById('student-subscription-box');
+  const purchasesBox = document.getElementById('student-purchases-box');
+  const ledgerBox = document.getElementById('student-points-ledger-box');
+
   const accName = (state.userAccount && state.userAccount.name) || 'Estudiante Invitado';
-  const accEmail = (state.userAccount && state.userAccount.email) || 'Sin cuenta Google vinculada aún';
+  const accEmail = (state.userAccount && state.userAccount.email) || 'Sin cuenta vinculada aún';
   const rankTitle = document.getElementById('user-rank-title')?.textContent || 'Estudiante Bronce';
+  const vipActive = isVipSubscriptionActive();
+  const emailVerified = isCurrentUserEmailVerified();
 
   if (profileBox) {
+    const verificationBadgeHtml = state.userAccount
+      ? emailVerified
+        ? `<span class="status-badge verified" title="Correo verificado oficialmente">✔ Correo Verificado (${state.userAccount.provider === 'Google' ? 'Google OAuth' : 'Email'})</span>`
+        : `<span class="status-badge pending" title="Pendiente de confirmación">⚠️ Correo Sin Verificar</span>`
+      : `<span class="status-badge pending">Modo Invitado Local</span>`;
+
     profileBox.innerHTML = `
       <article class="instructor-card featured-instructor">
         <div class="instructor-card-top">
           <div class="instructor-avatar avatar-neon-violet">${accName.slice(0, 2).toUpperCase()}</div>
-          <span class="instructor-verified-badge">${state.isProMember ? '👑 Miembro VIP PRO' : '🎓 Cuenta Estándar'}</span>
+          <span class="instructor-verified-badge">${vipActive ? '👑 Miembro VIP PRO' : '🎓 Cuenta Estándar'}</span>
         </div>
         <div class="instructor-identity">
           <h3>${accName}</h3>
           <span class="instructor-role">${accEmail}</span>
+          <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+            ${verificationBadgeHtml}
+            ${state.userAccount && !emailVerified
+              ? `<button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="resendVerificationEmail()">📨 Reenviar Enlace</button>
+                 <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="openMailboxModal()">📬 Abrir Bandeja</button>`
+              : ''
+            }
+          </div>
         </div>
         <p class="instructor-bio">
           Rango actual: <strong>${rankTitle}</strong> • Racha de estudio: <strong>🔥 ${state.streak || 1} días</strong> • Cursos aprobados al 100%: <strong>${state.completedCourses.length}</strong>.
@@ -8771,16 +9747,17 @@ function renderStudentProfileAndSettings() {
     settingsBox.innerHTML = `
       <article class="instructor-card">
         <div class="instructor-identity">
-          <h3>🛡️ Seguridad y Sesión OAuth 2.0</h3>
-          <span class="instructor-role">Acceso 100% seguro con Google (Cero contraseñas almacenadas)</span>
+          <h3>🛡️ Seguridad, Correo y Sesión</h3>
+          <span class="instructor-role">Autenticación con Correo/Contraseña o Google OAuth 2.0</span>
         </div>
         <p class="instructor-bio">
           Estado de la cuenta: <strong>${state.userAccount ? `Conectado como ${accEmail}` : 'Modo local sin sincronizar'}</strong>.
         </p>
-        <div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
           ${state.userAccount
-            ? `<button type="button" class="btn-secondary" onclick="logoutUser()">🚪 Cerrar Sesión de Google</button>`
-            : `<button type="button" class="btn-primary-full" onclick="openAuthModal()">🔐 Continuar con Google</button>`
+            ? `<button type="button" class="btn-secondary" onclick="logoutUser()">🚪 Cerrar Sesión</button>
+               <button type="button" class="btn-secondary" onclick="openMailboxModal()">📬 Bandeja de Correos</button>`
+            : `<button type="button" class="btn-primary-full" onclick="openAuthModal()">🔐 Iniciar Sesión / Crear Cuenta</button>`
           }
         </div>
       </article>
@@ -8799,10 +9776,203 @@ function renderStudentProfileAndSettings() {
       </article>
     `;
   }
+
+  // 5. Renderizar sección "Mi suscripción"
+  if (subBox) {
+    const sub = state.subscription;
+    if (sub && vipActive) {
+      const isCancelledPendingEnd = sub.autoRenew === false || sub.status === 'cancelled_at_period_end';
+      const periodEndDate = sub.currentPeriodEnd
+        ? new Date(sub.currentPeriodEnd).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+        : 'Sin vencimiento';
+      const planTypeLabel = sub.tier === 'annual' ? 'VIP Founder Anual (12 Meses)' : 'VIP PRO Mensual (30 Días)';
+
+      subBox.innerHTML = `
+        <div class="subscription-panel-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div>
+              <span class="skill-cat-tag gold-tag">${planTypeLabel}</span>
+              <h4 style="font-size:18px; color:#fff; margin-top:6px;">${sub.planName || 'Pase VIP PRO'}</h4>
+            </div>
+            <span class="status-badge ${isCancelledPendingEnd ? 'cancelled' : 'approved'}">
+              ${isCancelledPendingEnd ? '⏳ Cancelada (Beneficios vigentes hasta fin de ciclo)' : '✅ Suscripción Activa'}
+            </span>
+          </div>
+          <div class="subscription-meta-grid">
+            <div class="subscription-meta-item">
+              <span>Modalidad contratada</span>
+              <strong>${sub.tier === 'annual' ? 'Anual' : 'Mensual'}</strong>
+            </div>
+            <div class="subscription-meta-item">
+              <span>Precio del plan</span>
+              <strong>$${Number(sub.priceUSD || 49).toFixed(2)} ${sub.currency || 'USD'}</strong>
+            </div>
+            <div class="subscription-meta-item">
+              <span>${isCancelledPendingEnd ? 'Conservas beneficios VIP hasta' : 'Próxima fecha de renovación'}</span>
+              <strong>${periodEndDate}</strong>
+            </div>
+            <div class="subscription-meta-item">
+              <span>Proveedor de pago</span>
+              <strong>${sub.paymentMethod || 'PayPal'} (${isCancelledPendingEnd ? 'Sin cobros futuros' : 'Renovación automática'})</strong>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-top:8px; border-top:1px solid var(--border);">
+            <span style="font-size:12.5px; color:var(--text-muted);">
+              ${isCancelledPendingEnd
+                ? `🔒 No se realizará ningún cargo futuro. Sigues teniendo acceso total VIP hasta el ${periodEndDate}.`
+                : 'Puedes cancelar la renovación automática en cualquier momento y conservarás tus días ya pagados.'
+              }
+            </span>
+            ${!isCancelledPendingEnd
+              ? `<button type="button" class="btn-secondary" style="border-color:rgba(239,68,68,0.45); color:#fca5a5;" onclick="openCancelSubscriptionModal()">
+                   🛑 Cancelar suscripción
+                 </button>`
+              : `<button type="button" class="btn-secondary" onclick="openMailboxModal()">
+                   📧 Ver Confirmación de Cancelación
+                 </button>`
+            }
+          </div>
+        </div>
+      `;
+    } else if (sub && sub.status === 'expired') {
+      subBox.innerHTML = `
+        <div class="subscription-panel-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h4 style="font-size:16px; color:#fff;">Tu suscripción ${sub.planName || 'VIP'} ha finalizado</h4>
+              <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+                El período pagado venció el ${new Date(sub.currentPeriodEnd).toLocaleDateString('es-ES')}. Tus cursos comprados individualmente siguen desbloqueados de por vida.
+              </p>
+            </div>
+            <button type="button" class="btn-primary-full gold-vip-cta" style="width:auto;" onclick="switchAppTab('plans')">
+              👑 Reactivar Membresía VIP
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      subBox.innerHTML = `
+        <div class="subscription-panel-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h4 style="font-size:16px; color:#fff;">Actualmente tienes el Plan Estándar Gratuito</h4>
+              <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+                No tienes ninguna suscripción VIP activa ni cobros recurrentes programados.
+              </p>
+            </div>
+            <button type="button" class="btn-primary-full gold-vip-cta" style="width:auto;" onclick="switchAppTab('plans')">
+              👑 Ver Planes VIP Mensual y Anual
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // 4. Renderizar sección "Mis compras"
+  if (purchasesBox) {
+    const purchases = Array.isArray(state.purchases) ? state.purchases : [];
+    if (purchases.length === 0) {
+      purchasesBox.innerHTML = `
+        <div class="certificate-card">
+          <h4>Aún no registras compras ni suscripciones</h4>
+          <p style="font-size:13px; color:var(--text-muted); margin:6px 0 12px;">
+            Cuando adquieras un curso individual o actives una suscripción VIP, aquí podrás consultar la fecha, importe, moneda, método de pago, estado y descargar tu factura o comprobante.
+          </p>
+          <button type="button" class="btn-secondary" onclick="switchAppTab('plans')">Ver Planes y Cursos</button>
+        </div>
+      `;
+    } else {
+      const statusMap = {
+        approved: { label: 'Aprobado', cls: 'approved' },
+        pending: { label: 'Pendiente', cls: 'pending' },
+        rejected: { label: 'Rechazado', cls: 'rejected' },
+        refunded: { label: 'Reembolsado', cls: 'refunded' }
+      };
+      purchasesBox.innerHTML = `
+        <div class="purchases-table-wrap">
+          ${purchases
+            .map(p => {
+              const st = statusMap[p.status] || statusMap.approved;
+              const dateStr = new Date(p.date).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+              return `
+                <div class="purchase-item-row">
+                  <div class="purchase-item-main">
+                    <strong>${p.title}</strong>
+                    <div class="purchase-item-meta">
+                      <span>📅 ${dateStr}</span>
+                      <span>💳 Método: <strong>${p.paymentMethod}</strong></span>
+                      <span>🧾 Comprobante: <strong>${p.invoiceNumber || p.orderNumber}</strong></span>
+                    </div>
+                  </div>
+                  <div class="purchase-item-actions">
+                    <span class="status-badge ${st.cls}">${st.label}</span>
+                    <strong style="font-size:15px; color:#fff;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
+                    <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="openReceiptModal('${p.id}')">
+                      🧾 Ver Comprobante / Factura
+                    </button>
+                  </div>
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+      `;
+    }
+  }
+
+  // 6. Renderizar "Historial de Movimientos de Puntos"
+  if (ledgerBox) {
+    const ledger = Array.isArray(state.pointsLedger) ? state.pointsLedger : [];
+    if (ledger.length === 0) {
+      ledgerBox.innerHTML = `<div class="certificate-card"><p style="color:var(--text-muted); margin:0;">No hay movimientos registrados aún.</p></div>`;
+    } else {
+      ledgerBox.innerHTML = `
+        <div class="ledger-table-wrap">
+          ${ledger
+            .slice(0, 15)
+            .map(tx => {
+              const dt = new Date(tx.timestamp).toLocaleString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+              const ptsBadge = tx.deltaPTS
+                ? `<span style="color:${tx.deltaPTS > 0 ? '#34d399' : '#f87171'}; font-weight:700;">${tx.deltaPTS > 0 ? '+' : ''}${tx.deltaPTS} PTS</span>`
+                : '';
+              const vpBadge = tx.deltaVP
+                ? `<span style="color:${tx.deltaVP > 0 ? '#fbbf24' : '#f87171'}; font-weight:700; margin-left:8px;">${tx.deltaVP > 0 ? '+' : ''}${tx.deltaVP} VP</span>`
+                : '';
+              return `
+                <div class="ledger-item-row">
+                  <div>
+                    <strong style="color:#f8fafc; display:block;">${tx.reason}</strong>
+                    <span style="font-size:11.5px; color:var(--text-muted);">${dt} • ID: ${tx.txId}</span>
+                  </div>
+                  <div style="text-align:right;">
+                    <div>${ptsBadge} ${vpBadge}</div>
+                    <span style="font-size:11px; color:var(--text-muted);">Saldo: ${tx.balancePTS} PTS / ${tx.balanceVP} VP</span>
+                  </div>
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+      `;
+    }
+  }
 }
 
 function renderOwnerTransactions() {
   const list = document.getElementById('owner-tx-list');
+  if (!list) return;
   list.innerHTML = state.ownerTransactions
     .map(
       tx => `
@@ -8830,20 +10000,16 @@ window.setRoleView = function (role, silent = false) {
   document.body.classList.toggle('role-student', !isAdminModeActive);
   document.body.classList.toggle('role-admin', isAdminModeActive);
 
-  // Ocultar o mostrar por completo todos los elementos exclusivos de Administrador
-  // ("Panel del Creador", "Ingresos" y "Publicar Nuevo Curso")
   document.querySelectorAll('.owner-only-el').forEach(el => {
     el.hidden = !isAdminModeActive;
     el.style.display = isAdminModeActive ? '' : 'none';
   });
 
-  // Actualizar estado del Toggle en el Header
   const studentPill = document.getElementById('role-btn-student');
   const adminPill = document.getElementById('role-btn-admin');
   if (studentPill) studentPill.classList.toggle('active', !isAdminModeActive);
   if (adminPill) adminPill.classList.toggle('active', isAdminModeActive);
 
-  // Sincronizar botón secundario del Sidebar
   const sidebarBtn = document.getElementById('toggle-admin-btn');
   if (sidebarBtn) {
     sidebarBtn.textContent = isAdminModeActive
@@ -8852,7 +10018,6 @@ window.setRoleView = function (role, silent = false) {
     sidebarBtn.classList.toggle('active', isAdminModeActive);
   }
 
-  // Si pasa a modo Alumno mientras estaba en Panel del Creador o Publicar Curso, expulsar al Catálogo
   if (!isAdminModeActive) {
     const ownerView = document.getElementById('view-owner');
     const createView = document.getElementById('view-create');
@@ -8874,8 +10039,8 @@ window.setRoleView = function (role, silent = false) {
   if (!silent) {
     showToast(
       isAdminModeActive
-        ? '🔐 Simulación de Vista: Administrador (Panel del Creador, Ingresos y Publicar Curso habilitados).'
-        : '🎓 Simulación de Vista: Alumno (Panel del Creador, Ingresos y Publicar Curso ocultos por completo).'
+        ? '🔐 Simulación de Vista: Administrador (Panel del Creador, Soporte Admin y Auditoría habilitados).'
+        : '🎓 Simulación de Vista: Alumno (Paneles administrativos ocultos).'
     );
   }
 };
@@ -8885,15 +10050,22 @@ window.toggleAdminMode = function () {
 };
 
 // ==========================================================================
-// MEJORA 2: GANCHO GRATUITO DEL HERO (+50 PTS)
+// MEJORA 2: GANCHO GRATUITO DEL HERO (+50 PTS CON IDEMPOTENCIA)
 // ==========================================================================
 window.startFreeTrialModule = function () {
   const freeSkillId = 'py-automation';
+  const userEmail = (state.userAccount && state.userAccount.email) || 'invitado@skillvault.local';
 
   if (!state.freeTrialBonusClaimed) {
-    state.points += 50;
-    state.xp += 50;
     state.freeTrialBonusClaimed = true;
+    recordPointsTransaction({
+      idempotencyKey: `hero_free_trial_bonus:${userEmail}`,
+      type: 'FREE_TRIAL_BONUS',
+      deltaPTS: 50,
+      deltaVP: 0,
+      deltaXP: 50,
+      reason: 'Bono de primera misión interactiva (Hero)'
+    });
     saveState();
     renderHeaderAndStats();
     showToast('🎉 ¡Ganaste tus primeros +50 PTS y +50 XP! Comienza ahora el curso.');
@@ -8966,7 +10138,7 @@ const FOOTER_INFO_CONTENT = {
       <div class="lesson-box">
         <h4>Tu privacidad y seguridad son nuestra prioridad</h4>
         <p style="color:var(--text-muted); margin-bottom:12px;">• <strong>Encriptación SSL de 256 bits:</strong> Toda la comunicación entre tu navegador y SkillVault viaja cifrada bajo estándares bancarios.</p>
-        <p style="color:var(--text-muted); margin-bottom:12px;">• <strong>Procesamiento Seguro (Stripe & PayPal):</strong> SkillVault nunca almacena los datos completos de tus tarjetas de crédito; los pagos son procesados directamente por pasarelas certificadas PCI-DSS Nivel 1.</p>
+        <p style="color:var(--text-muted); margin-bottom:12px;">• <strong>Procesamiento Seguro (PayPal y MercadoPago):</strong> SkillVault nunca almacena los datos completos de tus tarjetas de crédito; los pagos son procesados directamente por pasarelas certificadas PCI-DSS Nivel 1.</p>
         <p style="color:var(--text-muted);">• <strong>Cero Spam:</strong> Tus datos de progreso académico y correo jamás se venden ni comparten con terceros.</p>
       </div>
     `
@@ -9054,9 +10226,9 @@ window.closeWaitlistModal = function () {
 };
 
 // ==========================================================================
-// MEJORA MOBILE 3: FLUJO DE AUTENTICACIÓN REAL (BASE DE DATOS DE CUENTAS)
+// 1. RECUPERACIÓN DE CONTRASEÑA, 2. VERIFICACIÓN DE CORREO Y AUTENTICACIÓN
 // ==========================================================================
-let currentAuthMode = 'login'; // 'login' | 'register' | 'reset'
+let currentAuthMode = 'login'; // 'login' | 'register' | 'forgot' | 'reset-confirm'
 
 function showAuthFeedback(msg, type = 'error') {
   const box = document.getElementById('auth-feedback-box');
@@ -9073,10 +10245,14 @@ function showAuthFeedback(msg, type = 'error') {
 
 function applyUserProfileToState(accountRecord) {
   const prof = accountRecord.profile || {};
+  const isGoogle = accountRecord.provider === 'Google';
+  const emailVerified = isGoogle ? true : Boolean(accountRecord.emailVerified || prof.emailVerified);
+
   state.userAccount = {
     name: accountRecord.name,
     email: accountRecord.email,
-    provider: accountRecord.provider || 'Email'
+    provider: accountRecord.provider || 'Email',
+    emailVerified
   };
   state.points = typeof prof.points === 'number' ? prof.points : 150;
   state.vipPoints = typeof prof.vipPoints === 'number' ? prof.vipPoints : 0;
@@ -9089,16 +10265,48 @@ function applyUserProfileToState(accountRecord) {
     : [];
   state.completedCourses = Array.isArray(prof.completedCourses) ? prof.completedCourses : [];
   state.courseProgress = prof.courseProgress || {};
+  state.courseProgressPct = prof.courseProgressPct || {};
+  state.lastVisitedByCourse = prof.lastVisitedByCourse || {};
+  state.lastActiveCourseId = prof.lastActiveCourseId || null;
   state.unlockedRewards = Array.isArray(prof.unlockedRewards) ? prof.unlockedRewards : [];
   state.freeTrialBonusClaimed = Boolean(prof.freeTrialBonusClaimed);
+  state.subscription = prof.subscription || null;
+  state.purchases = Array.isArray(prof.purchases) ? prof.purchases : [];
+  state.pointsLedger = Array.isArray(prof.pointsLedger) && prof.pointsLedger.length > 0
+    ? prof.pointsLedger
+    : [
+        {
+          txId: 'tx_user_init_' + accountRecord.email,
+          idempotencyKey: 'init:' + accountRecord.email,
+          type: 'WELCOME_BONUS',
+          deltaPTS: state.points,
+          deltaVP: state.vipPoints,
+          deltaXP: state.xp,
+          balancePTS: state.points,
+          balanceVP: state.vipPoints,
+          balanceXP: state.xp,
+          reason: 'Saldo inicial de cuenta verificada',
+          timestamp: accountRecord.createdAt || new Date().toISOString()
+        }
+      ];
+  state.walletSignature = computeWalletSignature(
+    state.points,
+    state.vipPoints,
+    state.xp,
+    state.pointsLedger.length,
+    accountRecord.email
+  );
+
+  checkAndSyncSubscriptionExpiry(true);
   saveState();
   renderHeaderAndStats();
   renderSkillsGrid();
 }
 
-window.openAuthModal = function () {
+window.openAuthModal = function (initialMode = 'login') {
   const modal = document.getElementById('auth-modal');
   if (modal) modal.classList.add('open');
+  window.switchAuthMode(initialMode);
   initGoogleIdentityServices();
 };
 
@@ -9107,13 +10315,622 @@ window.closeAuthModal = function () {
   if (modal) modal.classList.remove('open');
 };
 
-window.switchAuthMode = function () {
-  // Refactorizado: Autenticación 100% OAuth con Google sin inputs de contraseña
+window.switchAuthMode = function (mode = 'login', resetTokenValue = '') {
+  currentAuthMode = mode;
+  showAuthFeedback('');
+
+  const tabLogin = document.getElementById('auth-tab-login');
+  const tabRegister = document.getElementById('auth-tab-register');
+  const titleEl = document.getElementById('auth-modal-title');
+  const subEl = document.getElementById('auth-modal-subtitle');
+  const nameGroup = document.getElementById('auth-name-group');
+  const emailGroup = document.getElementById('auth-email-group');
+  const passGroup = document.getElementById('auth-password-group');
+  const confirmGroup = document.getElementById('auth-password-confirm-group');
+  const forgotRow = document.getElementById('auth-forgot-row');
+  const backLoginRow = document.getElementById('auth-back-to-login-row');
+  const submitBtn = document.getElementById('auth-submit-btn');
+  const passInput = document.getElementById('auth-password');
+  const confirmInput = document.getElementById('auth-password-confirm');
+  const emailInput = document.getElementById('auth-email');
+  const tokenInput = document.getElementById('auth-reset-token-input');
+
+  if (tabLogin) {
+    tabLogin.classList.toggle('active', mode === 'login');
+    tabLogin.setAttribute('aria-selected', mode === 'login' ? 'true' : 'false');
+  }
+  if (tabRegister) {
+    tabRegister.classList.toggle('active', mode === 'register');
+    tabRegister.setAttribute('aria-selected', mode === 'register' ? 'true' : 'false');
+  }
+  if (tokenInput) tokenInput.value = resetTokenValue || '';
+
+  if (mode === 'register') {
+    if (titleEl) titleEl.textContent = 'Crea tu Cuenta en SkillVault (+50 PTS Gratis)';
+    if (subEl) subEl.textContent = 'Recibirás un enlace de verificación de correo y acceso inmediato a tu primera misión.';
+    if (nameGroup) nameGroup.style.display = 'block';
+    if (emailGroup) emailGroup.style.display = 'block';
+    if (passGroup) passGroup.style.display = 'block';
+    if (confirmGroup) confirmGroup.style.display = 'block';
+    if (forgotRow) forgotRow.style.display = 'none';
+    if (backLoginRow) backLoginRow.style.display = 'none';
+    if (passInput) passInput.required = true;
+    if (confirmInput) confirmInput.required = true;
+    if (emailInput) emailInput.required = true;
+    if (submitBtn) submitBtn.textContent = '✨ Crear Cuenta y Enviar Verificación';
+  } else if (mode === 'forgot') {
+    if (titleEl) titleEl.textContent = 'Recuperación Segura de Contraseña';
+    if (subEl) subEl.textContent = 'Introduce tu correo electrónico y te enviaremos un enlace único con vencimiento de 15 minutos.';
+    if (nameGroup) nameGroup.style.display = 'none';
+    if (emailGroup) emailGroup.style.display = 'block';
+    if (passGroup) passGroup.style.display = 'none';
+    if (confirmGroup) confirmGroup.style.display = 'none';
+    if (forgotRow) forgotRow.style.display = 'none';
+    if (backLoginRow) backLoginRow.style.display = 'block';
+    if (passInput) passInput.required = false;
+    if (confirmInput) confirmInput.required = false;
+    if (emailInput) emailInput.required = true;
+    if (submitBtn) submitBtn.textContent = '📨 Enviar Enlace de Recuperación';
+  } else if (mode === 'reset-confirm') {
+    if (titleEl) titleEl.textContent = 'Crear Nueva Contraseña';
+    if (subEl) subEl.textContent = 'Tu enlace de seguridad fue validado. Ingresa tu nueva contraseña para restablecer el acceso.';
+    if (nameGroup) nameGroup.style.display = 'none';
+    if (emailGroup) emailGroup.style.display = 'none';
+    if (passGroup) passGroup.style.display = 'block';
+    if (confirmGroup) confirmGroup.style.display = 'block';
+    if (forgotRow) forgotRow.style.display = 'none';
+    if (backLoginRow) backLoginRow.style.display = 'block';
+    if (passInput) passInput.required = true;
+    if (confirmInput) confirmInput.required = true;
+    if (emailInput) emailInput.required = false;
+    if (submitBtn) submitBtn.textContent = '🔑 Guardar Nueva Contraseña';
+  } else {
+    // 'login'
+    if (titleEl) titleEl.textContent = 'Accede a tu Cuenta de SkillVault';
+    if (subEl) subEl.textContent = 'Sincroniza tus puntos PTS, Puntos VIP (VP), certificados y progreso entre dispositivos.';
+    if (nameGroup) nameGroup.style.display = 'none';
+    if (emailGroup) emailGroup.style.display = 'block';
+    if (passGroup) passGroup.style.display = 'block';
+    if (confirmGroup) confirmGroup.style.display = 'none';
+    if (forgotRow) forgotRow.style.display = 'flex';
+    if (backLoginRow) backLoginRow.style.display = 'none';
+    if (passInput) passInput.required = true;
+    if (confirmInput) confirmInput.required = false;
+    if (emailInput) emailInput.required = true;
+    if (submitBtn) submitBtn.textContent = '🔐 Iniciar Sesión';
+  }
+};
+
+function createAndSendEmailVerificationLink(email, name) {
+  const verifyTokens = loadJsonDB(VERIFY_TOKENS_DB_KEY, {});
+  const token = generateSecureToken('vrf');
+  const nowMs = Date.now();
+  const expiresAt = nowMs + 24 * 60 * 60 * 1000; // Vencimiento 24 horas
+
+  // Invalidar tokens anteriores del mismo correo
+  Object.keys(verifyTokens).forEach(k => {
+    if (verifyTokens[k] && verifyTokens[k].email === email) {
+      verifyTokens[k].used = true;
+    }
+  });
+
+  verifyTokens[token] = {
+    token,
+    email,
+    createdAt: nowMs,
+    expiresAt,
+    used: false
+  };
+  saveJsonDB(VERIFY_TOKENS_DB_KEY, verifyTokens);
+
+  const verifyUrl = `${window.location.pathname}?verify_email=${encodeURIComponent(token)}`;
+  sendTransactionalEmail({
+    to: email,
+    subject: 'Confirma tu correo electrónico en SkillVault Academy',
+    category: 'VERIFICACIÓN DE CUENTA',
+    bodyHtml: `
+      <p>Hola <strong>${name || email}</strong>,</p>
+      <p>Bienvenido a <strong>SkillVault Academy</strong>. Por favor confirma tu dirección de correo electrónico haciendo clic en el siguiente enlace seguro (válido por 24 horas):</p>
+    `,
+    ctaLabel: '✅ Confirmar mi Correo Electrónico',
+    ctaUrl: verifyUrl
+  });
+  return token;
+}
+
+window.resendVerificationEmail = function () {
+  if (!state.userAccount || !state.userAccount.email) {
+    showToast('⚠️ Primero debes iniciar sesión en tu cuenta.');
+    return;
+  }
+  if (isCurrentUserEmailVerified()) {
+    showToast('✅ Tu correo electrónico ya se encuentra verificado.');
+    return;
+  }
+  const email = state.userAccount.email.toLowerCase();
+  const rl = checkAndRecordRateLimit(`resend_verify:${email}`, 3, 10 * 60 * 1000);
+  if (!rl.allowed) {
+    showToast(`⏳ Has alcanzado el límite de reenvíos. Intenta de nuevo en ${rl.retryAfterSec} segundos.`);
+    return;
+  }
+
+  createAndSendEmailVerificationLink(email, state.userAccount.name);
+  showToast('📨 Correo de verificación enviado. Revisa la Bandeja de Correos (📬) para confirmarlo.');
+  openMailboxModal();
+};
+
+window.verifyEmailWithToken = function (token) {
+  const verifyTokens = loadJsonDB(VERIFY_TOKENS_DB_KEY, {});
+  const record = verifyTokens[token];
+  if (!record) {
+    showToast('❌ El enlace de verificación no es válido o no existe.');
+    return false;
+  }
+  if (record.used) {
+    showToast('⚠️ Este enlace de verificación ya fue utilizado anteriormente.');
+    return false;
+  }
+  if (Date.now() > record.expiresAt) {
+    showToast('⌛ Este enlace de verificación ha expirado (vencimiento de 24h). Solicita uno nuevo desde tu perfil.');
+    return false;
+  }
+
+  record.used = true;
+  record.usedAt = Date.now();
+  saveJsonDB(VERIFY_TOKENS_DB_KEY, verifyTokens);
+
+  const db = loadUsersDB();
+  if (db[record.email]) {
+    db[record.email].emailVerified = true;
+    if (db[record.email].profile) {
+      db[record.email].profile.emailVerified = true;
+    }
+    saveUsersDB(db);
+  }
+
+  if (state.userAccount && state.userAccount.email.toLowerCase() === record.email.toLowerCase()) {
+    state.userAccount.emailVerified = true;
+    saveState();
+  }
+
+  closeMailboxModal();
+  renderHeaderAndStats();
+  showToast('🎉 ¡Correo electrónico verificado con éxito! Todas las funciones de tu cuenta están habilitadas.');
+  return true;
+};
+
+window.openResetPasswordFromLink = function (token) {
+  const resetTokens = loadJsonDB(RESET_TOKENS_DB_KEY, {});
+  const record = resetTokens[token];
+  closeMailboxModal();
+
+  if (!record) {
+    openAuthModal('login');
+    showAuthFeedback('❌ El enlace de recuperación es inválido o no existe.', 'error');
+    return false;
+  }
+  if (record.used) {
+    openAuthModal('login');
+    showAuthFeedback('⚠️ Este enlace de recuperación ya fue utilizado y quedó invalidado.', 'error');
+    return false;
+  }
+  if (Date.now() > record.expiresAt) {
+    openAuthModal('forgot');
+    showAuthFeedback('⌛ El enlace de recuperación ha vencido (máximo 15 minutos). Solicita uno nuevo.', 'error');
+    return false;
+  }
+
+  openAuthModal('reset-confirm');
+  window.switchAuthMode('reset-confirm', token);
+  showAuthFeedback(`🔒 Enlace verificado para <strong>${record.email}</strong>. Crea tu nueva contraseña a continuación.`, 'success');
+  return true;
+};
+
+window.handleSimulatedEmailAction = function (url) {
+  if (!url) return;
+  try {
+    const qIndex = url.indexOf('?');
+    const params = new URLSearchParams(qIndex !== -1 ? url.slice(qIndex) : url);
+    if (params.has('verify_email')) {
+      window.verifyEmailWithToken(params.get('verify_email'));
+      return;
+    }
+    if (params.has('reset_token')) {
+      window.openResetPasswordFromLink(params.get('reset_token'));
+      return;
+    }
+    if (params.has('tab')) {
+      closeMailboxModal();
+      switchAppTab(params.get('tab'));
+      return;
+    }
+  } catch (e) {}
+};
+
+window.openMailboxModal = function () {
+  const listEl = document.getElementById('mailbox-emails-list');
+  const modal = document.getElementById('mailbox-modal');
+  if (!listEl || !modal) return;
+
+  const emails = loadJsonDB(MAILBOX_DB_KEY, []);
+  let mutated = false;
+  emails.forEach(em => {
+    if (!em.read) {
+      em.read = true;
+      mutated = true;
+    }
+  });
+  if (mutated) {
+    saveJsonDB(MAILBOX_DB_KEY, emails);
+    updateMailboxCounterUI();
+  }
+
+  if (emails.length === 0) {
+    listEl.innerHTML = `
+      <div class="certificate-card" style="text-align:center;">
+        <h4>📭 No hay correos en la bandeja</h4>
+        <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">
+          Cuando te registres, solicites recuperar tu contraseña, realices una compra o envíes un ticket de soporte, los correos transaccionales aparecerán aquí al instante.
+        </p>
+      </div>
+    `;
+  } else {
+    listEl.innerHTML = emails
+      .map(em => {
+        const dt = new Date(em.createdAt).toLocaleString('es-ES', {
+          day: '2-digit',
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        return `
+          <div class="lesson-box" style="margin-bottom:0; padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+              <span class="skill-cat-tag">${em.category || 'NOTIFICACIÓN'}</span>
+              <span style="font-size:11.5px; color:var(--text-muted);">${dt} • Para: <strong>${em.to}</strong></span>
+            </div>
+            <h4 style="font-size:15px; color:#fff; margin-bottom:8px;">${em.subject}</h4>
+            <div style="font-size:13px; color:var(--text-main); line-height:1.55;">
+              ${em.bodyHtml}
+            </div>
+            ${em.ctaUrl && em.ctaLabel
+              ? `<div style="margin-top:12px;">
+                   <button type="button" class="btn-primary-full" style="width:auto; padding:8px 16px; font-size:12.5px;" onclick="handleSimulatedEmailAction('${em.ctaUrl}')">
+                     ${em.ctaLabel}
+                   </button>
+                 </div>`
+              : ''
+            }
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  modal.classList.add('open');
+};
+
+window.closeMailboxModal = function () {
+  const modal = document.getElementById('mailbox-modal');
+  if (modal) modal.classList.remove('open');
+};
+
+// ==========================================================================
+// 8. PÁGINAS DE ERRORES PROFESIONALES
+// ==========================================================================
+const ERROR_SCREENS_CATALOG = {
+  '404': {
+    code: 'ERROR 404',
+    icon: '🧭',
+    title: 'Página o ruta inexistente',
+    detail: 'La dirección o sección que intentaste abrir no existe en SkillVault Academy o fue movida.',
+    canRetry: false
+  },
+  '403': {
+    code: 'ERROR 403',
+    icon: '🔒',
+    title: 'Acceso no autorizado a contenido exclusivo',
+    detail: 'No tienes los permisos necesarios para acceder a este curso, ruta privada o recurso. Adquiere el curso o activa tu membresía VIP PRO.',
+    canRetry: false,
+    primaryActionLabel: '👑 Ver Planes y Cursos',
+    primaryActionFn: "switchAppTab('plans')"
+  },
+  '500': {
+    code: 'ERROR 500',
+    icon: '⚙️',
+    title: 'Error temporal del sistema',
+    detail: 'Ocurrió un inconveniente inesperado al procesar tu solicitud. Tus puntos y tu progreso están a salvo.',
+    canRetry: true
+  },
+  network: {
+    code: 'CONEXIÓN',
+    icon: '📡',
+    title: 'Problemas de conexión a Internet',
+    detail: 'No pudimos sincronizar con el servidor en este momento. Verifica tu conexión Wi-Fi o datos móviles e inténtalo nuevamente.',
+    canRetry: true
+  },
+  course_load: {
+    code: 'AULA VIRTUAL',
+    icon: '📚',
+    title: 'Error al cargar el curso solicitado',
+    detail: 'El módulo o laboratorio que intentas abrir no pudo cargarse correctamente.',
+    canRetry: true
+  },
+  payment_error: {
+    code: 'CHECKOUT SEGURO',
+    icon: '💳',
+    title: 'Error durante el procesamiento del pago',
+    detail: 'La transacción no pudo completarse con el proveedor de pagos. No se ha realizado ningún cargo en tu cuenta.',
+    canRetry: true
+  },
+  session_expired: {
+    code: 'SESIÓN EXPIRADA',
+    icon: '⏳',
+    title: 'Tu sesión ha vencido por seguridad',
+    detail: 'Para proteger tus puntos, certificados y métodos de pago, vuelve a iniciar sesión en tu cuenta.',
+    canRetry: false,
+    primaryActionLabel: '🔐 Iniciar Sesión de Nuevo',
+    primaryActionFn: "openAuthModal('login')"
+  },
+  resource_unavailable: {
+    code: 'MANTENIMIENTO',
+    icon: '🚧',
+    title: 'Recurso temporalmente no disponible',
+    detail: 'Este laboratorio o descarga se encuentra en actualización técnica. Estará disponible nuevamente en unos minutos.',
+    canRetry: true
+  }
+};
+
+window.showSkillVaultErrorScreen = function (errorType = '404', customOverrides = {}) {
+  const base = ERROR_SCREENS_CATALOG[errorType] || ERROR_SCREENS_CATALOG['404'];
+  const cfg = { ...base, ...customOverrides };
+  const container = document.getElementById('error-screen-container');
+  if (!container) return;
+
+  const primaryBtnHtml = cfg.primaryActionFn
+    ? `<button type="button" class="btn-primary-full" style="width:auto;" onclick="${cfg.primaryActionFn}">${cfg.primaryActionLabel || 'Continuar'}</button>`
+    : `<button type="button" class="btn-primary-full" style="width:auto;" onclick="switchAppTab('explore')">🏠 Volver al Inicio / Catálogo</button>`;
+
+  const retryBtnHtml = cfg.canRetry
+    ? `<button type="button" class="btn-secondary" onclick="switchAppTab('explore'); renderSkillsGrid(); showToast('🔄 Conexión y catálogo actualizados.');">🔄 Reintentar ahora</button>`
+    : '';
+
+  container.innerHTML = `
+    <div class="error-screen-card">
+      <span class="error-code-pill">${cfg.code}</span>
+      <div class="error-screen-icon" aria-hidden="true">${cfg.icon}</div>
+      <h2>${cfg.title}</h2>
+      <p>${cfg.detail}</p>
+      <div class="error-screen-actions">
+        ${primaryBtnHtml}
+        ${retryBtnHtml}
+        <button type="button" class="btn-secondary" onclick="switchAppTab('explore')">🏠 Ir al Panel Principal</button>
+      </div>
+      <div class="error-support-note">
+        ¿El problema persiste? Nuestro equipo técnico puede ayudarte en el
+        <button type="button" class="text-link-btn" onclick="switchAppTab('help')">🛟 Centro de Ayuda y Soporte</button>.
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('.tab-view').forEach(v => {
+    v.classList.toggle('active', v.id === 'view-error-screen');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ==========================================================================
+// 9. SISTEMA DE SOPORTE ("CENTRO DE AYUDA") Y AUDITORÍA ADMIN
+// ==========================================================================
+window.renderHelpCenterAndSupport = function () {
+  const nameInput = document.getElementById('support-name');
+  const emailInput = document.getElementById('support-email');
+  if (state.userAccount) {
+    if (nameInput && !nameInput.value) nameInput.value = state.userAccount.name || '';
+    if (emailInput && !emailInput.value) emailInput.value = state.userAccount.email || '';
+  }
+
+  const allTickets = loadJsonDB(SUPPORT_TICKETS_DB_KEY, []);
+  const studentBox = document.getElementById('student-support-tickets-box');
+  const adminBox = document.getElementById('admin-support-panel-box');
+  const adminAuditBox = document.getElementById('admin-points-audit-box');
+
+  const statusLabels = {
+    pendiente: '⏳ Pendiente',
+    en_proceso: '🛠️ En proceso',
+    resuelto: '✅ Resuelto'
+  };
+  const categoryLabels = {
+    pagos: '💳 Pagos y Facturación',
+    cursos: '📚 Cursos y Aula',
+    cuenta: '🔐 Cuenta y Acceso',
+    puntos: '💎 Puntos (PTS / VP)',
+    otros: '📌 Otros'
+  };
+
+  if (studentBox) {
+    const userEmail = state.userAccount ? state.userAccount.email.toLowerCase() : null;
+    const myTickets = userEmail
+      ? allTickets.filter(t => t.email.toLowerCase() === userEmail)
+      : allTickets.slice(0, 5);
+
+    if (myTickets.length === 0) {
+      studentBox.innerHTML = `
+        <p style="font-size:13px; color:var(--text-muted); margin:0;">
+          Aún no has enviado consultas a soporte. Si tienes alguna duda, completa el formulario de la izquierda.
+        </p>
+      `;
+    } else {
+      studentBox.innerHTML = `
+        <div class="support-tickets-list">
+          ${myTickets
+            .map(t => {
+              const dt = new Date(t.createdAt).toLocaleString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+              return `
+                <div class="support-ticket-card">
+                  <div class="support-ticket-header">
+                    <div>
+                      <span class="skill-cat-tag">${categoryLabels[t.category] || t.category}</span>
+                      <strong style="color:#fff; font-size:13.5px; margin-left:6px;">Ticket #${t.id}</strong>
+                    </div>
+                    <span class="status-badge ${t.status}">${statusLabels[t.status] || 'Pendiente'}</span>
+                  </div>
+                  <p class="support-ticket-desc">${t.description}</p>
+                  <div style="font-size:11.5px; color:var(--text-muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                    <span>📅 Enviado: ${dt}</span>
+                    ${t.adminResponse ? `<span style="color:#6ee7b7;">💬 Respuesta soporte: ${t.adminResponse}</span>` : ''}
+                  </div>
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+      `;
+    }
+  }
+
+  // Panel Privado de Administrador para gestionar tickets de soporte
+  if (adminBox && (isAdminModeActive || devControlsVisible)) {
+    const filterCat = document.getElementById('admin-ticket-filter-category')?.value || 'all';
+    const filterSt = document.getElementById('admin-ticket-filter-status')?.value || 'all';
+
+    const filtered = allTickets.filter(t => {
+      const okCat = filterCat === 'all' || t.category === filterCat;
+      const okSt = filterSt === 'all' || t.status === filterSt;
+      return okCat && okSt;
+    });
+
+    if (filtered.length === 0) {
+      adminBox.innerHTML = `<div class="certificate-card"><p style="color:var(--text-muted); margin:0;">No hay tickets de soporte con los filtros seleccionados.</p></div>`;
+    } else {
+      adminBox.innerHTML = `
+        <div class="support-tickets-list">
+          ${filtered
+            .map(t => {
+              const dt = new Date(t.createdAt).toLocaleString('es-ES');
+              return `
+                <div class="support-ticket-card">
+                  <div class="support-ticket-header">
+                    <div>
+                      <span class="skill-cat-tag">${categoryLabels[t.category] || t.category}</span>
+                      <strong style="color:#fff; font-size:14px; margin-left:8px;">#${t.id} — ${t.name} (${t.email})</strong>
+                    </div>
+                    <span class="status-badge ${t.status}">${statusLabels[t.status] || t.status}</span>
+                  </div>
+                  <p class="support-ticket-desc">${t.description}</p>
+                  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-top:8px; border-top:1px solid var(--border);">
+                    <span style="font-size:11.5px; color:var(--text-muted);">📅 ${dt}</span>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                      <button type="button" class="btn-secondary" style="padding:5px 10px; font-size:11.5px;" onclick="updateSupportTicketStatus('${t.id}', 'pendiente')">⏳ Pendiente</button>
+                      <button type="button" class="btn-secondary" style="padding:5px 10px; font-size:11.5px; border-color:#38bdf8; color:#7dd3fc;" onclick="updateSupportTicketStatus('${t.id}', 'en_proceso')">🛠️ En proceso</button>
+                      <button type="button" class="btn-secondary" style="padding:5px 10px; font-size:11.5px; border-color:#10b981; color:#6ee7b7;" onclick="updateSupportTicketStatus('${t.id}', 'resuelto')">✅ Marcar Resuelto</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+      `;
+    }
+  }
+
+  // Panel Privado de Auditoría de Puntos y Anomalías (Admin)
+  if (adminAuditBox && (isAdminModeActive || devControlsVisible)) {
+    const anomalies = loadJsonDB(ANOMALY_LOGS_DB_KEY, []);
+    const ledger = Array.isArray(state.pointsLedger) ? state.pointsLedger : [];
+
+    adminAuditBox.innerHTML = `
+      <div class="certificate-card" style="margin-bottom:14px;">
+        <h4 style="color:#fde68a; margin-bottom:8px;">🚨 Registro de Anomalías e Intentos de Manipulación (${anomalies.length})</h4>
+        ${anomalies.length === 0
+          ? `<p style="font-size:12.5px; color:var(--text-muted); margin:0;">✅ No se han detectado manipulaciones ni operaciones anómalas.</p>`
+          : `<div class="ledger-table-wrap">
+               ${anomalies
+                 .slice(0, 10)
+                 .map(
+                   a => `
+                     <div class="ledger-item-row">
+                       <div>
+                         <strong style="color:#fca5a5;">[${a.type}] ${a.description}</strong>
+                         <span style="display:block; font-size:11px; color:var(--text-muted);">${new Date(a.timestamp).toLocaleString('es-ES')} • Usuario: ${a.userEmail}</span>
+                       </div>
+                       <code style="font-size:11px; color:#fde68a;">${JSON.stringify(a.details || {})}</code>
+                     </div>
+                   `
+                 )
+                 .join('')}
+             </div>`
+        }
+      </div>
+      <div class="certificate-card">
+        <h4 style="color:#6ee7b7; margin-bottom:8px;">📒 Libro Mayor de Transacciones de Puntos (${ledger.length} registros)</h4>
+        <div class="ledger-table-wrap">
+          ${ledger
+            .slice(0, 12)
+            .map(
+              tx => `
+                <div class="ledger-item-row">
+                  <div>
+                    <strong style="color:#fff;">[${tx.type}] ${tx.reason}</strong>
+                    <span style="display:block; font-size:11px; color:var(--text-muted);">Clave Idempotencia: ${tx.idempotencyKey} • ${new Date(tx.timestamp).toLocaleString('es-ES')}</span>
+                  </div>
+                  <div style="text-align:right; font-size:12px;">
+                    <strong>PTS: ${tx.deltaPTS >= 0 ? '+' : ''}${tx.deltaPTS} | VP: ${tx.deltaVP >= 0 ? '+' : ''}${tx.deltaVP}</strong>
+                    <span style="display:block; font-size:11px; color:var(--text-muted);">Saldo final: ${tx.balancePTS} PTS / ${tx.balanceVP} VP</span>
+                  </div>
+                </div>
+              `
+            )
+            .join('')}
+        </div>
+      </div>
+    `;
+  }
+};
+
+window.updateSupportTicketStatus = function (ticketId, newStatus) {
+  if (!isAdminModeActive && !devControlsVisible) {
+    showToast('🔒 Solo el administrador puede modificar el estado de los tickets.');
+    return;
+  }
+  const allTickets = loadJsonDB(SUPPORT_TICKETS_DB_KEY, []);
+  const idx = allTickets.findIndex(t => t.id === ticketId);
+  if (idx === -1) return;
+
+  allTickets[idx].status = newStatus;
+  allTickets[idx].updatedAt = new Date().toISOString();
+  if (newStatus === 'resuelto') {
+    allTickets[idx].adminResponse = 'Tu solicitud fue revisada y resuelta por el equipo de soporte de SkillVault.';
+  } else if (newStatus === 'en_proceso') {
+    allTickets[idx].adminResponse = 'Un especialista de soporte está revisando tu caso.';
+  }
+  saveJsonDB(SUPPORT_TICKETS_DB_KEY, allTickets);
+
+  sendTransactionalEmail({
+    to: allTickets[idx].email,
+    subject: `Actualización de tu Ticket #${ticketId} — Estado: ${newStatus.toUpperCase()}`,
+    category: 'SOPORTE SKILLVAULT',
+    bodyHtml: `
+      <p>Hola <strong>${allTickets[idx].name}</strong>,</p>
+      <p>El estado de tu consulta <strong>#${ticketId}</strong> ha cambiado a: <strong>${newStatus.toUpperCase()}</strong>.</p>
+      <p>${allTickets[idx].adminResponse || ''}</p>
+    `,
+    ctaLabel: 'Ver Estado en Centro de Ayuda',
+    ctaUrl: '?tab=help'
+  });
+
+  renderHelpCenterAndSupport();
+  showToast(`✅ Ticket #${ticketId} actualizado a "${newStatus}". Se notificó al alumno por correo.`);
 };
 
 // ==========================================================================
 // INTEGRACIÓN OFICIAL GOOGLE IDENTITY SERVICES (PARA VERCEL / DOMINIO PÚBLICO)
-// Client ID configurado para: https://skillvault-umber.vercel.app
 // ==========================================================================
 const GOOGLE_CLIENT_ID =
   localStorage.getItem('skillvault_google_client_id') ||
@@ -9152,6 +10969,7 @@ window.handleGoogleCredentialResponse = function (response) {
       name,
       email,
       provider: 'Google',
+      emailVerified: payload.email_verified !== false,
       picture: payload.picture || '',
       passwordHash: hashPassword('google_verified_' + payload.sub),
       createdAt: new Date().toISOString(),
@@ -9160,6 +10978,7 @@ window.handleGoogleCredentialResponse = function (response) {
         vipPoints: 0,
         xp: 100,
         streak: 1,
+        emailVerified: payload.email_verified !== false,
         isProMember: false,
         ownedCourses: ['py-automation'],
         completedCourses: [],
@@ -9171,8 +10990,10 @@ window.handleGoogleCredentialResponse = function (response) {
     saveUsersDB(db);
     applyUserProfileToState(db[email]);
     closeAuthModal();
-    showToast(`🎉 ¡Cuenta oficial de Google (${email}) conectada! +50 PTS de bienvenida.`);
+    showToast(`🎉 ¡Cuenta oficial de Google (${email}) conectada y verificada! +50 PTS de bienvenida.`);
   } else {
+    db[email].emailVerified = true;
+    saveUsersDB(db);
     applyUserProfileToState(db[email]);
     closeAuthModal();
     showToast(`👋 ¡Hola de nuevo, ${db[email].name}! Sesión de Google iniciada.`);
@@ -9215,12 +11036,12 @@ window.handleGoogleAuth = function () {
     window.google.accounts.id.prompt();
     return;
   }
-  // Respaldo OAuth en 1 clic sin pedir jamás contraseña
   const db = loadUsersDB();
   const savedGoogle = Object.values(db).find(u => u.provider === 'Google') || {
     name: 'Alumno Google Verificado',
     email: 'alumno.google@gmail.com',
     provider: 'Google',
+    emailVerified: true,
     passwordHash: hashPassword('oauth_token_verified'),
     createdAt: new Date().toISOString(),
     profile: {
@@ -9228,6 +11049,7 @@ window.handleGoogleAuth = function () {
       vipPoints: 0,
       xp: 100,
       streak: 1,
+      emailVerified: true,
       isProMember: false,
       ownedCourses: ['py-automation'],
       completedCourses: [],
@@ -9236,17 +11058,18 @@ window.handleGoogleAuth = function () {
       freeTrialBonusClaimed: false
     }
   };
+  savedGoogle.emailVerified = true;
   db[savedGoogle.email] = savedGoogle;
   saveUsersDB(db);
   applyUserProfileToState(savedGoogle);
   closeAuthModal();
-  showToast('🛡️ ¡Sesión iniciada de forma 100% segura con Google OAuth!');
+  showToast('🛡️ ¡Sesión iniciada y verificada con Google OAuth!');
 };
 
 window.closeGoogleOAuthModal = function () {};
 
 window.logoutUser = function () {
-  saveState(); // Guarda el progreso de la cuenta antes de salir
+  saveState(); // Guarda todo el progreso de la cuenta en la base de datos de usuarios antes de salir
   state.userAccount = null;
   state.points = 100;
   state.vipPoints = 0;
@@ -9257,12 +11080,33 @@ window.logoutUser = function () {
   state.trialCoursePurchased = false;
   state.completedCourses = [];
   state.courseProgress = {};
+  state.courseProgressPct = {};
+  state.lastVisitedByCourse = {};
+  state.lastActiveCourseId = null;
   state.unlockedRewards = [];
   state.freeTrialBonusClaimed = false;
+  state.subscription = null;
+  state.purchases = [];
+  state.pointsLedger = [
+    {
+      txId: 'tx_guest_reset',
+      idempotencyKey: 'init:guest',
+      type: 'INITIAL_GRANT',
+      deltaPTS: 100,
+      deltaVP: 0,
+      deltaXP: 100,
+      balancePTS: 100,
+      balanceVP: 0,
+      balanceXP: 100,
+      reason: 'Bono inicial de sesión invitado',
+      timestamp: new Date().toISOString()
+    }
+  ];
+  state.walletSignature = computeWalletSignature(100, 0, 100, 1);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   renderHeaderAndStats();
   renderSkillsGrid();
-  showToast('👋 Sesión cerrada. Vuelve a iniciar sesión cuando quieras recuperar tus puntos y cursos.');
+  showToast('👋 Sesión cerrada de forma segura. Tu progreso quedó guardado en tu cuenta.');
 };
 
 // ==========================================================================
@@ -9272,8 +11116,7 @@ const PAYMENT_CONFIG_KEY = 'skillvault_payment_config_v1';
 const DEFAULT_PAYMENT_CONFIG = {
   mpLink: '',
   mpAlias: 'gonlletaa',
-  paypal: 'gonzaloramirez.mail@gmail.com',
-  stripeLink: ''
+  paypal: 'gonzaloramirez.mail@gmail.com'
 };
 
 function loadPaymentConfig() {
@@ -9284,8 +11127,7 @@ function loadPaymentConfig() {
     return {
       mpLink: parsed.mpLink || DEFAULT_PAYMENT_CONFIG.mpLink,
       mpAlias: parsed.mpAlias || DEFAULT_PAYMENT_CONFIG.mpAlias,
-      paypal: parsed.paypal || DEFAULT_PAYMENT_CONFIG.paypal,
-      stripeLink: parsed.stripeLink || DEFAULT_PAYMENT_CONFIG.stripeLink
+      paypal: parsed.paypal || DEFAULT_PAYMENT_CONFIG.paypal
     };
   } catch (e) {
     return { ...DEFAULT_PAYMENT_CONFIG };
@@ -9298,7 +11140,7 @@ function savePaymentConfig(cfg) {
 
 window.openPaymentSettingsModal = function () {
   if (!isAdminModeActive && !devControlsVisible) {
-    showToast('🔒 Ruta protegida (/admin/payments): exclusiva para el administrador.');
+    showSkillVaultErrorScreen('403');
     return;
   }
 
@@ -9330,10 +11172,6 @@ window.openPaymentSettingsModal = function () {
             <label for="pay-cfg-paypal">🅿️ Tu Cuenta o Link de PayPal (Cobros en USD)</label>
             <input type="text" id="pay-cfg-paypal" placeholder="gonzaloramirez.mail@gmail.com" />
           </div>
-          <div class="form-group">
-            <label for="pay-cfg-stripe">💳 Link de Pago de Stripe (Opcional)</label>
-            <input type="url" id="pay-cfg-stripe" placeholder="https://buy.stripe.com/..." />
-          </div>
           <button type="submit" class="btn-primary-full">💾 Guardar Configuración en /admin/payments</button>
         </form>
       </div>
@@ -9349,11 +11187,10 @@ window.openPaymentSettingsModal = function () {
         savePaymentConfig({
           mpLink: (document.getElementById('pay-cfg-mp-link')?.value || '').trim(),
           mpAlias: (document.getElementById('pay-cfg-mp-alias')?.value || '').trim(),
-          paypal: (document.getElementById('pay-cfg-paypal')?.value || '').trim(),
-          stripeLink: (document.getElementById('pay-cfg-stripe')?.value || '').trim()
+          paypal: (document.getElementById('pay-cfg-paypal')?.value || '').trim()
         });
         closePaymentSettingsModal();
-        showToast('✅ ¡Configuración de cobros guardada en el panel privado de Admin!');
+        showToast('✅ ¡Configuración de cobros (PayPal y MercadoPago) guardada en el panel privado de Admin!');
       });
     }
   }
@@ -9362,12 +11199,10 @@ window.openPaymentSettingsModal = function () {
   const mpLinkEl = document.getElementById('pay-cfg-mp-link');
   const mpAliasEl = document.getElementById('pay-cfg-mp-alias');
   const paypalEl = document.getElementById('pay-cfg-paypal');
-  const stripeEl = document.getElementById('pay-cfg-stripe');
 
   if (mpLinkEl) mpLinkEl.value = cfg.mpLink || '';
   if (mpAliasEl) mpAliasEl.value = cfg.mpAlias || '';
   if (paypalEl) paypalEl.value = cfg.paypal || '';
-  if (stripeEl) stripeEl.value = cfg.stripeLink || '';
 
   modal.classList.add('open');
 };
@@ -9411,9 +11246,6 @@ function buildRealPaymentUrl(gateway, priceUSD) {
     }
     return `${url.replace(/\/$/, '')}/${priceUSD.toFixed(2)}USD`;
   }
-  if (gateway.includes('Stripe') && cfg.stripeLink) {
-    return cfg.stripeLink;
-  }
   return '';
 }
 
@@ -9421,7 +11253,7 @@ function updateCheckoutGatewayLiveBox() {
   const box = document.getElementById('checkout-gateway-live-box');
   if (!box || !pendingCheckoutConfig) return;
   const selectedGatewayEl = document.querySelector('input[name="checkout-gateway"]:checked');
-  const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'MercadoPago';
+  const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'PayPal Express Checkout';
   const cfg = loadPaymentConfig();
   const payBtn = document.getElementById('checkout-pay-now-btn');
 
@@ -9452,11 +11284,6 @@ function updateCheckoutGatewayLiveBox() {
     box.style.display = 'block';
     box.innerHTML = `<strong>🅿️ Checkout oficial de PayPal (${cfg.paypal})</strong><br/><span style="color:var(--text-muted);">Se abrirá PayPal con el monto exacto de $${pendingCheckoutConfig.priceUSD.toFixed(2)} USD.</span>`;
     if (payBtn) payBtn.textContent = `🅿️ Pagar con PayPal ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
-    return;
-  } else if (gateway.includes('Stripe') && cfg.stripeLink) {
-    box.style.display = 'block';
-    box.innerHTML = `<strong>💳 Checkout seguro de Stripe</strong><br/><span style="color:var(--text-muted);">Se abrirá el enlace oficial de pago con tarjeta.</span>`;
-    if (payBtn) payBtn.textContent = `💳 Pagar con Stripe ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
     return;
   }
 
@@ -9496,9 +11323,19 @@ let devControlsVisible = false;
 window.grantFullAdminSuperpowers = function (silent = false) {
   state.isProMember = true;
   state.trialCoursePurchased = true;
-  state.points = Math.max(state.points, 99999);
-  state.vipPoints = Math.max(state.vipPoints, 99999);
-  state.xp = Math.max(state.xp, 25000);
+  const deltaPts = Math.max(0, 99999 - state.points);
+  const deltaVp = Math.max(0, 99999 - state.vipPoints);
+  const deltaXp = Math.max(0, 25000 - state.xp);
+  if (deltaPts > 0 || deltaVp > 0 || deltaXp > 0) {
+    recordPointsTransaction({
+      idempotencyKey: 'admin_grant_' + Date.now(),
+      type: 'ADMIN_GRANT',
+      deltaPTS: deltaPts,
+      deltaVP: deltaVp,
+      deltaXP: deltaXp,
+      reason: 'Recarga administrativa de propietario (?admin=1)'
+    });
+  }
   state.streak = Math.max(state.streak, 99);
 
   getAllSkills().forEach(s => {
@@ -9524,7 +11361,14 @@ window.grantFullAdminSuperpowers = function (silent = false) {
 window.toggleMyVipStatusAdmin = function () {
   state.isProMember = !state.isProMember;
   if (state.isProMember && state.vipPoints < 150) {
-    state.vipPoints += 150;
+    recordPointsTransaction({
+      idempotencyKey: 'admin_vip_toggle_' + Date.now(),
+      type: 'ADMIN_GRANT',
+      deltaPTS: 0,
+      deltaVP: 150,
+      deltaXP: 0,
+      reason: 'Activación administrativa de estado VIP'
+    });
   }
   saveState();
   renderHeaderAndStats();
@@ -9562,7 +11406,7 @@ window.setDevControlsVisibility = function (visible) {
           <span style="font-size:18px;">🔐</span>
           <div>
             <strong style="font-size:13.5px; color:#fff; display:block;">Modo Propietario Activo (?admin=1) • Todo Desbloqueado + 99.999 PTS/VP</strong>
-            <span style="font-size:11.5px; color:var(--text-muted);">Tienes todos los cursos (incluidos secretos), módulos, cofres y puntos al máximo.</span>
+            <span style="font-size:11.5px; color:var(--text-muted);">Tienes todos los cursos (incluidos secretos), módulos, cofres, soporte admin y auditoría.</span>
           </div>
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:8px;">
@@ -9571,6 +11415,9 @@ window.setDevControlsVisibility = function (visible) {
           </button>
           <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="openPaymentSettingsModal()">
             💳 Configurar Cobros (PayPal / Alias MP)
+          </button>
+          <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="switchAppTab('help')">
+            🛟 Gestionar Tickets Soporte
           </button>
           <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="toggleMyVipStatusAdmin()">
             👑 Alternar Mi Estado VIP
@@ -9595,7 +11442,61 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   window.setDevControlsVisibility(urlParams.get('admin') === '1');
 
-  // Detector automático de retorno tras Pago Exitoso en MercadoPago / Stripe / PayPal (?pago_exitoso=vip_pro)
+  // Monitoreo de conexión a internet en tiempo real
+  const netBanner = document.getElementById('network-status-banner');
+  window.addEventListener('offline', () => {
+    if (netBanner) netBanner.style.display = 'flex';
+    showToast('📡 Conexión perdida. Tu progreso se guardará localmente.');
+  });
+  window.addEventListener('online', () => {
+    if (netBanner) netBanner.style.display = 'none';
+    saveState();
+    showToast('✅ Conexión restablecida y progreso sincronizado.');
+  });
+
+  // Sincronización automática entre pestañas/dispositivos en el mismo navegador
+  window.addEventListener('storage', e => {
+    if (e.key === STORAGE_KEY || e.key === USERS_DB_KEY) {
+      state = loadState();
+      renderHeaderAndStats();
+      renderSkillsGrid();
+    }
+  });
+
+  // Manejo de enlaces de Verificación de Correo (?verify_email=TOKEN) y Recuperación (?reset_token=TOKEN)
+  if (urlParams.has('verify_email')) {
+    const token = urlParams.get('verify_email');
+    setTimeout(() => {
+      window.verifyEmailWithToken(token);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }, 250);
+  }
+  if (urlParams.has('reset_token')) {
+    const token = urlParams.get('reset_token');
+    setTimeout(() => {
+      window.openResetPasswordFromLink(token);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }, 250);
+  }
+  if (urlParams.has('error')) {
+    const errCode = urlParams.get('error');
+    setTimeout(() => {
+      window.showSkillVaultErrorScreen(errCode);
+    }, 200);
+  }
+  if (urlParams.has('tab')) {
+    const targetTab = urlParams.get('tab');
+    const validTabs = ['explore', 'plans', 'rewards', 'dictionary', 'certificates', 'profile', 'help', 'owner', 'create'];
+    setTimeout(() => {
+      if (validTabs.includes(targetTab)) {
+        window.switchAppTab(targetTab);
+      } else {
+        window.showSkillVaultErrorScreen('404');
+      }
+    }, 150);
+  }
+
+  // Detector automático de retorno tras Pago Exitoso en MercadoPago / PayPal (?pago_exitoso=vip_pro)
   const pagoExitoso = urlParams.get('pago_exitoso') || urlParams.get('payment_status');
   if (pagoExitoso === 'vip_pro' || pagoExitoso === 'vip_founder' || pagoExitoso === 'approved' || pagoExitoso === '1') {
     const savedPendingRaw = localStorage.getItem('skillvault_pending_checkout_v1');
@@ -9605,17 +11506,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) { }
 
     if (pendingOrder && pendingOrder.type === 'course') {
-      const skill = getAllSkills().find(s => s.id === pendingOrder.skillId);
-      if (skill) {
-        if (skill.isTrialCourse) state.trialCoursePurchased = true;
-        if (!state.ownedCourses.includes(skill.id)) {
-          state.ownedCourses.push(skill.id);
-        }
-        saveState();
-        setTimeout(() => showToast(`🎉 ¡Pago verificado! Curso "${skill.title}" desbloqueado al 100% en tu cuenta.`), 400);
-      }
+      setTimeout(() => completeIndividualCoursePurchase(pendingOrder.skillId, 'MercadoPago Verificado'), 400);
     } else {
-      const tier = pagoExitoso === 'vip_founder' || (pendingOrder && pendingOrder.tier === 'founder') ? 'founder' : 'monthly';
+      const tier = pagoExitoso === 'vip_founder' || (pendingOrder && pendingOrder.tier === 'founder') ? 'annual' : 'monthly';
       setTimeout(() => completeVipMembershipPurchase(tier, 'MercadoPago Verificado'), 400);
     }
     localStorage.removeItem('skillvault_pending_checkout_v1');
@@ -9648,13 +11541,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Submit de Lista de Espera (#waitlist-form)
+  // Submit de Lista de Espera (#waitlist-form) con protección idempotente de puntos
   const waitlistForm = document.getElementById('waitlist-form');
   if (waitlistForm) {
     waitlistForm.addEventListener('submit', e => {
       e.preventDefault();
       const name = document.getElementById('waitlist-name').value.trim();
-      const email = document.getElementById('waitlist-email').value.trim();
+      const email = document.getElementById('waitlist-email').value.trim().toLowerCase();
       const planName = document.getElementById('waitlist-plan-name').textContent;
 
       if (!state.waitlistEntries) state.waitlistEntries = [];
@@ -9665,34 +11558,55 @@ document.addEventListener('DOMContentLoaded', () => {
         date: new Date().toISOString()
       });
 
-      state.points += 100;
+      const txRes = recordPointsTransaction({
+        idempotencyKey: `waitlist_bonus:${email}`,
+        type: 'WAITLIST_BONUS',
+        deltaPTS: 100,
+        deltaVP: 0,
+        deltaXP: 0,
+        reason: `Bono por unirse a Lista de Espera (${planName})`
+      });
+
       saveState();
       renderHeaderAndStats();
       waitlistForm.reset();
       closeWaitlistModal();
-      showToast(`🎉 ¡${name}, estás en la Lista de Espera de "${planName}"! Te acreditamos +100 PTS de regalo.`);
+      if (txRes.duplicate) {
+        showToast(`✅ ¡${name}, ya estabas registrado en la Lista de Espera!`);
+      } else {
+        showToast(`🎉 ¡${name}, estás en la Lista de Espera de "${planName}"! Te acreditamos +100 PTS de regalo.`);
+      }
     });
   }
 
-  // Submit de Login / Registro / Restablecer Contraseña (#auth-form)
+  // Submit de Login / Registro / Recuperar Contraseña (#auth-form)
   const authForm = document.getElementById('auth-form');
   if (authForm) {
     authForm.addEventListener('submit', e => {
       e.preventDefault();
       showAuthFeedback('');
 
-      const email = document.getElementById('auth-email').value.trim().toLowerCase();
-      const rawName = document.getElementById('auth-name').value.trim();
-      const password = document.getElementById('auth-password').value;
-      const confirmPassEl = document.getElementById('auth-password-confirm');
-      const confirmPassword = confirmPassEl ? confirmPassEl.value : '';
+      const email = (document.getElementById('auth-email')?.value || '').trim().toLowerCase();
+      const rawName = (document.getElementById('auth-name')?.value || '').trim();
+      const password = document.getElementById('auth-password')?.value || '';
+      const confirmPassword = document.getElementById('auth-password-confirm')?.value || '';
+      const resetToken = (document.getElementById('auth-reset-token-input')?.value || '').trim();
 
       const db = loadUsersDB();
 
-      // MODO 1: CREAR CUENTA NUEVA
+      // MODO 1: CREAR CUENTA NUEVA + ENVIAR VERIFICACIÓN DE CORREO
       if (currentAuthMode === 'register') {
+        const regRl = checkAndRecordRateLimit(`register:${email || 'ip'}`, 5, 10 * 60 * 1000);
+        if (!regRl.allowed) {
+          showAuthFeedback(`⏳ Demasiados intentos de registro. Espera ${regRl.retryAfterSec} segundos.`, 'error');
+          return;
+        }
         if (!rawName || rawName.length < 2) {
-          showAuthFeedback('⚠️ Por favor escribe tu nombre y apellido.', 'error');
+          showAuthFeedback('⚠️ Por favor escribe tu nombre y apellido completo.', 'error');
+          return;
+        }
+        if (!email.includes('@')) {
+          showAuthFeedback('⚠️ Introduce un correo electrónico válido.', 'error');
           return;
         }
         if (password.length < 6) {
@@ -9704,43 +11618,137 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
         if (db[email]) {
-          showAuthFeedback(`⚠️ Ya existe una cuenta registrada con <strong>${email}</strong>. Cambia a "Iniciar Sesión".`, 'error');
+          showAuthFeedback('⚠️ No se pudo completar el registro con este correo. Si ya tienes cuenta, inicia sesión o recupera tu contraseña.', 'error');
           return;
         }
+
+        const nowIso = new Date().toISOString();
+        const initialLedger = [
+          {
+            txId: 'tx_welcome_' + Date.now(),
+            idempotencyKey: 'welcome_bonus:' + email,
+            type: 'WELCOME_BONUS',
+            deltaPTS: 150,
+            deltaVP: 0,
+            deltaXP: 100,
+            balancePTS: 150,
+            balanceVP: 0,
+            balanceXP: 100,
+            reason: 'Bono de bienvenida por registro de cuenta (100 base + 50 PTS)',
+            timestamp: nowIso
+          }
+        ];
 
         const newAccount = {
           name: rawName,
           email,
           provider: 'Email',
+          emailVerified: false,
           passwordHash: hashPassword(password),
-          createdAt: new Date().toISOString(),
+          createdAt: nowIso,
           profile: {
-            points: 150, // 100 iniciales + 50 PTS bono de bienvenida por registro
+            points: 150,
             vipPoints: 0,
             xp: 100,
             streak: 1,
+            emailVerified: false,
             isProMember: false,
-            ownedCourses: ['py-automation'],
+            ownedCourses: [],
+            trialCoursePurchased: false,
             completedCourses: [],
             courseProgress: {},
+            courseProgressPct: {},
+            lastVisitedByCourse: {},
+            lastActiveCourseId: null,
             unlockedRewards: [],
-            freeTrialBonusClaimed: false
+            freeTrialBonusClaimed: false,
+            subscription: null,
+            purchases: [],
+            pointsLedger: initialLedger,
+            walletSignature: computeWalletSignature(150, 0, 100, 1, email)
           }
         };
 
         db[email] = newAccount;
         saveUsersDB(db);
         applyUserProfileToState(newAccount);
+        createAndSendEmailVerificationLink(email, rawName);
+
         authForm.reset();
         closeAuthModal();
-        showToast(`✨ ¡Cuenta creada con éxito, ${newAccount.name}! Recibiste +50 PTS de bienvenida (Total: 150 PTS).`);
+        showToast(`✨ ¡Cuenta creada, ${newAccount.name}! Te enviamos un correo de verificación (revisa 📬 Bandeja de Correos).`);
         return;
       }
 
-      // MODO 2: RESTABLECER CONTRASEÑA
-      if (currentAuthMode === 'reset') {
-        if (!db[email]) {
-          showAuthFeedback(`❌ No encontramos ninguna cuenta registrada con el correo <strong>${email}</strong>.`, 'error');
+      // MODO 2: SOLICITAR ENLACE DE RECUPERACIÓN DE CONTRASEÑA (SIN REVELAR SI EL CORREO EXISTE)
+      if (currentAuthMode === 'forgot') {
+        if (!email.includes('@')) {
+          showAuthFeedback('⚠️ Introduce un correo electrónico válido.', 'error');
+          return;
+        }
+        const resetRl = checkAndRecordRateLimit(`pwd_reset:${email}`, 3, 15 * 60 * 1000);
+        if (!resetRl.allowed) {
+          showAuthFeedback(
+            `⏳ Has superado el límite de solicitudes de recuperación. Por seguridad, intenta nuevamente en ${resetRl.retryAfterSec} segundos.`,
+            'error'
+          );
+          return;
+        }
+
+        // Si la cuenta existe, generamos token con vencimiento de 15 minutos e invalidamos anteriores
+        if (db[email]) {
+          const resetTokens = loadJsonDB(RESET_TOKENS_DB_KEY, {});
+          Object.keys(resetTokens).forEach(k => {
+            if (resetTokens[k] && resetTokens[k].email === email) {
+              resetTokens[k].used = true;
+            }
+          });
+          const token = generateSecureToken('rst');
+          const nowMs = Date.now();
+          const expiresAt = nowMs + 15 * 60 * 1000; // 15 minutos de vigencia
+
+          resetTokens[token] = {
+            token,
+            email,
+            createdAt: nowMs,
+            expiresAt,
+            used: false
+          };
+          saveJsonDB(RESET_TOKENS_DB_KEY, resetTokens);
+
+          const resetUrl = `${window.location.pathname}?reset_token=${encodeURIComponent(token)}`;
+          sendTransactionalEmail({
+            to: email,
+            subject: 'Enlace seguro para restablecer tu contraseña — SkillVault',
+            category: 'SEGURIDAD DE CUENTA',
+            bodyHtml: `
+              <p>Hola <strong>${db[email].name || email}</strong>,</p>
+              <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta en SkillVault Academy.</p>
+              <p>Este enlace es de <strong>un solo uso</strong> y vencerá en <strong>15 minutos</strong> (${new Date(expiresAt).toLocaleTimeString('es-ES')}):</p>
+            `,
+            ctaLabel: '🔑 Crear Nueva Contraseña Ahora',
+            ctaUrl: resetUrl
+          });
+        }
+
+        // Mensaje idéntico exista o no exista el correo (Prevención de enumeración de usuarios)
+        showAuthFeedback(
+          '✅ Si el correo ingresado está registrado en SkillVault, recibirás un enlace seguro para restablecer tu contraseña en unos instantes (válido por 15 minutos). Revisa tu Bandeja de Correos (📬).',
+          'success'
+        );
+        return;
+      }
+
+      // MODO 3: CONFIRMAR NUEVA CONTRASEÑA CON TOKEN SEGURO DE UN SOLO USO
+      if (currentAuthMode === 'reset-confirm') {
+        const resetTokens = loadJsonDB(RESET_TOKENS_DB_KEY, {});
+        const tokenRecord = resetTokens[resetToken];
+
+        if (!tokenRecord || tokenRecord.used || Date.now() > tokenRecord.expiresAt) {
+          showAuthFeedback(
+            '❌ El enlace de restablecimiento es inválido, ya fue utilizado o ha vencido. Solicita uno nuevo.',
+            'error'
+          );
           return;
         }
         if (password.length < 6) {
@@ -9752,28 +11760,46 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        db[email].passwordHash = hashPassword(password);
+        const targetEmail = tokenRecord.email;
+        if (!db[targetEmail]) {
+          showAuthFeedback('❌ No se pudo completar la operación.', 'error');
+          return;
+        }
+
+        // Actualizar contraseña e invalidar el enlace inmediatamente
+        db[targetEmail].passwordHash = hashPassword(password);
+        db[targetEmail].passwordUpdatedAt = new Date().toISOString();
         saveUsersDB(db);
-        applyUserProfileToState(db[email]);
+
+        tokenRecord.used = true;
+        tokenRecord.usedAt = Date.now();
+        saveJsonDB(RESET_TOKENS_DB_KEY, resetTokens);
+
+        sendTransactionalEmail({
+          to: targetEmail,
+          subject: 'Tu contraseña de SkillVault fue actualizada',
+          category: 'SEGURIDAD DE CUENTA',
+          bodyHtml: `<p>Hola <strong>${db[targetEmail].name}</strong>, te confirmamos que la contraseña de tu cuenta ha sido restablecida exitosamente y el enlace de recuperación quedó invalidado.</p>`
+        });
+
+        applyUserProfileToState(db[targetEmail]);
         authForm.reset();
         closeAuthModal();
-        showToast(`🔑 ¡Contraseña actualizada con éxito! Sesión iniciada como ${db[email].name}.`);
+        showToast(`🔑 ¡Contraseña restablecida con éxito! Sesión iniciada como ${db[targetEmail].name}.`);
         return;
       }
 
-      // MODO 3: INICIAR SESIÓN (LOGIN)
+      // MODO 4: INICIAR SESIÓN (LOGIN CON LÍMITE DE INTENTOS Y MENSAJE NO ENUMERADOR)
+      const loginRl = checkAndRecordRateLimit(`login:${email}`, 5, 5 * 60 * 1000);
+      if (!loginRl.allowed) {
+        showAuthFeedback(`⏳ Demasiados intentos fallidos. Espera ${loginRl.retryAfterSec} segundos o recupera tu contraseña.`, 'error');
+        return;
+      }
+
       const existingAccount = db[email];
-      if (!existingAccount) {
+      if (!existingAccount || !verifyPasswordHash(password, existingAccount.passwordHash)) {
         showAuthFeedback(
-          `❌ No existe ninguna cuenta registrada con <strong>${email}</strong>. Toca la pestaña <strong>"Crear Cuenta"</strong> arriba para registrarte primero.`,
-          'error'
-        );
-        return;
-      }
-
-      if (existingAccount.passwordHash !== hashPassword(password)) {
-        showAuthFeedback(
-          '❌ Contraseña incorrecta para esta cuenta. Inténtalo de nuevo o usa "¿Olvidaste tu contraseña?".',
+          '❌ Correo electrónico o contraseña incorrectos. Verifica tus datos o utiliza "¿Olvidaste tu contraseña?".',
           'error'
         );
         return;
@@ -9782,7 +11808,87 @@ document.addEventListener('DOMContentLoaded', () => {
       applyUserProfileToState(existingAccount);
       authForm.reset();
       closeAuthModal();
-      showToast(`👋 ¡Bienvenido de nuevo, ${existingAccount.name}! Se cargaron tus ${state.points} PTS y tu progreso.`);
+      showToast(`👋 ¡Bienvenido de nuevo, ${existingAccount.name}! Se sincronizaron tus ${state.points} PTS y tu progreso.`);
+    });
+  }
+
+  // Submit del Formulario de Soporte ("Centro de ayuda" #support-ticket-form)
+  const supportForm = document.getElementById('support-ticket-form');
+  if (supportForm) {
+    supportForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const feedbackEl = document.getElementById('support-form-feedback');
+      const hpValue = (document.getElementById('support-website-hp')?.value || '').trim();
+
+      // Protección anti-bots (Honeypot)
+      if (hpValue) {
+        return;
+      }
+
+      const name = (document.getElementById('support-name')?.value || '').trim();
+      const email = (document.getElementById('support-email')?.value || '').trim().toLowerCase();
+      const category = (document.getElementById('support-category')?.value || '').trim();
+      const description = (document.getElementById('support-description')?.value || '').trim();
+
+      if (!name || !email.includes('@') || !category || description.length < 10) {
+        if (feedbackEl) {
+          feedbackEl.className = 'auth-feedback-box error';
+          feedbackEl.innerHTML = '⚠️ Completa tu nombre, un correo válido, la categoría y describe el problema (mínimo 10 caracteres).';
+          feedbackEl.style.display = 'block';
+        }
+        return;
+      }
+
+      const supRl = checkAndRecordRateLimit(`support_ticket:${email}`, 4, 10 * 60 * 1000);
+      if (!supRl.allowed) {
+        if (feedbackEl) {
+          feedbackEl.className = 'auth-feedback-box error';
+          feedbackEl.innerHTML = `⏳ Has enviado varias consultas seguidas. Por favor espera ${supRl.retryAfterSec} segundos antes de enviar otra.`;
+          feedbackEl.style.display = 'block';
+        }
+        return;
+      }
+
+      const ticketId = 'TK-' + String(Date.now()).slice(-6);
+      const newTicket = {
+        id: ticketId,
+        name,
+        email,
+        category,
+        description,
+        status: 'pendiente',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        adminResponse: null
+      };
+
+      const allTickets = loadJsonDB(SUPPORT_TICKETS_DB_KEY, []);
+      allTickets.unshift(newTicket);
+      saveJsonDB(SUPPORT_TICKETS_DB_KEY, allTickets);
+
+      sendTransactionalEmail({
+        to: email,
+        subject: `Recibimos tu consulta #${ticketId} — Centro de Ayuda SkillVault`,
+        category: 'SOPORTE AL ESTUDIANTE',
+        bodyHtml: `
+          <p>Hola <strong>${name}</strong>,</p>
+          <p>Hemos registrado tu consulta en la categoría <strong>${category.toUpperCase()}</strong> con el número de seguimiento <strong>#${ticketId}</strong>.</p>
+          <p><strong>Descripción enviada:</strong> "${description}"</p>
+          <p>Estado actual: <strong>PENDIENTE</strong>. Te notificaremos por correo apenas el equipo la actualice.</p>
+        `,
+        ctaLabel: 'Ver Mis Consultas en Centro de Ayuda',
+        ctaUrl: '?tab=help'
+      });
+
+      if (feedbackEl) {
+        feedbackEl.className = 'auth-feedback-box success';
+        feedbackEl.innerHTML = `✅ ¡Consulta enviada con éxito! Tu número de ticket es <strong>#${ticketId}</strong> (Estado: Pendiente). Te enviamos confirmación por correo.`;
+        feedbackEl.style.display = 'block';
+      }
+
+      document.getElementById('support-description').value = '';
+      renderHelpCenterAndSupport();
+      showToast(`🛟 Ticket #${ticketId} registrado correctamente en la base de datos.`);
     });
   }
 
@@ -9809,7 +11915,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const existing = db[email];
 
       if (existing) {
-        if (existing.passwordHash !== hashPassword(pass)) {
+        if (!verifyPasswordHash(pass, existing.passwordHash)) {
           if (fb) {
             fb.className = 'auth-feedback-box error';
             fb.innerHTML = '❌ La contraseña no coincide con esta cuenta de Google registrada.';
@@ -9817,6 +11923,8 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           return;
         }
+        existing.emailVerified = true;
+        saveUsersDB(db);
         applyUserProfileToState(existing);
         googleForm.reset();
         closeGoogleOAuthModal();
@@ -9828,6 +11936,7 @@ document.addEventListener('DOMContentLoaded', () => {
           name: finalName,
           email,
           provider: 'Google',
+          emailVerified: true,
           passwordHash: hashPassword(pass),
           createdAt: new Date().toISOString(),
           profile: {
@@ -9835,6 +11944,7 @@ document.addEventListener('DOMContentLoaded', () => {
             vipPoints: 0,
             xp: 100,
             streak: 1,
+            emailVerified: true,
             isProMember: false,
             ownedCourses: ['py-automation'],
             completedCourses: [],
@@ -9848,12 +11958,12 @@ document.addEventListener('DOMContentLoaded', () => {
         applyUserProfileToState(newGoogleAcc);
         googleForm.reset();
         closeGoogleOAuthModal();
-        showToast(`🎉 ¡Cuenta de Google (${email}) vinculada con éxito! +50 PTS acreditados.`);
+        showToast(`🎉 ¡Cuenta de Google (${email}) vinculada y verificada con éxito! +50 PTS acreditados.`);
       }
     });
   }
 
-  // Actualizar vista de pasarela al cambiar entre MercadoPago / PayPal / Stripe
+  // Actualizar vista de pasarela al cambiar entre MercadoPago / PayPal
   document.querySelectorAll('input[name="checkout-gateway"]').forEach(radio => {
     radio.addEventListener('change', updateCheckoutGatewayLiveBox);
   });
@@ -9866,12 +11976,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const newCfg = {
         mpLink: (document.getElementById('pay-cfg-mp-link')?.value || '').trim(),
         mpAlias: (document.getElementById('pay-cfg-mp-alias')?.value || '').trim(),
-        paypal: (document.getElementById('pay-cfg-paypal')?.value || '').trim(),
-        stripeLink: (document.getElementById('pay-cfg-stripe')?.value || '').trim()
+        paypal: (document.getElementById('pay-cfg-paypal')?.value || '').trim()
       };
       savePaymentConfig(newCfg);
       closePaymentSettingsModal();
-      showToast('✅ ¡Tus métodos de cobro reales (MercadoPago / PayPal / Stripe) fueron guardados!');
+      showToast('✅ ¡Tus métodos de cobro reales (MercadoPago y PayPal) fueron guardados!');
     });
   }
 
@@ -9896,28 +12005,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pendingCheckoutConfig.type === 'vip') {
         completeVipMembershipPurchase(pendingCheckoutConfig.tier, gateway);
       } else if (pendingCheckoutConfig.type === 'course') {
-        const skill = getAllSkills().find(s => s.id === pendingCheckoutConfig.skillId);
-        if (skill) {
-          if (skill.isTrialCourse) {
-            state.trialCoursePurchased = true;
-          }
-          if (!state.ownedCourses.includes(skill.id)) {
-            state.ownedCourses.push(skill.id);
-          }
-          state.ownerBalanceUSD += skill.priceUSD;
-          state.ownerSalesCount += 1;
-          state.ownerTransactions.unshift({
-            id: 'otx-' + Date.now(),
-            title: `🎓 Venta vía ${gateway}: "${skill.title}"`,
-            date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            amount: skill.priceUSD,
-            type: 'positive'
-          });
-          saveState();
-          renderHeaderAndStats();
-          renderSkillsGrid();
-          showToast(`🎉 ¡Pago procesado con ${gateway}! Curso "${skill.title}" desbloqueado al 100%.`);
-        }
+        completeIndividualCoursePurchase(pendingCheckoutConfig.skillId, gateway);
       }
 
       checkoutForm.reset();
@@ -9925,12 +12013,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Cerrar modales adicionales con clic afuera
-  ['info-modal', 'waitlist-modal', 'auth-modal', 'google-oauth-modal', 'checkout-modal', 'pwa-install-modal', 'payment-settings-modal'].forEach(modalId => {
+  // Cerrar modales adicionales con clic afuera o Escape
+  [
+    'info-modal',
+    'waitlist-modal',
+    'auth-modal',
+    'google-oauth-modal',
+    'checkout-modal',
+    'pwa-install-modal',
+    'payment-settings-modal',
+    'cancel-subscription-modal',
+    'receipt-modal',
+    'mailbox-modal'
+  ].forEach(modalId => {
     const m = document.getElementById(modalId);
     if (m) {
       m.addEventListener('click', e => {
         if (e.target === m) m.classList.remove('open');
+      });
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.open').forEach(m => {
+        if (m.id !== 'lesson-modal') m.classList.remove('open');
       });
     }
   });
