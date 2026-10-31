@@ -11444,12 +11444,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Monitoreo de conexión a internet en tiempo real
   const netBanner = document.getElementById('network-status-banner');
+  if (netBanner) {
+    const isOffline = navigator.onLine === false;
+    netBanner.hidden = !isOffline;
+    netBanner.style.display = isOffline ? 'flex' : 'none';
+  }
+  window.retryNetworkConnection = function () {
+    if (navigator.onLine !== false) {
+      if (netBanner) {
+        netBanner.hidden = true;
+        netBanner.style.display = 'none';
+      }
+      saveState();
+      showToast('✅ Conexión activa y progreso sincronizado.');
+    } else {
+      showToast('📡 Aún sin conexión a internet. Tu progreso sigue guardado localmente.');
+    }
+  };
   window.addEventListener('offline', () => {
-    if (netBanner) netBanner.style.display = 'flex';
+    if (netBanner) {
+      netBanner.hidden = false;
+      netBanner.style.display = 'flex';
+    }
     showToast('📡 Conexión perdida. Tu progreso se guardará localmente.');
   });
   window.addEventListener('online', () => {
-    if (netBanner) netBanner.style.display = 'none';
+    if (netBanner) {
+      netBanner.hidden = true;
+      netBanner.style.display = 'none';
+    }
     saveState();
     showToast('✅ Conexión restablecida y progreso sincronizado.');
   });

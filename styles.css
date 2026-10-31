@@ -3591,12 +3591,16 @@ main:focus {
   padding: 10px 20px;
   font-size: 13px;
   font-weight: 700;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
   z-index: 9000;
+}
+
+.network-status-banner[hidden] {
+  display: none !important;
 }
 
 /* Tarjeta de Continuar donde dejaste (Guardado Automático de Progreso) */
