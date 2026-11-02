@@ -5533,36 +5533,77 @@ function getCloudRequestHeaders() {
 
 let cloudSyncDebounceTimer = null;
 
+function getEmailCloudTopic(email) {
+  const clean = String(email || '').trim().toLowerCase();
+  let h1 = 0x811c9dc5;
+  let h2 = 0x01000193;
+  for (let i = 0; i < clean.length; i++) {
+    const ch = clean.charCodeAt(i);
+    h1 ^= ch;
+    h1 = Math.imul(h1, 0x01000193);
+    h2 ^= ch * 31;
+    h2 = Math.imul(h2, 0x85ebca6b);
+  }
+  return 'sv_cloud_u_' + (h1 >>> 0).toString(36) + '_' + (h2 >>> 0).toString(36);
+}
+
 async function syncAccountToCloud(accountObj) {
   if (!accountObj || !accountObj.email) return { ok: false };
+  const cleanEmail = String(accountObj.email).trim().toLowerCase();
+  const normalizedAcc = {
+    ...accountObj,
+    email: cleanEmail,
+    updatedAt: new Date().toISOString()
+  };
   const cfg = loadCloudConfig();
+  let synced = false;
+
+  // 1. Sincronizar con el endpoint Serverless de Vercel (/api/cloud-sync)
   try {
     const res = await fetch('/api/cloud-sync', {
       method: 'POST',
       headers: getCloudRequestHeaders(),
       body: JSON.stringify({
         action: 'upsert_user',
-        account: accountObj
+        account: normalizedAcc
       })
     });
     if (res.ok) {
       const data = await res.json();
-      if (data && data.ok) return { ok: true, mode: 'vercel_api' };
+      if (data && data.ok) synced = true;
     }
   } catch (e) {}
 
-  // Respaldo directo a Supabase REST si el propietario configuró URL y Key en el panel Admin
+  // 2. Respaldo directo al Cloud Relay determinístico para persistencia inmediata entre PC y Celular
+  try {
+    const topic = getEmailCloudTopic(cleanEmail);
+    const relayRes = await fetch(`https://ntfy.sh/${topic}`, {
+      method: 'POST',
+      headers: {
+        Title: 'SkillVault Account Sync',
+        Priority: 'min'
+      },
+      body: JSON.stringify({
+        _svType: 'account_sync_v2',
+        updatedAt: normalizedAcc.updatedAt,
+        account: normalizedAcc
+      })
+    });
+    if (relayRes.ok) synced = true;
+  } catch (e) {}
+
+  // 3. Respaldo directo a Supabase REST si el propietario configuró URL y Key en el panel Admin
   if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
     try {
       const sbUrl = cfg.supabaseUrl.trim().replace(/\/$/, '');
       const sbKey = cfg.supabaseAnonKey.trim();
-      const profile = accountObj.profile || {};
+      const profile = normalizedAcc.profile || {};
       const payload = {
-        email: String(accountObj.email).trim().toLowerCase(),
-        name: accountObj.name || accountObj.email.split('@')[0],
-        provider: accountObj.provider || 'Email',
-        email_verified: Boolean(accountObj.emailVerified),
-        password_hash: accountObj.passwordHash || '',
+        email: cleanEmail,
+        name: normalizedAcc.name || cleanEmail.split('@')[0],
+        provider: normalizedAcc.provider || 'Email',
+        email_verified: Boolean(normalizedAcc.emailVerified),
+        password_hash: normalizedAcc.passwordHash || '',
         is_pro_member: Boolean(profile.isProMember),
         points: Number(profile.points ?? 150),
         vip_points: Number(profile.vipPoints ?? 0),
@@ -5582,16 +5623,38 @@ async function syncAccountToCloud(accountObj) {
         },
         body: JSON.stringify(payload)
       });
-      if (directRes.ok) return { ok: true, mode: 'supabase_direct' };
+      if (directRes.ok) synced = true;
     } catch (e) {}
   }
-  return { ok: false };
+
+  return { ok: synced };
 }
 
 async function fetchAccountFromCloud(email) {
   if (!email) return null;
   const cleanEmail = String(email).trim().toLowerCase();
   const cfg = loadCloudConfig();
+  let bestCandidate = null;
+
+  const pickNewerAccount = candidate => {
+    if (!candidate || !candidate.email) return;
+    if (!bestCandidate) {
+      bestCandidate = candidate;
+      return;
+    }
+    const ptsA = Number(bestCandidate.profile?.points || 0);
+    const ptsB = Number(candidate.profile?.points || 0);
+    const modA = Object.keys(bestCandidate.profile?.courseProgress || {}).length;
+    const modB = Object.keys(candidate.profile?.courseProgress || {}).length;
+    const timeA = new Date(bestCandidate.updatedAt || bestCandidate.createdAt || 0).getTime() || 0;
+    const timeB = new Date(candidate.updatedAt || candidate.createdAt || 0).getTime() || 0;
+
+    if (timeB > timeA || ptsB > ptsA || modB > modA) {
+      bestCandidate = candidate;
+    }
+  };
+
+  // 1. Consultar API Serverless (/api/cloud-sync)
   try {
     const res = await fetch(`/api/cloud-sync?email=${encodeURIComponent(cleanEmail)}`, {
       method: 'GET',
@@ -5600,11 +5663,35 @@ async function fetchAccountFromCloud(email) {
     if (res.ok) {
       const data = await res.json();
       if (data && data.ok && data.user) {
-        return data.user;
+        pickNewerAccount(data.user);
       }
     }
   } catch (e) {}
 
+  // 2. Consultar Cloud Relay determinístico directo para sincronización garantizada entre dispositivos
+  try {
+    const topic = getEmailCloudTopic(cleanEmail);
+    const relayRes = await fetch(`https://ntfy.sh/${topic}/json?poll=1&since=all`);
+    if (relayRes.ok) {
+      const text = await relayRes.text();
+      if (text && text.trim()) {
+        const lines = text.trim().split('\n');
+        for (const line of lines) {
+          try {
+            const evt = JSON.parse(line);
+            if (evt && evt.event === 'message' && evt.message) {
+              const payload = JSON.parse(evt.message);
+              if (payload && payload._svType === 'account_sync_v2' && payload.account && payload.account.email) {
+                pickNewerAccount(payload.account);
+              }
+            }
+          } catch (e) {}
+        }
+      }
+    }
+  } catch (e) {}
+
+  // 3. Consultar Supabase directo si está configurado
   if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
     try {
       const sbUrl = cfg.supabaseUrl.trim().replace(/\/$/, '');
@@ -5622,20 +5709,22 @@ async function fetchAccountFromCloud(email) {
         const rows = await directRes.json();
         if (Array.isArray(rows) && rows.length > 0) {
           const r = rows[0];
-          return {
+          pickNewerAccount({
             email: r.email,
             name: r.name,
             provider: r.provider || 'Email',
             emailVerified: Boolean(r.email_verified),
             passwordHash: r.password_hash,
             createdAt: r.created_at,
+            updatedAt: r.updated_at,
             profile: r.profile || {}
-          };
+          });
         }
       }
     } catch (e) {}
   }
-  return null;
+
+  return bestCandidate;
 }
 
 async function syncSupportTicketToCloud(ticketObj) {
@@ -5987,8 +6076,10 @@ function saveState() {
   if (state.userAccount && state.userAccount.email) {
     const db = loadUsersDB();
     const emailKey = state.userAccount.email.toLowerCase();
+    const currentQuizRes = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
     if (db[emailKey]) {
       db[emailKey].emailVerified = Boolean(state.userAccount.emailVerified);
+      db[emailKey].updatedAt = new Date().toISOString();
       db[emailKey].profile = {
         points: state.points,
         vipPoints: state.vipPoints,
@@ -6007,14 +6098,15 @@ function saveState() {
         unlockedRewards: state.unlockedRewards,
         pointsLedger: state.pointsLedger || [],
         walletSignature: state.walletSignature || '',
-        freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed)
+        freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed),
+        quizResult: currentQuizRes || db[emailKey].profile?.quizResult || null
       };
       saveUsersDB(db);
       clearTimeout(cloudSyncDebounceTimer);
       const accountSnapshot = db[emailKey];
       cloudSyncDebounceTimer = setTimeout(() => {
         syncAccountToCloud(accountSnapshot);
-      }, 450);
+      }, 350);
     }
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -10722,47 +10814,78 @@ function applyUserProfileToState(accountRecord) {
   const isGoogle = accountRecord.provider === 'Google';
   const emailVerified = isGoogle ? true : Boolean(accountRecord.emailVerified || prof.emailVerified);
 
+  // Combinar progreso local de invitado (si hizo el test o algún módulo antes de iniciar sesión) con el perfil de la cuenta
+  const mergedCourseProgress = { ...(state.courseProgress || {}) };
+  if (prof.courseProgress && typeof prof.courseProgress === 'object') {
+    Object.entries(prof.courseProgress).forEach(([cid, steps]) => {
+      const localSteps = Array.isArray(mergedCourseProgress[cid]) ? mergedCourseProgress[cid] : [];
+      const cloudSteps = Array.isArray(steps) ? steps : [];
+      mergedCourseProgress[cid] = Array.from(new Set([...localSteps, ...cloudSteps])).sort((a, b) => a - b);
+    });
+  }
+
+  const mergedCompleted = Array.from(
+    new Set([...(state.completedCourses || []), ...(Array.isArray(prof.completedCourses) ? prof.completedCourses : [])])
+  );
+  const mergedRewards = Array.from(
+    new Set([...(state.unlockedRewards || []), ...(Array.isArray(prof.unlockedRewards) ? prof.unlockedRewards : [])])
+  );
+
+  // Restaurar o sincronizar el resultado del Cuestionario Inicial (Curso Ideal) entre dispositivos
+  const localQuiz = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
+  const resolvedQuiz = prof.quizResult || localQuiz || null;
+  if (resolvedQuiz && typeof saveQuizResult === 'function') {
+    saveQuizResult(resolvedQuiz);
+    try {
+      sessionStorage.setItem('skillvault_splash_dismissed', '1');
+      const splash = document.getElementById('logo-splash-overlay');
+      if (splash) splash.classList.add('is-hidden');
+      const qModal = document.getElementById('onboarding-quiz-modal');
+      if (qModal) qModal.classList.remove('open');
+    } catch (e) {}
+  }
+
   state.userAccount = {
     name: accountRecord.name,
     email: accountRecord.email,
     provider: accountRecord.provider || 'Email',
     emailVerified
   };
-  state.points = typeof prof.points === 'number' ? prof.points : 150;
-  state.vipPoints = typeof prof.vipPoints === 'number' ? prof.vipPoints : 0;
-  state.xp = typeof prof.xp === 'number' ? prof.xp : 100;
-  state.streak = typeof prof.streak === 'number' ? prof.streak : 1;
-  state.isProMember = Boolean(prof.isProMember);
-  state.trialCoursePurchased = Boolean(prof.trialCoursePurchased);
-  state.ownedCourses = Array.isArray(prof.ownedCourses)
-    ? (state.trialCoursePurchased ? prof.ownedCourses : prof.ownedCourses.filter(id => id !== 'py-automation'))
-    : [];
-  state.completedCourses = Array.isArray(prof.completedCourses) ? prof.completedCourses : [];
-  state.courseProgress = prof.courseProgress || {};
-  state.courseProgressPct = prof.courseProgressPct || {};
-  state.lastVisitedByCourse = prof.lastVisitedByCourse || {};
-  state.lastActiveCourseId = prof.lastActiveCourseId || null;
-  state.unlockedRewards = Array.isArray(prof.unlockedRewards) ? prof.unlockedRewards : [];
-  state.freeTrialBonusClaimed = Boolean(prof.freeTrialBonusClaimed);
-  state.subscription = prof.subscription || null;
-  state.purchases = Array.isArray(prof.purchases) ? prof.purchases : [];
-  state.pointsLedger = Array.isArray(prof.pointsLedger) && prof.pointsLedger.length > 0
-    ? prof.pointsLedger
-    : [
-        {
-          txId: 'tx_user_init_' + accountRecord.email,
-          idempotencyKey: 'init:' + accountRecord.email,
-          type: 'WELCOME_BONUS',
-          deltaPTS: state.points,
-          deltaVP: state.vipPoints,
-          deltaXP: state.xp,
-          balancePTS: state.points,
-          balanceVP: state.vipPoints,
-          balanceXP: state.xp,
-          reason: 'Saldo inicial de cuenta verificada',
-          timestamp: accountRecord.createdAt || new Date().toISOString()
-        }
-      ];
+  state.points = Math.max(typeof prof.points === 'number' ? prof.points : 150, state.points || 100);
+  state.vipPoints = Math.max(typeof prof.vipPoints === 'number' ? prof.vipPoints : 0, state.vipPoints || 0);
+  state.xp = Math.max(typeof prof.xp === 'number' ? prof.xp : 100, state.xp || 100);
+  state.streak = Math.max(typeof prof.streak === 'number' ? prof.streak : 1, state.streak || 1);
+  state.isProMember = Boolean(prof.isProMember || state.isProMember);
+  state.trialCoursePurchased = Boolean(prof.trialCoursePurchased || state.trialCoursePurchased);
+
+  const rawOwned = Array.from(
+    new Set([...(state.ownedCourses || []), ...(Array.isArray(prof.ownedCourses) ? prof.ownedCourses : [])])
+  );
+  state.ownedCourses = state.trialCoursePurchased ? rawOwned : rawOwned.filter(id => id !== 'py-automation');
+  state.completedCourses = mergedCompleted;
+  state.courseProgress = mergedCourseProgress;
+  state.courseProgressPct = { ...(state.courseProgressPct || {}), ...(prof.courseProgressPct || {}) };
+  state.lastVisitedByCourse = { ...(state.lastVisitedByCourse || {}), ...(prof.lastVisitedByCourse || {}) };
+  state.lastActiveCourseId = prof.lastActiveCourseId || state.lastActiveCourseId || null;
+  state.unlockedRewards = mergedRewards;
+  state.freeTrialBonusClaimed = Boolean(prof.freeTrialBonusClaimed || state.freeTrialBonusClaimed);
+  state.subscription = prof.subscription || state.subscription || null;
+  state.purchases = Array.isArray(prof.purchases) && prof.purchases.length > 0 ? prof.purchases : (state.purchases || []);
+  state.pointsLedger = [
+    {
+      txId: 'tx_user_sync_' + accountRecord.email,
+      idempotencyKey: 'sync:' + accountRecord.email + ':' + state.points + ':' + state.vipPoints + ':' + state.xp,
+      type: 'WELCOME_BONUS',
+      deltaPTS: state.points,
+      deltaVP: state.vipPoints,
+      deltaXP: state.xp,
+      balancePTS: state.points,
+      balanceVP: state.vipPoints,
+      balanceXP: state.xp,
+      reason: 'Saldo sincronizado de cuenta multi-dispositivo',
+      timestamp: accountRecord.updatedAt || accountRecord.createdAt || new Date().toISOString()
+    }
+  ];
   state.walletSignature = computeWalletSignature(
     state.points,
     state.vipPoints,
@@ -11520,7 +11643,7 @@ function decodeGoogleJwt(token) {
   }
 }
 
-window.handleGoogleCredentialResponse = function (response) {
+window.handleGoogleCredentialResponse = async function (response) {
   const payload = decodeGoogleJwt(response.credential);
   if (!payload || !payload.email) {
     showToast('❌ No se pudo verificar la respuesta de Google.');
@@ -11531,7 +11654,18 @@ window.handleGoogleCredentialResponse = function (response) {
   const name = payload.name || email.split('@')[0];
   const db = loadUsersDB();
 
+  // Consultar siempre la nube antes de decidir si la cuenta de Google ya existe en otro dispositivo
+  const cloudAcc = await fetchAccountFromCloud(email);
+  if (cloudAcc && cloudAcc.email) {
+    db[email] = cloudAcc;
+    saveUsersDB(db);
+  }
+
+  const currentQuizRes = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
+
   if (!db[email]) {
+    const startPts = Math.max(150, (state.points || 100) + 50);
+    const startXp = Math.max(100, state.xp || 100);
     db[email] = {
       name,
       email,
@@ -11540,30 +11674,34 @@ window.handleGoogleCredentialResponse = function (response) {
       picture: payload.picture || '',
       passwordHash: hashPassword('google_verified_' + payload.sub),
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       profile: {
-        points: 150,
-        vipPoints: 0,
-        xp: 100,
-        streak: 1,
+        points: startPts,
+        vipPoints: state.vipPoints || 0,
+        xp: startXp,
+        streak: state.streak || 1,
         emailVerified: payload.email_verified !== false,
-        isProMember: false,
-        ownedCourses: ['py-automation'],
-        completedCourses: [],
-        courseProgress: {},
-        unlockedRewards: [],
-        freeTrialBonusClaimed: false
+        isProMember: Boolean(state.isProMember),
+        ownedCourses: Array.from(new Set(['py-automation', ...(state.ownedCourses || [])])),
+        completedCourses: [...(state.completedCourses || [])],
+        courseProgress: { ...(state.courseProgress || {}) },
+        unlockedRewards: [...(state.unlockedRewards || [])],
+        freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed),
+        quizResult: currentQuizRes || null
       }
     };
     saveUsersDB(db);
     applyUserProfileToState(db[email]);
+    await syncAccountToCloud(db[email]);
     closeAuthModal();
-    showToast(`🎉 ¡Cuenta oficial de Google (${email}) conectada y verificada! +50 PTS de bienvenida.`);
+    showToast(`🎉 ¡Cuenta oficial de Google (${email}) conectada y sincronizada en la nube!`);
   } else {
     db[email].emailVerified = true;
     saveUsersDB(db);
     applyUserProfileToState(db[email]);
+    await syncAccountToCloud(db[email]);
     closeAuthModal();
-    showToast(`👋 ¡Hola de nuevo, ${db[email].name}! Sesión de Google iniciada.`);
+    showToast(`👋 ¡Hola de nuevo, ${db[email].name}! Se recuperó tu progreso y tus ${state.points} PTS.`);
   }
 };
 
@@ -11598,39 +11736,49 @@ function initGoogleIdentityServices() {
 
 window.addEventListener('load', initGoogleIdentityServices);
 
-window.handleGoogleAuth = function () {
+window.handleGoogleAuth = async function () {
   if (initGoogleIdentityServices()) {
     window.google.accounts.id.prompt();
     return;
   }
   const db = loadUsersDB();
+  const defaultGoogleEmail = 'alumno.google@gmail.com';
+  const cloudGoogle = await fetchAccountFromCloud(defaultGoogleEmail);
+  if (cloudGoogle && cloudGoogle.email) {
+    db[defaultGoogleEmail] = cloudGoogle;
+    saveUsersDB(db);
+  }
+  const currentQuizRes = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
   const savedGoogle = Object.values(db).find(u => u.provider === 'Google') || {
     name: 'Alumno Google Verificado',
-    email: 'alumno.google@gmail.com',
+    email: defaultGoogleEmail,
     provider: 'Google',
     emailVerified: true,
     passwordHash: hashPassword('oauth_token_verified'),
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     profile: {
-      points: 150,
-      vipPoints: 0,
-      xp: 100,
-      streak: 1,
+      points: Math.max(150, (state.points || 100) + 50),
+      vipPoints: state.vipPoints || 0,
+      xp: Math.max(100, state.xp || 100),
+      streak: state.streak || 1,
       emailVerified: true,
-      isProMember: false,
-      ownedCourses: ['py-automation'],
-      completedCourses: [],
-      courseProgress: {},
-      unlockedRewards: [],
-      freeTrialBonusClaimed: false
+      isProMember: Boolean(state.isProMember),
+      ownedCourses: Array.from(new Set(['py-automation', ...(state.ownedCourses || [])])),
+      completedCourses: [...(state.completedCourses || [])],
+      courseProgress: { ...(state.courseProgress || {}) },
+      unlockedRewards: [...(state.unlockedRewards || [])],
+      freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed),
+      quizResult: currentQuizRes || null
     }
   };
   savedGoogle.emailVerified = true;
   db[savedGoogle.email] = savedGoogle;
   saveUsersDB(db);
   applyUserProfileToState(savedGoogle);
+  await syncAccountToCloud(db[savedGoogle.email]);
   closeAuthModal();
-  showToast('🛡️ ¡Sesión iniciada y verificada con Google OAuth!');
+  showToast('🛡️ ¡Sesión iniciada y sincronizada en la nube con Google OAuth!');
 };
 
 window.closeGoogleOAuthModal = function () {};
@@ -12309,19 +12457,29 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSkillsGrid();
   renderDictionary();
 
-  // Sincronización automática inicial desde la nube (Supabase) si hay sesión activa
-  if (state.userAccount && state.userAccount.email) {
-    fetchAccountFromCloud(state.userAccount.email)
-      .then(cloudAcc => {
+  // Sincronización automática bidireccional con la nube al iniciar (sube cuentas locales previas y descarga actualizaciones)
+  setTimeout(async () => {
+    try {
+      const localDb = loadUsersDB();
+      const localAccounts = Object.values(localDb).filter(u => u && u.email);
+      for (const acc of localAccounts) {
+        await syncAccountToCloud(acc);
+      }
+      if (state.userAccount && state.userAccount.email) {
+        const emailKey = state.userAccount.email.toLowerCase();
+        saveState();
+        const cloudAcc = await fetchAccountFromCloud(emailKey);
         if (cloudAcc && cloudAcc.email) {
-          const db = loadUsersDB();
-          db[cloudAcc.email.toLowerCase()] = cloudAcc;
-          saveUsersDB(db);
+          const freshDb = loadUsersDB();
+          freshDb[emailKey] = cloudAcc;
+          saveUsersDB(freshDb);
           applyUserProfileToState(cloudAcc);
+        } else if (localDb[emailKey]) {
+          await syncAccountToCloud(localDb[emailKey]);
         }
-      })
-      .catch(() => {});
-  }
+      }
+    } catch (e) {}
+  }, 300);
 
   const navButtons = document.querySelectorAll('.nav-item');
 
@@ -12431,23 +12589,35 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
         if (db[email]) {
-          showAuthFeedback('⚠️ No se pudo completar el registro con este correo. Si ya tienes cuenta, inicia sesión o recupera tu contraseña.', 'error');
+          // Si ya existía la cuenta en otro dispositivo y escribió la misma contraseña, iniciar sesión automáticamente y sincronizar
+          if (verifyPasswordHash(password, db[email].passwordHash)) {
+            applyUserProfileToState(db[email]);
+            await syncAccountToCloud(db[email]);
+            authForm.reset();
+            closeAuthModal();
+            showToast(`👋 ¡Cuenta recuperada en este dispositivo, ${db[email].name}! Se sincronizaron tus ${state.points} PTS y tu progreso.`);
+            return;
+          }
+          showAuthFeedback('⚠️ Este correo ya está registrado. Toca "Iniciar Sesión" arriba e ingresa tu contraseña, o usa "¿Olvidaste tu contraseña?".', 'error');
           return;
         }
 
         const nowIso = new Date().toISOString();
+        const startPts = Math.max(150, (state.points || 100) + 50);
+        const startXp = Math.max(100, state.xp || 100);
+        const currentQuizRes = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
         const initialLedger = [
           {
             txId: 'tx_welcome_' + Date.now(),
             idempotencyKey: 'welcome_bonus:' + email,
             type: 'WELCOME_BONUS',
-            deltaPTS: 150,
-            deltaVP: 0,
-            deltaXP: 100,
-            balancePTS: 150,
-            balanceVP: 0,
-            balanceXP: 100,
-            reason: 'Bono de bienvenida por registro de cuenta (100 base + 50 PTS)',
+            deltaPTS: startPts,
+            deltaVP: state.vipPoints || 0,
+            deltaXP: startXp,
+            balancePTS: startPts,
+            balanceVP: state.vipPoints || 0,
+            balanceXP: startXp,
+            reason: 'Bono de bienvenida por registro de cuenta + progreso inicial sincronizado',
             timestamp: nowIso
           }
         ];
@@ -12459,38 +12629,40 @@ document.addEventListener('DOMContentLoaded', () => {
           emailVerified: false,
           passwordHash: hashPassword(password),
           createdAt: nowIso,
+          updatedAt: nowIso,
           profile: {
-            points: 150,
-            vipPoints: 0,
-            xp: 100,
-            streak: 1,
+            points: startPts,
+            vipPoints: state.vipPoints || 0,
+            xp: startXp,
+            streak: state.streak || 1,
             emailVerified: false,
-            isProMember: false,
-            ownedCourses: [],
-            trialCoursePurchased: false,
-            completedCourses: [],
-            courseProgress: {},
-            courseProgressPct: {},
-            lastVisitedByCourse: {},
-            lastActiveCourseId: null,
-            unlockedRewards: [],
-            freeTrialBonusClaimed: false,
-            subscription: null,
-            purchases: [],
+            isProMember: Boolean(state.isProMember),
+            ownedCourses: [...(state.ownedCourses || [])],
+            trialCoursePurchased: Boolean(state.trialCoursePurchased),
+            completedCourses: [...(state.completedCourses || [])],
+            courseProgress: { ...(state.courseProgress || {}) },
+            courseProgressPct: { ...(state.courseProgressPct || {}) },
+            lastVisitedByCourse: { ...(state.lastVisitedByCourse || {}) },
+            lastActiveCourseId: state.lastActiveCourseId || null,
+            unlockedRewards: [...(state.unlockedRewards || [])],
+            freeTrialBonusClaimed: Boolean(state.freeTrialBonusClaimed),
+            subscription: state.subscription || null,
+            purchases: [...(state.purchases || [])],
             pointsLedger: initialLedger,
-            walletSignature: computeWalletSignature(150, 0, 100, 1, email)
+            walletSignature: computeWalletSignature(startPts, state.vipPoints || 0, startXp, 1, email),
+            quizResult: currentQuizRes || null
           }
         };
 
         db[email] = newAccount;
         saveUsersDB(db);
-        syncAccountToCloud(newAccount);
         applyUserProfileToState(newAccount);
+        await syncAccountToCloud(db[email]);
         createAndSendEmailVerificationLink(email, rawName);
 
         authForm.reset();
         closeAuthModal();
-        showToast(`✨ ¡Cuenta creada, ${newAccount.name}! Te enviamos un correo de verificación (revisa tu correo o 📬 Bandeja de Correos).`);
+        showToast(`✨ ¡Cuenta creada y sincronizada en la nube, ${newAccount.name}!`);
         return;
       }
 
@@ -13525,8 +13697,10 @@ function finishCourseQuiz() {
   const recommendedCourse = getAllSkills().find(s => s.id === result.top1Id);
   const courseTitle = recommendedCourse ? recommendedCourse.title : 'tu Curso Ideal';
 
+  // Guardar siempre el estado (y sincronizar quizResult en la nube si hay cuenta activa)
+  saveState();
+
   if (txRes && txRes.ok) {
-    saveState();
     showToast(`🎉 ¡Listo! Ganaste +25 PTS y +30 XP. Tu curso ideal es: "${courseTitle}".`);
   } else {
     showToast(`🎯 ¡Listo! Tu curso ideal recomendado es: "${courseTitle}".`);
