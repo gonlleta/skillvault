@@ -6383,22 +6383,46 @@ function renderHeaderAndStats() {
     ? '👑 VIP Activo (+VP)'
     : 'Cuenta Estándar';
 
-  // Sincronizar estado de Autenticación en el Header y el botón de Perfil Móvil (.avatar-pro-pill)
+  // Sincronizar estado de Autenticación en el Header, Sidebar, Student Strip y Barra Móvil
   const currentUser = state.userAccount || null;
   const headerAuthBtn = document.getElementById('header-auth-btn');
   const mobileTopAuthBtn = document.getElementById('mobile-top-auth-btn');
+  const mobileLogoutIconBtn = document.getElementById('mobile-logout-icon-btn');
+  const sidebarAuthBtn = document.getElementById('sidebar-auth-btn');
+  const stripAuthBtn = document.getElementById('strip-auth-action-btn');
   const mobileAvatarBtn = document.querySelector('.avatar-pro-pill');
   const mobileAvatarTag = document.querySelector('.avatar-pro-tag');
 
   if (currentUser) {
     const shortName = currentUser.name.split(' ')[0];
     if (headerAuthBtn) {
-      headerAuthBtn.textContent = `👤 ${shortName} (Cerrar Sesión)`;
+      headerAuthBtn.textContent = `🚪 Cerrar Sesión (${shortName})`;
+      headerAuthBtn.style.borderColor = 'rgba(240, 45, 0, 0.35)';
+      headerAuthBtn.style.color = '#b41f00';
       headerAuthBtn.onclick = () => logoutUser();
     }
     if (mobileTopAuthBtn) {
-      mobileTopAuthBtn.textContent = `👤 ${shortName} (Salir)`;
+      mobileTopAuthBtn.textContent = `🚪 Salir (${shortName})`;
       mobileTopAuthBtn.onclick = () => logoutUser();
+    }
+    if (mobileLogoutIconBtn) {
+      mobileLogoutIconBtn.style.display = 'inline-flex';
+      mobileLogoutIconBtn.title = `Cerrar sesión de ${currentUser.name}`;
+      mobileLogoutIconBtn.onclick = () => logoutUser();
+    }
+    if (sidebarAuthBtn) {
+      sidebarAuthBtn.textContent = `🚪 Cerrar Sesión (${shortName})`;
+      sidebarAuthBtn.style.borderColor = 'rgba(240, 45, 0, 0.35)';
+      sidebarAuthBtn.style.color = '#b41f00';
+      sidebarAuthBtn.style.background = '#fff5f2';
+      sidebarAuthBtn.onclick = () => logoutUser();
+    }
+    if (stripAuthBtn) {
+      stripAuthBtn.textContent = '🚪 Cerrar Sesión';
+      stripAuthBtn.style.borderColor = 'rgba(240, 45, 0, 0.35)';
+      stripAuthBtn.style.color = '#b41f00';
+      stripAuthBtn.style.background = '#fff5f2';
+      stripAuthBtn.onclick = () => logoutUser();
     }
     if (mobileAvatarBtn) {
       mobileAvatarBtn.onclick = () => switchAppTab('profile');
@@ -6410,11 +6434,30 @@ function renderHeaderAndStats() {
   } else {
     if (headerAuthBtn) {
       headerAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
+      headerAuthBtn.style.borderColor = '';
+      headerAuthBtn.style.color = '';
       headerAuthBtn.onclick = () => openAuthModal('login');
     }
     if (mobileTopAuthBtn) {
       mobileTopAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
       mobileTopAuthBtn.onclick = () => openAuthModal('login');
+    }
+    if (mobileLogoutIconBtn) {
+      mobileLogoutIconBtn.style.display = 'none';
+    }
+    if (sidebarAuthBtn) {
+      sidebarAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
+      sidebarAuthBtn.style.borderColor = '';
+      sidebarAuthBtn.style.color = '';
+      sidebarAuthBtn.style.background = '';
+      sidebarAuthBtn.onclick = () => openAuthModal('login');
+    }
+    if (stripAuthBtn) {
+      stripAuthBtn.textContent = '🔐 Iniciar Sesión';
+      stripAuthBtn.style.borderColor = 'rgba(26, 28, 28, 0.16)';
+      stripAuthBtn.style.color = '#1a1c1c';
+      stripAuthBtn.style.background = '#ffffff';
+      stripAuthBtn.onclick = () => openAuthModal('login');
     }
     if (mobileAvatarBtn) {
       mobileAvatarBtn.onclick = () => openAuthModal('login');
@@ -10294,6 +10337,10 @@ function renderStudentProfileAndSettings() {
               ? `<button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="resendVerificationEmail()">📨 Reenviar Enlace</button>
                  <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="openMailboxModal()">📬 Abrir Bandeja</button>`
               : ''
+            }
+            ${state.userAccount
+              ? `<button type="button" class="btn-secondary" style="padding:5px 12px; font-size:11.5px; font-weight:700; color:#b41f00; border-color:rgba(240,45,0,0.35); background:#fff5f2;" onclick="logoutUser()">🚪 Cerrar Sesión</button>`
+              : `<button type="button" class="btn-primary-glow" style="padding:5px 12px; font-size:11.5px;" onclick="openAuthModal('login')">🔐 Iniciar Sesión</button>`
             }
           </div>
         </div>
