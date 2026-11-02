@@ -6282,10 +6282,12 @@ function renderHeaderAndStats() {
     ? '👑 VIP Activo (+VP)'
     : 'Cuenta Estándar';
 
-  // Sincronizar estado de Autenticación en el Header
+  // Sincronizar estado de Autenticación en el Header y el botón de Perfil Móvil (.avatar-pro-pill)
   const currentUser = state.userAccount || null;
   const headerAuthBtn = document.getElementById('header-auth-btn');
   const mobileTopAuthBtn = document.getElementById('mobile-top-auth-btn');
+  const mobileAvatarBtn = document.querySelector('.avatar-pro-pill');
+  const mobileAvatarTag = document.querySelector('.avatar-pro-tag');
 
   if (currentUser) {
     const shortName = currentUser.name.split(' ')[0];
@@ -6297,6 +6299,13 @@ function renderHeaderAndStats() {
       mobileTopAuthBtn.textContent = `👤 ${shortName} (Salir)`;
       mobileTopAuthBtn.onclick = () => logoutUser();
     }
+    if (mobileAvatarBtn) {
+      mobileAvatarBtn.onclick = () => switchAppTab('profile');
+      mobileAvatarBtn.title = `Perfil de ${currentUser.name}`;
+    }
+    if (mobileAvatarTag) {
+      mobileAvatarTag.textContent = vipActive ? 'VIP' : shortName.slice(0, 6).toUpperCase();
+    }
   } else {
     if (headerAuthBtn) {
       headerAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
@@ -6305,6 +6314,13 @@ function renderHeaderAndStats() {
     if (mobileTopAuthBtn) {
       mobileTopAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
       mobileTopAuthBtn.onclick = () => openAuthModal('login');
+    }
+    if (mobileAvatarBtn) {
+      mobileAvatarBtn.onclick = () => openAuthModal('login');
+      mobileAvatarBtn.title = 'Iniciar Sesión o Registrarse';
+    }
+    if (mobileAvatarTag) {
+      mobileAvatarTag.textContent = vipActive ? 'VIP' : 'ENTRAR';
     }
   }
 
@@ -6395,6 +6411,7 @@ function renderHeaderAndStats() {
     renderHelpCenterAndSupport();
   }
 }
+window.updateUI = renderHeaderAndStats;
 
 function renderFeaturedSkill() {
   const all = getAllSkills();
@@ -10105,7 +10122,7 @@ window.openReceiptModal = function (purchaseId) {
     <div class="lesson-box" style="margin-bottom:0;">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:14px;">
         <div>
-          <strong style="font-size:15px; color:#fff; display:block;">⚡ SKILLVAULT ACADEMY INC.</strong>
+          <strong style="font-size:15px; color:#1b1b1d; display:block;">⚡ SKILLVAULT ACADEMY INC.</strong>
           <span style="font-size:12px; color:var(--text-muted);">Factura / Comprobante Electrónico Oficial</span>
         </div>
         <span class="status-badge ${st.cls}">${st.label}</span>
@@ -10117,10 +10134,10 @@ window.openReceiptModal = function (purchaseId) {
         <div><span style="color:var(--text-muted); display:block;">Método de Pago:</span><strong>${p.paymentMethod}</strong></div>
         <div style="grid-column:1/-1;"><span style="color:var(--text-muted); display:block;">Titular / Alumno:</span><strong>${p.userName || 'Estudiante'} (${p.userEmail || 'Cuenta local'})</strong></div>
       </div>
-      <div style="background:rgba(15, 23, 42, 0.75); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px;">
+      <div style="background:#f6f3f5; border:1px solid #e4e2e4; border-radius:10px; padding:12px; margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:13.5px;">
-          <strong>${p.title}</strong>
-          <strong style="color:#34d399;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
+          <strong style="color:#1b1b1d;">${p.title}</strong>
+          <strong style="color:#007D8A;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
         </div>
         <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">
           Tipo de operación: ${p.itemType === 'subscription' ? 'Suscripción VIP con acceso total' : 'Licencia vitalicia de curso individual'}
@@ -10128,7 +10145,7 @@ window.openReceiptModal = function (purchaseId) {
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; padding-top:8px; border-top:1px solid var(--border);">
         <span>Total Abonado (${p.currency || 'USD'}):</span>
-        <strong style="font-size:17px; color:#fff;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
+        <strong style="font-size:17px; color:#1b1b1d;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
       </div>
     </div>
   `;
@@ -10240,7 +10257,7 @@ function renderStudentProfileAndSettings() {
           <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
             <div>
               <span class="skill-cat-tag gold-tag">${planTypeLabel}</span>
-              <h4 style="font-size:18px; color:#fff; margin-top:6px;">${sub.planName || 'Pase VIP PRO'}</h4>
+              <h4 style="font-size:18px; color:#1b1b1d; margin-top:6px;">${sub.planName || 'Pase VIP PRO'}</h4>
             </div>
             <span class="status-badge ${isCancelledPendingEnd ? 'cancelled' : 'approved'}">
               ${isCancelledPendingEnd ? '⏳ Cancelada (Beneficios vigentes hasta fin de ciclo)' : '✅ Suscripción Activa'}
@@ -10272,7 +10289,7 @@ function renderStudentProfileAndSettings() {
               }
             </span>
             ${!isCancelledPendingEnd
-              ? `<button type="button" class="btn-secondary" style="border-color:rgba(239,68,68,0.45); color:#fca5a5;" onclick="openCancelSubscriptionModal()">
+              ? `<button type="button" class="btn-secondary" style="border-color:rgba(239,68,68,0.45); color:#dc2626;" onclick="openCancelSubscriptionModal()">
                    🛑 Cancelar suscripción
                  </button>`
               : `<button type="button" class="btn-secondary" onclick="openMailboxModal()">
@@ -10287,7 +10304,7 @@ function renderStudentProfileAndSettings() {
         <div class="subscription-panel-card">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
-              <h4 style="font-size:16px; color:#fff;">Tu suscripción ${sub.planName || 'VIP'} ha finalizado</h4>
+              <h4 style="font-size:16px; color:#1b1b1d;">Tu suscripción ${sub.planName || 'VIP'} ha finalizado</h4>
               <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
                 El período pagado venció el ${new Date(sub.currentPeriodEnd).toLocaleDateString('es-ES')}. Tus cursos comprados individualmente siguen desbloqueados de por vida.
               </p>
@@ -10303,7 +10320,7 @@ function renderStudentProfileAndSettings() {
         <div class="subscription-panel-card">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div>
-              <h4 style="font-size:16px; color:#fff;">Actualmente tienes el Plan Estándar Gratuito</h4>
+              <h4 style="font-size:16px; color:#1b1b1d;">Actualmente tienes el Plan Estándar Gratuito</h4>
               <p style="font-size:13px; color:var(--text-muted); margin-top:4px;">
                 No tienes ninguna suscripción VIP activa ni cobros recurrentes programados.
               </p>
@@ -10361,7 +10378,7 @@ function renderStudentProfileAndSettings() {
                   </div>
                   <div class="purchase-item-actions">
                     <span class="status-badge ${st.cls}">${st.label}</span>
-                    <strong style="font-size:15px; color:#fff;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
+                    <strong style="font-size:15px; color:#1b1b1d;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
                     <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="openReceiptModal('${p.id}')">
                       🧾 Ver Comprobante / Factura
                     </button>
@@ -10393,15 +10410,15 @@ function renderStudentProfileAndSettings() {
                 minute: '2-digit'
               });
               const ptsBadge = tx.deltaPTS
-                ? `<span style="color:${tx.deltaPTS > 0 ? '#34d399' : '#f87171'}; font-weight:700;">${tx.deltaPTS > 0 ? '+' : ''}${tx.deltaPTS} PTS</span>`
+                ? `<span style="color:${tx.deltaPTS > 0 ? '#007D8A' : '#dc2626'}; font-weight:700;">${tx.deltaPTS > 0 ? '+' : ''}${tx.deltaPTS} PTS</span>`
                 : '';
               const vpBadge = tx.deltaVP
-                ? `<span style="color:${tx.deltaVP > 0 ? '#fbbf24' : '#f87171'}; font-weight:700; margin-left:8px;">${tx.deltaVP > 0 ? '+' : ''}${tx.deltaVP} VP</span>`
+                ? `<span style="color:${tx.deltaVP > 0 ? '#E60050' : '#dc2626'}; font-weight:700; margin-left:8px;">${tx.deltaVP > 0 ? '+' : ''}${tx.deltaVP} VP</span>`
                 : '';
               return `
                 <div class="ledger-item-row">
                   <div>
-                    <strong style="color:#f8fafc; display:block;">${tx.reason}</strong>
+                    <strong style="color:#1b1b1d; display:block;">${tx.reason}</strong>
                     <span style="font-size:11.5px; color:var(--text-muted);">${dt} • ID: ${tx.txId}</span>
                   </div>
                   <div style="text-align:right;">
@@ -12532,9 +12549,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = (document.getElementById('support-name')?.value || '').trim();
       const email = (document.getElementById('support-email')?.value || '').trim().toLowerCase();
       const category = (document.getElementById('support-category')?.value || '').trim();
-      const description = (document.getElementById('support-description')?.value || '').trim();
+      const subjectLine = (document.getElementById('support-subject')?.value || '').trim();
+      const rawMessage = (
+        document.getElementById('support-message')?.value ||
+        document.getElementById('support-description')?.value ||
+        ''
+      ).trim();
+      const description = subjectLine ? `[${subjectLine}] ${rawMessage}` : rawMessage;
 
-      if (!name || !email.includes('@') || !category || description.length < 10) {
+      if (!name || !email.includes('@') || !category || rawMessage.length < 10) {
         if (feedbackEl) {
           feedbackEl.className = 'auth-feedback-box error';
           feedbackEl.innerHTML = '⚠️ Completa tu nombre, un correo válido, la categoría y describe el problema (mínimo 10 caracteres).';
@@ -12591,7 +12614,12 @@ document.addEventListener('DOMContentLoaded', () => {
         feedbackEl.style.display = 'block';
       }
 
-      document.getElementById('support-description').value = '';
+      const msgEl = document.getElementById('support-message');
+      const descEl = document.getElementById('support-description');
+      const subjEl = document.getElementById('support-subject');
+      if (msgEl) msgEl.value = '';
+      if (descEl) descEl.value = '';
+      if (subjEl) subjEl.value = '';
       renderHelpCenterAndSupport();
       showToast(`🛟 Ticket #${ticketId} registrado correctamente en la base de datos.`);
     });
@@ -13597,6 +13625,9 @@ function renderQuizRecommendationBanner() {
 // PANTALLA INICIAL CON EL LOGO EN GRANDE Y PRIMER PLANO (SOLO CIERRA CON BOTÓN)
 // ==========================================================================
 window.dismissLogoSplash = function (openQuizOnEnter = true) {
+  try {
+    sessionStorage.setItem('skillvault_splash_dismissed', '1');
+  } catch (e) {}
   const splash = document.getElementById('logo-splash-overlay');
   if (splash && !splash.classList.contains('is-hidden')) {
     splash.classList.add('is-hidden');
@@ -13604,7 +13635,7 @@ window.dismissLogoSplash = function (openQuizOnEnter = true) {
   if (openQuizOnEnter !== false) {
     setTimeout(() => {
       openCourseQuizModal(true);
-    }, 260);
+    }, 220);
   }
 };
 
@@ -13615,6 +13646,16 @@ window.showLogoSplash = function () {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Si el usuario ya completó el test inicial o ya cerró la bienvenida en esta sesión, mostrar directo el inicio
+  try {
+    const splashDismissed = sessionStorage.getItem('skillvault_splash_dismissed') === '1';
+    const hasCompletedQuiz = Boolean(typeof getSavedQuizResult === 'function' && getSavedQuizResult());
+    if (splashDismissed || hasCompletedQuiz) {
+      const splash = document.getElementById('logo-splash-overlay');
+      if (splash) splash.classList.add('is-hidden');
+    }
+  } catch (e) {}
+
   document.querySelectorAll('.brand .brand-logo, .mobile-brand-bar .brand-logo').forEach(logoEl => {
     logoEl.style.cursor = 'pointer';
     logoEl.title = 'Ver logo en pantalla completa';

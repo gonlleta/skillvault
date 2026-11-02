@@ -6105,11 +6105,25 @@ body.device-mobile .skills-grid {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18) !important;
 }
 
+/* Garantizar que cualquier modal y toast estén siempre por encima de la barra móvil inferior y la tira superior */
+.modal-overlay {
+  z-index: 100000 !important;
+}
+
+.toast-container {
+  z-index: 200000 !important;
+}
+
 .modal-window h2,
 .modal-window h3,
+.modal-window h4,
+.modal-window h5,
 .quiz-question-title,
 .dict-term-name,
-.instructor-identity h3 {
+.instructor-identity h3,
+.checkpoint-question,
+.exam-question-card h5,
+.lesson-box h4 {
   color: #1b1b1d !important;
 }
 
@@ -6126,11 +6140,156 @@ body.device-mobile .skills-grid {
 .dict-card,
 .plan-card,
 .certificate-card,
-.create-skill-card {
+.create-skill-card,
+.subscription-panel-card {
   background: #ffffff !important;
   border: 1px solid #e4e2e4 !important;
   color: #1b1b1d !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* Contraste legible en Checkpoints obligatorios, Examen Final y Bloques de Lección en Tema Claro */
+.checkpoint-box {
+  background: #f0fdf4 !important;
+  border: 1.5px solid #007D8A !important;
+  color: #1b1b1d !important;
+}
+
+.checkpoint-title {
+  color: #006874 !important;
+}
+
+.checkpoint-btn {
+  background: #ffffff !important;
+  border: 1.5px solid #dcd9dc !important;
+  color: #1b1b1d !important;
+  font-weight: 500;
+}
+
+.checkpoint-btn:hover {
+  border-color: #F02D00 !important;
+  background: #fff5f2 !important;
+}
+
+.checkpoint-btn.correct {
+  background: #d1fae5 !important;
+  border-color: #059669 !important;
+  color: #065f46 !important;
+  font-weight: 700 !important;
+}
+
+.checkpoint-btn.wrong {
+  background: #fee2e2 !important;
+  border-color: #dc2626 !important;
+  color: #991b1b !important;
+  font-weight: 600 !important;
+}
+
+.lesson-Warning {
+  background: #fff1f2 !important;
+  border: 1px solid #fecdd3 !important;
+  color: #9f1239 !important;
+}
+
+.lesson-module-badge {
+  background: #ffdad3 !important;
+  color: #b41f00 !important;
+}
+
+.modal-reward-badge {
+  background: #e0f2fe !important;
+  color: #006874 !important;
+}
+
+.step-pill {
+  background: #f6f3f5 !important;
+  border: 1px solid #dcd9dc !important;
+  color: #5e3f39 !important;
+}
+
+.step-pill:hover {
+  border-color: #b41f00 !important;
+  color: #1b1b1d !important;
+}
+
+.step-pill.done {
+  background: #e0f2fe !important;
+  border-color: #007D8A !important;
+  color: #006874 !important;
+}
+
+.step-pill.current {
+  background: #F02D00 !important;
+  border-color: #F02D00 !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(240, 45, 0, 0.25) !important;
+}
+
+.code-block-header {
+  background: #f6f3f5 !important;
+  border: 1px solid #dcd9dc !important;
+  border-bottom: none !important;
+}
+
+.code-block-title {
+  color: #b41f00 !important;
+}
+
+.case-col.problem {
+  background: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+}
+
+.case-col.problem strong {
+  color: #be123c !important;
+}
+
+.case-col.solution {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+
+.case-col.solution strong {
+  color: #047857 !important;
+}
+
+.purchase-item-row,
+.ledger-item-row,
+.support-ticket-card,
+.subscription-meta-item {
+  background: #f6f3f5 !important;
+  border: 1px solid #e4e2e4 !important;
+  color: #1b1b1d !important;
+}
+
+.purchase-item-main strong,
+.subscription-meta-item strong,
+.support-ticket-card strong {
+  color: #1b1b1d !important;
+}
+
+/* Restaurar padding interno para las tarjetas de la Bóveda de Recompensas */
+#vip-exclusive-rewards-grid .skill-card,
+#rewards-grid .skill-card {
+  padding: 20px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+#vip-exclusive-rewards-grid .skill-card h3,
+#rewards-grid .skill-card h3 {
+  color: #1b1b1d !important;
+  font-size: 16.5px !important;
+  margin: 8px 0 6px !important;
+}
+
+#vip-exclusive-rewards-grid .skill-card p,
+#rewards-grid .skill-card p {
+  color: #5e3f39 !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
 }
 
 .lesson-keypoints {
@@ -6298,6 +6457,218 @@ body.device-mobile .skills-grid {
   height: 7px;
   border-radius: 50%;
   background: #E60050;
+}
+
+/* ==========================================================================
+   OPTIMIZACIÓN MOBILE-FIRST CREATIVE ACADEMY RED (CELULARES <= 960px & DEVICE-MOBILE)
+   ========================================================================== */
+@media (max-width: 960px) {
+  .top-urgency-strip {
+    font-size: 10.5px !important;
+    padding: 6px 10px !important;
+    min-height: 30px !important;
+  }
+
+  .main-content {
+    padding: 12px 12px calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .topbar {
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  /* En móvil, la barra superior muestra el logo + lupa + notificaciones + botón PRO/Perfil sin desbordar */
+  .mobile-brand-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+  }
+
+  #mobile-top-auth-btn,
+  #header-auth-btn {
+    display: none !important;
+  }
+
+  /* Ocultar resumen duplicado del topbar en celular porque #domestika-student-strip ya muestra PTS, VP y botón VIP */
+  .topbar .wallet-summary {
+    display: none !important;
+  }
+
+  /* Student Status Strip compacto y táctil en celular */
+  .student-status-strip-card {
+    padding: 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .strip-bottom-row {
+    gap: 6px !important;
+  }
+
+  .strip-wallet-pill {
+    padding: 6px 10px !important;
+    font-size: 11.5px !important;
+  }
+
+  .btn-strip-vip-cta {
+    width: 100%;
+    justify-content: center;
+    padding: 9px 14px !important;
+    margin-top: 2px;
+  }
+
+  /* En celular, mostrar directamente la tarjeta Hero Domestika 16:9 (#featured-skill-box) como en el diseño móvil oficial */
+  .hero-banner {
+    display: block !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin-bottom: 18px !important;
+  }
+
+  .hero-banner .hero-text {
+    display: none !important;
+  }
+
+  .domestika-hero-card {
+    width: 100% !important;
+    border-radius: 14px !important;
+  }
+
+  .domestika-hero-body {
+    padding: 16px !important;
+  }
+
+  .domestika-hero-title {
+    font-size: 18px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Modales en celular: centrados/ajustados con scroll fluido y botones siempre visibles */
+  .modal-overlay {
+    padding: 10px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 100000 !important;
+  }
+
+  .modal-window,
+  .onboarding-quiz-window {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(100dvh - 24px) !important;
+    padding: 16px 14px calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 16px !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+  }
+
+  .modal-body {
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding-right: 2px !important;
+  }
+
+  /* Stepper de módulos deslizable horizontalmente en celular para no ocupar media pantalla */
+  .lesson-stepper {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 12px !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .step-pill {
+    flex: 0 0 auto !important;
+    min-width: 88px !important;
+    padding: 7px 10px !important;
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+  }
+
+  .modal-footer,
+  .quiz-nav-footer {
+    position: sticky;
+    bottom: -16px;
+    background: #ffffff !important;
+    padding: 12px 0 6px !important;
+    margin-top: 12px !important;
+    border-top: 1px solid #eae7ea !important;
+    z-index: 10;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .modal-footer button,
+  .quiz-nav-footer button {
+    min-height: 44px;
+  }
+
+  .quiz-question-title {
+    font-size: 17px !important;
+    line-height: 1.3 !important;
+  }
+
+  .quiz-option-btn {
+    padding: 11px 12px !important;
+    gap: 10px !important;
+  }
+
+  .quiz-option-title {
+    font-size: 13px !important;
+  }
+
+  .quiz-option-desc {
+    font-size: 11.5px !important;
+  }
+
+  /* Pantalla de bienvenida (Splash) compacta en celulares */
+  .logo-splash-emblem-wrap {
+    width: 116px !important;
+    height: 116px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .logo-splash-emblem {
+    width: 96px !important;
+    height: 96px !important;
+  }
+
+  .logo-splash-title {
+    font-size: 32px !important;
+  }
+
+  .logo-splash-subtitle {
+    font-size: 13.5px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .logo-splash-enter-btn {
+    padding: 14px 22px !important;
+    font-size: 15px !important;
+    width: 100% !important;
+  }
+}
+
+/* Reglas equivalentes cuando body tiene clase .device-mobile */
+body.device-mobile #mobile-top-auth-btn,
+body.device-mobile #header-auth-btn,
+body.device-mobile .topbar .wallet-summary,
+body.device-mobile .hero-banner .hero-text {
+  display: none !important;
+}
+
+body.device-mobile .hero-banner {
+  display: block !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Respeto estricto de Preferencias de Movimiento Reducido (WCAG 2.3.3) */
