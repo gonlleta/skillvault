@@ -6659,8 +6659,79 @@ body.device-mobile .skills-grid {
 body.device-mobile #mobile-top-auth-btn,
 body.device-mobile #header-auth-btn,
 body.device-mobile .topbar .wallet-summary,
-body.device-mobile .hero-banner .hero-text {
+body.device-mobile .hero-banner .hero-text,
+body.device-mobile #category-filters .cat-btn[data-cat="all"] {
   display: none !important;
+}
+
+@media (max-width: 960px) {
+  #category-filters .cat-btn[data-cat="all"] {
+    display: none !important;
+  }
+
+  #category-filters {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    overflow: visible !important;
+    padding-bottom: 4px !important;
+  }
+
+  #category-filters .cat-btn {
+    width: 100% !important;
+    justify-content: space-between !important;
+    padding: 10px 11px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
+
+body.device-mobile #category-filters {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  overflow: visible !important;
+  padding-bottom: 4px !important;
+}
+
+body.device-mobile #category-filters .cat-btn {
+  width: 100% !important;
+  justify-content: space-between !important;
+  padding: 10px 11px !important;
+  font-size: 12px !important;
+}
+
+.mobile-category-switcher-footer {
+  grid-column: 1 / -1;
+  background: #ffffff;
+  border: 1.5px solid #e4e2e4;
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 6px;
+}
+
+.mobile-cat-switcher-kicker {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #5e3f39;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.mobile-cat-switcher-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mobile-cat-switcher-grid .cat-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 10px 10px;
+  font-size: 12px;
 }
 
 body.device-mobile .hero-banner {

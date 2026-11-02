@@ -5572,7 +5572,7 @@ async function syncAccountToCloud(accountObj) {
       const data = await res.json();
       if (data && data.ok) synced = true;
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // 2. Respaldo directo al Cloud Relay determinístico para persistencia inmediata entre PC y Celular
   try {
@@ -5590,7 +5590,7 @@ async function syncAccountToCloud(accountObj) {
       })
     });
     if (relayRes.ok) synced = true;
-  } catch (e) {}
+  } catch (e) { }
 
   // 3. Respaldo directo a Supabase REST si el propietario configuró URL y Key en el panel Admin
   if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
@@ -5624,7 +5624,7 @@ async function syncAccountToCloud(accountObj) {
         body: JSON.stringify(payload)
       });
       if (directRes.ok) synced = true;
-    } catch (e) {}
+    } catch (e) { }
   }
 
   return { ok: synced };
@@ -5666,7 +5666,7 @@ async function fetchAccountFromCloud(email) {
         pickNewerAccount(data.user);
       }
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // 2. Consultar Cloud Relay determinístico directo para sincronización garantizada entre dispositivos
   try {
@@ -5685,11 +5685,11 @@ async function fetchAccountFromCloud(email) {
                 pickNewerAccount(payload.account);
               }
             }
-          } catch (e) {}
+          } catch (e) { }
         }
       }
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // 3. Consultar Supabase directo si está configurado
   if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
@@ -5721,7 +5721,7 @@ async function fetchAccountFromCloud(email) {
           });
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   return bestCandidate;
@@ -5738,7 +5738,7 @@ async function syncSupportTicketToCloud(ticketObj) {
         ticket: ticketObj
       })
     });
-  } catch (e) {}
+  } catch (e) { }
 }
 
 async function recordPurchaseInCloudWebhook({ userEmail, itemType, itemId, amountUSD, gateway, externalPaymentId }) {
@@ -5756,7 +5756,7 @@ async function recordPurchaseInCloudWebhook({ userEmail, itemType, itemId, amoun
         externalPaymentId
       })
     });
-  } catch (e) {}
+  } catch (e) { }
 }
 
 // Despachador de Correos Transaccionales (Bandeja Local + Envío Real vía Resend API /api/send-email)
@@ -5797,7 +5797,7 @@ function sendTransactionalEmail({ to, subject, category, bodyHtml, actionLabel =
         ctaUrl: finalUrl,
         originUrl: window.location.origin
       })
-    }).catch(() => {});
+    }).catch(() => { });
   }
 
   return msg;
@@ -6123,7 +6123,7 @@ window.addEventListener('storage', ev => {
         renderHeaderAndStats();
         renderSkillsGrid();
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 });
 
@@ -6611,20 +6611,20 @@ function renderFeaturedSkill() {
 
       <div class="domestika-hero-actions">
         ${unlocked || trialHalf
-          ? `<button type="button" class="btn-domestika-primary" onclick="openSkillModal('${nextSkill.id}')">
+      ? `<button type="button" class="btn-domestika-primary" onclick="openSkillModal('${nextSkill.id}')">
                <span class="material-symbols-outlined" style="font-size: 20px;">play_circle</span>
                <span>${completed ? 'Repasar Curso Completo' : 'Continuar Lección Actual'}</span>
              </button>`
-          : nextSkill.secretCourse
-            ? `<button type="button" class="btn-domestika-primary" onclick="switchAppTab('rewards')">
+      : nextSkill.secretCourse
+        ? `<button type="button" class="btn-domestika-primary" onclick="switchAppTab('rewards')">
                  <span class="material-symbols-outlined" style="font-size: 20px;">lock_open</span>
                  <span>Desbloquear Curso Secreto en Bóveda</span>
                </button>`
-            : `<button type="button" class="btn-domestika-primary" onclick="buyCourse('${nextSkill.id}')">
+        : `<button type="button" class="btn-domestika-primary" onclick="buyCourse('${nextSkill.id}')">
                  <span class="material-symbols-outlined" style="font-size: 20px;">play_circle</span>
                  <span>Desbloquear Curso Completo ($${nextSkill.priceUSD.toFixed(2)} USD)</span>
                </button>`
-        }
+    }
         <button type="button" class="btn-card-vip-upsell" onclick="openCourseQuizModal(true)">
           🧭 ${isQuizMatched ? 'Ver mi diagnóstico o repetir el Cuestionario' : '¿No sabes cuál elegir? Haz el Test de 1 minuto (+25 PTS)'}
         </button>
@@ -8323,6 +8323,41 @@ function renderDictionary() {
 }
 
 // Catálogo de Cursos
+function isMobileCatalogLayout() {
+  return document.body.classList.contains('device-mobile') || window.innerWidth <= 960;
+}
+
+function getDefaultMobileCategory() {
+  try {
+    const savedQuiz = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
+    if (savedQuiz && savedQuiz.top1Id) {
+      const topSkill = getAllSkills().find(s => s.id === savedQuiz.top1Id);
+      if (topSkill && topSkill.category) {
+        return topSkill.category;
+      }
+    }
+  } catch (e) {}
+  return 'Programación';
+}
+
+function syncCategoryButtonsActiveUI() {
+  document.querySelectorAll('#category-filters .cat-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === activeFilter);
+  });
+}
+
+window.selectCourseCategory = function (catName, scrollToCatalog = false) {
+  activeFilter = catName;
+  syncCategoryButtonsActiveUI();
+  renderSkillsGrid();
+  if (scrollToCatalog) {
+    const catBar = document.querySelector('.category-bar') || document.getElementById('category-filters');
+    if (catBar) {
+      catBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+};
+
 function updateCategoryButtonsCounts() {
   const all = getAllSkills();
   document.querySelectorAll('#category-filters .cat-btn').forEach(btn => {
@@ -8521,10 +8556,19 @@ function renderSkillsGrid() {
   const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
   const sortMode = document.getElementById('sort-select').value;
   const grid = document.getElementById('skills-grid');
+  const isMobile = isMobileCatalogLayout();
+
+  // En celular no se muestra la opción "Todos" para evitar una página excesivamente larga;
+  // siempre se divide por categoría activa (salvo que el usuario esté escribiendo en el buscador).
+  if (isMobile && activeFilter === 'all') {
+    activeFilter = getDefaultMobileCategory();
+  }
+  syncCategoryButtonsActiveUI();
 
   let skills = getAllSkills().filter(skill => {
-    const matchesCat =
-      activeFilter === 'all'
+    const matchesCat = searchQuery
+      ? true
+      : activeFilter === 'all'
         ? true
         : activeFilter === 'unlocked'
           ? (hasAccessToCourse(skill) || skill.isTrialCourse)
@@ -8563,11 +8607,13 @@ function renderSkillsGrid() {
   }
 
   if (skills.length === 0) {
+    const fallbackCat = isMobile ? getDefaultMobileCategory() : 'all';
+    const fallbackLabel = isMobile ? `Ver cursos de ${fallbackCat}` : 'Ver todos los cursos';
     grid.innerHTML = `
       <div class="certificate-card" style="grid-column: 1/-1; text-align: center;">
         <h3>No se encontraron cursos con ese filtro o búsqueda</h3>
-        <p style="color:var(--text-muted); margin: 8px 0 16px;">Prueba limpiando el buscador o seleccionando "Todos los Cursos".</p>
-        <button class="btn-secondary" onclick="document.getElementById('search-input').value=''; document.querySelector('[data-cat=all]').click();">Ver todos los cursos</button>
+        <p style="color:var(--text-muted); margin: 8px 0 16px;">Prueba limpiando el buscador o eligiendo otra categoría arriba.</p>
+        <button class="btn-secondary" onclick="document.getElementById('search-input').value=''; selectCourseCategory('${fallbackCat}', true);">${fallbackLabel}</button>
       </div>
     `;
     return;
@@ -8576,6 +8622,18 @@ function renderSkillsGrid() {
   const catalogCountEl = document.getElementById('catalog-count-label');
   if (catalogCountEl) {
     catalogCountEl.textContent = `${skills.length} ${skills.length === 1 ? 'Curso' : 'Cursos'}`;
+  }
+  const feedTitleEl = document.querySelector('.course-feed-title');
+  if (feedTitleEl) {
+    if (searchQuery) {
+      feedTitleEl.textContent = `Resultados para "${searchQuery}"`;
+    } else if (activeFilter === 'all') {
+      feedTitleEl.textContent = 'Cursos Recomendados para Ti';
+    } else if (activeFilter === 'unlocked') {
+      feedTitleEl.textContent = '🔓 Mis Cursos Desbloqueados';
+    } else {
+      feedTitleEl.textContent = `Categoría: ${activeFilter}`;
+    }
   }
 
   grid.innerHTML = skills
@@ -8646,15 +8704,15 @@ function renderSkillsGrid() {
                 <span class="domestika-unlock-req-val">${reqRw.costVIPPoints} VP o Pase Founder</span>
               </div>
               ${unlocked
-                ? `<button type="button" class="btn-domestika-secret" onclick="openSkillModal('${skill.id}')">
+            ? `<button type="button" class="btn-domestika-secret" onclick="openSkillModal('${skill.id}')">
                      <span class="material-symbols-outlined" style="font-size: 18px;">play_circle</span>
                      <span>Cursar Masterclass VIP (+${skill.pointsReward} PTS)</span>
                    </button>`
-                : `<button type="button" class="btn-domestika-secret" onclick="switchAppTab('rewards')">
+            : `<button type="button" class="btn-domestika-secret" onclick="switchAppTab('rewards')">
                      <span class="material-symbols-outlined" style="font-size: 18px;">lock_open</span>
                      <span>Desbloquear con Membresía VIP (${reqRw.costVIPPoints} VP)</span>
                    </button>`
-              }
+          }
             </div>
           </article>
         `;
@@ -8711,22 +8769,22 @@ function renderSkillsGrid() {
               <div class="domestika-pricing-row">
                 <div class="domestika-price-cluster">
                   ${unlocked || trialHalf
-                    ? `<span class="domestika-price-current">${unlocked ? '🔓 Desbloqueado' : `$${skill.priceUSD.toFixed(2)} USD`}</span>
+          ? `<span class="domestika-price-current">${unlocked ? '🔓 Desbloqueado' : `$${skill.priceUSD.toFixed(2)} USD`}</span>
                        ${trialHalf && !unlocked ? `<span class="domestika-discount-pill">MITAD GRATIS</span>` : ''}`
-                    : `<span class="domestika-price-current">$${skill.priceUSD.toFixed(2)} USD</span>
+          : `<span class="domestika-price-current">$${skill.priceUSD.toFixed(2)} USD</span>
                        <span class="domestika-price-old">$${origPrice.toFixed(2)}</span>
                        <span class="domestika-discount-pill">-${discountPct}%</span>`
-                  }
+        }
                 </div>
                 <div class="domestika-card-btns">
                   ${unlocked || trialHalf
-                    ? `<button type="button" class="btn-domestika-course primary-red" onclick="openSkillModal('${skill.id}')">
+          ? `<button type="button" class="btn-domestika-course primary-red" onclick="openSkillModal('${skill.id}')">
                          ${completed ? 'Repasar' : doneModulesCount > 0 ? `Continuar (${doneModulesCount}/${skill.lessons.length})` : 'Cursar Ahora'}
                        </button>`
-                    : `<button type="button" class="btn-domestika-course primary-red" onclick="buyCourse('${skill.id}')">
+          : `<button type="button" class="btn-domestika-course primary-red" onclick="buyCourse('${skill.id}')">
                          Ver Curso
                        </button>`
-                  }
+        }
                 </div>
               </div>
             </div>
@@ -8735,6 +8793,32 @@ function renderSkillsGrid() {
       `;
     })
     .join('');
+
+  if (isMobile && !searchQuery) {
+    const mobileCategories = [
+      { cat: 'Programación', label: '💻 Programación' },
+      { cat: 'Inteligencia Artificial', label: '🤖 IA & Prompts' },
+      { cat: 'Finanzas', label: '📈 Finanzas & Ventas' },
+      { cat: 'Diseño & Marketing', label: '🎨 Marketing & Video' },
+      { cat: 'Curso Secreto VIP', label: '🔒 Cursos Secretos' },
+      { cat: 'unlocked', label: '🔓 Mis Desbloqueados' }
+    ];
+    const otherCatsHtml = mobileCategories
+      .map(c => {
+        const isCurrent = c.cat === activeFilter;
+        return `<button type="button" class="cat-btn ${isCurrent ? 'active' : ''}" onclick="selectCourseCategory('${c.cat}', true)">${c.label}</button>`;
+      })
+      .join('');
+
+    grid.innerHTML += `
+      <div class="mobile-category-switcher-footer">
+        <span class="mobile-cat-switcher-kicker">📂 TOCA OTRA CATEGORÍA PARA VER MÁS CURSOS:</span>
+        <div class="mobile-cat-switcher-grid">
+          ${otherCatsHtml}
+        </div>
+      </div>
+    `;
+  }
 }
 
 // Compra de un curso individual -> Abre el Modal de Checkout (o Lista de Espera si hay 0 cursos)
@@ -9368,15 +9452,15 @@ function buildLineByLineBeginnerCodeHtml(lesson) {
       <h5 style="color: #7dd3fc; margin-bottom: 8px;">🔍 ¿Nunca viste esto antes? Qué significa cada parte del ejemplo en español simple:</h5>
       <div class="steps-list">
         ${explainedRows
-          .map(
-            r => `
+      .map(
+        r => `
               <div class="step-item" style="font-size: 12.8px; line-height: 1.5;">
                 <code style="background: rgba(15, 23, 42, 0.85); color: #38bdf8; padding: 2px 6px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px;">${r.codeSnippet.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>
                 <div style="margin-top: 4px; color: #e2e8f0;">👉 <strong>En simple:</strong> ${r.meaning}</div>
               </div>
             `
-          )
-          .join('')}
+      )
+      .join('')}
       </div>
     </div>
   `;
@@ -10294,14 +10378,14 @@ function renderStudentProfileAndSettings() {
           <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
             ${verificationBadgeHtml}
             ${state.userAccount && !emailVerified
-              ? `<button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="resendVerificationEmail()">📨 Reenviar Enlace</button>
+        ? `<button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="resendVerificationEmail()">📨 Reenviar Enlace</button>
                  <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="openMailboxModal()">📬 Abrir Bandeja</button>`
-              : ''
-            }
+        : ''
+      }
             ${state.userAccount
-              ? `<button type="button" class="btn-secondary" style="padding:5px 12px; font-size:11.5px; font-weight:700; color:#b41f00; border-color:rgba(240,45,0,0.35); background:#fff5f2;" onclick="logoutUser()">🚪 Cerrar Sesión</button>`
-              : `<button type="button" class="btn-primary-glow" style="padding:5px 12px; font-size:11.5px;" onclick="openAuthModal('login')">🔐 Iniciar Sesión</button>`
-            }
+        ? `<button type="button" class="btn-secondary" style="padding:5px 12px; font-size:11.5px; font-weight:700; color:#b41f00; border-color:rgba(240,45,0,0.35); background:#fff5f2;" onclick="logoutUser()">🚪 Cerrar Sesión</button>`
+        : `<button type="button" class="btn-primary-glow" style="padding:5px 12px; font-size:11.5px;" onclick="openAuthModal('login')">🔐 Iniciar Sesión</button>`
+      }
           </div>
         </div>
         <p class="instructor-bio">
@@ -10314,10 +10398,10 @@ function renderStudentProfileAndSettings() {
         </div>
         <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #e4e2e4; display: flex; flex-wrap: wrap; gap: 10px;">
           ${state.userAccount
-            ? `<button type="button" class="btn-secondary" style="flex: 1; min-width: 170px; padding: 11px 16px; font-size: 13.5px; font-weight: 800; color: #b41f00; border-color: rgba(240, 45, 0, 0.4); background: #fff5f2;" onclick="logoutUser()">🚪 Cerrar Sesión</button>
+        ? `<button type="button" class="btn-secondary" style="flex: 1; min-width: 170px; padding: 11px 16px; font-size: 13.5px; font-weight: 800; color: #b41f00; border-color: rgba(240, 45, 0, 0.4); background: #fff5f2;" onclick="logoutUser()">🚪 Cerrar Sesión</button>
                <button type="button" class="btn-secondary" style="flex: 1; min-width: 170px; padding: 11px 16px; font-size: 13px; font-weight: 700;" onclick="openMailboxModal()">📬 Bandeja de Notificaciones</button>`
-            : `<button type="button" class="btn-primary-full" style="width: 100%;" onclick="openAuthModal('login')">🔐 Iniciar Sesión / Registrarse</button>`
-          }
+        : `<button type="button" class="btn-primary-full" style="width: 100%;" onclick="openAuthModal('login')">🔐 Iniciar Sesión / Registrarse</button>`
+      }
         </div>
       </article>
     `;
@@ -10335,10 +10419,10 @@ function renderStudentProfileAndSettings() {
         </p>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
           ${state.userAccount
-            ? `<button type="button" class="btn-secondary" onclick="logoutUser()">🚪 Cerrar Sesión</button>
+        ? `<button type="button" class="btn-secondary" onclick="logoutUser()">🚪 Cerrar Sesión</button>
                <button type="button" class="btn-secondary" onclick="openMailboxModal()">📬 Bandeja de Correos</button>`
-            : `<button type="button" class="btn-primary-full" onclick="openAuthModal()">🔐 Iniciar Sesión / Crear Cuenta</button>`
-          }
+        : `<button type="button" class="btn-primary-full" onclick="openAuthModal()">🔐 Iniciar Sesión / Crear Cuenta</button>`
+      }
         </div>
       </article>
       <article class="instructor-card">
@@ -10399,18 +10483,18 @@ function renderStudentProfileAndSettings() {
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-top:8px; border-top:1px solid var(--border);">
             <span style="font-size:12.5px; color:var(--text-muted);">
               ${isCancelledPendingEnd
-                ? `🔒 No se realizará ningún cargo futuro. Sigues teniendo acceso total VIP hasta el ${periodEndDate}.`
-                : 'Puedes cancelar la renovación automática en cualquier momento y conservarás tus días ya pagados.'
-              }
+          ? `🔒 No se realizará ningún cargo futuro. Sigues teniendo acceso total VIP hasta el ${periodEndDate}.`
+          : 'Puedes cancelar la renovación automática en cualquier momento y conservarás tus días ya pagados.'
+        }
             </span>
             ${!isCancelledPendingEnd
-              ? `<button type="button" class="btn-secondary" style="border-color:rgba(239,68,68,0.45); color:#dc2626;" onclick="openCancelSubscriptionModal()">
+          ? `<button type="button" class="btn-secondary" style="border-color:rgba(239,68,68,0.45); color:#dc2626;" onclick="openCancelSubscriptionModal()">
                    🛑 Cancelar suscripción
                  </button>`
-              : `<button type="button" class="btn-secondary" onclick="openMailboxModal()">
+          : `<button type="button" class="btn-secondary" onclick="openMailboxModal()">
                    📧 Ver Confirmación de Cancelación
                  </button>`
-            }
+        }
           </div>
         </div>
       `;
@@ -10472,16 +10556,16 @@ function renderStudentProfileAndSettings() {
       purchasesBox.innerHTML = `
         <div class="purchases-table-wrap">
           ${purchases
-            .map(p => {
-              const st = statusMap[p.status] || statusMap.approved;
-              const dateStr = new Date(p.date).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              });
-              return `
+          .map(p => {
+            const st = statusMap[p.status] || statusMap.approved;
+            const dateStr = new Date(p.date).toLocaleDateString('es-ES', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            return `
                 <div class="purchase-item-row">
                   <div class="purchase-item-main">
                     <strong>${p.title}</strong>
@@ -10500,8 +10584,8 @@ function renderStudentProfileAndSettings() {
                   </div>
                 </div>
               `;
-            })
-            .join('')}
+          })
+          .join('')}
         </div>
       `;
     }
@@ -10516,21 +10600,21 @@ function renderStudentProfileAndSettings() {
       ledgerBox.innerHTML = `
         <div class="ledger-table-wrap">
           ${ledger
-            .slice(0, 15)
-            .map(tx => {
-              const dt = new Date(tx.timestamp).toLocaleString('es-ES', {
-                day: '2-digit',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit'
-              });
-              const ptsBadge = tx.deltaPTS
-                ? `<span style="color:${tx.deltaPTS > 0 ? '#007D8A' : '#dc2626'}; font-weight:700;">${tx.deltaPTS > 0 ? '+' : ''}${tx.deltaPTS} PTS</span>`
-                : '';
-              const vpBadge = tx.deltaVP
-                ? `<span style="color:${tx.deltaVP > 0 ? '#E60050' : '#dc2626'}; font-weight:700; margin-left:8px;">${tx.deltaVP > 0 ? '+' : ''}${tx.deltaVP} VP</span>`
-                : '';
-              return `
+          .slice(0, 15)
+          .map(tx => {
+            const dt = new Date(tx.timestamp).toLocaleString('es-ES', {
+              day: '2-digit',
+              month: 'short',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            const ptsBadge = tx.deltaPTS
+              ? `<span style="color:${tx.deltaPTS > 0 ? '#007D8A' : '#dc2626'}; font-weight:700;">${tx.deltaPTS > 0 ? '+' : ''}${tx.deltaPTS} PTS</span>`
+              : '';
+            const vpBadge = tx.deltaVP
+              ? `<span style="color:${tx.deltaVP > 0 ? '#E60050' : '#dc2626'}; font-weight:700; margin-left:8px;">${tx.deltaVP > 0 ? '+' : ''}${tx.deltaVP} VP</span>`
+              : '';
+            return `
                 <div class="ledger-item-row">
                   <div>
                     <strong style="color:#1b1b1d; display:block;">${tx.reason}</strong>
@@ -10542,8 +10626,8 @@ function renderStudentProfileAndSettings() {
                   </div>
                 </div>
               `;
-            })
-            .join('')}
+          })
+          .join('')}
         </div>
       `;
     }
@@ -10859,7 +10943,7 @@ function applyUserProfileToState(accountRecord) {
       if (splash) splash.classList.add('is-hidden');
       const qModal = document.getElementById('onboarding-quiz-modal');
       if (qModal) qModal.classList.remove('open');
-    } catch (e) {}
+    } catch (e) { }
   }
 
   state.userAccount = {
@@ -11158,7 +11242,7 @@ window.handleSimulatedEmailAction = function (url) {
       switchAppTab(params.get('tab'));
       return;
     }
-  } catch (e) {}
+  } catch (e) { }
 };
 
 window.openMailboxModal = function () {
@@ -11170,7 +11254,7 @@ window.openMailboxModal = function () {
 
   try {
     sessionStorage.setItem('skillvault_notifs_seen', '1');
-  } catch (e) {}
+  } catch (e) { }
 
   const emails = loadJsonDB(MAILBOX_DB_KEY, []);
   let mutated = false;
@@ -11237,19 +11321,19 @@ window.openMailboxModal = function () {
       <h4 style="font-size:15px; color:#1b1b1d !important; margin-bottom:6px;">Tienes ${state.points} PTS y 👑 ${state.vipPoints} VP disponibles</h4>
       <p style="font-size:13px; color:#5e3f39; line-height:1.5; margin-bottom:10px;">
         ${state.freeTrialBonusClaimed
-          ? 'Ya reclamaste tu bono de bienvenida de +50 PTS. Completa los módulos prácticos de tus cursos para seguir sumando puntos.'
-          : '¡Tienes disponible tu primera misión interactiva de Python con un bono gratuito de +50 PTS y +50 XP!'
-        }
+      ? 'Ya reclamaste tu bono de bienvenida de +50 PTS. Completa los módulos prácticos de tus cursos para seguir sumando puntos.'
+      : '¡Tienes disponible tu primera misión interactiva de Python con un bono gratuito de +50 PTS y +50 XP!'
+    }
       </p>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
         ${!state.freeTrialBonusClaimed
-          ? `<button type="button" class="btn-primary-full" style="width:auto; padding:8px 14px; font-size:12.5px;" onclick="closeMailboxModal(); startFreeTrialModule();">
+      ? `<button type="button" class="btn-primary-full" style="width:auto; padding:8px 14px; font-size:12.5px;" onclick="closeMailboxModal(); startFreeTrialModule();">
                🎁 Reclamar +50 PTS en Misión 1
              </button>`
-          : `<button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="closeMailboxModal(); switchAppTab('rewards');">
+      : `<button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="closeMailboxModal(); switchAppTab('rewards');">
                🎁 Ir a la Bóveda de Recompensas
              </button>`
-        }
+    }
       </div>
     </div>
 
@@ -11283,14 +11367,14 @@ window.openMailboxModal = function () {
            </p>
          </div>`
       : emails
-          .map(em => {
-            const dt = new Date(em.createdAt).toLocaleString('es-ES', {
-              day: '2-digit',
-              month: 'short',
-              hour: '2-digit',
-              minute: '2-digit'
-            });
-            return `
+        .map(em => {
+          const dt = new Date(em.createdAt).toLocaleString('es-ES', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          return `
               <div class="lesson-box" style="margin-bottom:0; padding:14px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
                   <span class="skill-cat-tag">${em.category || 'NOTIFICACIÓN'}</span>
@@ -11301,17 +11385,17 @@ window.openMailboxModal = function () {
                   ${em.bodyHtml}
                 </div>
                 ${em.ctaUrl && em.ctaLabel
-                  ? `<div style="margin-top:12px;">
+              ? `<div style="margin-top:12px;">
                        <button type="button" class="btn-primary-full" style="width:auto; padding:8px 16px; font-size:12.5px;" onclick="handleSimulatedEmailAction('${em.ctaUrl}')">
                          ${em.ctaLabel}
                        </button>
                      </div>`
-                  : ''
-                }
+              : ''
+            }
               </div>
             `;
-          })
-          .join('');
+        })
+        .join('');
 
   listEl.innerHTML = systemNotificationsHtml + emailsHtml;
   modal.classList.add('open');
@@ -11471,14 +11555,14 @@ window.renderHelpCenterAndSupport = function () {
       studentBox.innerHTML = `
         <div class="support-tickets-list">
           ${myTickets
-            .map(t => {
-              const dt = new Date(t.createdAt).toLocaleString('es-ES', {
-                day: '2-digit',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit'
-              });
-              return `
+          .map(t => {
+            const dt = new Date(t.createdAt).toLocaleString('es-ES', {
+              day: '2-digit',
+              month: 'short',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            return `
                 <div class="support-ticket-card">
                   <div class="support-ticket-header">
                     <div>
@@ -11494,8 +11578,8 @@ window.renderHelpCenterAndSupport = function () {
                   </div>
                 </div>
               `;
-            })
-            .join('')}
+          })
+          .join('')}
         </div>
       `;
     }
@@ -11518,9 +11602,9 @@ window.renderHelpCenterAndSupport = function () {
       adminBox.innerHTML = `
         <div class="support-tickets-list">
           ${filtered
-            .map(t => {
-              const dt = new Date(t.createdAt).toLocaleString('es-ES');
-              return `
+          .map(t => {
+            const dt = new Date(t.createdAt).toLocaleString('es-ES');
+            return `
                 <div class="support-ticket-card">
                   <div class="support-ticket-header">
                     <div>
@@ -11540,8 +11624,8 @@ window.renderHelpCenterAndSupport = function () {
                   </div>
                 </div>
               `;
-            })
-            .join('')}
+          })
+          .join('')}
         </div>
       `;
     }
@@ -11556,12 +11640,12 @@ window.renderHelpCenterAndSupport = function () {
       <div class="certificate-card" style="margin-bottom:14px;">
         <h4 style="color:#fde68a; margin-bottom:8px;">🚨 Registro de Anomalías e Intentos de Manipulación (${anomalies.length})</h4>
         ${anomalies.length === 0
-          ? `<p style="font-size:12.5px; color:var(--text-muted); margin:0;">✅ No se han detectado manipulaciones ni operaciones anómalas.</p>`
-          : `<div class="ledger-table-wrap">
+        ? `<p style="font-size:12.5px; color:var(--text-muted); margin:0;">✅ No se han detectado manipulaciones ni operaciones anómalas.</p>`
+        : `<div class="ledger-table-wrap">
                ${anomalies
-                 .slice(0, 10)
-                 .map(
-                   a => `
+          .slice(0, 10)
+          .map(
+            a => `
                      <div class="ledger-item-row">
                        <div>
                          <strong style="color:#fca5a5;">[${a.type}] ${a.description}</strong>
@@ -11570,18 +11654,18 @@ window.renderHelpCenterAndSupport = function () {
                        <code style="font-size:11px; color:#fde68a;">${JSON.stringify(a.details || {})}</code>
                      </div>
                    `
-                 )
-                 .join('')}
+          )
+          .join('')}
              </div>`
-        }
+      }
       </div>
       <div class="certificate-card">
         <h4 style="color:#6ee7b7; margin-bottom:8px;">📒 Libro Mayor de Transacciones de Puntos (${ledger.length} registros)</h4>
         <div class="ledger-table-wrap">
           ${ledger
-            .slice(0, 12)
-            .map(
-              tx => `
+        .slice(0, 12)
+        .map(
+          tx => `
                 <div class="ledger-item-row">
                   <div>
                     <strong style="color:#fff;">[${tx.type}] ${tx.reason}</strong>
@@ -11593,8 +11677,8 @@ window.renderHelpCenterAndSupport = function () {
                   </div>
                 </div>
               `
-            )
-            .join('')}
+        )
+        .join('')}
         </div>
       </div>
     `;
@@ -11798,7 +11882,7 @@ window.handleGoogleAuth = async function () {
   showToast('🛡️ ¡Sesión iniciada y sincronizada en la nube con Google OAuth!');
 };
 
-window.closeGoogleOAuthModal = function () {};
+window.closeGoogleOAuthModal = function () { };
 
 window.logoutUser = function () {
   saveState(); // Guarda todo el progreso de la cuenta en la base de datos de usuarios antes de salir
@@ -12213,23 +12297,20 @@ window.openCloudConfigModal = async function () {
       const emailActive = Boolean(cfg.resendApiKey);
 
       statusBox.innerHTML = `
-        <div>🗄️ <strong>Base de Datos Multi-Dispositivo (Supabase):</strong> ${
-          cloudActive
-            ? '<span style="color:#34d399; font-weight:700;">CONECTADA Y ACTIVA</span>'
-            : '<span style="color:#fbbf24;">Modo Local Activo (Pega tu URL y Key de Supabase o configúralas en Vercel)</span>'
+        <div>🗄️ <strong>Base de Datos Multi-Dispositivo (Supabase):</strong> ${cloudActive
+          ? '<span style="color:#34d399; font-weight:700;">CONECTADA Y ACTIVA</span>'
+          : '<span style="color:#fbbf24;">Modo Local Activo (Pega tu URL y Key de Supabase o configúralas en Vercel)</span>'
         }</div>
-        <div>💳 <strong>Webhook Oficial Pagos (<code>/api/payment-webhook</code>):</strong> ${
-          whActive
-            ? '<span style="color:#34d399; font-weight:700;">OPERATIVO EN SERVIDOR</span>'
-            : '<span style="color:#38bdf8;">Listo para desplegar en Vercel</span>'
+        <div>💳 <strong>Webhook Oficial Pagos (<code>/api/payment-webhook</code>):</strong> ${whActive
+          ? '<span style="color:#34d399; font-weight:700;">OPERATIVO EN SERVIDOR</span>'
+          : '<span style="color:#38bdf8;">Listo para desplegar en Vercel</span>'
         }</div>
-        <div>📨 <strong>Correos Transaccionales (Resend + Bandeja Integrada):</strong> ${
-          emailActive
-            ? '<span style="color:#34d399; font-weight:700;">RESEND CLOUD + BANDEJA ACTIVA</span>'
-            : '<span style="color:#38bdf8;">Bandeja Integrada Activa (Agrega RESEND_API_KEY para envío externo)</span>'
+        <div>📨 <strong>Correos Transaccionales (Resend + Bandeja Integrada):</strong> ${emailActive
+          ? '<span style="color:#34d399; font-weight:700;">RESEND CLOUD + BANDEJA ACTIVA</span>'
+          : '<span style="color:#38bdf8;">Bandeja Integrada Activa (Agrega RESEND_API_KEY para envío externo)</span>'
         }</div>
       `;
-    } catch (e) {}
+    } catch (e) { }
   }
 };
 
@@ -12275,7 +12356,7 @@ window.syncAllLocalDataToSupabase = async function (silent = false) {
         return;
       }
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // Respaldo directo si se usa Supabase REST desde el navegador
   const list = Object.values(users);
@@ -12359,10 +12440,24 @@ window.detectAndApplyDeviceLayoutMode = function () {
     /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
   const isMobileViewport = window.innerWidth <= 960;
   const useMobileLayout = isMobileUA || isMobileViewport;
+  const wasMobile = document.body.classList.contains('device-mobile');
 
   document.body.classList.toggle('device-mobile', useMobileLayout);
   document.body.classList.toggle('device-desktop', !useMobileLayout);
   document.documentElement.setAttribute('data-device-layout', useMobileLayout ? 'mobile' : 'desktop');
+
+  if (useMobileLayout && activeFilter === 'all') {
+    activeFilter = getDefaultMobileCategory();
+    syncCategoryButtonsActiveUI();
+    if (document.getElementById('skills-grid') && document.getElementById('skills-grid').innerHTML) {
+      renderSkillsGrid();
+    }
+  } else if (!useMobileLayout && wasMobile) {
+    syncCategoryButtonsActiveUI();
+    if (document.getElementById('skills-grid') && document.getElementById('skills-grid').innerHTML) {
+      renderSkillsGrid();
+    }
+  }
 };
 
 // Eventos principales
@@ -12498,7 +12593,7 @@ document.addEventListener('DOMContentLoaded', () => {
           await syncAccountToCloud(localDb[emailKey]);
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }, 300);
 
   const navButtons = document.querySelectorAll('.nav-item');
@@ -13556,8 +13651,8 @@ function renderQuizStep() {
 
     <div class="quiz-options-list" role="radiogroup" aria-label="${q.title}">
       ${q.options.map(opt => {
-        const isSelected = selectedOptId === opt.id;
-        return `
+    const isSelected = selectedOptId === opt.id;
+    return `
           <button type="button"
             class="quiz-option-btn ${isSelected ? 'selected' : ''}"
             onclick="selectQuizOption('${q.id}', '${opt.id}')"
@@ -13570,15 +13665,15 @@ function renderQuizStep() {
             </span>
           </button>
         `;
-      }).join('')}
+  }).join('')}
     </div>
 
     <div class="quiz-nav-footer">
       <div>
         ${currentQuizStep > 0
-          ? `<button type="button" class="btn-secondary" onclick="prevQuizStep()">⬅ Anterior</button>`
-          : `<button type="button" class="btn-secondary" style="font-size: 12px; opacity: 0.85;" onclick="closeCourseQuizModal()">Saltar por ahora</button>`
-        }
+      ? `<button type="button" class="btn-secondary" onclick="prevQuizStep()">⬅ Anterior</button>`
+      : `<button type="button" class="btn-secondary" style="font-size: 12px; opacity: 0.85;" onclick="closeCourseQuizModal()">Saltar por ahora</button>`
+    }
       </div>
       <div style="display: flex; gap: 8px;">
         <button type="button"
@@ -13700,10 +13795,11 @@ function finishCourseQuiz() {
   // Cerrar el modal del test y enviar directo a la pantalla de inicio con el curso recomendado destacado
   closeCourseQuizModal();
 
-  activeFilter = 'all';
-  document.querySelectorAll('#category-filters .cat-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.cat === 'all');
-  });
+  const recommendedCourse = getAllSkills().find(s => s.id === result.top1Id);
+  activeFilter = isMobileCatalogLayout()
+    ? (recommendedCourse && recommendedCourse.category ? recommendedCourse.category : 'Programación')
+    : 'all';
+  syncCategoryButtonsActiveUI();
 
   if (typeof switchAppTab === 'function') {
     switchAppTab('explore');
@@ -13714,7 +13810,6 @@ function finishCourseQuiz() {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const recommendedCourse = getAllSkills().find(s => s.id === result.top1Id);
   const courseTitle = recommendedCourse ? recommendedCourse.title : 'tu Curso Ideal';
 
   // Guardar siempre el estado (y sincronizar quizResult en la nube si hay cuenta activa)
@@ -13797,9 +13892,9 @@ window.renderQuizResultView = function (resultObj) {
       </span>
       <div class="quiz-alt-grid">
         ${[
-          { skill: top2, match: resultObj.top2Match || 92, stepLabel: 'Paso 2 de tu Ruta' },
-          { skill: top3, match: resultObj.top3Match || 87, stepLabel: 'Paso 3 de tu Ruta' }
-        ].map(item => `
+      { skill: top2, match: resultObj.top2Match || 92, stepLabel: 'Paso 2 de tu Ruta' },
+      { skill: top3, match: resultObj.top3Match || 87, stepLabel: 'Paso 3 de tu Ruta' }
+    ].map(item => `
           <div class="quiz-alt-card">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 6px;">
@@ -13840,11 +13935,9 @@ window.launchRecommendedCourseFromQuiz = function (skillId, actionMode = 'detail
     switchTab('explore');
   }
 
-  // Asegurar que el filtro muestre todos para que la tarjeta esté visible
-  activeFilter = 'all';
-  document.querySelectorAll('#category-filters .cat-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.cat === 'all');
-  });
+  // En PC mostrar todos; en celular seleccionar la categoría de ese curso para no alargar la página
+  activeFilter = isMobileCatalogLayout() ? (skill.category || 'Programación') : 'all';
+  syncCategoryButtonsActiveUI();
   renderSkillsGrid();
 
   setTimeout(() => {
@@ -13923,7 +14016,7 @@ function renderQuizRecommendationBanner() {
 window.dismissLogoSplash = function (openQuizOnEnter = true) {
   try {
     sessionStorage.setItem('skillvault_splash_dismissed', '1');
-  } catch (e) {}
+  } catch (e) { }
   const splash = document.getElementById('logo-splash-overlay');
   if (splash && !splash.classList.contains('is-hidden')) {
     splash.classList.add('is-hidden');
@@ -13950,7 +14043,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const splash = document.getElementById('logo-splash-overlay');
       if (splash) splash.classList.add('is-hidden');
     }
-  } catch (e) {}
+  } catch (e) { }
 
   document.querySelectorAll('.brand .brand-logo, .mobile-brand-bar .brand-logo').forEach(logoEl => {
     logoEl.style.cursor = 'pointer';
