@@ -13273,15 +13273,15 @@ function renderQuizStep() {
 window.selectQuizOption = function (questionId, optionId) {
   currentQuizAnswers[questionId] = optionId;
   renderQuizStep();
-  // Avance suave automático tras breve pausa para que la experiencia sea ágil
-  setTimeout(() => {
-    if (currentQuizStep < COURSE_QUIZ_QUESTIONS.length - 1) {
-      currentQuizStep++;
-      renderQuizStep();
-    } else {
-      finishCourseQuiz();
-    }
-  }, 220);
+  // En las preguntas 1 a 3 avanza automáticamente; en la última pregunta deja lista la opción para tocar "Descubrir mi Curso Ideal"
+  if (currentQuizStep < COURSE_QUIZ_QUESTIONS.length - 1) {
+    setTimeout(() => {
+      if (currentQuizStep < COURSE_QUIZ_QUESTIONS.length - 1) {
+        currentQuizStep++;
+        renderQuizStep();
+      }
+    }, 220);
+  }
 };
 
 window.prevQuizStep = function () {
@@ -13294,14 +13294,17 @@ window.prevQuizStep = function () {
 window.nextQuizStep = function () {
   const q = COURSE_QUIZ_QUESTIONS[currentQuizStep];
   if (!q) return;
-  if (!currentQuizAnswers[q.id]) {
-    showToast('👆 Selecciona una opción para continuar con tu diagnóstico.');
-    return;
-  }
   if (currentQuizStep < COURSE_QUIZ_QUESTIONS.length - 1) {
+    if (!currentQuizAnswers[q.id]) {
+      showToast('👆 Selecciona una opción para continuar con tu diagnóstico.');
+      return;
+    }
     currentQuizStep++;
     renderQuizStep();
   } else {
+    if (!currentQuizAnswers[q.id] && q.options && q.options[0]) {
+      currentQuizAnswers[q.id] = q.options[0].id;
+    }
     finishCourseQuiz();
   }
 };
@@ -13372,16 +13375,32 @@ function finishCourseQuiz() {
     reason: 'Bono por completar el Cuestionario Inicial de Curso Ideal'
   });
 
-  if (txRes && txRes.ok) {
-    saveState();
-    showToast('🎉 ¡Diagnóstico completado! Ganaste +25 PTS y +30 XP por descubrir tu ruta ideal.');
-  } else {
-    showToast('🎯 ¡Tu ruta personalizada de cursos ha sido actualizada!');
+  // Cerrar el modal del test y enviar directo a la pantalla de inicio con el curso recomendado destacado
+  closeCourseQuizModal();
+
+  activeFilter = 'all';
+  document.querySelectorAll('#category-filters .cat-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === 'all');
+  });
+
+  if (typeof switchAppTab === 'function') {
+    switchAppTab('explore');
   }
 
-  updateUI();
+  renderHeaderAndStats();
   renderSkillsGrid();
-  renderQuizResultView(result);
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const recommendedCourse = getAllSkills().find(s => s.id === result.top1Id);
+  const courseTitle = recommendedCourse ? recommendedCourse.title : 'tu Curso Ideal';
+
+  if (txRes && txRes.ok) {
+    saveState();
+    showToast(`🎉 ¡Listo! Ganaste +25 PTS y +30 XP. Tu curso ideal es: "${courseTitle}".`);
+  } else {
+    showToast(`🎯 ¡Listo! Tu curso ideal recomendado es: "${courseTitle}".`);
+  }
 }
 
 window.renderQuizResultView = function (resultObj) {
