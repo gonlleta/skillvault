@@ -6258,6 +6258,26 @@ function renderHeaderAndStats() {
   document.getElementById('user-next-xp').textContent = lvl.nextXp;
   document.getElementById('xp-bar-fill').style.width = `${(lvl.xpInLevel / lvl.nextXp) * 100}%`;
 
+  // Sincronizar también la Franja Gamificada del Alumno (Estilo Domestika / Creative Academy Red)
+  const stripLvl = document.getElementById('strip-user-level');
+  if (stripLvl) stripLvl.textContent = lvl.level;
+  const stripRank = document.getElementById('strip-user-rank-title');
+  if (stripRank) stripRank.textContent = lvl.rankTitle;
+  const stripStreak = document.getElementById('strip-user-streak');
+  if (stripStreak) stripStreak.textContent = state.streak;
+  const stripXp = document.getElementById('strip-user-xp');
+  if (stripXp) stripXp.textContent = lvl.xpInLevel;
+  const stripNextXp = document.getElementById('strip-user-next-xp');
+  if (stripNextXp) stripNextXp.textContent = lvl.nextXp;
+  const stripXpFill = document.getElementById('strip-xp-bar-fill');
+  if (stripXpFill) stripXpFill.style.width = `${(lvl.xpInLevel / lvl.nextXp) * 100}%`;
+  const stripPts = document.getElementById('strip-user-points');
+  if (stripPts) stripPts.textContent = `${state.points} PTS`;
+  const stripVp = document.getElementById('strip-user-vip-points');
+  if (stripVp) stripVp.textContent = `${state.vipPoints} VP`;
+  const stripVipCta = document.getElementById('strip-vip-cta-text');
+  if (stripVipCta) stripVipCta.textContent = vipActive ? '👑 VIP PRO Activo' : 'Hacerse VIP PRO';
+
   document.getElementById('vip-status-tag').textContent = vipActive
     ? '👑 VIP Activo (+VP)'
     : 'Cuenta Estándar';
@@ -6364,6 +6384,9 @@ function renderHeaderAndStats() {
 
   updateMailboxCounterUI();
   renderEmailVerificationTopBanner();
+  if (typeof renderQuizRecommendationBanner === 'function') {
+    renderQuizRecommendationBanner();
+  }
   renderContinueLearningBanner();
   renderFeaturedSkill();
   renderRewardsVault();
@@ -6395,37 +6418,103 @@ function renderFeaturedSkill() {
     return;
   }
 
-  const nextSkill = all.find(s => !state.completedCourses.includes(s.id) && !s.secretCourse) || all[0];
+  const savedQuiz = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
+  const quizPrimarySkill = savedQuiz && savedQuiz.top1Id
+    ? all.find(s => s.id === savedQuiz.top1Id)
+    : null;
+  const nextSkill = quizPrimarySkill || all.find(s => !state.completedCourses.includes(s.id) && !s.secretCourse) || all[0];
   const unlocked = hasAccessToCourse(nextSkill);
   const trialHalf = isTrialHalfOnly(nextSkill);
   const completed = state.completedCourses.includes(nextSkill.id);
   const qCount = getSkillQuestions(nextSkill).length;
+  const isQuizMatched = Boolean(quizPrimarySkill);
+  const cover = getCourseCoverVisual(nextSkill);
+  const savedPassed = (state.courseProgress && state.courseProgress[nextSkill.id]) || [];
+  const doneModulesCount = completed ? nextSkill.lessons.length : savedPassed.length;
+  const pct = Math.min(100, Math.round((doneModulesCount / nextSkill.lessons.length) * 100)) || (trialHalf ? 35 : 0);
+  const currentModIdx = Math.min(nextSkill.lessons.length - 1, doneModulesCount);
+  const currentLessonHeading = (nextSkill.lessons[currentModIdx] && nextSkill.lessons[currentModIdx].heading) || 'Módulo 1: Inicio Práctico';
 
   box.innerHTML = `
-    <div class="card-top">
-      <span class="skill-cat-tag">⭐ CURSO DESTACADO • ${nextSkill.lessons.length} MÓDULOS</span>
-      <div style="display:flex; gap:6px;">
-        <span class="points-pill">+${nextSkill.pointsReward} PTS</span>
-        <span class="vip-points-pill">👑 +${nextSkill.vipPointsReward || 50} VP</span>
+    <div class="domestika-hero-media">
+      <img src="${cover.imageUrl}" alt="${nextSkill.title}" loading="eager" />
+      <div class="domestika-hero-overlay">
+        <div class="domestika-hero-overlay-top">
+          <span class="domestika-mission-pill">
+            ${isQuizMatched ? `🎯 TU CURSO IDEAL (${savedQuiz.top1Match || 98}% MATCH)` : 'Misión en Curso'}
+          </span>
+          <span class="domestika-live-pill">
+            <span class="domestika-live-dot"></span> En directo
+          </span>
+        </div>
+        <div class="domestika-hero-overlay-bottom">
+          <span class="domestika-free-vip-pill">
+            GRATIS CON <span style="color: #E60050;">VIP PRO</span>
+          </span>
+          <span class="domestika-mod-count">• Módulo ${Math.min(nextSkill.lessons.length, doneModulesCount + 1)} de ${nextSkill.lessons.length}</span>
+        </div>
       </div>
     </div>
-    <h3 style="margin-bottom: 8px; font-size: 18px;">${nextSkill.title}</h3>
-    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">${nextSkill.description}</p>
-    <div class="vip-bonus-banner">
-      <span>📚 ${nextSkill.lessons.length} Módulos Extensos (${formatCourseDuration(nextSkill.duration)}) + Examen (${qCount} preg.)</span>
-      <span>👑 <strong>+${nextSkill.vipPointsReward || 50} VP</strong></span>
+
+    <div class="domestika-hero-body">
+      <h2 class="domestika-hero-title">${nextSkill.title}</h2>
+      <p class="domestika-hero-desc">${nextSkill.description}</p>
+
+      ${isQuizMatched && savedQuiz.reasonSummary ? `
+        <div class="domestika-quiz-reason-box">
+          🧭 <strong>Por qué es para ti:</strong> ${savedQuiz.reasonSummary}
+        </div>
+      ` : ''}
+
+      <div class="domestika-social-row">
+        <div class="domestika-rating-cluster">
+          <span class="material-symbols-outlined domestika-star-icon">star</span>
+          <strong>${cover.rating || '5.0'}</strong>
+          <span>(${cover.reviews || '2,140'} reseñas)</span>
+        </div>
+        <div class="domestika-students-cluster">
+          <span class="material-symbols-outlined" style="font-size: 16px;">group</span>
+          <span>${cover.students || '8,450'} alumnos</span>
+        </div>
+      </div>
+
+      <div class="domestika-hero-progress-box">
+        <div class="domestika-hero-progress-labels">
+          <span>Progreso actual: ${pct}%</span>
+          <span class="domestika-lesson-hint">${currentLessonHeading.split(':')[0] || 'Módulo 1'}</span>
+        </div>
+        <div class="domestika-hero-progress-track">
+          <div class="domestika-hero-progress-fill" style="width: ${pct}%;"></div>
+        </div>
+      </div>
+
+      <div class="domestika-hero-actions">
+        ${unlocked || trialHalf
+          ? `<button type="button" class="btn-domestika-primary" onclick="openSkillModal('${nextSkill.id}')">
+               <span class="material-symbols-outlined" style="font-size: 20px;">play_circle</span>
+               <span>${completed ? 'Repasar Curso Completo' : 'Continuar Lección Actual'}</span>
+             </button>`
+          : nextSkill.secretCourse
+            ? `<button type="button" class="btn-domestika-primary" onclick="switchAppTab('rewards')">
+                 <span class="material-symbols-outlined" style="font-size: 20px;">lock_open</span>
+                 <span>Desbloquear Curso Secreto en Bóveda</span>
+               </button>`
+            : `<button type="button" class="btn-domestika-primary" onclick="buyCourse('${nextSkill.id}')">
+                 <span class="material-symbols-outlined" style="font-size: 20px;">play_circle</span>
+                 <span>Desbloquear Curso Completo ($${nextSkill.priceUSD.toFixed(2)} USD)</span>
+               </button>`
+        }
+        <button type="button" class="btn-card-vip-upsell" onclick="openCourseQuizModal(true)">
+          🧭 ${isQuizMatched ? 'Ver mi diagnóstico o repetir el Cuestionario' : '¿No sabes cuál elegir? Haz el Test de 1 minuto (+25 PTS)'}
+        </button>
+        <div class="domestika-hero-bounty">
+          <span>Recompensa al completar:</span>
+          <strong class="bounty-pts">+${nextSkill.pointsReward} PTS</strong>
+          <span>•</span>
+          <strong class="bounty-vp">👑 +${nextSkill.vipPointsReward || 50} VP</strong>
+        </div>
+      </div>
     </div>
-    ${unlocked || trialHalf
-      ? `<button class="btn-start-skill" onclick="openSkillModal('${nextSkill.id}')">
-            ${completed ? '✅ Repasar Módulos' : `▶ Cursar ${nextSkill.lessons.length} Módulos (+${nextSkill.pointsReward} PTS ${isVipSubscriptionActive() ? `y +${nextSkill.vipPointsReward} VP` : ''})`}
-           </button>`
-      : `<button class="btn-start-skill buy-btn" onclick="buyCourse('${nextSkill.id}')">
-            🔓 Comprar Curso Completo por $${nextSkill.priceUSD.toFixed(2)} USD
-           </button>
-           <button class="btn-card-vip-upsell" onclick="handlePlanCTA('monthly')">
-            👑 O desbloquéalo con Pase VIP PRO ($49 USD • Incluye los 14 cursos)
-           </button>`
-    }
   `;
 }
 
@@ -8132,67 +8221,161 @@ function updateCategoryButtonsCounts() {
   });
 }
 
-// Array de 3 cursos destacados (Mock Data) + portadas visuales para las tarjetas del catálogo
-const MOCK_COURSES_DATA = [
-  {
-    id: 'py-automation',
-    title: 'Python desde Cero & Automatización de Tareas Reales',
-    category: 'Programación',
-    rewardLabel: 'Gana 450 PTS',
-    pointsReward: 450,
+// Metadatos editoriales e ilustraciones estilo Domestika / Creative Academy Red para el catálogo
+const DOMESTIKA_IMAGES = {
+  pythonHero: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAyRvidjP_plg-zszOW7--ptk1p_3u1jFW8LpYezpuKdzCmEnZHq7Xk6-qs7W0l8Hxwc74hSZ0Ir7NJJy7kPQH9HTcEaRHwJ7gCvv1csYy0LRa4hMk2Y-VH2Dkmjgh91bvkfPL4puQWzCtnuTuCA6u6jKXPRXjAsnb87FJpp6gCsr713T_gOIoMRf_PkjGqGYu9xIFeU1h3Gc0rz7FkMG7Z943sWnTQl86YyNdrR7hL',
+  aiChatgpt: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjGRJP3hLDcLV9n1IeHDBVe8-1MkmbGuIxkZIYH4gvbIhwX744ppC5RDrLARsMQ79JjAOejBM0DYLq4s-OKhF8o67nPIWsRFI2xgUheh1pjA_UlDbVu4wB-GMgtP7HPVMDjQcnpv6sWxqeUrqs1X1dZIRPx6qukj9jxT0PxSPUIFxF3Qx57jGEkcG4VBmJaUbnGjzyRGaZtPKsW8bphyF-dEdCgQBZw2xBzyJGghul',
+  webStreamlit: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDnC30cevi5ntF6_p_Gr_Nhjj5Jt2cN0uOo094MiB5UWpMZPbS5OyeRsqcn6PcKRW-WVLZWXCUc7Gs-qT94n3_hGVpjyW4bL4vIt1S9ZnKu0QJnPNEUUPYWfEy9Gk3uTZTfAkDo0lVoYmgjpZjDwL-eW8wEELfm1yF1OEq9uo3rIvoXuntOG9Y95msQEe3VftMBeEdYtpYOn0UwGp4Yy0LzFRgHI6TEzg39s5HjqqnD',
+  whatsappBot: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBkxN22FPnYhvMzCFXyL_p0wDTsABkXeM8I4BrdrTRvftVsu9usWCKROnR427qxyvF1k-WpGp77XzCwz78lcn2hsUbxj_b1q8dAAupbvnCXQL5ZKbTs96ry4ORnARKRfMKCbXH5gLgAgRouehTZVWkeZuKnDBZsJzQVeFeYAYKoU7W8-QiYqdZfK1K25NPV1h2zDNLo2zUF5cziTNWHYQEYom1sHZ0KAwB2oZSEs377',
+  vipVault: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBKJshLK1x0TXRvjgWTQQBVeEP_NJ5Qag6Bh70fVKuKDAmWA5t7TkBL01mnWGLj2GBjzXfiBqcfAxigeiAw49JqZzUav2WRf_E7hIJvWxVJREGMwjnuAsrYQ1r7F6Toske-Kk1UITjM2K5x4hp98G6k-K74ChLjuSzRvs2s6Wd7nCwNX6-VkSM5OWZr3Xkkn78wFeyfQCJi0q6iJY17ElzzWvbgDCANTOibb2p-Jsyo'
+};
+
+const COURSE_EDITORIAL_META = {
+  'py-automation': {
+    instructor: 'Mateo Valdés',
+    role: 'Senior Python & Automation Lead',
+    rating: '5.0',
+    reviews: '2,140',
+    students: '8,450',
+    badge: '🔥 MÁS VENDIDO',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.pythonHero,
     coverIcon: '🐍',
-    coverGradient: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #065f46 100%)'
+    coverGradient: 'linear-gradient(135deg, #b41f00 0%, #e12a00 55%, #006874 100%)'
   },
-  {
-    id: 'ai-prompt-eng',
-    title: 'Ingeniería de Prompts, Agentes de IA & Automatización',
-    category: 'Inteligencia Artificial',
-    rewardLabel: 'Gana 500 PTS',
-    pointsReward: 500,
+  'ai-agents-pro': {
+    instructor: 'Alex Rivers',
+    role: 'Especialista en IA & Prompt Engineering',
+    rating: '4.9',
+    reviews: '1,840',
+    students: '6,200',
+    badge: '🔥 MÁS VENDIDO',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.aiChatgpt,
     coverIcon: '🤖',
-    coverGradient: 'linear-gradient(135deg, #2e1065 0%, #4c1d95 55%, #701a75 100%)'
+    coverGradient: 'linear-gradient(135deg, #b41f00 0%, #d946ef 60%, #006874 100%)'
   },
-  {
-    id: 'fin-b2b-pricing',
-    title: 'Finanzas Digitales, Pricing B2B y Psicología de Ventas',
-    category: 'Finanzas',
-    rewardLabel: 'Gana 450 PTS',
-    pointsReward: 450,
-    coverIcon: '📈',
-    coverGradient: 'linear-gradient(135deg, #064e3b 0%, #0f766e 55%, #1e3a8a 100%)'
+  'fullstack-apis-sql': {
+    instructor: 'David Mendoza',
+    role: 'Full-Stack Software Architect',
+    rating: '5.0',
+    reviews: '420',
+    students: '3,100',
+    badge: 'NUEVO',
+    badgeType: 'teal',
+    imageUrl: DOMESTIKA_IMAGES.webStreamlit,
+    coverIcon: '💻',
+    coverGradient: 'linear-gradient(135deg, #006874 0%, #0057c0 60%, #1b1b1d 100%)'
+  },
+  'nocode-n8n-whatsapp': {
+    instructor: 'Camila Ortiz',
+    role: 'Automatizadora No-Code & AI',
+    rating: '4.8',
+    reviews: '980',
+    students: '4,890',
+    badge: 'TENDENCIA',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.whatsappBot,
+    coverIcon: '💬',
+    coverGradient: 'linear-gradient(135deg, #007D8A 0%, #10b981 60%, #004f57 100%)'
+  },
+  'secret-high-ticket-agency': {
+    instructor: 'Lucas Vance',
+    role: 'Fundador de Agencia AI Enterprise',
+    rating: '5.0',
+    reviews: '310',
+    students: '1,240',
+    badge: '👑 BÓVEDA EXCLUSIVA VIP',
+    badgeType: 'vip',
+    imageUrl: DOMESTIKA_IMAGES.vipVault,
+    coverIcon: '👑',
+    coverGradient: 'linear-gradient(135deg, #1b1b1d 0%, #3e0500 55%, #b41f00 100%)'
+  },
+  'secret-saas-masterclass': {
+    instructor: 'Elena Rostova',
+    role: 'Creadora de Micro-SaaS Rentables',
+    rating: '5.0',
+    reviews: '295',
+    students: '1,180',
+    badge: '👑 BÓVEDA EXCLUSIVA VIP',
+    badgeType: 'vip',
+    imageUrl: DOMESTIKA_IMAGES.vipVault,
+    coverIcon: '🚀',
+    coverGradient: 'linear-gradient(135deg, #1b1b1d 0%, #3e0500 55%, #E60050 100%)'
   }
-];
+};
 
 function getCourseCoverVisual(skill) {
-  const match = MOCK_COURSES_DATA.find(m => m.id === skill.id);
-  if (match) return match;
+  if (COURSE_EDITORIAL_META[skill.id]) {
+    return COURSE_EDITORIAL_META[skill.id];
+  }
+  if (skill.secretCourse) {
+    return {
+      instructor: 'Consejo Académico VIP',
+      role: 'Mentores Ejecutivos SkillVault',
+      rating: '5.0',
+      reviews: '340',
+      students: '1,420',
+      badge: '👑 BÓVEDA EXCLUSIVA VIP',
+      badgeType: 'vip',
+      imageUrl: DOMESTIKA_IMAGES.vipVault,
+      coverIcon: '👑',
+      coverGradient: 'linear-gradient(135deg, #1b1b1d 0%, #3e0500 55%, #b41f00 100%)'
+    };
+  }
   if (skill.category.includes('Programación')) {
     return {
+      instructor: 'David Mendoza',
+      role: 'Ingeniero de Software Senior',
+      rating: '4.9',
+      reviews: '860',
+      students: '4,120',
+      badge: 'DESTACADO',
+      badgeType: 'teal',
+      imageUrl: DOMESTIKA_IMAGES.webStreamlit,
       coverIcon: '💻',
-      coverGradient: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #0f766e 100%)'
+      coverGradient: 'linear-gradient(135deg, #006874 0%, #0057c0 60%, #1b1b1d 100%)'
     };
   }
   if (skill.category.includes('Inteligencia Artificial')) {
     return {
+      instructor: 'Alex Rivers',
+      role: 'Especialista en IA Aplicada',
+      rating: '4.9',
+      reviews: '1,210',
+      students: '5,340',
+      badge: 'TENDENCIA',
+      badgeType: 'red',
+      imageUrl: DOMESTIKA_IMAGES.aiChatgpt,
       coverIcon: '🤖',
-      coverGradient: 'linear-gradient(135deg, #2e1065 0%, #581c87 60%, #4338ca 100%)'
+      coverGradient: 'linear-gradient(135deg, #b41f00 0%, #e12a00 60%, #006874 100%)'
     };
   }
   if (skill.category.includes('Finanzas')) {
     return {
+      instructor: 'Sofía Altamirano',
+      role: 'Estratega Financiera & Closer B2B',
+      rating: '4.9',
+      reviews: '940',
+      students: '4,680',
+      badge: '🔥 MÁS VENDIDO',
+      badgeType: 'red',
+      imageUrl: DOMESTIKA_IMAGES.webStreamlit,
       coverIcon: '📊',
-      coverGradient: 'linear-gradient(135deg, #064e3b 0%, #115e59 60%, #1e3a8a 100%)'
-    };
-  }
-  if (skill.secretCourse) {
-    return {
-      coverIcon: '👑',
-      coverGradient: 'linear-gradient(135deg, #451a03 0%, #78350f 55%, #3b0764 100%)'
+      coverGradient: 'linear-gradient(135deg, #007D8A 0%, #004f57 60%, #1b1b1d 100%)'
     };
   }
   return {
+    instructor: 'Valeria Montes',
+    role: 'Directora de Growth & Marketing Digital',
+    rating: '4.9',
+    reviews: '1,150',
+    students: '5,090',
+    badge: 'TENDENCIA',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.whatsappBot,
     coverIcon: '🎨',
-    coverGradient: 'linear-gradient(135deg, #3b0764 0%, #6b21a8 55%, #be185d 100%)'
+    coverGradient: 'linear-gradient(135deg, #E60050 0%, #b41f00 60%, #3e0500 100%)'
   };
 }
 
@@ -8269,11 +8452,15 @@ function renderSkillsGrid() {
     return;
   }
 
+  const catalogCountEl = document.getElementById('catalog-count-label');
+  if (catalogCountEl) {
+    catalogCountEl.textContent = `${skills.length} ${skills.length === 1 ? 'Curso' : 'Cursos'}`;
+  }
+
   grid.innerHTML = skills
     .map(skill => {
       const unlocked = hasAccessToCourse(skill);
       const trialHalf = isTrialHalfOnly(skill);
-      const trialLimit = getTrialModulesLimit(skill);
       const completed = state.completedCourses.includes(skill.id);
       const vpAmount = skill.vipPointsReward || 50;
       const qCount = getSkillQuestions(skill).length;
@@ -8281,22 +8468,17 @@ function renderSkillsGrid() {
       const doneModulesCount = completed ? skill.lessons.length : savedPassed.length;
       const pct = Math.min(100, Math.round((doneModulesCount / skill.lessons.length) * 100));
       const cover = getCourseCoverVisual(skill);
+      const origPrice = skill.originalPriceUSD || Number((skill.priceUSD * 2.6).toFixed(2));
+      const discountPct = skill.priceUSD > 0 ? Math.round((1 - skill.priceUSD / origPrice) * 100) : 100;
 
-      let actionButton = '';
-      if (skill.secretCourse && !unlocked) {
-        const reqRw = EXCLUSIVE_VIP_REWARDS.find(r => r.id === skill.requiredRewardId) || EXCLUSIVE_VIP_REWARDS[0];
-        actionButton = `<button type="button" class="btn-start-skill gold-btn" onclick="switchAppTab('rewards')">👑 Canjear (${reqRw.costVIPPoints} VP)</button>`;
-      } else if (unlocked || trialHalf) {
-        actionButton = `<button type="button" class="btn-start-skill ${completed ? 'done' : ''}" onclick="openSkillModal('${skill.id}')">
-          ${completed ? '✅ Repasar' : doneModulesCount > 0 ? `▶ Continuar (${doneModulesCount}/${skill.lessons.length})` : '🚀 Cursar Ahora'}
-        </button>`;
-      } else {
-        actionButton = `
-          <button type="button" class="btn-start-skill buy-btn" onclick="buyCourse('${skill.id}')">
-            💳 Desbloquear ($${skill.priceUSD.toFixed(2)})
-          </button>
-        `;
-      }
+      const savedQuiz = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
+      const isTop1Match = savedQuiz && savedQuiz.top1Id === skill.id;
+      const isTopAltMatch = savedQuiz && Array.isArray(savedQuiz.topIds) && savedQuiz.topIds.slice(1, 3).includes(skill.id);
+      const matchBadgeHtml = isTop1Match
+        ? `<div class="course-quiz-match-badge">🎯 #1 Curso Ideal según tu Test (${savedQuiz.top1Match || 98}% Match)</div>`
+        : isTopAltMatch
+          ? `<div class="course-quiz-match-badge quiz-alt-badge">✨ Recomendado en tu Ruta Personalizada</div>`
+          : '';
 
       const progressHtml = (unlocked || trialHalf)
         ? `
@@ -8312,58 +8494,120 @@ function renderSkillsGrid() {
         `
         : '';
 
-      const bioListHtml = Array.isArray(skill.bioHighlights) && skill.bioHighlights.length > 0
-        ? `
-          <ul class="course-bio-list">
-            ${skill.bioHighlights.map(item => `<li><span>${item}</span></li>`).join('')}
-          </ul>
-        `
-        : '';
+      if (skill.secretCourse) {
+        const reqRw = EXCLUSIVE_VIP_REWARDS.find(r => r.id === skill.requiredRewardId) || EXCLUSIVE_VIP_REWARDS[0];
+        return `
+          <article class="skill-card vip-exclusive-card ${isTop1Match ? 'quiz-top-match-card' : ''}" id="course-card-${skill.id}">
+            <div class="domestika-card-media secret-media">
+              <img src="${cover.imageUrl}" alt="${skill.title}" loading="lazy" />
+              <div class="domestika-secret-overlay">
+                <div class="domestika-secret-top">
+                  <span class="domestika-vip-vault-pill">👑 BÓVEDA EXCLUSIVA VIP</span>
+                  <span class="domestika-lock-circle">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">lock</span>
+                  </span>
+                </div>
+                <div class="domestika-secret-bottom">
+                  <span class="material-symbols-outlined" style="font-size: 16px; color: #E60050;">verified</span>
+                  <span>Acceso restringido a miembros activos</span>
+                </div>
+              </div>
+            </div>
+            <div class="domestika-card-body">
+              ${matchBadgeHtml}
+              <h3>${skill.title.replace('🔒 [CURSO SECRETO VIP] ', '')}</h3>
+              <p class="domestika-secret-desc">${skill.description}</p>
+              <div class="domestika-unlock-req-box">
+                <div class="domestika-unlock-req-left">
+                  <span class="material-symbols-outlined" style="font-size: 18px; color: #b41f00;">key</span>
+                  <span>Requisito de Desbloqueo:</span>
+                </div>
+                <span class="domestika-unlock-req-val">${reqRw.costVIPPoints} VP o Pase Founder</span>
+              </div>
+              ${unlocked
+                ? `<button type="button" class="btn-domestika-secret" onclick="openSkillModal('${skill.id}')">
+                     <span class="material-symbols-outlined" style="font-size: 18px;">play_circle</span>
+                     <span>Cursar Masterclass VIP (+${skill.pointsReward} PTS)</span>
+                   </button>`
+                : `<button type="button" class="btn-domestika-secret" onclick="switchAppTab('rewards')">
+                     <span class="material-symbols-outlined" style="font-size: 18px;">lock_open</span>
+                     <span>Desbloquear con Membresía VIP (${reqRw.costVIPPoints} VP)</span>
+                   </button>`
+              }
+            </div>
+          </article>
+        `;
+      }
 
       return `
-        <article class="skill-card ${skill.secretCourse ? 'vip-exclusive-card' : ''}">
-          <div>
-            <!-- Imagen de Portada (Placeholder Visual Gamificado) -->
-            <div class="course-cover-placeholder" style="background: ${cover.coverGradient};" role="img" aria-label="Portada del curso ${skill.title}">
-              <div class="course-cover-top">
-                <span class="skill-cat-tag ${skill.secretCourse ? 'gold-tag' : ''}">${skill.category}</span>
-                <span class="course-reward-pill">🏆 Gana ${skill.pointsReward} PTS</span>
-              </div>
-              <div style="display:flex; justify-content:space-between; align-items:flex-end; position:relative; z-index:1;">
-                <span class="course-cover-icon" aria-hidden="true">${cover.coverIcon}</span>
-                <span class="vip-points-pill" title="Puntos Exclusivos solo para miembros VIP">👑 +${vpAmount} VP</span>
-              </div>
-            </div>
-
-            <h3>${skill.title}</h3>
-            <div class="course-bio-box">
-              <span class="course-bio-title">📖 De qué trata este curso</span>
-              <p style="margin-bottom:0; color: var(--text-muted); font-size: 13px; line-height: 1.5;">${skill.description}</p>
-              ${bioListHtml}
-            </div>
-          </div>
-          <div>
-            ${progressHtml}
-            <div class="vip-bonus-banner">
-              <span>📚 <b>${skill.lessons.length} Módulos</b> + 📝 <b>Examen (${qCount} preg.)</b></span>
-              <span>⚡ <b>+${skill.xp} XP</b></span>
-            </div>
-            <div class="skill-meta">
-              <span>⏱️ ${formatCourseDuration(skill.duration)}</span>
-              <span class="price-badge">
-                ${skill.secretCourse
-          ? '👑 Exclusivo VIP'
-          : (unlocked || trialHalf)
-            ? '🔓 Desbloqueado'
-            : `$${skill.priceUSD.toFixed(2)} USD`
-        }
+        <article class="skill-card ${isTop1Match ? 'quiz-top-match-card' : ''}" id="course-card-${skill.id}">
+          <div class="domestika-card-media">
+            <img src="${cover.imageUrl}" alt="Portada del curso ${skill.title}" loading="lazy" />
+            <div class="domestika-media-badges">
+              <span class="domestika-tag-pill ${cover.badgeType === 'teal' ? 'teal-pill' : 'red-pill'}">
+                ${cover.badge || skill.category}
+              </span>
+              <span class="domestika-plus-free-pill">
+                GRATIS CON <span style="color: #E60050;">VIP</span>
               </span>
             </div>
-            <div class="course-card-actions">
-              <button type="button" class="btn-course-details" onclick="viewCourseDetails('${skill.id}')">
-                🔎 Ver detalles
-              </button>
-              ${actionButton}
+            <button type="button" class="domestika-bookmark-btn" aria-label="Ver detalles del curso" onclick="viewCourseDetails('${skill.id}')">
+              <span class="material-symbols-outlined" style="font-size: 18px;">bookmark_border</span>
+            </button>
+          </div>
+
+          <div class="domestika-card-body">
+            <div>
+              ${matchBadgeHtml}
+              <h3>${skill.title}</h3>
+              <p class="domestika-instructor-line">
+                Por <strong>${cover.instructor}</strong>, ${cover.role}
+              </p>
+
+              <div class="domestika-social-row">
+                <div class="domestika-rating-cluster">
+                  <span class="material-symbols-outlined domestika-star-icon">star</span>
+                  <strong>${cover.rating}</strong>
+                  <span>(${cover.reviews})</span>
+                </div>
+                <span>•</span>
+                <div class="domestika-students-cluster">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">people</span>
+                  <span>${cover.students} alumnos</span>
+                </div>
+              </div>
+
+              <div class="domestika-reward-row">
+                <span class="material-symbols-outlined" style="font-size: 15px;">stars</span>
+                <span>Recompensa al aprobar: <strong>+${skill.pointsReward} PTS</strong> | <strong class="text-urgency-red">👑 +${vpAmount} VP</strong></span>
+              </div>
+
+              <p class="domestika-course-summary">${skill.description}</p>
+            </div>
+
+            <div>
+              ${progressHtml}
+              <div class="domestika-pricing-row">
+                <div class="domestika-price-cluster">
+                  ${unlocked || trialHalf
+                    ? `<span class="domestika-price-current">${unlocked ? '🔓 Desbloqueado' : `$${skill.priceUSD.toFixed(2)} USD`}</span>
+                       ${trialHalf && !unlocked ? `<span class="domestika-discount-pill">MITAD GRATIS</span>` : ''}`
+                    : `<span class="domestika-price-current">$${skill.priceUSD.toFixed(2)} USD</span>
+                       <span class="domestika-price-old">$${origPrice.toFixed(2)}</span>
+                       <span class="domestika-discount-pill">-${discountPct}%</span>`
+                  }
+                </div>
+                <div class="domestika-card-btns">
+                  ${unlocked || trialHalf
+                    ? `<button type="button" class="btn-domestika-course primary-red" onclick="openSkillModal('${skill.id}')">
+                         ${completed ? 'Repasar' : doneModulesCount > 0 ? `Continuar (${doneModulesCount}/${skill.lessons.length})` : 'Cursar Ahora'}
+                       </button>`
+                    : `<button type="button" class="btn-domestika-course primary-red" onclick="buyCourse('${skill.id}')">
+                         Ver Curso
+                       </button>`
+                  }
+                </div>
+              </div>
             </div>
           </div>
         </article>
@@ -12494,7 +12738,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'payment-settings-modal',
     'cancel-subscription-modal',
     'receipt-modal',
-    'mailbox-modal'
+    'mailbox-modal',
+    'onboarding-quiz-modal'
   ].forEach(modalId => {
     const m = document.getElementById(modalId);
     if (m) {
@@ -12611,6 +12856,750 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+  });
+});
+
+// ==========================================================================
+// CUESTIONARIO INICIAL DE DIAGNÓSTICO & RECOMENDACIÓN DE CURSO IDEAL
+// ==========================================================================
+const QUIZ_STORAGE_KEY = 'skillvault_course_quiz_v1';
+
+const COURSE_QUIZ_QUESTIONS = [
+  {
+    id: 'q1_goal',
+    title: '1. ¿Cuál es tu objetivo principal al entrar hoy a SkillVault?',
+    subtitle: 'Elige la meta que más te motiva alcanzar en las próximas semanas.',
+    options: [
+      {
+        id: 'automate_ai',
+        icon: '🤖',
+        title: 'Ahorrar horas de trabajo con IA y Automatización',
+        desc: 'Hacer que la computadora, ChatGPT o bots de WhatsApp resuelvan tareas repetitivas por mí.',
+        reason: 'buscas delegar tareas repetitivas y multiplicar tu productividad con IA y automatización',
+        weights: {
+          'py-automation': 35,
+          'ai-agents-pro': 38,
+          'nocode-n8n-whatsapp': 36,
+          'ai-rag-embeddings': 30
+        }
+      },
+      {
+        id: 'remote_usd',
+        icon: '🌎',
+        title: 'Conseguir trabajo remoto o clientes y cobrar en Dólares',
+        desc: 'Prepararme para oportunidades internacionales, entrevistas en inglés o vender servicios de alto valor.',
+        reason: 'tu prioridad es generar ingresos en dólares trabajando en remoto o prestando servicios profesionales',
+        weights: {
+          'english-remote-tech': 42,
+          'closer-high-ticket-sales': 34,
+          'js-react-modern': 28,
+          'secret-high-ticket-agency': 32
+        }
+      },
+      {
+        id: 'clients_sales_mkt',
+        icon: '📈',
+        title: 'Atraer clientes, visitas virales y multiplicar ventas',
+        desc: 'Dominar redes sociales, anuncios pagados, textos persuasivos y páginas web que convierten.',
+        reason: 'quieres atraer tráfico constante y transformar espectadores o visitantes en compradores reales',
+        weights: {
+          'meta-ads-roas': 38,
+          'viral-video-retention': 36,
+          'mkt-copywriting-funnels': 36,
+          'ux-growth-convert': 35
+        }
+      },
+      {
+        id: 'finance_money',
+        icon: '💰',
+        title: 'Multiplicar mis ahorros, fijar precios rentables o cerrar ventas',
+        desc: 'Ordenar mis finanzas e inversiones, hacer rentable mi negocio o ganar comisiones como Closer.',
+        reason: 'te enfocas en la rentabilidad directa, la inversión inteligente y el cierre de ventas',
+        weights: {
+          'fin-crypto-invest': 40,
+          'fin-b2b-pricing': 38,
+          'closer-high-ticket-sales': 35
+        }
+      },
+      {
+        id: 'software_dev_sec',
+        icon: '💻',
+        title: 'Crear sitios web profesionales, aplicaciones o blindar sistemas',
+        desc: 'Programar desde cero hasta nivel profesional en Python, JavaScript, bases de datos o Ciberseguridad.',
+        reason: 'quieres construir tecnología sólida, aplicaciones completas o proteger sistemas contra ataques',
+        weights: {
+          'py-automation': 32,
+          'js-react-modern': 38,
+          'fullstack-apis-sql': 40,
+          'cybersec-ethical-web': 38,
+          'secret-saas-masterclass': 30
+        }
+      }
+    ]
+  },
+  {
+    id: 'q2_area',
+    title: '2. ¿Qué habilidad específica te despierta más curiosidad dominar primero?',
+    subtitle: 'Esto nos ayuda a elegir la especialidad exacta dentro del catálogo.',
+    options: [
+      {
+        id: 'area_chatgpt_bots',
+        icon: '🧠',
+        title: 'ChatGPT Profesional, Agentes de IA y Bots de WhatsApp',
+        desc: 'Crear asistentes inteligentes, entrenar a la IA con mis propios PDFs o automatizar WhatsApp sin programar.',
+        reason: 'te apasiona aplicar la Inteligencia Artificial a casos reales de atención y negocio',
+        weights: {
+          'ai-agents-pro': 42,
+          'nocode-n8n-whatsapp': 40,
+          'ai-rag-embeddings': 38,
+          'secret-high-ticket-agency': 28
+        }
+      },
+      {
+        id: 'area_code_python_web',
+        icon: '🐍',
+        title: 'Programación Práctica (Python, JavaScript o Apps Completas)',
+        desc: 'Automatizar Excel/CSV con Python, crear webs dinámicas con JS o sistemas con usuarios y bases de datos SQL.',
+        reason: 'prefieres dominar el código para automatizar procesos o crear tus propias aplicaciones web',
+        weights: {
+          'py-automation': 42,
+          'js-react-modern': 38,
+          'fullstack-apis-sql': 38,
+          'secret-saas-masterclass': 26
+        }
+      },
+      {
+        id: 'area_cyber_english',
+        icon: '🛡️',
+        title: 'Ciberseguridad & Hacking Ético o Inglés para Trabajo Remoto',
+        desc: 'Proteger páginas web de ataques reales o dominar el inglés práctico para entrevistas y empleos en USD.',
+        reason: 'apuntas a habilidades altamente demandadas por empresas tecnológicas internacionales',
+        weights: {
+          'cybersec-ethical-web': 45,
+          'english-remote-tech': 45
+        }
+      },
+      {
+        id: 'area_mkt_video_copy',
+        icon: '🎬',
+        title: 'Videos Virales (TikTok/Reels), Publicidad (Ads), Copywriting y Diseño Web',
+        desc: 'Retener la atención en video, escribir textos que venden, diseñar webs persuasivas o lanzar campañas rentables.',
+        reason: 'buscas dominar el crecimiento digital, la atención en redes y la psicología de conversión',
+        weights: {
+          'viral-video-retention': 40,
+          'meta-ads-roas': 40,
+          'mkt-copywriting-funnels': 40,
+          'ux-growth-convert': 40
+        }
+      },
+      {
+        id: 'area_fin_pricing_sales',
+        icon: '📊',
+        title: 'Inversión Personal, Estrategia de Precios o Ventas por Chat/Llamada',
+        desc: 'Invertir con interés compuesto, calcular márgenes de ganancia reales o cerrar clientes de alto ticket.',
+        reason: 'quieres dominar el flujo del dinero, la fijación de precios y la negociación comercial',
+        weights: {
+          'fin-crypto-invest': 42,
+          'fin-b2b-pricing': 42,
+          'closer-high-ticket-sales': 42
+        }
+      }
+    ]
+  },
+  {
+    id: 'q3_level',
+    title: '3. ¿Cómo describirías tu punto de partida actual?',
+    subtitle: 'Adaptaremos la complejidad del curso recomendado a tu experiencia.',
+    options: [
+      {
+        id: 'lvl_beginner',
+        icon: '🌱',
+        title: 'Desde absoluto cero (Principiante)',
+        desc: 'Quiero explicaciones claras en español simple, paso a paso y sin tecnicismos confusos.',
+        reason: 'valoras una ruta guiada desde cero con ejemplos claros e inmediatos',
+        weights: {
+          'py-automation': 30,
+          'ai-agents-pro': 28,
+          'fin-crypto-invest': 30,
+          'mkt-copywriting-funnels': 25,
+          'viral-video-retention': 25,
+          'english-remote-tech': 26
+        }
+      },
+      {
+        id: 'lvl_nocode',
+        icon: '⚡',
+        title: 'Práctico y visual (Prefiero resultados rápidos sin programar código complejo)',
+        desc: 'Quiero usar herramientas visuales, plantillas listas, prompts o estrategias de negocio directas.',
+        reason: 'prefieres soluciones visuales y estratégicas que puedas aplicar hoy mismo sin escribir código complejo',
+        weights: {
+          'nocode-n8n-whatsapp': 35,
+          'ai-agents-pro': 30,
+          'ux-growth-convert': 28,
+          'fin-b2b-pricing': 28,
+          'closer-high-ticket-sales': 30,
+          'meta-ads-roas': 26
+        }
+      },
+      {
+        id: 'lvl_intermediate',
+        icon: '🔧',
+        title: 'Intermedio (Ya tengo bases y quiero dar un salto profesional)',
+        desc: 'Quiero dominar arquitecturas reales, campañas de anuncios medibles, JavaScript moderno o cierre de ventas.',
+        reason: 'ya cuentas con una base y buscas herramientas profesionales que marquen diferencia en el mercado',
+        weights: {
+          'js-react-modern': 32,
+          'fullstack-apis-sql': 30,
+          'meta-ads-roas': 30,
+          'ux-growth-convert': 26,
+          'fin-b2b-pricing': 26
+        }
+      },
+      {
+        id: 'lvl_advanced_vip',
+        icon: '🚀',
+        title: 'Avanzado / Escala de Negocio (Busco el nivel más alto y rentable)',
+        desc: 'Me interesan chatbots con documentos propios (RAG), ciberseguridad, Micro-SaaS o crear una Agencia de IA.',
+        reason: 'buscas dominar las implementaciones más avanzadas y los modelos de negocio de mayor facturación',
+        weights: {
+          'ai-rag-embeddings': 38,
+          'cybersec-ethical-web': 35,
+          'fullstack-apis-sql': 32,
+          'secret-saas-masterclass': 36,
+          'secret-high-ticket-agency': 36
+        }
+      }
+    ]
+  },
+  {
+    id: 'q4_project',
+    title: '4. ¿Qué proyecto concreto te daría más orgullo tener funcionando este mes?',
+    subtitle: 'Elige el resultado práctico que más te entusiasme construir.',
+    options: [
+      {
+        id: 'proj_excel_bot',
+        icon: '⚙️',
+        title: 'Un programa o Bot con IA que limpie planillas o atienda WhatsApp solo',
+        desc: 'Automatizar reportes en segundos con Python o tener un bot 24/7 en WhatsApp / ChatGPT.',
+        reason: 'tu meta inmediata es automatizar flujos de trabajo y atención al cliente',
+        weights: {
+          'py-automation': 36,
+          'nocode-n8n-whatsapp': 38,
+          'ai-agents-pro': 32,
+          'ai-rag-embeddings': 30
+        }
+      },
+      {
+        id: 'proj_web_app',
+        icon: '🌐',
+        title: 'Una página web o aplicación moderna, rápida y 100% segura',
+        desc: 'Crear interfaces interactivas, sistemas con base de datos SQL o auditar la seguridad de un sitio.',
+        reason: 'quieres lanzar y blindar productos web profesionales',
+        weights: {
+          'js-react-modern': 36,
+          'fullstack-apis-sql': 38,
+          'cybersec-ethical-web': 36,
+          'ux-growth-convert': 30
+        }
+      },
+      {
+        id: 'proj_viral_ads',
+        icon: '🔥',
+        title: 'Una máquina de atraer clientes con Reels virales, Anuncios y Copywriting',
+        desc: 'Publicar videos con alta retención, redactar ofertas irresistibles y lanzar campañas con retorno positivo.',
+        reason: 'quieres dominar la captación de atención y ventas digitales de principio a fin',
+        weights: {
+          'viral-video-retention': 38,
+          'meta-ads-roas': 38,
+          'mkt-copywriting-funnels': 38,
+          'ux-growth-convert': 32
+        }
+      },
+      {
+        id: 'proj_wealth_sales',
+        icon: '🏦',
+        title: 'Mi sistema de inversión automática, precios rentables o comisiones en USD',
+        desc: 'Tener mi cartera de inversión en marcha, cobrar bien por mi trabajo o cerrar ventas por llamada.',
+        reason: 'priorizas el impacto directo en tu bolsillo, tus ahorros y tus ingresos comerciales',
+        weights: {
+          'fin-crypto-invest': 38,
+          'fin-b2b-pricing': 38,
+          'closer-high-ticket-sales': 38
+        }
+      },
+      {
+        id: 'proj_global_agency',
+        icon: '🏆',
+        title: 'Superar entrevistas en inglés para ganar en USD o lanzar mi SaaS / Agencia IA',
+        desc: 'Trabajar para el exterior desde casa o vender soluciones de software e IA por suscripción.',
+        reason: 'apuntas a escalar tus ingresos a nivel internacional con inglés o tu propia agencia/software',
+        weights: {
+          'english-remote-tech': 42,
+          'secret-high-ticket-agency': 38,
+          'secret-saas-masterclass': 38
+        }
+      }
+    ]
+  }
+];
+
+let currentQuizStep = 0;
+let currentQuizAnswers = {};
+
+function getSavedQuizResult() {
+  try {
+    const raw = localStorage.getItem(QUIZ_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveQuizResult(resultObj) {
+  try {
+    localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(resultObj));
+  } catch (e) { }
+}
+
+window.openCourseQuizModal = function (startFreshOrShowExisting = false) {
+  const modal = document.getElementById('onboarding-quiz-modal');
+  if (!modal) return;
+
+  const saved = getSavedQuizResult();
+  modal.classList.add('open');
+
+  // Si ya tiene un diagnóstico guardado y lo abre desde el botón de consulta rápida, puede ver su resultado o reiniciar
+  if (saved && saved.top1Id && !startFreshOrShowExisting) {
+    renderQuizResultView(saved);
+    return;
+  }
+
+  currentQuizStep = 0;
+  currentQuizAnswers = {};
+  renderQuizStep();
+};
+
+window.restartCourseQuiz = function () {
+  currentQuizStep = 0;
+  currentQuizAnswers = {};
+  renderQuizStep();
+};
+
+window.closeCourseQuizModal = function () {
+  const modal = document.getElementById('onboarding-quiz-modal');
+  if (modal) modal.classList.remove('open');
+};
+
+function renderQuizStep() {
+  const container = document.getElementById('onboarding-quiz-container');
+  const badge = document.getElementById('onboarding-quiz-badge');
+  if (!container) return;
+
+  const totalSteps = COURSE_QUIZ_QUESTIONS.length;
+  const q = COURSE_QUIZ_QUESTIONS[currentQuizStep];
+  if (!q) return;
+
+  const pct = Math.round(((currentQuizStep + 1) / totalSteps) * 100);
+  const selectedOptId = currentQuizAnswers[q.id] || null;
+  const saved = getSavedQuizResult();
+  const savedCourse = saved && saved.top1Id ? getAllSkills().find(s => s.id === saved.top1Id) : null;
+
+  if (badge) {
+    badge.textContent = `🧭 Test de Curso Ideal • Paso ${currentQuizStep + 1} de ${totalSteps}`;
+  }
+
+  container.innerHTML = `
+    ${savedCourse && currentQuizStep === 0 ? `
+      <div style="background: rgba(0, 125, 138, 0.08); border: 1px solid rgba(0, 125, 138, 0.25); border-radius: 12px; padding: 10px 13px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+        <span style="font-size: 12px; color: #006874;">
+          🎯 Tu última recomendación fue: <strong>${savedCourse.title}</strong>
+        </span>
+        <button type="button" class="btn-secondary" style="padding: 5px 11px; font-size: 11.5px;" onclick="renderQuizResultView(getSavedQuizResult())">
+          Ver mi resultado →
+        </button>
+      </div>
+    ` : ''}
+
+    <div class="quiz-step-progress-row">
+      <span>PREGUNTA ${currentQuizStep + 1} DE ${totalSteps}</span>
+      <span>${pct}% COMPLETADO • 🎁 +25 PTS AL FINALIZAR</span>
+    </div>
+    <div class="quiz-progress-track" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100">
+      <div class="quiz-progress-fill" style="width: ${pct}%;"></div>
+    </div>
+
+    <h2 class="quiz-question-title" id="onboarding-quiz-title">${q.title}</h2>
+    <p class="quiz-question-subtitle">${q.subtitle}</p>
+
+    <div class="quiz-options-list" role="radiogroup" aria-label="${q.title}">
+      ${q.options.map(opt => {
+        const isSelected = selectedOptId === opt.id;
+        return `
+          <button type="button"
+            class="quiz-option-btn ${isSelected ? 'selected' : ''}"
+            onclick="selectQuizOption('${q.id}', '${opt.id}')"
+            role="radio"
+            aria-checked="${isSelected}">
+            <span class="quiz-option-icon" aria-hidden="true">${opt.icon}</span>
+            <span class="quiz-option-content">
+              <span class="quiz-option-title">${opt.title}</span>
+              <span class="quiz-option-desc">${opt.desc}</span>
+            </span>
+          </button>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="quiz-nav-footer">
+      <div>
+        ${currentQuizStep > 0
+          ? `<button type="button" class="btn-secondary" onclick="prevQuizStep()">⬅ Anterior</button>`
+          : `<button type="button" class="btn-secondary" style="font-size: 12px; opacity: 0.85;" onclick="closeCourseQuizModal()">Saltar por ahora</button>`
+        }
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button type="button"
+          class="btn-primary-full"
+          style="width: auto; padding: 11px 22px; ${!selectedOptId ? 'opacity: 0.55;' : ''}"
+          onclick="nextQuizStep()">
+          ${currentQuizStep === totalSteps - 1 ? '🎯 Descubrir mi Curso Ideal' : 'Siguiente pregunta ➔'}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+window.selectQuizOption = function (questionId, optionId) {
+  currentQuizAnswers[questionId] = optionId;
+  renderQuizStep();
+  // Avance suave automático tras breve pausa para que la experiencia sea ágil
+  setTimeout(() => {
+    if (currentQuizStep < COURSE_QUIZ_QUESTIONS.length - 1) {
+      currentQuizStep++;
+      renderQuizStep();
+    } else {
+      finishCourseQuiz();
+    }
+  }, 220);
+};
+
+window.prevQuizStep = function () {
+  if (currentQuizStep > 0) {
+    currentQuizStep--;
+    renderQuizStep();
+  }
+};
+
+window.nextQuizStep = function () {
+  const q = COURSE_QUIZ_QUESTIONS[currentQuizStep];
+  if (!q) return;
+  if (!currentQuizAnswers[q.id]) {
+    showToast('👆 Selecciona una opción para continuar con tu diagnóstico.');
+    return;
+  }
+  if (currentQuizStep < COURSE_QUIZ_QUESTIONS.length - 1) {
+    currentQuizStep++;
+    renderQuizStep();
+  } else {
+    finishCourseQuiz();
+  }
+};
+
+function calculateQuizRecommendations(answersMap) {
+  const allSkills = getAllSkills();
+  const scores = {};
+  const reasons = [];
+
+  allSkills.forEach(s => {
+    scores[s.id] = s.isTrialCourse ? 6 : 0; // Ligero desempate a favor del curso con prueba gratuita si hay empate exacto
+  });
+
+  COURSE_QUIZ_QUESTIONS.forEach(q => {
+    const chosenId = answersMap[q.id];
+    const opt = q.options.find(o => o.id === chosenId);
+    if (!opt) return;
+    if (opt.reason) reasons.push(opt.reason);
+    if (opt.weights) {
+      Object.entries(opt.weights).forEach(([courseId, pts]) => {
+        if (typeof scores[courseId] === 'number') {
+          scores[courseId] += pts;
+        }
+      });
+    }
+  });
+
+  // Ordenar primero cursos regulares (no secretos) para que el Top 1 sea inmediatamente accionable, o incluir todos según puntaje
+  const rankedRegular = allSkills
+    .filter(s => !s.secretCourse)
+    .sort((a, b) => (scores[b.id] || 0) - (scores[a.id] || 0));
+
+  const rankedAll = [...allSkills].sort((a, b) => (scores[b.id] || 0) - (scores[a.id] || 0));
+
+  const top1 = rankedRegular[0] || rankedAll[0];
+  const top2 = rankedRegular[1] || rankedAll[1] || top1;
+  const top3 = rankedAll.find(s => s.id !== top1.id && s.id !== top2.id) || rankedRegular[2] || top2;
+
+  const reasonSummary = reasons.length >= 2
+    ? `Porque ${reasons[0]} y además ${reasons[1]}.`
+    : reasons[0]
+      ? `Porque ${reasons[0]}.`
+      : 'Combina de forma directa con tus metas de aprendizaje y nivel actual.';
+
+  return {
+    completedAt: new Date().toISOString(),
+    answers: { ...answersMap },
+    top1Id: top1.id,
+    top1Match: 98,
+    top2Match: 92,
+    top3Match: 87,
+    topIds: [top1.id, top2.id, top3.id],
+    reasonSummary
+  };
+}
+
+function finishCourseQuiz() {
+  const result = calculateQuizRecommendations(currentQuizAnswers);
+  saveQuizResult(result);
+
+  // Otorgar +25 PTS y +30 XP de bienvenida la primera vez que completa el cuestionario
+  const txRes = recordPointsTransaction({
+    idempotencyKey: 'onboarding_quiz_bonus_v1',
+    type: 'ONBOARDING_QUIZ_BONUS',
+    deltaPTS: 25,
+    deltaVP: 0,
+    deltaXP: 30,
+    reason: 'Bono por completar el Cuestionario Inicial de Curso Ideal'
+  });
+
+  if (txRes && txRes.ok) {
+    saveState();
+    showToast('🎉 ¡Diagnóstico completado! Ganaste +25 PTS y +30 XP por descubrir tu ruta ideal.');
+  } else {
+    showToast('🎯 ¡Tu ruta personalizada de cursos ha sido actualizada!');
+  }
+
+  updateUI();
+  renderSkillsGrid();
+  renderQuizResultView(result);
+}
+
+window.renderQuizResultView = function (resultObj) {
+  const container = document.getElementById('onboarding-quiz-container');
+  const badge = document.getElementById('onboarding-quiz-badge');
+  if (!container || !resultObj) return;
+
+  const all = getAllSkills();
+  const top1 = all.find(s => s.id === resultObj.top1Id) || all[0];
+  const top2 = (resultObj.topIds && all.find(s => s.id === resultObj.topIds[1])) || all[1] || top1;
+  const top3 = (resultObj.topIds && all.find(s => s.id === resultObj.topIds[2])) || all[2] || top1;
+
+  if (badge) {
+    badge.textContent = '🏆 Resultado de tu Diagnóstico Personalizado';
+  }
+
+  const cover1 = getCourseCoverVisual(top1);
+  const unlocked1 = hasAccessToCourse(top1);
+  const trialHalf1 = isTrialHalfOnly(top1);
+
+  container.innerHTML = `
+    <div style="margin-bottom: 12px;">
+      <h2 class="quiz-question-title" id="onboarding-quiz-title">¡Encontramos el curso perfecto para ti!</h2>
+      <p class="quiz-question-subtitle" style="margin-bottom: 12px;">
+        Según tus respuestas, esta es la ruta donde más rápido verás resultados reales y acumularás puntos en la academia:
+      </p>
+    </div>
+
+    <div class="quiz-result-hero-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+        <span class="quiz-match-pill">🎯 #1 CURSO IDEAL PARA TI • ${resultObj.top1Match || 98}% COMPATIBILIDAD</span>
+        <div style="display: flex; gap: 6px;">
+          <span class="points-pill">+${top1.pointsReward} PTS</span>
+          <span class="vip-points-pill">👑 +${top1.vipPointsReward || 50} VP</span>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: ${cover1.coverGradient}; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">
+          ${cover1.coverIcon}
+        </div>
+        <div>
+          <span style="font-size: 11px; font-weight: 800; color: #b41f00; text-transform: uppercase;">${top1.category} • ${top1.lessons.length} Módulos Prácticos</span>
+          <h3 style="margin: 2px 0 4px; font-size: 17px; color: #1b1b1d;">${top1.title}</h3>
+        </div>
+      </div>
+
+      <p style="font-size: 12.8px; color: #5e3f39; line-height: 1.5; margin: 0 0 10px;">
+        ${top1.description}
+      </p>
+
+      <div class="quiz-why-box">
+        <strong>💡 ¿Por qué te recomendamos empezar aquí?</strong><br />
+        ${resultObj.reasonSummary}
+      </div>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px;">
+        <button type="button" class="btn-primary-full" style="flex: 1.4; min-width: 210px;" onclick="launchRecommendedCourseFromQuiz('${top1.id}', 'start')">
+          ${unlocked1 || trialHalf1 ? '🚀 Empezar este Curso Ahora' : `🔓 Ver / Desbloquear Curso ($${top1.priceUSD.toFixed(2)} USD)`}
+        </button>
+        <button type="button" class="btn-secondary" style="flex: 1; min-width: 150px;" onclick="launchRecommendedCourseFromQuiz('${top1.id}', 'details')">
+          🔎 Ver Temario y Módulos
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <span style="font-size: 11.5px; font-weight: 800; color: #5e3f39; text-transform: uppercase; letter-spacing: 0.05em;">
+        🗺️ Tus siguientes pasos recomendados (Top 2 y Top 3):
+      </span>
+      <div class="quiz-alt-grid">
+        ${[
+          { skill: top2, match: resultObj.top2Match || 92, stepLabel: 'Paso 2 de tu Ruta' },
+          { skill: top3, match: resultObj.top3Match || 87, stepLabel: 'Paso 3 de tu Ruta' }
+        ].map(item => `
+          <div class="quiz-alt-card">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 6px;">
+                <span style="font-size: 10.5px; font-weight: 800; color: #b41f00;">${item.stepLabel} (${item.match}% Match)</span>
+                <span style="font-size: 11px; font-weight: 800; color: #007D8A;">+${item.skill.pointsReward} PTS</span>
+              </div>
+              <strong style="display: block; font-size: 13px; color: #1b1b1d; line-height: 1.35; margin-bottom: 4px;">
+                ${item.skill.title}
+              </strong>
+              <span style="font-size: 11.5px; color: #5e3f39;">${item.skill.category}</span>
+            </div>
+            <button type="button" class="btn-secondary" style="width: 100%; padding: 7px 10px; font-size: 12px;" onclick="launchRecommendedCourseFromQuiz('${item.skill.id}', 'details')">
+              🔎 Ver este curso
+            </button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="quiz-nav-footer" style="margin-top: 16px;">
+      <button type="button" class="btn-secondary" onclick="restartCourseQuiz()">
+        🔄 Repetir Cuestionario
+      </button>
+      <button type="button" class="btn-secondary" onclick="closeCourseQuizModal()">
+        🎓 Ir al Catálogo Completo
+      </button>
+    </div>
+  `;
+};
+
+window.launchRecommendedCourseFromQuiz = function (skillId, actionMode = 'details') {
+  closeCourseQuizModal();
+  const skill = getAllSkills().find(s => s.id === skillId);
+  if (!skill) return;
+
+  const exploreView = document.getElementById('view-explore');
+  if (exploreView && !exploreView.classList.contains('active')) {
+    switchTab('explore');
+  }
+
+  // Asegurar que el filtro muestre todos para que la tarjeta esté visible
+  activeFilter = 'all';
+  document.querySelectorAll('#category-filters .cat-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === 'all');
+  });
+  renderSkillsGrid();
+
+  setTimeout(() => {
+    const cardEl = document.getElementById(`course-card-${skill.id}`);
+    if (cardEl) {
+      cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, 120);
+
+  if (actionMode === 'start') {
+    if (hasAccessToCourse(skill) || isTrialHalfOnly(skill)) {
+      openSkillModal(skill.id);
+    } else if (skill.secretCourse) {
+      switchAppTab('rewards');
+    } else {
+      viewCourseDetails(skill.id);
+    }
+  } else {
+    viewCourseDetails(skill.id);
+  }
+};
+
+function renderQuizRecommendationBanner() {
+  const banner = document.getElementById('quiz-recommendation-banner');
+  if (!banner) return;
+
+  const saved = getSavedQuizResult();
+  if (!saved || !saved.top1Id) {
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+    return;
+  }
+
+  const all = getAllSkills();
+  const top1 = all.find(s => s.id === saved.top1Id);
+  if (!top1) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  const unlocked = hasAccessToCourse(top1);
+  const trialHalf = isTrialHalfOnly(top1);
+  const cover = getCourseCoverVisual(top1);
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div class="quiz-banner-card">
+      <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 240px;">
+        <div style="width: 48px; height: 48px; border-radius: 13px; background: ${cover.coverGradient}; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">
+          ${cover.coverIcon}
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 3px;">
+            <span class="quiz-match-pill" style="font-size: 10.5px; padding: 2px 9px;">🎯 TU CURSO IDEAL (${saved.top1Match || 98}% MATCH)</span>
+            <span style="font-size: 11.5px; color: #b41f00; font-weight: 800;">${top1.category} • +${top1.pointsReward} PTS</span>
+          </div>
+          <strong style="display: block; font-size: 15px; color: #1b1b1d; margin-bottom: 2px;">${top1.title}</strong>
+          <span style="font-size: 12px; color: #5e3f39;">${saved.reasonSummary || 'Recomendado según tus respuestas en el test inicial.'}</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <button type="button" class="btn-start-skill" style="width: auto; padding: 9px 16px; margin: 0;" onclick="launchRecommendedCourseFromQuiz('${top1.id}', 'start')">
+          ${unlocked || trialHalf ? '🚀 Cursar Ahora' : '🔎 Ver mi Curso Ideal'}
+        </button>
+        <button type="button" class="btn-secondary" style="padding: 9px 13px; font-size: 12px;" onclick="openCourseQuizModal(true)">
+          🔄 Repetir Test
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// ==========================================================================
+// PANTALLA INICIAL CON EL LOGO EN GRANDE Y PRIMER PLANO (SOLO CIERRA CON BOTÓN)
+// ==========================================================================
+window.dismissLogoSplash = function (openQuizOnEnter = true) {
+  const splash = document.getElementById('logo-splash-overlay');
+  if (splash && !splash.classList.contains('is-hidden')) {
+    splash.classList.add('is-hidden');
+  }
+  if (openQuizOnEnter !== false) {
+    setTimeout(() => {
+      openCourseQuizModal(true);
+    }, 260);
+  }
+};
+
+window.showLogoSplash = function () {
+  const splash = document.getElementById('logo-splash-overlay');
+  if (!splash) return;
+  splash.classList.remove('is-hidden');
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.brand .brand-logo, .mobile-brand-bar .brand-logo').forEach(logoEl => {
+    logoEl.style.cursor = 'pointer';
+    logoEl.title = 'Ver logo en pantalla completa';
+    logoEl.addEventListener('click', () => window.showLogoSplash());
   });
 });
 

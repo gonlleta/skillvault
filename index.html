@@ -1,82 +1,164 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#08090e" />
+  <meta name="theme-color" content="#F02D00" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="SkillVault" />
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
-  <title>SkillVault — Academia Interactiva & Club VIP</title>
+  <title>SkillVault Mastery — Academia Interactiva & Club VIP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261031c" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261101r" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
+
 <body>
+  <!-- PANTALLA DE INICIO: LOGO EN GRANDE Y PRIMER PLANO (SOLO CIERRA AL TOCAR EL BOTÓN) -->
+  <div id="logo-splash-overlay" class="logo-splash-overlay" role="dialog" aria-label="Bienvenida a SkillVault">
+    <div class="logo-splash-ambient-glow" aria-hidden="true"></div>
+    <div class="logo-splash-content">
+      <div class="logo-splash-emblem-wrap">
+        <div class="logo-splash-ring ring-outer" aria-hidden="true"></div>
+        <div class="logo-splash-ring ring-inner" aria-hidden="true"></div>
+        <div class="logo-splash-emblem">
+          <svg viewBox="0 0 512 512" class="logo-splash-svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="splashBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#F02D00" />
+                <stop offset="55%" stop-color="#e12a00" />
+                <stop offset="100%" stop-color="#b41f00" />
+              </linearGradient>
+              <linearGradient id="splashBoltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" />
+                <stop offset="100%" stop-color="#ffdad3" />
+              </linearGradient>
+              <filter id="splashBoltGlow" x="-25%" y="-25%" width="150%" height="150%">
+                <feGaussianBlur stdDeviation="16" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+            </defs>
+            <rect width="512" height="512" rx="116" fill="url(#splashBgGrad)" />
+            <rect x="16" y="16" width="480" height="480" rx="102" fill="none" stroke="url(#splashBoltGrad)"
+              stroke-opacity="0.55" stroke-width="8" />
+            <path d="M294 76L134 278h110l-26 158 160-202H268L294 76z" fill="url(#splashBoltGrad)"
+              filter="url(#splashBoltGlow)" />
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="logo-splash-title">Skill<span class="accent">Vault</span></h1>
+      <p class="logo-splash-subtitle">ACADEMIA INTERACTIVA &amp; CLUB VIP</p>
+
+      <div class="logo-splash-actions">
+        <button type="button" class="logo-splash-enter-btn" onclick="dismissLogoSplash(true)">
+          🧭 Descubrir mi Curso Ideal (+25 PTS Gratis)
+        </button>
+        <button type="button" class="logo-splash-skip-btn" onclick="dismissLogoSplash(false)">
+          ⚡ Ir directo al catálogo sin hacer el test →
+        </button>
+      </div>
+    </div>
+  </div>
+
   <a href="#main-content-area" class="skip-to-content-link">Saltar al contenido principal</a>
 
   <!-- Notificación Toast -->
   <div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
 
+  <!-- BARRA SUPERIOR DE URGENCIA CREATIVE ACADEMY RED -->
+  <div class="top-urgency-strip" onclick="switchAppTab('plans')" role="region" aria-label="Oferta de lanzamiento VIP">
+    <span class="material-symbols-outlined urgency-bolt-icon" aria-hidden="true">bolt</span>
+    <span class="urgency-ticker-text" id="urgency-countdown-text">⚡ Oferta Lanzamiento VIP • Termina en 05h : 42m : 18s</span>
+  </div>
+
   <!-- Banner de Estado de Conexión (Offline / Problemas de red) -->
   <div id="network-status-banner" class="network-status-banner" role="alert" hidden>
-    <span>📡 Conexión a internet interrumpida. Tu progreso se guarda de forma segura y se sincronizará al reconectar.</span>
-    <button type="button" class="btn-secondary" style="padding: 5px 12px; font-size: 12px;" onclick="retryNetworkConnection()">🔄 Reintentar conexión</button>
+    <span>📡 Conexión a internet interrumpida. Tu progreso se guarda de forma segura y se sincronizará al
+      reconectar.</span>
+    <button type="button" class="btn-secondary" style="padding: 5px 12px; font-size: 12px;"
+      onclick="retryNetworkConnection()">🔄 Reintentar conexión</button>
   </div>
 
   <div class="app-layout">
     <!-- Barra Lateral -->
     <aside class="sidebar" aria-label="Barra lateral de navegación">
       <div class="brand">
-        <div class="brand-logo" role="img" aria-label="Logo de SkillVault">⚡</div>
+        <div class="brand-logo" role="img" aria-label="Logo de SkillVault">
+          <span class="material-symbols-outlined" style="font-size: 20px; color: #ffffff;">token</span>
+        </div>
         <div>
           <span class="brand-name">Skill<span class="accent">Vault</span></span>
-          <span class="brand-tag">ACADEMIA & PUNTOS VIP</span>
+          <span class="brand-tag">MASTERY</span>
         </div>
       </div>
 
       <nav class="nav-menu" aria-label="Menú principal del panel del alumno">
         <button class="nav-item active" data-tab="explore">
           <span class="nav-icon" aria-hidden="true">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
           </span>
           <span>Mi aprendizaje</span>
         </button>
         <button class="nav-item" data-tab="certificates" onclick="switchAppTab('certificates')">
           <span class="nav-icon" aria-hidden="true">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+              <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </svg>
           </span>
           <span>Mis cursos</span>
         </button>
         <button class="nav-item" data-tab="rewards">
           <span class="nav-icon" aria-hidden="true">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M6 3h12l4 6-10 13L2 9Z" />
+              <path d="M11 3 8 9l4 13 4-13-3-6" />
+              <path d="M2 9h20" />
+            </svg>
           </span>
           <span>Mis puntos</span>
           <span class="badge-pill" id="vault-badge">9</span>
         </button>
-        <button class="nav-item" data-tab="certificates" onclick="switchAppTab('certificates'); document.getElementById('completed-diplomas-list')?.scrollIntoView({behavior:'smooth'});">
+        <button class="nav-item" data-tab="certificates"
+          onclick="switchAppTab('certificates'); document.getElementById('completed-diplomas-list')?.scrollIntoView({behavior:'smooth'});">
           <span class="nav-icon" aria-hidden="true">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="8" r="6" />
+              <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+            </svg>
           </span>
           <span>Mis certificados</span>
         </button>
         <button class="nav-item" data-tab="profile">
           <span class="nav-icon" aria-hidden="true">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
           </span>
           <span>Mi perfil</span>
         </button>
         <button class="nav-item" data-tab="settings">
           <span class="nav-icon" aria-hidden="true">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
           </span>
           <span>Configuración</span>
         </button>
@@ -113,41 +195,67 @@
           <span><b id="user-xp">200</b> / <span id="user-next-xp">500</span> XP</span>
           <span class="bonus-rate" id="vip-status-tag">Cuenta Estándar</span>
         </div>
-        <button type="button" id="sidebar-vip-btn" class="btn-sidebar-vip" onclick="document.querySelector('[data-tab=plans]').click()">👑 Hacerse VIP PRO</button>
+        <button type="button" id="sidebar-vip-btn" class="btn-sidebar-vip"
+          onclick="document.querySelector('[data-tab=plans]').click()">👑 Hacerse VIP PRO</button>
       </div>
     </aside>
 
     <!-- Contenido Principal -->
     <main class="main-content" id="main-content-area" tabindex="-1">
-      <!-- Barra Superior (Header Responsivo) -->
+      <!-- Barra Superior (Header Responsivo Creative Academy Red) -->
       <header class="topbar" role="banner">
-        <!-- Marca compacta visible en móvil -->
+        <!-- Marca compacta visible en móvil (Estilo Domestika / SkillVault Mastery) -->
         <div class="mobile-brand-bar">
-          <div class="brand-logo" style="width: 36px; height: 36px; font-size: 18px;" aria-hidden="true">⚡</div>
-          <div>
-            <span class="brand-name" style="font-size: 18px;">Skill<span class="accent">Vault</span></span>
-            <span class="brand-tag" style="font-size: 9px;">ACADEMIA GAMIFICADA</span>
+          <div class="brand-logo" style="width: 30px; height: 30px; border-radius: 6px;" aria-hidden="true">
+            <span class="material-symbols-outlined" style="font-size: 18px; color: #ffffff;">token</span>
           </div>
-          <button type="button" class="btn-auth-top mobile-only-auth" id="mobile-top-auth-btn" onclick="openAuthModal('login')">
+          <div style="display: flex; flex-direction: column;">
+            <span class="brand-name" style="font-size: 16px; line-height: 1;">Skill<span class="accent">Vault</span></span>
+            <span class="brand-tag" style="font-size: 9px; letter-spacing: 0.12em;">MASTERY</span>
+          </div>
+          <div class="mobile-header-icons">
+            <button type="button" class="icon-circle-btn" aria-label="Buscar cursos"
+              onclick="document.getElementById('search-input')?.focus()">
+              <span class="material-symbols-outlined">search</span>
+            </button>
+            <button type="button" class="icon-circle-btn" aria-label="Notificaciones y bandeja de entrada"
+              onclick="openMailboxModal()">
+              <span class="material-symbols-outlined">notifications</span>
+              <span class="notif-red-dot"></span>
+            </button>
+            <button type="button" class="avatar-pro-pill" aria-label="Perfil y cuenta"
+              onclick="openAuthModal('login')">
+              <span class="avatar-pro-circle">
+                <span class="material-symbols-outlined" style="font-size: 18px;">person</span>
+              </span>
+              <span class="avatar-pro-tag">PRO</span>
+            </button>
+          </div>
+          <button type="button" class="btn-auth-top mobile-only-auth" id="mobile-top-auth-btn"
+            onclick="openAuthModal('login')">
             🔐 Iniciar Sesión / Registrarse
           </button>
         </div>
 
         <div class="search-box" role="search">
-          <span class="search-icon" aria-hidden="true">🔍</span>
-          <input type="search" id="search-input" aria-label="Buscar cursos en el catálogo" placeholder="Buscar cursos completos (Python, IA, Finanzas, Diseño...)" />
+          <span class="search-icon material-symbols-outlined" aria-hidden="true">search</span>
+          <input type="search" id="search-input" aria-label="Buscar cursos en el catálogo"
+            placeholder="Buscar cursos completos (Python, IA, Finanzas, Diseño...)" />
         </div>
 
         <div class="wallet-summary">
-          <div class="balance-chip points-chip" id="top-points-btn" title="Puntos estándar ganados al aprobar cursos completos">
+          <div class="balance-chip points-chip" id="top-points-btn"
+            title="Puntos estándar ganados al aprobar cursos completos">
             <span class="chip-label">Puntos Estándar</span>
             <span class="chip-amount" id="user-points">450 <small>PTS</small></span>
           </div>
-          <div class="balance-chip vip-points-chip" id="top-vip-points-btn" title="Puntos Exclusivos VIP: Solo los miembros VIP ganan y usan estos puntos">
+          <div class="balance-chip vip-points-chip" id="top-vip-points-btn"
+            title="Puntos Exclusivos VIP: Solo los miembros VIP ganan y usan estos puntos">
             <span class="chip-label">👑 Puntos VIP</span>
             <span class="chip-amount" id="user-vip-points">0 <small>VP</small></span>
           </div>
-          <button type="button" class="btn-vip-top" id="top-vip-cta-btn" onclick="handleVipQuickButton()">👑 Hacerse VIP</button>
+          <button type="button" class="btn-vip-top" id="top-vip-cta-btn" onclick="handleVipQuickButton()">👑 Hacerse
+            VIP</button>
           <button type="button" class="btn-withdraw-quick" id="go-rewards-btn">🎁 Canjear</button>
           <button type="button" class="btn-auth-top btn-auth-cta" id="header-auth-btn" onclick="openAuthModal('login')">
             🔐 Iniciar Sesión / Registrarse
@@ -157,12 +265,63 @@
 
       <!-- VISTA 1: CATÁLOGO DE CURSOS -->
       <section class="tab-view active" id="view-explore">
-        <!-- Sección Hero con Propuesta de Valor y Grupo de Botones Call to Action -->
+        <!-- Gamified Student Status Strip (Domestika Polished Light Styling) -->
+        <div class="student-status-strip-card" id="domestika-student-strip" aria-label="Estado gamificado del estudiante">
+          <div class="strip-top-row">
+            <div class="strip-rank-left">
+              <div class="strip-medal-circle" aria-hidden="true">
+                <span class="material-symbols-outlined">military_tech</span>
+              </div>
+              <div>
+                <div class="strip-rank-kicker-row">
+                  <span class="strip-rank-kicker">Rango Alumno</span>
+                  <span class="strip-dot"></span>
+                  <span class="strip-level-text">Nivel <span id="strip-user-level">1</span></span>
+                </div>
+                <h2 class="strip-rank-heading" id="strip-user-rank-title">Estudiante Bronce</h2>
+              </div>
+            </div>
+            <div class="strip-streak-pill">
+              <span class="strip-fire-icon">🔥</span> <span id="strip-user-streak">4</span>d racha
+            </div>
+          </div>
+
+          <div class="strip-xp-block">
+            <div class="strip-xp-labels">
+              <span><strong id="strip-user-xp">200</strong> / <span id="strip-user-next-xp">500</span> XP</span>
+              <span class="strip-next-rank" id="strip-next-rank-label">Siguiente: Estudiante Plata</span>
+            </div>
+            <div class="strip-xp-track">
+              <div class="strip-xp-fill" id="strip-xp-bar-fill" style="width: 40%;"></div>
+            </div>
+          </div>
+
+          <div class="strip-bottom-row">
+            <div class="strip-pockets">
+              <span class="strip-pocket-pts" onclick="switchAppTab('rewards')" style="cursor:pointer;">
+                💎 <strong id="strip-user-points">450 PTS</strong>
+              </span>
+              <span class="strip-pocket-vp" onclick="switchAppTab('rewards')" style="cursor:pointer;">
+                👑 <strong id="strip-user-vip-points">0 VP</strong>
+              </span>
+            </div>
+            <a href="#planes" class="strip-vip-link" onclick="document.querySelector('[data-tab=plans]').click(); return false;">
+              <span id="strip-vip-cta-text">Hacerse VIP PRO</span>
+              <span class="material-symbols-outlined" style="font-size: 15px;">chevron_right</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero Featured Course (Domestika Signature Hero Pattern) -->
         <div class="hero-banner">
+          <div class="hero-featured-card" id="featured-skill-box"></div>
           <div class="hero-text">
             <span class="hero-kicker">⚡ ACADEMIA GAMIFICADA DE PROGRAMACIÓN, IA, FINANZAS Y MARKETING DIGITAL</span>
             <h1>Domina Programación, Inteligencia Artificial y Marketing Digital mientras subes de rango.</h1>
-            <p>Deja atrás los cursos teóricos que abandonas a la mitad. Aprende <strong>Desarrollo con Python, Automatización con IA, Finanzas y Ventas Digitales</strong> mediante misiones prácticas de 6 módulos: gana <strong>Puntos Estándar (PTS)</strong> para abrir cofres de herramientas y multiplica tus recompensas con <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
+            <p>Deja atrás los cursos teóricos que abandonas a la mitad. Aprende <strong>Desarrollo con Python,
+                Automatización con IA, Finanzas y Ventas Digitales</strong> mediante misiones prácticas de 6 módulos:
+              gana <strong>Puntos Estándar (PTS)</strong> para abrir cofres de herramientas y multiplica tus recompensas
+              con <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
             <div class="hero-stats">
               <div class="h-stat">
                 <strong id="stat-completed">0</strong>
@@ -173,30 +332,42 @@
                 <span>Puntos estándar</span>
               </div>
               <div class="h-stat">
-                <strong id="stat-vip-points" style="color: #fbbf24;">0 VP</strong>
+                <strong id="stat-vip-points">0 VP</strong>
                 <span>Puntos Exclusivos VIP</span>
               </div>
             </div>
             <div class="hero-cta-row" role="group" aria-label="Acciones principales">
-              <button type="button" class="btn-hero-free-hook" id="hero-free-module-btn" onclick="startFreeTrialModule()">
+              <button type="button" class="btn-hero-free-hook" id="hero-free-module-btn"
+                onclick="startFreeTrialModule()">
                 🚀 Empezar mi primera misión (+50 PTS Gratis)
               </button>
-              <button type="button" class="btn-hero-explore" onclick="document.getElementById('skills-grid').scrollIntoView({ behavior: 'smooth' })">
+              <button type="button" class="btn-hero-explore" id="hero-quiz-btn"
+                onclick="openCourseQuizModal(true)">
+                🧭 Test: ¿Qué curso elegir?
+              </button>
+              <button type="button" class="btn-hero-explore"
+                onclick="document.getElementById('skills-grid').scrollIntoView({ behavior: 'smooth' })">
                 🎓 Explorar Catálogo
               </button>
-              <button type="button" class="btn-hero-plans" id="hero-vip-btn" onclick="document.querySelector('[data-tab=plans]').click()">
+              <button type="button" class="btn-hero-plans" id="hero-vip-btn"
+                onclick="document.querySelector('[data-tab=plans]').click()">
                 👑 Ver Pase VIP PRO
               </button>
             </div>
           </div>
-          <div class="hero-featured-card" id="featured-skill-box"></div>
         </div>
 
         <!-- Aviso de Verificación de Correo Pendiente (si aplica) -->
-        <div id="email-verification-top-banner" style="display: none; margin-bottom: 18px;" role="region" aria-label="Estado de verificación de correo"></div>
+        <div id="email-verification-top-banner" style="display: none; margin-bottom: 18px;" role="region"
+          aria-label="Estado de verificación de correo"></div>
+
+        <!-- Banner de Recomendación Personalizada según el Cuestionario Inicial -->
+        <div id="quiz-recommendation-banner" style="display: none; margin-bottom: 22px;" role="region"
+          aria-label="Tu ruta de cursos recomendada"></div>
 
         <!-- Continuar estudiando desde la última lección visitada (Guardado Automático) -->
-        <div id="continue-learning-banner" style="display: none; margin-bottom: 22px;" role="region" aria-label="Continuar último curso visitado"></div>
+        <div id="continue-learning-banner" style="display: none; margin-bottom: 22px;" role="region"
+          aria-label="Continuar último curso visitado"></div>
 
         <!-- Filtros -->
         <div class="category-bar">
@@ -219,15 +390,139 @@
           </div>
         </div>
 
+        <!-- Encabezado del Feed de Cursos (Estilo Creative Academy Red) -->
+        <div class="course-feed-header">
+          <div>
+            <span class="course-feed-kicker">CATÁLOGO ACTIVO</span>
+            <h2 class="course-feed-title">Cursos Recomendados para Ti</h2>
+          </div>
+          <span class="course-feed-count" id="catalog-count-label">17 Cursos</span>
+        </div>
+
         <!-- Grid de Cursos -->
         <div class="skills-grid" id="skills-grid"></div>
+
+        <!-- SECCIÓN: PASE VIP SHOWCASE + SELLOS DE CONFIANZA (ESTILO DOMESTIKA PLUS / CREATIVE ACADEMY RED) -->
+        <section class="domestika-plus-showcase" id="planes-showcase" aria-label="Elige tu Pase VIP y Desbloquea Todo">
+          <div class="plus-showcase-container">
+            <div class="plus-showcase-header">
+              <span class="plus-showcase-kicker">👑 EXPERIENCIA ACADÉMICA ILIMITADA</span>
+              <h2>Elige tu Pase VIP y Desbloquea Todo</h2>
+              <p>Acceso instantáneo a todos los cursos completos (valorados en +$450 USD) más recompensas multiplicadas.</p>
+            </div>
+
+            <div class="plus-showcase-grid">
+              <!-- Plan Card 1: Mensual -->
+              <div class="plus-plan-card plus-plan-monthly">
+                <div class="plus-plan-top">
+                  <div>
+                    <span class="plus-plan-subtag">Plan Flexible</span>
+                    <h3>Pase VIP PRO Mensual</h3>
+                  </div>
+                  <div class="plus-plan-price-col">
+                    <span class="plus-price-big">$49.00</span>
+                    <span class="plus-price-period">/ mes</span>
+                  </div>
+                </div>
+                <ul class="plus-plan-list">
+                  <li>
+                    <span class="material-symbols-outlined plus-check-teal">check_circle</span>
+                    <span><strong>14 Cursos Completos</strong> desbloqueados</span>
+                  </li>
+                  <li>
+                    <span class="material-symbols-outlined plus-check-teal">check_circle</span>
+                    <span>Multiplicador <strong>x1.5 en Puntos (PTS)</strong></span>
+                  </li>
+                  <li>
+                    <span class="material-symbols-outlined plus-check-teal">check_circle</span>
+                    <span>Bono inmediato: <strong class="text-urgency-red">+120 VP + 300 PTS</strong></span>
+                  </li>
+                  <li>
+                    <span class="material-symbols-outlined plus-check-teal">check_circle</span>
+                    <span>Acceso a Bóveda Secreta de Códigos</span>
+                  </li>
+                </ul>
+                <button type="button" class="btn-plus-monthly" onclick="handlePlanCTA('monthly')">
+                  Activar Pase Mensual
+                </button>
+              </div>
+
+              <!-- Plan Card 2: Founder Anual (Featured Highlight) -->
+              <div class="plus-plan-card plus-plan-founder">
+                <div class="plus-founder-strip"></div>
+                <div class="plus-founder-badges">
+                  <span class="plus-saving-pill">AHORRAS 78% • MÁS ELEGIDO</span>
+                  <span class="plus-annual-label">ACCESO ANUAL</span>
+                </div>
+                <div class="plus-plan-top">
+                  <div>
+                    <h3>Pase VIP Founder</h3>
+                    <span class="plus-plan-note">12 meses completos ($588 USD valor normal)</span>
+                  </div>
+                  <div class="plus-plan-price-col">
+                    <span class="plus-price-big text-urgency-red">$129</span>
+                    <span class="plus-price-period">/ año</span>
+                  </div>
+                </div>
+                <ul class="plus-plan-list">
+                  <li>
+                    <span class="material-symbols-outlined plus-check-red">verified</span>
+                    <span><strong>Todo lo incluido en VIP PRO por 1 año</strong></span>
+                  </li>
+                  <li>
+                    <span class="material-symbols-outlined plus-check-red">verified</span>
+                    <span>Regalo hoy: <strong class="text-urgency-red">+350 VP Exclusivos</strong> (1 Curso Secreto)</span>
+                  </li>
+                  <li>
+                    <span class="material-symbols-outlined plus-check-red">verified</span>
+                    <span>Bono de bienvenida: <strong class="text-teal-accent">+800 PTS</strong></span>
+                  </li>
+                  <li>
+                    <span class="material-symbols-outlined plus-check-red">verified</span>
+                    <span>Descarga directa de plantillas Full-Stack</span>
+                  </li>
+                </ul>
+                <button type="button" class="btn-plus-founder" onclick="handlePlanCTA('annual')">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">auto_awesome</span>
+                  <span>Activar VIP Founder Anual — $129.00 USD</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trust Badges & Payment Methods (Domestika Style) -->
+          <div class="domestika-trust-strip">
+            <div class="trust-strip-title">
+              <span class="material-symbols-outlined" style="font-size: 19px; color: #007D8A;">shield</span>
+              <span>Pagos 100% Seguros y Encriptados</span>
+            </div>
+            <p class="trust-strip-desc">
+              Todas las compras cuentan con protección SSL bancaria de 256 bits y garantía de satisfacción.
+            </p>
+            <div class="trust-strip-pills">
+              <span class="trust-pill-item">
+                <span class="material-symbols-outlined" style="font-size: 16px; color: #0057c0;">account_balance_wallet</span>
+                MercadoPago Oficial
+              </span>
+              <span class="trust-pill-item">
+                <span class="material-symbols-outlined" style="font-size: 16px; color: #0057c0;">payment</span>
+                PayPal Checkout
+              </span>
+              <span class="trust-pill-item">
+                <span class="material-symbols-outlined" style="font-size: 16px; color: #007D8A;">lock</span>
+                SSL 256-Bit
+              </span>
+            </div>
+          </div>
+        </section>
 
         <!-- SECCIÓN: PREGUNTAS FRECUENTES (FAQ INTERACTIVO EN LA LANDING ANTES DE PASAR A PLANES) -->
         <section class="faq-accordion-section" id="landing-faq-section" aria-labelledby="faq-landing-heading">
           <div class="faq-section-header">
             <span class="faq-kicker">❓ RESPUESTAS CLARAS Y SIN LETRA CHICA</span>
             <h2 id="faq-landing-heading">Preguntas Frecuentes antes de Empezar tu Ruta</h2>
-            <p>Todo lo que necesitas saber sobre nuestra metodología práctica, el sistema de recompensas gamificado y la garantía de tu membresía VIP.</p>
+            <p>Todo lo que necesitas saber sobre nuestra metodología práctica, el sistema de recompensas gamificado y la
+              garantía de tu membresía VIP.</p>
           </div>
 
           <div class="faq-accordion-list">
@@ -239,7 +534,11 @@
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  Son <strong>100% bajo demanda y en alta definición</strong> para que avances a tu propio ritmo, pauses, repitas y practiques a cualquier hora desde tu computadora o celular. A diferencia de los cursos tradicionales que quedan viejos en 6 meses, en <strong>SkillVault actualizamos constantemente cada módulo, plantilla y bloque de código</strong> para que siempre domines las herramientas, modelos de IA y estrategias que funcionan hoy en el mercado real.
+                  Son <strong>100% bajo demanda y en alta definición</strong> para que avances a tu propio ritmo,
+                  pauses, repitas y practiques a cualquier hora desde tu computadora o celular. A diferencia de los
+                  cursos tradicionales que quedan viejos en 6 meses, en <strong>SkillVault actualizamos constantemente
+                    cada módulo, plantilla y bloque de código</strong> para que siempre domines las herramientas,
+                  modelos de IA y estrategias que funcionan hoy en el mercado real.
                 </p>
               </div>
             </details>
@@ -252,7 +551,11 @@
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  <strong>¡Por supuesto! Nunca estudias solo.</strong> Cada módulo incluye una explicación desde cero en español simple, traducción línea por línea del código y un diccionario técnico integrado. Y si aun así te trabas en un paso o necesitas revisar tu implementación, cuentas con <strong>soporte directo de nuestro equipo y acceso a la comunidad privada</strong> para resolver cualquier duda rápido y seguir avanzando de rango.
+                  <strong>¡Por supuesto! Nunca estudias solo.</strong> Cada módulo incluye una explicación desde cero en
+                  español simple, traducción línea por línea del código y un diccionario técnico integrado. Y si aun así
+                  te trabas en un paso o necesitas revisar tu implementación, cuentas con <strong>soporte directo de
+                    nuestro equipo y acceso a la comunidad privada</strong> para resolver cualquier duda rápido y seguir
+                  avanzando de rango.
                 </p>
               </div>
             </details>
@@ -265,7 +568,10 @@
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  <strong>Sí, con total libertad y en un solo clic.</strong> No existen contratos de permanencia forzosa, cláusulas ocultas ni vueltas burocráticas. Si decides cancelar tu suscripción mensual, no se te volverá a cobrar ni un centavo más y <strong>conservarás el acceso total a los cursos, plantillas y cofres desbloqueados</strong> durante todo tu período vigente hasta la fecha de corte.
+                  <strong>Sí, con total libertad y en un solo clic.</strong> No existen contratos de permanencia
+                  forzosa, cláusulas ocultas ni vueltas burocráticas. Si decides cancelar tu suscripción mensual, no se
+                  te volverá a cobrar ni un centavo más y <strong>conservarás el acceso total a los cursos, plantillas y
+                    cofres desbloqueados</strong> durante todo tu período vigente hasta la fecha de corte.
                 </p>
               </div>
             </details>
@@ -273,12 +579,18 @@
             <!-- FAQ 4 -->
             <details class="faq-accordion-item">
               <summary class="faq-accordion-trigger">
-                <span class="faq-question-text">💎 ¿Cómo funciona exactamente el sistema de Puntos Estándar (PTS) y VIP (👑 VP)?</span>
+                <span class="faq-question-text">💎 ¿Cómo funciona exactamente el sistema de Puntos Estándar (PTS) y VIP
+                  (👑 VP)?</span>
                 <span class="faq-toggle-icon" aria-hidden="true">+</span>
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  Transformamos el estudio en un juego con premios reales: cada vez que superas los módulos prácticos ganas <strong>Puntos Estándar (PTS)</strong> para abrir cofres con plantillas, packs de prompts y hojas de ruta en la Bóveda. Y cuando eres miembro <strong>VIP PRO o Founder</strong>, además recibes un <strong>multiplicador x1.5 de PTS</strong> y desbloqueas los codiciados <strong>Puntos Exclusivos VIP (👑 VP)</strong> al aprobar los exámenes al 100%, con los que puedes canjear <strong>Masterclasses Secretas, código fuente Full-Stack listo para vender y mentorías 1 a 1</strong>.
+                  Transformamos el estudio en un juego con premios reales: cada vez que superas los módulos prácticos
+                  ganas <strong>Puntos Estándar (PTS)</strong> para abrir cofres con plantillas, packs de prompts y
+                  hojas de ruta en la Bóveda. Y cuando eres miembro <strong>VIP PRO o Founder</strong>, además recibes
+                  un <strong>multiplicador x1.5 de PTS</strong> y desbloqueas los codiciados <strong>Puntos Exclusivos
+                    VIP (👑 VP)</strong> al aprobar los exámenes al 100%, con los que puedes canjear
+                  <strong>Masterclasses Secretas, código fuente Full-Stack listo para vender y mentorías 1 a 1</strong>.
                 </p>
               </div>
             </details>
@@ -286,7 +598,8 @@
 
           <div class="faq-bottom-cta">
             <span>¿Listo para desbloquear los 14 cursos completos y empezar a sumar Puntos VIP hoy?</span>
-            <button type="button" class="btn-primary-full gold-vip-cta" style="max-width: 320px;" onclick="document.querySelector('[data-tab=plans]').click()">
+            <button type="button" class="btn-primary-full gold-vip-cta" style="max-width: 320px;"
+              onclick="document.querySelector('[data-tab=plans]').click()">
               👑 Ver Planes y Desbloquear Todo
             </button>
           </div>
@@ -298,7 +611,8 @@
         <div class="section-header">
           <div>
             <h2>👑 Recompensas Exclusivas para Miembros VIP (Solo con 👑 VP)</h2>
-            <p>Estos cofres, cursos secretos, plantillas y packs de cursos completos solo pueden desbloquearse con <strong>Puntos Exclusivos VIP (VP)</strong> obtenidos siendo miembro VIP.</p>
+            <p>Estos cofres, cursos secretos, plantillas y packs de cursos completos solo pueden desbloquearse con
+              <strong>Puntos Exclusivos VIP (VP)</strong> obtenidos siendo miembro VIP.</p>
           </div>
         </div>
         <div class="skills-grid" id="vip-exclusive-rewards-grid" style="margin-bottom: 38px;"></div>
@@ -306,7 +620,8 @@
         <div class="section-header">
           <div>
             <h2>💎 Bóveda Estándar (Canjeable con Puntos Normales PTS)</h2>
-            <p>Usa tus puntos de estudio regulares (PTS) para desbloquear herramientas, plantillas y guías prácticas de cursos completos.</p>
+            <p>Usa tus puntos de estudio regulares (PTS) para desbloquear herramientas, plantillas y guías prácticas de
+              cursos completos.</p>
           </div>
         </div>
         <div class="skills-grid" id="rewards-grid"></div>
@@ -315,7 +630,8 @@
       <!-- VISTA 3: PLANES Y MEMBRESÍAS (CON FAQ INTERACTIVO JUSTO ANTES DE LOS PLANES) -->
       <section class="tab-view" id="view-plans">
         <!-- Acordeón FAQ justo antes de la sección de Planes y Precios -->
-        <div class="faq-accordion-section faq-in-plans-view" aria-label="Preguntas frecuentes sobre planes y membresía VIP">
+        <div class="faq-accordion-section faq-in-plans-view"
+          aria-label="Preguntas frecuentes sobre planes y membresía VIP">
           <div class="faq-section-header">
             <span class="faq-kicker">❓ ANTES DE ELEGIR TU PLAN • TRANSPARENCIA TOTAL</span>
             <h2>Preguntas Frecuentes sobre Cursos y Membresía VIP</h2>
@@ -330,7 +646,9 @@
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  Son <strong>100% grabados en alta calidad y bajo demanda</strong> para que avances a tu propio ritmo sin horarios fijos, pero con <strong>actualizaciones constantes incluidas</strong> para que ningún código, herramienta de IA ni estrategia de negocio quede obsoleta.
+                  Son <strong>100% grabados en alta calidad y bajo demanda</strong> para que avances a tu propio ritmo
+                  sin horarios fijos, pero con <strong>actualizaciones constantes incluidas</strong> para que ningún
+                  código, herramienta de IA ni estrategia de negocio quede obsoleta.
                 </p>
               </div>
             </details>
@@ -342,7 +660,8 @@
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  <strong>Sí, tienes soporte directo y acceso a la comunidad privada</strong> para resolver dudas rápidas cuando te trabes en cualquier línea de código, configuración o campaña práctica.
+                  <strong>Sí, tienes soporte directo y acceso a la comunidad privada</strong> para resolver dudas
+                  rápidas cuando te trabes en cualquier línea de código, configuración o campaña práctica.
                 </p>
               </div>
             </details>
@@ -354,19 +673,24 @@
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  <strong>Cancelación 100% transparente a un solo clic</strong>, sin contratos trampa ni permanencia obligatoria. Si cancelas, no recibirás nuevos cobros y conservarás todo lo desbloqueado hasta tu fecha de corte.
+                  <strong>Cancelación 100% transparente a un solo clic</strong>, sin contratos trampa ni permanencia
+                  obligatoria. Si cancelas, no recibirás nuevos cobros y conservarás todo lo desbloqueado hasta tu fecha
+                  de corte.
                 </p>
               </div>
             </details>
 
             <details class="faq-accordion-item">
               <summary class="faq-accordion-trigger">
-                <span class="faq-question-text">💎 ¿Cómo funciona exactamente el sistema de Puntos (PTS) y VIP (👑 VP)?</span>
+                <span class="faq-question-text">💎 ¿Cómo funciona exactamente el sistema de Puntos (PTS) y VIP (👑
+                  VP)?</span>
                 <span class="faq-toggle-icon" aria-hidden="true">+</span>
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  Ganas <strong>PTS</strong> al completar módulos y cursos normales, y ganas <strong>Puntos Exclusivos VIP (👑 VP)</strong> al aprobar los exámenes al 100% siendo miembro VIP. Ambos se usan en la Bóveda para abrir cofres de herramientas, Masterclasses Secretas y plantillas listas para usar.
+                  Ganas <strong>PTS</strong> al completar módulos y cursos normales, y ganas <strong>Puntos Exclusivos
+                    VIP (👑 VP)</strong> al aprobar los exámenes al 100% siendo miembro VIP. Ambos se usan en la Bóveda
+                  para abrir cofres de herramientas, Masterclasses Secretas y plantillas listas para usar.
                 </p>
               </div>
             </details>
@@ -376,7 +700,9 @@
         <div class="section-header">
           <div>
             <h2>👑 Planes y Precios — Desbloquea Todos los Cursos Completos y Puntos VIP</h2>
-            <p>Cada curso completo (7.5h a 12h de formación práctica) cuesta entre <strong>$12.99 y $39.99 USD</strong> por separado (valor total del catálogo: <strong>+$450 USD</strong>). Con el <strong>Pase VIP PRO</strong> desbloqueas absolutamente todos los cursos completos al instante.</p>
+            <p>Cada curso completo (7.5h a 12h de formación práctica) cuesta entre <strong>$12.99 y $39.99 USD</strong>
+              por separado (valor total del catálogo: <strong>+$450 USD</strong>). Con el <strong>Pase VIP PRO</strong>
+              desbloqueas absolutamente todos los cursos completos al instante.</p>
           </div>
         </div>
 
@@ -386,7 +712,8 @@
               <span class="plan-tag">CUENTA ESTÁNDAR • PAGO POR CURSO</span>
               <h3>Curso Completo Individual</h3>
               <div class="plan-price">$12.99 – $39.99 <small>USD / curso</small></div>
-              <p>Ideal si solo quieres dominar una habilidad puntual. Acceso ilimitado de por vida al curso completo que elijas.</p>
+              <p>Ideal si solo quieres dominar una habilidad puntual. Acceso ilimitado de por vida al curso completo que
+                elijas.</p>
               <ul class="plan-features">
                 <li>✅ Acceso permanente a los 6 módulos extensos (7.5h–10h)</li>
                 <li>✅ Guía paso a paso, casos reales y diccionario integrado</li>
@@ -395,7 +722,8 @@
                 <li>❌ <strong>No suma Puntos Exclusivos VIP (👑 VP)</strong></li>
               </ul>
             </div>
-            <button class="btn-secondary" id="buy-individual-btn" style="width:100%" onclick="handlePlanCTA('individual')">💳 Comprar Curso Individual (Desde $12.99 USD)</button>
+            <button class="btn-secondary" id="buy-individual-btn" style="width:100%"
+              onclick="handlePlanCTA('individual')">💳 Comprar Curso Individual (Desde $12.99 USD)</button>
           </div>
 
           <div class="plan-card featured-plan">
@@ -404,7 +732,8 @@
               <h3>Pase VIP PRO Mensual</h3>
               <div class="plan-old-price">Valor individual: $455.00 USD</div>
               <div class="plan-price">$49.00 <small>USD / mes</small></div>
-              <p>Por el precio de apenas 1 curso y medio, desbloqueas los <strong>14 cursos completos pagos</strong> y activas los <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
+              <p>Por el precio de apenas 1 curso y medio, desbloqueas los <strong>14 cursos completos pagos</strong> y
+                activas los <strong>Puntos Exclusivos VIP (👑 VP)</strong>.</p>
               <ul class="plan-features">
                 <li>🔥 <strong>Los 14 Cursos Completos desbloqueados</strong> desde el primer minuto</li>
                 <li>👑 <strong>Habilita Puntos Exclusivos VIP (VP)</strong> al aprobar cada curso</li>
@@ -413,7 +742,8 @@
                 <li>🔒 Acceso a la Bóveda de Cursos Secretos VIP y Plantillas</li>
               </ul>
             </div>
-            <button class="btn-primary-full gold-vip-cta" id="buy-pro-btn" onclick="handlePlanCTA('monthly')">👑 Hacerse VIP PRO — $49.00 USD / mes</button>
+            <button class="btn-primary-full gold-vip-cta" id="buy-pro-btn" onclick="handlePlanCTA('monthly')">👑 Hacerse
+              VIP PRO — $49.00 USD / mes</button>
           </div>
 
           <div class="plan-card founder-plan">
@@ -422,7 +752,8 @@
               <h3>Pase VIP Founder (1 Año)</h3>
               <div class="plan-old-price">12 meses ($588 USD) -> Ahorras 78%</div>
               <div class="plan-price">$129.00 <small>USD / año</small></div>
-              <p>Acceso total durante 12 meses a todos los cursos actuales y futuros + <strong>350 VP inmediatos</strong> para abrir un Curso Secreto hoy mismo.</p>
+              <p>Acceso total durante 12 meses a todos los cursos actuales y futuros + <strong>350 VP
+                  inmediatos</strong> para abrir un Curso Secreto hoy mismo.</p>
               <ul class="plan-features">
                 <li>👑 <strong>Todo lo incluido en el Pase VIP PRO</strong> por 1 año entero</li>
                 <li>🚀 <strong>+350 VP Exclusivos de regalo hoy</strong> (alcanza para 1 Curso Secreto ya)</li>
@@ -431,7 +762,8 @@
                 <li>🏆 Acceso directo a plantillas Full-Stack y packs descargables</li>
               </ul>
             </div>
-            <button class="btn-primary-full" id="buy-founder-btn" onclick="handlePlanCTA('annual')">💎 Activar VIP Founder Anual — $129.00 USD</button>
+            <button class="btn-primary-full" id="buy-founder-btn" onclick="handlePlanCTA('annual')">💎 Activar VIP
+              Founder Anual — $129.00 USD</button>
           </div>
         </div>
       </section>
@@ -441,7 +773,8 @@
         <div class="section-header">
           <div>
             <h2>🎓 Mis Cursos Completos (100% Finalizados)</h2>
-            <p>Cada vez que superas los 6 módulos prácticos y apruebas el examen final al 100%, queda registrado aquí tu curso completo.</p>
+            <p>Cada vez que superas los 6 módulos prácticos y apruebas el examen final al 100%, queda registrado aquí tu
+              curso completo.</p>
           </div>
         </div>
         <div class="unlocked-list" id="completed-diplomas-list" style="margin-bottom: 36px;"></div>
@@ -449,7 +782,8 @@
         <div class="section-header">
           <div>
             <h2>💎 Mis Cofres, Herramientas y Recompensas Canjeadas en Bóveda</h2>
-            <p>Aquí tienes todos los premios y recursos desbloqueados con tus Puntos Estándar (PTS) y Puntos Exclusivos VIP (👑 VP).</p>
+            <p>Aquí tienes todos los premios y recursos desbloqueados con tus Puntos Estándar (PTS) y Puntos Exclusivos
+              VIP (👑 VP).</p>
           </div>
         </div>
         <div class="unlocked-list" id="unlocked-list"></div>
@@ -460,19 +794,22 @@
         <div class="section-header">
           <div>
             <h2>📖 Diccionario Completo de la Academia (Explicado en Español Simple)</h2>
-            <p>¿Encontraste una palabra técnica, sigla en inglés o término de negocios en algún módulo? Búscala aquí y entiéndela en segundos con ejemplos de la vida real.</p>
+            <p>¿Encontraste una palabra técnica, sigla en inglés o término de negocios en algún módulo? Búscala aquí y
+              entiéndela en segundos con ejemplos de la vida real.</p>
           </div>
         </div>
 
         <div class="dictionary-controls">
           <div class="search-box dict-search-box">
             <span class="search-icon">🔎</span>
-            <input type="text" id="dict-search-input" placeholder="Buscar palabra o sigla (ej: API, ROAS, Webhook, JWT, LTV, CAC, RAG, BANT, Pip, ETF...)" />
+            <input type="text" id="dict-search-input"
+              placeholder="Buscar palabra o sigla (ej: API, ROAS, Webhook, JWT, LTV, CAC, RAG, BANT, Pip, ETF...)" />
           </div>
           <div class="categories" id="dict-category-filters">
             <button class="cat-btn dict-cat-btn active" data-dcat="all">📚 Todas las Palabras</button>
             <button class="cat-btn dict-cat-btn" data-dcat="Programación">💻 Programación & Ciberseguridad</button>
-            <button class="cat-btn dict-cat-btn" data-dcat="Inteligencia Artificial">🤖 Inteligencia Artificial & Bots</button>
+            <button class="cat-btn dict-cat-btn" data-dcat="Inteligencia Artificial">🤖 Inteligencia Artificial &
+              Bots</button>
             <button class="cat-btn dict-cat-btn" data-dcat="Finanzas">📈 Finanzas, Precios & Ventas</button>
             <button class="cat-btn dict-cat-btn" data-dcat="Diseño & Marketing">🎨 Marketing, Diseño & Ads</button>
             <button class="cat-btn dict-cat-btn" data-dcat="Trabajo Remoto">🌎 Inglés & Trabajo Remoto</button>
@@ -487,7 +824,8 @@
         <div class="section-header">
           <div>
             <h2 id="profile-main-heading">👤 Mi Perfil de Estudiante</h2>
-            <p>Resumen de tu cuenta, verificación de correo, progreso sincronizado, rango gamificado y balance de puntos <strong>PTS</strong> y <strong>👑 VP</strong>.</p>
+            <p>Resumen de tu cuenta, verificación de correo, progreso sincronizado, rango gamificado y balance de puntos
+              <strong>PTS</strong> y <strong>👑 VP</strong>.</p>
           </div>
         </div>
         <div id="student-profile-summary-box" class="instructors-grid" style="margin-bottom: 32px;"></div>
@@ -496,7 +834,8 @@
         <div class="section-header" id="student-subscription-section">
           <div>
             <h2>👑 Mi suscripción</h2>
-            <p>Consulta el estado de tu membresía VIP, precio, próxima fecha de renovación y administra tu suscripción con total transparencia.</p>
+            <p>Consulta el estado de tu membresía VIP, precio, próxima fecha de renovación y administra tu suscripción
+              con total transparencia.</p>
           </div>
         </div>
         <div id="student-subscription-box" style="margin-bottom: 36px;"></div>
@@ -505,7 +844,8 @@
         <div class="section-header" id="student-purchases-section">
           <div>
             <h2>💳 Mis compras</h2>
-            <p>Historial verificado de cursos adquiridos y suscripciones VIP contratadas, con acceso a comprobantes y facturas oficiales.</p>
+            <p>Historial verificado de cursos adquiridos y suscripciones VIP contratadas, con acceso a comprobantes y
+              facturas oficiales.</p>
           </div>
         </div>
         <div id="student-purchases-box" style="margin-bottom: 36px;"></div>
@@ -514,7 +854,8 @@
         <div class="section-header" id="student-points-ledger-section">
           <div>
             <h2>🛡️ Historial de Movimientos de Puntos (PTS, 👑 VP y XP)</h2>
-            <p>Registro seguro y verificado por el servidor de cada recompensa ganada y cada canje realizado en la Bóveda.</p>
+            <p>Registro seguro y verificado por el servidor de cada recompensa ganada y cada canje realizado en la
+              Bóveda.</p>
           </div>
         </div>
         <div id="student-points-ledger-box" style="margin-bottom: 24px;"></div>
@@ -525,7 +866,8 @@
         <div class="section-header">
           <div>
             <h2 id="settings-main-heading">⚙️ Configuración de Cuenta y Preferencias</h2>
-            <p>Administra tu sesión, verificación de correo, seguridad de contraseña, preferencias de voz del reproductor y aplicación móvil.</p>
+            <p>Administra tu sesión, verificación de correo, seguridad de contraseña, preferencias de voz del
+              reproductor y aplicación móvil.</p>
           </div>
         </div>
         <div id="student-settings-summary-box" class="instructors-grid"></div>
@@ -536,19 +878,22 @@
         <div class="section-header">
           <div>
             <h2 id="help-center-heading">🛟 Centro de ayuda</h2>
-            <p>¿Tienes alguna consulta sobre pagos, cursos, tu cuenta o tus puntos? Envíanos tu solicitud y nuestro equipo te responderá a la brevedad.</p>
+            <p>¿Tienes alguna consulta sobre pagos, cursos, tu cuenta o tus puntos? Envíanos tu solicitud y nuestro
+              equipo te responderá a la brevedad.</p>
           </div>
         </div>
 
         <div class="help-center-grid">
           <!-- Columna Izquierda: Formulario de Contacto a Soporte -->
           <div class="create-skill-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
               <h3 style="font-size:19px;">📩 Contactar al Soporte Oficial</h3>
               <span class="skill-cat-tag">Respuesta prioritaria</span>
             </div>
             <p style="font-size:13.5px; color:var(--text-muted); margin-bottom:18px;">
-              Completa el formulario detallando tu consulta. Todas las solicitudes quedan registradas con número de seguimiento en tu cuenta.
+              Completa el formulario detallando tu consulta. Todas las solicitudes quedan registradas con número de
+              seguimiento en tu cuenta.
             </p>
 
             <form id="support-ticket-form" class="mobile-modal-form" novalidate>
@@ -559,18 +904,24 @@
               </div>
 
               <div class="form-group">
-                <label for="support-name">Tu Nombre Completo <span aria-hidden="true" style="color:#f43f5e;">*</span></label>
-                <input type="text" id="support-name" placeholder="Ej: Mateo Sánchez" autocomplete="name" required aria-required="true" />
+                <label for="support-name">Tu Nombre Completo <span aria-hidden="true"
+                    style="color:#f43f5e;">*</span></label>
+                <input type="text" id="support-name" placeholder="Ej: Mateo Sánchez" autocomplete="name" required
+                  aria-required="true" />
               </div>
 
               <div class="form-group">
-                <label for="support-email">Tu Correo Electrónico <span aria-hidden="true" style="color:#f43f5e;">*</span></label>
-                <input type="email" id="support-email" placeholder="tu@correo.com" autocomplete="email" required aria-required="true" />
+                <label for="support-email">Tu Correo Electrónico <span aria-hidden="true"
+                    style="color:#f43f5e;">*</span></label>
+                <input type="email" id="support-email" placeholder="tu@correo.com" autocomplete="email" required
+                  aria-required="true" />
               </div>
 
               <div class="form-group">
-                <label for="support-category">Categoría de la Consulta <span aria-hidden="true" style="color:#f43f5e;">*</span></label>
-                <select id="support-category" required aria-required="true" style="width:100%; padding:12px 14px; border-radius:11px; background:rgba(15, 23, 42, 0.9); border:1px solid var(--border-color); color:var(--text-main); font-family:inherit; font-size:14px;">
+                <label for="support-category">Categoría de la Consulta <span aria-hidden="true"
+                    style="color:#f43f5e;">*</span></label>
+                <select id="support-category" required aria-required="true"
+                  style="width:100%; padding:12px 14px; border-radius:11px; background:rgba(15, 23, 42, 0.9); border:1px solid var(--border-color); color:var(--text-main); font-family:inherit; font-size:14px;">
                   <option value="pagos">💳 Pagos, Suscripciones y Facturación</option>
                   <option value="cursos">🎓 Cursos, Módulos y Exámenes</option>
                   <option value="cuenta">👤 Cuenta, Acceso y Verificación de Correo</option>
@@ -580,13 +931,20 @@
               </div>
 
               <div class="form-group">
-                <label for="support-subject">Asunto Breve <span aria-hidden="true" style="color:#f43f5e;">*</span></label>
-                <input type="text" id="support-subject" placeholder="Ej: Consulta sobre mi curso de Python o comprobante de pago" maxlength="120" required aria-required="true" />
+                <label for="support-subject">Asunto Breve <span aria-hidden="true"
+                    style="color:#f43f5e;">*</span></label>
+                <input type="text" id="support-subject"
+                  placeholder="Ej: Consulta sobre mi curso de Python o comprobante de pago" maxlength="120" required
+                  aria-required="true" />
               </div>
 
               <div class="form-group">
-                <label for="support-message">Describe el problema o consulta en detalle <span aria-hidden="true" style="color:#f43f5e;">*</span></label>
-                <textarea id="support-message" rows="4" placeholder="Escribe aquí los detalles para que podamos ayudarte rápido..." required aria-required="true" style="width:100%; padding:12px 14px; border-radius:11px; background:rgba(15, 23, 42, 0.9); border:1px solid var(--border-color); color:var(--text-main); font-family:inherit; font-size:14px; resize:vertical;"></textarea>
+                <label for="support-message">Describe el problema o consulta en detalle <span aria-hidden="true"
+                    style="color:#f43f5e;">*</span></label>
+                <textarea id="support-message" rows="4"
+                  placeholder="Escribe aquí los detalles para que podamos ayudarte rápido..." required
+                  aria-required="true"
+                  style="width:100%; padding:12px 14px; border-radius:11px; background:rgba(15, 23, 42, 0.9); border:1px solid var(--border-color); color:var(--text-main); font-family:inherit; font-size:14px; resize:vertical;"></textarea>
               </div>
 
               <div id="support-form-feedback" class="auth-feedback-box" role="alert" style="display:none;"></div>
@@ -602,7 +960,8 @@
             <div class="create-skill-card">
               <h3 style="font-size:18px; margin-bottom:6px;">🗂️ Mis Consultas Enviadas</h3>
               <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">
-                Sigue en tiempo real el estado de tus tickets (<strong>Pendiente</strong>, <strong>En proceso</strong> o <strong>Resuelto</strong>).
+                Sigue en tiempo real el estado de tus tickets (<strong>Pendiente</strong>, <strong>En proceso</strong> o
+                <strong>Resuelto</strong>).
               </p>
               <div id="student-support-tickets-box"></div>
             </div>
@@ -610,7 +969,8 @@
             <div class="create-skill-card">
               <h3 style="font-size:17px; margin-bottom:8px;">📬 Bandeja de Correos y Notificaciones de Cuenta</h3>
               <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
-                Revisa aquí los enlaces seguros de verificación de correo, restablecimiento de contraseña, confirmaciones de pago y avisos de soporte enviados a tu cuenta.
+                Revisa aquí los enlaces seguros de verificación de correo, restablecimiento de contraseña,
+                confirmaciones de pago y avisos de soporte enviados a tu cuenta.
               </p>
               <button type="button" class="btn-secondary" style="width:100%;" onclick="openMailboxModal()">
                 📬 Abrir mis Correos Recibidos (<span id="mailbox-count-pill">0</span>)
@@ -624,7 +984,9 @@
           <div class="section-header">
             <div>
               <h2>🔐 Panel Privado del Administrador — Gestión de Soporte y Auditoría de Puntos</h2>
-              <p>Sección exclusiva para el administrador: organiza las consultas de los alumnos por estado (<strong>pendiente</strong>, <strong>en proceso</strong>, <strong>resuelto</strong>) y audita el libro mayor de puntos.</p>
+              <p>Sección exclusiva para el administrador: organiza las consultas de los alumnos por estado
+                (<strong>pendiente</strong>, <strong>en proceso</strong>, <strong>resuelto</strong>) y audita el libro
+                mayor de puntos.</p>
             </div>
           </div>
           <div id="admin-support-panel-box" style="margin-bottom:32px;"></div>
@@ -647,43 +1009,56 @@
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  En la ventana de <strong>Iniciar Sesión</strong>, haz clic en <strong>"¿Olvidaste tu contraseña?"</strong> e introduce tu correo. Recibirás un enlace único con vencimiento de 15 minutos que se invalida automáticamente tras usarlo. Para verificar tu correo tras registrarte, abre el enlace de confirmación enviado o solicita un reenvío desde <strong>Mi perfil</strong>.
+                  En la ventana de <strong>Iniciar Sesión</strong>, haz clic en <strong>"¿Olvidaste tu
+                    contraseña?"</strong> e introduce tu correo. Recibirás un enlace único con vencimiento de 15 minutos
+                  que se invalida automáticamente tras usarlo. Para verificar tu correo tras registrarte, abre el enlace
+                  de confirmación enviado o solicita un reenvío desde <strong>Mi perfil</strong>.
                 </p>
               </div>
             </details>
 
             <details class="faq-accordion-item">
               <summary class="faq-accordion-trigger">
-                <span class="faq-question-text">💾 ¿Se guarda mi progreso si cierro sesión o cambio del celular a la computadora?</span>
+                <span class="faq-question-text">💾 ¿Se guarda mi progreso si cierro sesión o cambio del celular a la
+                  computadora?</span>
                 <span class="faq-toggle-icon" aria-hidden="true">+</span>
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  <strong>Sí, el guardado es 100% automático.</strong> Cada lección visitada, cada checkpoint superado y el porcentaje de avance de tus cursos quedan asociados a tu cuenta en tiempo real para que retomes exactamente desde donde dejaste.
+                  <strong>Sí, el guardado es 100% automático.</strong> Cada lección visitada, cada checkpoint superado y
+                  el porcentaje de avance de tus cursos quedan asociados a tu cuenta en tiempo real para que retomes
+                  exactamente desde donde dejaste.
                 </p>
               </div>
             </details>
 
             <details class="faq-accordion-item">
               <summary class="faq-accordion-trigger">
-                <span class="faq-question-text">👑 ¿Qué pasa con mis cursos y beneficios si cancelo mi suscripción VIP?</span>
+                <span class="faq-question-text">👑 ¿Qué pasa con mis cursos y beneficios si cancelo mi suscripción
+                  VIP?</span>
                 <span class="faq-toggle-icon" aria-hidden="true">+</span>
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  Si cancelas tu suscripción desde <strong>Mi perfil → Mi suscripción</strong>, se detienen inmediatamente los cobros futuros y <strong>conservas el 100% de tus beneficios VIP hasta el último día de tu período ya pagado</strong>. Además, los cursos que hayas comprado de forma individual se conservan para siempre en tu cuenta.
+                  Si cancelas tu suscripción desde <strong>Mi perfil → Mi suscripción</strong>, se detienen
+                  inmediatamente los cobros futuros y <strong>conservas el 100% de tus beneficios VIP hasta el último
+                    día de tu período ya pagado</strong>. Además, los cursos que hayas comprado de forma individual se
+                  conservan para siempre en tu cuenta.
                 </p>
               </div>
             </details>
 
             <details class="faq-accordion-item">
               <summary class="faq-accordion-trigger">
-                <span class="faq-question-text">📄 ¿Dónde puedo descargar los comprobantes o ver el estado de mis pagos?</span>
+                <span class="faq-question-text">📄 ¿Dónde puedo descargar los comprobantes o ver el estado de mis
+                  pagos?</span>
                 <span class="faq-toggle-icon" aria-hidden="true">+</span>
               </summary>
               <div class="faq-accordion-content">
                 <p>
-                  Ingresa a <strong>Mi perfil → Mis compras</strong>. Allí encontrarás el listado detallado de todos tus cursos comprados y suscripciones VIP, con su fecha, importe, moneda, método de pago, estado (aprobado, pendiente, rechazado o reembolsado) y el botón para abrir e imprimir cada comprobante oficial.
+                  Ingresa a <strong>Mi perfil → Mis compras</strong>. Allí encontrarás el listado detallado de todos tus
+                  cursos comprados y suscripciones VIP, con su fecha, importe, moneda, método de pago, estado (aprobado,
+                  pendiente, rechazado o reembolsado) y el botón para abrir e imprimir cada comprobante oficial.
                 </p>
               </div>
             </details>
@@ -709,40 +1084,55 @@
               </div>
             </div>
             <p class="footer-desc">
-              La plataforma de educación interactiva donde dominas Programación, Inteligencia Artificial, Finanzas y Marketing Digital superando misiones prácticas, subiendo de rango y desbloqueando recompensas reales con tus puntos <strong>PTS</strong> y <strong>👑 VP</strong>.
+              La plataforma de educación interactiva donde dominas Programación, Inteligencia Artificial, Finanzas y
+              Marketing Digital superando misiones prácticas, subiendo de rango y desbloqueando recompensas reales con
+              tus puntos <strong>PTS</strong> y <strong>👑 VP</strong>.
             </p>
             <div class="footer-social-row" aria-label="Redes sociales oficiales de SkillVault">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Síguenos en Instagram" title="Instagram">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
+                aria-label="Síguenos en Instagram" title="Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  aria-hidden="true">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                 </svg>
               </a>
-              <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Síguenos en X (Twitter)" title="X / Twitter">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
+                aria-label="Síguenos en X (Twitter)" title="X / Twitter">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  aria-hidden="true">
                   <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
                   <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
                 </svg>
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Suscríbete en YouTube" title="YouTube">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
+                aria-label="Suscríbete en YouTube" title="YouTube">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  aria-hidden="true">
+                  <path
+                    d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
                   <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
                 </svg>
               </a>
-              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Únete a nuestra comunidad en Discord" title="Comunidad Discord">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
+                aria-label="Únete a nuestra comunidad en Discord" title="Comunidad Discord">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  aria-hidden="true">
                   <circle cx="9" cy="12" r="1" />
                   <circle cx="15" cy="12" r="1" />
                   <path d="M7.5 7.5c3.5-1 5.5-1 9 0" />
                   <path d="M7 16.5c3.5 1 6.5 1 10 0" />
-                  <path d="M15.5 17c0 1 1.5 3 2 3 1.5 0 2.833-1.667 3.5-3 .667-1.667.5-5.833-1.5-11.5-1.457-1.015-3-1.34-4.5-1.5l-1 2.5" />
-                  <path d="M8.5 17c0 1-1.356 3-1.832 3-1.429 0-2.698-1.667-3.333-3-.635-1.667-.476-5.833 1.428-11.5C6.151 4.485 7.5 4.16 9 4l1 2.5" />
+                  <path
+                    d="M15.5 17c0 1 1.5 3 2 3 1.5 0 2.833-1.667 3.5-3 .667-1.667.5-5.833-1.5-11.5-1.457-1.015-3-1.34-4.5-1.5l-1 2.5" />
+                  <path
+                    d="M8.5 17c0 1-1.356 3-1.832 3-1.429 0-2.698-1.667-3.333-3-.635-1.667-.476-5.833 1.428-11.5C6.151 4.485 7.5 4.16 9 4l1 2.5" />
                 </svg>
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn" aria-label="Síguenos en LinkedIn" title="LinkedIn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
+                aria-label="Síguenos en LinkedIn" title="LinkedIn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  aria-hidden="true">
                   <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                   <rect x="2" y="9" width="4" height="12" />
                   <circle cx="4" cy="4" r="2" />
@@ -756,9 +1146,12 @@
             <h4>Quiénes somos</h4>
             <ul>
               <li><a href="#about" onclick="openInfoModal('about'); return false;">⚡ Quiénes somos</a></li>
-              <li><a href="#view-explore" onclick="filterByFooterCategory('Programación'); return false;">💻 Programación &amp; Python</a></li>
-              <li><a href="#view-explore" onclick="filterByFooterCategory('Inteligencia Artificial'); return false;">🤖 IA, Agentes &amp; Prompts</a></li>
-              <li><a href="#view-explore" onclick="filterByFooterCategory('Finanzas'); return false;">📈 Finanzas &amp; Ventas B2B</a></li>
+              <li><a href="#view-explore" onclick="filterByFooterCategory('Programación'); return false;">💻
+                  Programación &amp; Python</a></li>
+              <li><a href="#view-explore" onclick="filterByFooterCategory('Inteligencia Artificial'); return false;">🤖
+                  IA, Agentes &amp; Prompts</a></li>
+              <li><a href="#view-explore" onclick="filterByFooterCategory('Finanzas'); return false;">📈 Finanzas &amp;
+                  Ventas B2B</a></li>
             </ul>
           </nav>
 
@@ -767,9 +1160,14 @@
             <h4>Contacto y soporte</h4>
             <ul>
               <li><a href="#help" onclick="switchAppTab('help'); return false;">🛟 Centro de ayuda y soporte</a></li>
-              <li><a href="#landing-faq-section" onclick="switchAppTab('explore'); setTimeout(() => document.getElementById('landing-faq-section')?.scrollIntoView({behavior:'smooth'}), 60); return false;">❓ Preguntas frecuentes</a></li>
-              <li><a href="#dictionary" onclick="document.querySelector('[data-tab=dictionary]').click(); return false;">📖 Diccionario Técnico A-Z</a></li>
-              <li><a href="#rewards" onclick="document.querySelector('[data-tab=rewards]').click(); return false;">💎 Bóveda de Recompensas</a></li>
+              <li><a href="#landing-faq-section"
+                  onclick="switchAppTab('explore'); setTimeout(() => document.getElementById('landing-faq-section')?.scrollIntoView({behavior:'smooth'}), 60); return false;">❓
+                  Preguntas frecuentes</a></li>
+              <li><a href="#dictionary"
+                  onclick="document.querySelector('[data-tab=dictionary]').click(); return false;">📖 Diccionario
+                  Técnico A-Z</a></li>
+              <li><a href="#rewards" onclick="document.querySelector('[data-tab=rewards]').click(); return false;">💎
+                  Bóveda de Recompensas</a></li>
             </ul>
           </nav>
 
@@ -777,9 +1175,11 @@
           <nav class="footer-links-col" aria-label="Política de privacidad y términos">
             <h4>Legal y Privacidad</h4>
             <ul>
-              <li><a href="#privacy" onclick="openInfoModal('privacy'); return false;">🔒 Política de privacidad</a></li>
+              <li><a href="#privacy" onclick="openInfoModal('privacy'); return false;">🔒 Política de privacidad</a>
+              </li>
               <li><a href="#terms" onclick="openInfoModal('terms'); return false;">📄 Términos y condiciones</a></li>
-              <li><a href="#guarantee" onclick="openInfoModal('guarantee'); return false;">🛡️ Garantía de Satisfacción VIP</a></li>
+              <li><a href="#guarantee" onclick="openInfoModal('guarantee'); return false;">🛡️ Garantía de Satisfacción
+                  VIP</a></li>
             </ul>
           </nav>
         </div>
@@ -796,7 +1196,8 @@
 
           <div class="payment-badges-row" aria-label="Métodos de pago y certificaciones de seguridad">
             <div class="trust-payment-badge" title="Pagos directos y seguros con MercadoPago">
-              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                aria-hidden="true">
                 <rect x="2" y="5" width="20" height="14" rx="3" />
                 <line x1="2" y1="10" x2="22" y2="10" />
               </svg>
@@ -804,14 +1205,16 @@
             </div>
 
             <div class="trust-payment-badge" title="Protección al comprador con PayPal">
-              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                aria-hidden="true">
                 <path d="M7 19h3l1.5-6H15a4 4 0 0 0 0-8H7.5L5 19Z" />
               </svg>
               <span><strong>PayPal</strong> Checkout</span>
             </div>
 
             <div class="trust-payment-badge ssl-badge" title="Certificado de Encriptación SSL 256-Bit">
-              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                aria-hidden="true">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 <path d="m9 12 2 2 4-4" />
               </svg>
@@ -866,30 +1269,31 @@
     </div>
   </div>
 
-  <!-- NAVEGACIÓN INFERIOR MÓVIL (Visible solo en pantallas móviles) -->
+  <!-- NAVEGACIÓN INFERIOR MÓVIL (Estilo Creative Academy Red) -->
   <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Navegación principal móvil">
     <button type="button" class="mob-nav-item active" data-mob-tab="explore" onclick="switchAppTab('explore')">
-      <span class="mob-nav-icon" aria-hidden="true">🏠</span>
+      <span class="mob-nav-icon material-symbols-outlined" aria-hidden="true">explore</span>
       <span class="mob-nav-label">Inicio</span>
     </button>
     <button type="button" class="mob-nav-item" data-mob-tab="certificates" onclick="switchAppTab('certificates')">
-      <span class="mob-nav-icon" aria-hidden="true">🎓</span>
-      <span class="mob-nav-label">Mis Cursos</span>
+      <span class="mob-nav-icon material-symbols-outlined" aria-hidden="true">play_circle</span>
+      <span class="mob-nav-label">Cursos</span>
     </button>
     <button type="button" class="mob-nav-item" data-mob-tab="rewards" onclick="switchAppTab('rewards')">
-      <span class="mob-nav-icon" aria-hidden="true">💎</span>
-      <span class="mob-nav-label">Bóveda VIP</span>
+      <span class="mob-nav-icon material-symbols-outlined" aria-hidden="true">inventory_2</span>
+      <span class="mob-nav-label">Bóveda</span>
     </button>
-    <button type="button" class="mob-nav-item" data-mob-tab="plans" onclick="switchAppTab('plans')">
-      <span class="mob-nav-icon" aria-hidden="true">👑</span>
-      <span class="mob-nav-label">Planes VIP</span>
+    <button type="button" class="mob-nav-item" data-mob-tab="plans" onclick="switchAppTab('plans')" style="position: relative;">
+      <span class="mob-nav-icon material-symbols-outlined" style="color: #E60050;" aria-hidden="true">auto_awesome</span>
+      <span class="mob-nav-label">Plus VIP</span>
+      <span class="mob-vip-dot" aria-hidden="true"></span>
     </button>
     <button type="button" class="mob-nav-item" data-mob-tab="profile" onclick="switchAppTab('profile')">
-      <span class="mob-nav-icon" aria-hidden="true">👤</span>
-      <span class="mob-nav-label">Mi Perfil</span>
+      <span class="mob-nav-icon material-symbols-outlined" aria-hidden="true">account_circle</span>
+      <span class="mob-nav-label">Perfil</span>
     </button>
     <button type="button" class="mob-nav-item" data-mob-tab="help" onclick="switchAppTab('help')">
-      <span class="mob-nav-icon" aria-hidden="true">🛟</span>
+      <span class="mob-nav-icon material-symbols-outlined" aria-hidden="true">support_agent</span>
       <span class="mob-nav-label">Ayuda</span>
     </button>
   </nav>
@@ -899,14 +1303,17 @@
     <div class="modal-window mobile-friendly-modal" style="max-width: 480px;">
       <div class="modal-header">
         <div class="modal-badge-row">
-          <span class="modal-cat-badge" style="background: rgba(251, 191, 36, 0.18); color: #fde68a;">⏳ Cupos en Apertura • Prioridad VIP</span>
+          <span class="modal-cat-badge" style="background: rgba(251, 191, 36, 0.18); color: #fde68a;">⏳ Cupos en
+            Apertura • Prioridad VIP</span>
         </div>
-        <button class="modal-close" type="button" onclick="closeWaitlistModal()" aria-label="Cerrar lista de espera">✕</button>
+        <button class="modal-close" type="button" onclick="closeWaitlistModal()"
+          aria-label="Cerrar lista de espera">✕</button>
       </div>
 
       <h2 id="waitlist-modal-title">Unirse a la Lista de Espera Prioritaria</h2>
       <p class="modal-sponsor" id="waitlist-modal-subtitle">
-        Regístrate gratis hoy y recibe acceso anticipado + un bono de <strong>+100 PTS</strong> apenas se habiliten las nuevas vacantes de <strong id="waitlist-plan-name">SkillVault Academy</strong>.
+        Regístrate gratis hoy y recibe acceso anticipado + un bono de <strong>+100 PTS</strong> apenas se habiliten las
+        nuevas vacantes de <strong id="waitlist-plan-name">SkillVault Academy</strong>.
       </p>
 
       <form id="waitlist-form" class="mobile-modal-form">
@@ -932,39 +1339,49 @@
         <div class="modal-badge-row">
           <span class="modal-cat-badge">✨ Acceso Oficial SkillVault</span>
         </div>
-        <button class="modal-close" type="button" onclick="closeAuthModal()" aria-label="Cerrar ventana de acceso">✕</button>
+        <button class="modal-close" type="button" onclick="closeAuthModal()"
+          aria-label="Cerrar ventana de acceso">✕</button>
       </div>
 
       <h2 id="auth-modal-heading" style="margin-bottom: 6px; text-align: center;">Bienvenido a SkillVault</h2>
-      <p id="auth-modal-subtext" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px; text-align: center; line-height: 1.5;">
-        Inicia sesión o crea tu cuenta para sincronizar tu rango, tus <strong>Puntos Estándar (PTS)</strong>, <strong>Puntos Exclusivos VIP (👑 VP)</strong> y tu progreso en todos tus dispositivos.
+      <p id="auth-modal-subtext"
+        style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px; text-align: center; line-height: 1.5;">
+        Inicia sesión o crea tu cuenta para sincronizar tu rango, tus <strong>Puntos Estándar (PTS)</strong>,
+        <strong>Puntos Exclusivos VIP (👑 VP)</strong> y tu progreso en todos tus dispositivos.
       </p>
 
       <!-- Pestañas de modo: Iniciar Sesión vs. Crear Cuenta -->
-      <div class="auth-tabs" id="auth-mode-tabs" role="tablist" aria-label="Opciones de acceso" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
-        <button type="button" role="tab" aria-selected="true" class="cat-btn active" id="auth-tab-login" onclick="switchAuthMode('login')" style="width: 100%; text-align: center;">
+      <div class="auth-tabs" id="auth-mode-tabs" role="tablist" aria-label="Opciones de acceso"
+        style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+        <button type="button" role="tab" aria-selected="true" class="cat-btn active" id="auth-tab-login"
+          onclick="switchAuthMode('login')" style="width: 100%; text-align: center;">
           🔐 Iniciar Sesión
         </button>
-        <button type="button" role="tab" aria-selected="false" class="cat-btn" id="auth-tab-register" onclick="switchAuthMode('register')" style="width: 100%; text-align: center;">
+        <button type="button" role="tab" aria-selected="false" class="cat-btn" id="auth-tab-register"
+          onclick="switchAuthMode('register')" style="width: 100%; text-align: center;">
           ✨ Crear Cuenta
         </button>
       </div>
 
       <!-- Contenedor oficial de Google Identity Services -->
       <div id="google-oauth-section">
-        <div id="google-gsi-button-container" style="display: flex; justify-content: center; margin-bottom: 10px;"></div>
+        <div id="google-gsi-button-container" style="display: flex; justify-content: center; margin-bottom: 10px;">
+        </div>
 
         <!-- Botón de Autenticación Rápida con Google OAuth -->
-        <button type="button" class="btn-google-oauth" id="fallback-google-btn" onclick="handleGoogleAuth()" style="padding: 13px 16px; font-size: 14px; font-weight: 800; width: 100%;">
+        <button type="button" class="btn-google-oauth" id="fallback-google-btn" onclick="handleGoogleAuth()"
+          style="padding: 13px 16px; font-size: 14px; font-weight: 800; width: 100%;">
           <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-            <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.5 12 2.5 6.8 2.5 2.5 6.8 2.5 12s4.3 9.5 9.5 9.5c5.5 0 9.1-3.9 9.1-9.3 0-.6-.1-1.1-.2-1.6H12z"/>
+            <path fill="#EA4335"
+              d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.5 12 2.5 6.8 2.5 2.5 6.8 2.5 12s4.3 9.5 9.5 9.5c5.5 0 9.1-3.9 9.1-9.3 0-.6-.1-1.1-.2-1.6H12z" />
           </svg>
           <span>Continuar con Google</span>
         </button>
 
         <div style="display: flex; align-items: center; gap: 10px; margin: 14px 0;">
           <hr style="flex: 1; border: none; border-top: 1px solid var(--border-color);" />
-          <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 700;">O CON TU CORREO ELECTRÓNICO</span>
+          <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 700;">O CON TU CORREO
+            ELECTRÓNICO</span>
           <hr style="flex: 1; border: none; border-top: 1px solid var(--border-color);" />
         </div>
       </div>
@@ -986,7 +1403,9 @@
         <div class="form-group" id="auth-password-group">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <label for="auth-password" id="auth-password-label" style="margin-bottom: 0;">Contraseña</label>
-            <button type="button" id="forgot-password-link-btn" class="link-inline-btn" onclick="switchAuthMode('forgot')" style="background: none; border: none; color: #c084fc; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: underline;">
+            <button type="button" id="forgot-password-link-btn" class="link-inline-btn"
+              onclick="switchAuthMode('forgot')"
+              style="background: none; border: none; color: #c084fc; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: underline;">
               ¿Olvidaste tu contraseña?
             </button>
           </div>
@@ -995,17 +1414,20 @@
 
         <div class="form-group" id="auth-password-confirm-group" style="display: none;">
           <label for="auth-password-confirm" id="auth-password-confirm-label">Confirmar Contraseña</label>
-          <input type="password" id="auth-password-confirm" placeholder="Repite tu contraseña" autocomplete="new-password" />
+          <input type="password" id="auth-password-confirm" placeholder="Repite tu contraseña"
+            autocomplete="new-password" />
         </div>
 
-        <div id="auth-feedback-box" class="auth-feedback-box" role="alert" aria-live="polite" style="display: none;"></div>
+        <div id="auth-feedback-box" class="auth-feedback-box" role="alert" aria-live="polite" style="display: none;">
+        </div>
 
         <button type="submit" class="btn-primary-full" id="auth-submit-btn" style="margin-top: 8px;">
           🔐 Iniciar Sesión en mi Cuenta
         </button>
 
         <div id="auth-back-to-login-row" style="display: none; text-align: center; margin-top: 10px;">
-          <button type="button" class="btn-secondary" style="width: 100%; font-size: 12.5px;" onclick="switchAuthMode('login')">
+          <button type="button" class="btn-secondary" style="width: 100%; font-size: 12.5px;"
+            onclick="switchAuthMode('login')">
             ⬅ Volver a Iniciar Sesión
           </button>
         </div>
@@ -1013,13 +1435,16 @@
 
       <!-- Acceso rápido a la bandeja de enlaces enviados (Verificación / Recuperación) -->
       <div id="auth-mailbox-shortcut" style="display: none; margin-top: 12px;">
-        <button type="button" class="btn-secondary" style="width: 100%; font-size: 12.5px; border-color: rgba(168, 85, 247, 0.5); color: #e9d5ff;" onclick="openMailboxModal()">
+        <button type="button" class="btn-secondary"
+          style="width: 100%; font-size: 12.5px; border-color: rgba(168, 85, 247, 0.5); color: #e9d5ff;"
+          onclick="openMailboxModal()">
           📬 Ver enlace enviado en Bandeja de Entrada
         </button>
       </div>
 
       <!-- Sello Obligatorio de Seguridad -->
-      <div style="margin-top: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.32); border-radius: 12px; padding: 10px 14px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <div
+        style="margin-top: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.32); border-radius: 12px; padding: 10px 14px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
         <span aria-hidden="true">🛡️</span>
         <span style="font-size: 12px; font-weight: 700; color: #6ee7b7;">
           Acceso 100% seguro y encriptado. Protección contra accesos no autorizados.
@@ -1029,13 +1454,16 @@
   </div>
 
   <!-- MODAL DE CONFIRMACIÓN DE CANCELACIÓN DE SUSCRIPCIÓN VIP -->
-  <div class="modal-overlay" id="cancel-subscription-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-sub-modal-title">
+  <div class="modal-overlay" id="cancel-subscription-modal" role="dialog" aria-modal="true"
+    aria-labelledby="cancel-sub-modal-title">
     <div class="modal-window mobile-friendly-modal" style="max-width: 480px;">
       <div class="modal-header">
         <div class="modal-badge-row">
-          <span class="modal-cat-badge" style="background: rgba(245, 158, 11, 0.18); color: #fde68a;">⚠️ Confirmar Cancelación de Suscripción</span>
+          <span class="modal-cat-badge" style="background: rgba(245, 158, 11, 0.18); color: #fde68a;">⚠️ Confirmar
+            Cancelación de Suscripción</span>
         </div>
-        <button class="modal-close" type="button" onclick="closeCancelSubscriptionModal()" aria-label="Cerrar ventana de cancelación">✕</button>
+        <button class="modal-close" type="button" onclick="closeCancelSubscriptionModal()"
+          aria-label="Cerrar ventana de cancelación">✕</button>
       </div>
 
       <h2 id="cancel-sub-modal-title">¿Deseas cancelar la renovación de tu Pase VIP?</h2>
@@ -1043,13 +1471,16 @@
         Si confirmas la cancelación, detendremos inmediatamente todos los cobros futuros en tu método de pago.
       </p>
 
-      <div id="cancel-sub-modal-details" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 14px; font-size: 13px; line-height: 1.55; margin-bottom: 18px;"></div>
+      <div id="cancel-sub-modal-details"
+        style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 14px; font-size: 13px; line-height: 1.55; margin-bottom: 18px;">
+      </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <button type="button" class="btn-primary-full" onclick="closeCancelSubscriptionModal()">
           👑 Mantener mi Suscripción VIP Activa
         </button>
-        <button type="button" class="btn-secondary" id="confirm-cancel-vip-btn" style="border-color: rgba(244, 63, 94, 0.45); color: #fda4af;" onclick="confirmCancelVipSubscription()">
+        <button type="button" class="btn-secondary" id="confirm-cancel-vip-btn"
+          style="border-color: rgba(244, 63, 94, 0.45); color: #fda4af;" onclick="confirmCancelVipSubscription()">
           Confirmar cancelación de próximas renovaciones
         </button>
       </div>
@@ -1061,16 +1492,19 @@
     <div class="modal-window mobile-friendly-modal" style="max-width: 540px;">
       <div class="modal-header">
         <div class="modal-badge-row">
-          <span class="modal-cat-badge" style="background: rgba(16, 185, 129, 0.18); color: #6ee7b7;">📄 Comprobante Oficial Verificado</span>
+          <span class="modal-cat-badge" style="background: rgba(16, 185, 129, 0.18); color: #6ee7b7;">📄 Comprobante
+            Oficial Verificado</span>
         </div>
-        <button class="modal-close" type="button" onclick="closeReceiptModal()" aria-label="Cerrar comprobante">✕</button>
+        <button class="modal-close" type="button" onclick="closeReceiptModal()"
+          aria-label="Cerrar comprobante">✕</button>
       </div>
 
       <h2 id="receipt-modal-title">Detalle de Operación y Comprobante</h2>
       <div id="receipt-modal-body" style="margin: 14px 0 18px;"></div>
 
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <button type="button" class="btn-secondary" style="flex: 1;" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+        <button type="button" class="btn-secondary" style="flex: 1;" onclick="window.print()">🖨️ Imprimir / Guardar
+          PDF</button>
         <button type="button" class="btn-primary-full" style="flex: 1;" onclick="closeReceiptModal()">Cerrar</button>
       </div>
     </div>
@@ -1083,15 +1517,18 @@
         <div class="modal-badge-row">
           <span class="modal-cat-badge">📬 Bandeja de Correos de Seguridad — SkillVault</span>
         </div>
-        <button class="modal-close" type="button" onclick="closeMailboxModal()" aria-label="Cerrar bandeja de correos">✕</button>
+        <button class="modal-close" type="button" onclick="closeMailboxModal()"
+          aria-label="Cerrar bandeja de correos">✕</button>
       </div>
 
       <h2 id="mailbox-modal-title">Correos Transaccionales Enviados</h2>
       <p class="modal-sponsor">
-        Aquí puedes abrir los enlaces seguros de <strong>verificación de correo</strong>, <strong>restablecimiento de contraseña</strong>, <strong>confirmaciones de cancelación VIP</strong> y notificaciones de soporte.
+        Aquí puedes abrir los enlaces seguros de <strong>verificación de correo</strong>, <strong>restablecimiento de
+          contraseña</strong>, <strong>confirmaciones de cancelación VIP</strong> y notificaciones de soporte.
       </p>
 
-      <div id="mailbox-messages-list" class="modal-body" style="max-height: 60vh; overflow-y: auto; margin-top: 12px;"></div>
+      <div id="mailbox-messages-list" class="modal-body" style="max-height: 60vh; overflow-y: auto; margin-top: 12px;">
+      </div>
 
       <div class="modal-footer">
         <button type="button" class="btn-primary-full" onclick="closeMailboxModal()">Cerrar Bandeja</button>
@@ -1104,9 +1541,11 @@
     <div class="modal-window mobile-friendly-modal" style="max-width: 540px;">
       <div class="modal-header">
         <div class="modal-badge-row">
-          <span class="modal-cat-badge" style="background: rgba(16, 185, 129, 0.16); color: #34d399;">🔒 Checkout Seguro SSL 256-Bit</span>
+          <span class="modal-cat-badge" style="background: rgba(16, 185, 129, 0.16); color: #34d399;">🔒 Checkout Seguro
+            SSL 256-Bit</span>
         </div>
-        <button class="modal-close" type="button" onclick="closeCheckoutModal()" aria-label="Cerrar ventana de pago">✕</button>
+        <button class="modal-close" type="button" onclick="closeCheckoutModal()"
+          aria-label="Cerrar ventana de pago">✕</button>
       </div>
 
       <h2 id="checkout-modal-title">Confirmación de Pedido</h2>
@@ -1132,7 +1571,8 @@
 
       <!-- Selector de Pasarela (PayPal / MercadoPago) -->
       <form id="checkout-payment-form" class="mobile-modal-form">
-        <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Elige tu pasarela de pago preferida:</label>
+        <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Elige tu pasarela de pago
+          preferida:</label>
         <div class="checkout-gateway-grid">
           <label class="gateway-pill active">
             <input type="radio" name="checkout-gateway" value="PayPal Express Checkout" checked />
@@ -1144,7 +1584,9 @@
           </label>
         </div>
 
-        <div id="checkout-gateway-live-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.28); border-radius: 12px; padding: 12px; font-size: 12.5px; color: var(--text-main);"></div>
+        <div id="checkout-gateway-live-box"
+          style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.28); border-radius: 12px; padding: 12px; font-size: 12.5px; color: var(--text-main);">
+        </div>
 
         <div class="form-group">
           <label for="checkout-cardholder">Tu Nombre o Correo de Cuenta</label>
@@ -1170,23 +1612,30 @@
         <div class="modal-badge-row">
           <span class="modal-cat-badge">📲 App para iPhone & Android</span>
         </div>
-        <button class="modal-close" type="button" onclick="closePwaInstallModal()" aria-label="Cerrar instrucciones de instalación">✕</button>
+        <button class="modal-close" type="button" onclick="closePwaInstallModal()"
+          aria-label="Cerrar instrucciones de instalación">✕</button>
       </div>
 
       <h2 id="pwa-modal-title">Instalar SkillVault en tu Celular</h2>
-      <p class="modal-sponsor">Sigue estos 2 pasos según tu teléfono para tener el ícono en tu pantalla de inicio a pantalla completa:</p>
+      <p class="modal-sponsor">Sigue estos 2 pasos según tu teléfono para tener el ícono en tu pantalla de inicio a
+        pantalla completa:</p>
 
       <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px;">
-        <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 14px; padding: 14px;">
-          <strong style="display: block; color: var(--text-main); font-size: 14px; margin-bottom: 6px;">🍎 En iPhone / iPad (Safari):</strong>
+        <div
+          style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 14px; padding: 14px;">
+          <strong style="display: block; color: var(--text-main); font-size: 14px; margin-bottom: 6px;">🍎 En iPhone /
+            iPad (Safari):</strong>
           <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0;">
-            1. Toca el botón <strong>Compartir</strong> (el cuadrado con la flecha hacia arriba <strong>⬆️</strong> en la barra inferior de Safari).<br />
+            1. Toca el botón <strong>Compartir</strong> (el cuadrado con la flecha hacia arriba <strong>⬆️</strong> en
+            la barra inferior de Safari).<br />
             2. Desliza hacia abajo y toca <strong>"Agregar a inicio" (➕)</strong> y luego <strong>Agregar</strong>.
           </p>
         </div>
 
-        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 14px;">
-          <strong style="display: block; color: var(--text-main); font-size: 14px; margin-bottom: 6px;">🤖 En Android (Chrome):</strong>
+        <div
+          style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 14px;">
+          <strong style="display: block; color: var(--text-main); font-size: 14px; margin-bottom: 6px;">🤖 En Android
+            (Chrome):</strong>
           <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0;">
             1. Toca los <strong>3 puntitos (⋮)</strong> arriba a la derecha en Chrome.<br />
             2. Selecciona <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla principal"</strong>.
@@ -1198,6 +1647,26 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261031c"></script>
+  <!-- MODAL DE CUESTIONARIO INICIAL: DESCUBRE TU CURSO IDEAL -->
+  <div class="modal-overlay" id="onboarding-quiz-modal" role="dialog" aria-modal="true"
+    aria-labelledby="onboarding-quiz-title">
+    <div class="modal-window mobile-friendly-modal onboarding-quiz-window" style="max-width: 660px;">
+      <div class="modal-header">
+        <div class="modal-badge-row">
+          <span class="modal-cat-badge" id="onboarding-quiz-badge"
+            style="background: #ffdad3; color: #b41f00; border: 1px solid rgba(180, 31, 0, 0.25);">
+            🧭 Diagnóstico Personalizado • 1 Minuto
+          </span>
+        </div>
+        <button class="modal-close" type="button" onclick="closeCourseQuizModal()"
+          aria-label="Cerrar cuestionario de recomendación">✕</button>
+      </div>
+
+      <div id="onboarding-quiz-container"></div>
+    </div>
+  </div>
+
+  <script src="app.js?v=20261101r"></script>
 </body>
+
 </html>
