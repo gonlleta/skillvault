@@ -6383,46 +6383,22 @@ function renderHeaderAndStats() {
     ? '👑 VIP Activo (+VP)'
     : 'Cuenta Estándar';
 
-  // Sincronizar estado de Autenticación en el Header, Sidebar, Student Strip y Barra Móvil
+  // Sincronizar estado de Autenticación en el Header y el botón de Perfil Móvil (.avatar-pro-pill)
   const currentUser = state.userAccount || null;
   const headerAuthBtn = document.getElementById('header-auth-btn');
   const mobileTopAuthBtn = document.getElementById('mobile-top-auth-btn');
-  const mobileLogoutIconBtn = document.getElementById('mobile-logout-icon-btn');
-  const sidebarAuthBtn = document.getElementById('sidebar-auth-btn');
-  const stripAuthBtn = document.getElementById('strip-auth-action-btn');
   const mobileAvatarBtn = document.querySelector('.avatar-pro-pill');
   const mobileAvatarTag = document.querySelector('.avatar-pro-tag');
 
   if (currentUser) {
     const shortName = currentUser.name.split(' ')[0];
     if (headerAuthBtn) {
-      headerAuthBtn.textContent = `🚪 Cerrar Sesión (${shortName})`;
-      headerAuthBtn.style.borderColor = 'rgba(240, 45, 0, 0.35)';
-      headerAuthBtn.style.color = '#b41f00';
-      headerAuthBtn.onclick = () => logoutUser();
+      headerAuthBtn.textContent = `👤 ${shortName} (Mi Perfil)`;
+      headerAuthBtn.onclick = () => switchAppTab('profile');
     }
     if (mobileTopAuthBtn) {
-      mobileTopAuthBtn.textContent = `🚪 Salir (${shortName})`;
-      mobileTopAuthBtn.onclick = () => logoutUser();
-    }
-    if (mobileLogoutIconBtn) {
-      mobileLogoutIconBtn.style.display = 'inline-flex';
-      mobileLogoutIconBtn.title = `Cerrar sesión de ${currentUser.name}`;
-      mobileLogoutIconBtn.onclick = () => logoutUser();
-    }
-    if (sidebarAuthBtn) {
-      sidebarAuthBtn.textContent = `🚪 Cerrar Sesión (${shortName})`;
-      sidebarAuthBtn.style.borderColor = 'rgba(240, 45, 0, 0.35)';
-      sidebarAuthBtn.style.color = '#b41f00';
-      sidebarAuthBtn.style.background = '#fff5f2';
-      sidebarAuthBtn.onclick = () => logoutUser();
-    }
-    if (stripAuthBtn) {
-      stripAuthBtn.textContent = '🚪 Cerrar Sesión';
-      stripAuthBtn.style.borderColor = 'rgba(240, 45, 0, 0.35)';
-      stripAuthBtn.style.color = '#b41f00';
-      stripAuthBtn.style.background = '#fff5f2';
-      stripAuthBtn.onclick = () => logoutUser();
+      mobileTopAuthBtn.textContent = `👤 ${shortName}`;
+      mobileTopAuthBtn.onclick = () => switchAppTab('profile');
     }
     if (mobileAvatarBtn) {
       mobileAvatarBtn.onclick = () => switchAppTab('profile');
@@ -6434,30 +6410,11 @@ function renderHeaderAndStats() {
   } else {
     if (headerAuthBtn) {
       headerAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
-      headerAuthBtn.style.borderColor = '';
-      headerAuthBtn.style.color = '';
       headerAuthBtn.onclick = () => openAuthModal('login');
     }
     if (mobileTopAuthBtn) {
       mobileTopAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
       mobileTopAuthBtn.onclick = () => openAuthModal('login');
-    }
-    if (mobileLogoutIconBtn) {
-      mobileLogoutIconBtn.style.display = 'none';
-    }
-    if (sidebarAuthBtn) {
-      sidebarAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
-      sidebarAuthBtn.style.borderColor = '';
-      sidebarAuthBtn.style.color = '';
-      sidebarAuthBtn.style.background = '';
-      sidebarAuthBtn.onclick = () => openAuthModal('login');
-    }
-    if (stripAuthBtn) {
-      stripAuthBtn.textContent = '🔐 Iniciar Sesión';
-      stripAuthBtn.style.borderColor = 'rgba(26, 28, 28, 0.16)';
-      stripAuthBtn.style.color = '#1a1c1c';
-      stripAuthBtn.style.background = '#ffffff';
-      stripAuthBtn.onclick = () => openAuthModal('login');
     }
     if (mobileAvatarBtn) {
       mobileAvatarBtn.onclick = () => openAuthModal('login');
@@ -6551,6 +6508,9 @@ function renderHeaderAndStats() {
   renderFeaturedSkill();
   renderRewardsVault();
   renderUnlockedItems();
+  if (typeof renderStudentProfileAndSettings === 'function') {
+    renderStudentProfileAndSettings();
+  }
   if (typeof renderHelpCenterAndSupport === 'function') {
     renderHelpCenterAndSupport();
   }
@@ -10352,6 +10312,13 @@ function renderStudentProfileAndSettings() {
           <span class="inst-stat-pill">👑 ${state.vipPoints} VP</span>
           <span class="inst-stat-pill">⚡ ${state.xp} XP</span>
         </div>
+        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #e4e2e4; display: flex; flex-wrap: wrap; gap: 10px;">
+          ${state.userAccount
+            ? `<button type="button" class="btn-secondary" style="flex: 1; min-width: 170px; padding: 11px 16px; font-size: 13.5px; font-weight: 800; color: #b41f00; border-color: rgba(240, 45, 0, 0.4); background: #fff5f2;" onclick="logoutUser()">🚪 Cerrar Sesión</button>
+               <button type="button" class="btn-secondary" style="flex: 1; min-width: 170px; padding: 11px 16px; font-size: 13px; font-weight: 700;" onclick="openMailboxModal()">📬 Bandeja de Notificaciones</button>`
+            : `<button type="button" class="btn-primary-full" style="width: 100%;" onclick="openAuthModal('login')">🔐 Iniciar Sesión / Registrarse</button>`
+          }
+        </div>
       </article>
     `;
   }
@@ -10807,6 +10774,9 @@ window.switchAppTab = function (tabName) {
   document.querySelectorAll('.tab-view').forEach(v => {
     v.classList.toggle('active', v.id === `view-${tabName}`);
   });
+  if (tabName === 'profile' || tabName === 'settings') {
+    renderStudentProfileAndSettings();
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -11868,6 +11838,9 @@ window.logoutUser = function () {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   renderHeaderAndStats();
   renderSkillsGrid();
+  if (typeof switchAppTab === 'function') {
+    switchAppTab('explore');
+  }
   showToast('👋 Sesión cerrada de forma segura. Tu progreso quedó guardado en tu cuenta.');
 };
 
