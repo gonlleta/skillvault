@@ -5724,10 +5724,19 @@ function updateMailboxCounterUI() {
   const visibleMails = currentEmail
     ? mailbox.filter(m => m.to === currentEmail)
     : mailbox;
+  const unreadMails = visibleMails.filter(m => !m.read);
+  const seenDefaultNotifs = sessionStorage.getItem('skillvault_notifs_seen') === '1';
+
   if (pill) pill.textContent = visibleMails.length;
   if (shortcut && visibleMails.length > 0) {
     shortcut.style.display = 'block';
   }
+
+  // Mostrar u ocultar el puntito rojo de notificaciones en móvil y escritorio
+  const showDot = unreadMails.length > 0 || !seenDefaultNotifs;
+  document.querySelectorAll('.notif-red-dot').forEach(dotEl => {
+    dotEl.style.display = showDot ? 'block' : 'none';
+  });
 }
 
 let state = loadState();
@@ -11013,9 +11022,15 @@ window.handleSimulatedEmailAction = function (url) {
 };
 
 window.openMailboxModal = function () {
-  const listEl = document.getElementById('mailbox-emails-list');
+  const listEl =
+    document.getElementById('mailbox-messages-list') ||
+    document.getElementById('mailbox-emails-list');
   const modal = document.getElementById('mailbox-modal');
   if (!listEl || !modal) return;
+
+  try {
+    sessionStorage.setItem('skillvault_notifs_seen', '1');
+  } catch (e) {}
 
   const emails = loadJsonDB(MAILBOX_DB_KEY, []);
   let mutated = false;
@@ -11027,51 +11042,138 @@ window.openMailboxModal = function () {
   });
   if (mutated) {
     saveJsonDB(MAILBOX_DB_KEY, emails);
-    updateMailboxCounterUI();
   }
+  updateMailboxCounterUI();
 
-  if (emails.length === 0) {
-    listEl.innerHTML = `
-      <div class="certificate-card" style="text-align:center;">
-        <h4>📭 No hay correos en la bandeja</h4>
-        <p style="font-size:13px; color:var(--text-muted); margin-top:6px;">
-          Cuando te registres, solicites recuperar tu contraseña, realices una compra o envíes un ticket de soporte, los correos transaccionales aparecerán aquí al instante.
-        </p>
+  // Construir tarjetas de notificaciones inteligentes de la cuenta + correos transaccionales
+  const savedQuiz = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
+  const recommendedSkill =
+    savedQuiz && savedQuiz.top1Id
+      ? getAllSkills().find(s => s.id === savedQuiz.top1Id)
+      : null;
+
+  const recentLedger = Array.isArray(state.pointsLedger) ? state.pointsLedger.slice(0, 3) : [];
+
+  const systemNotificationsHtml = `
+    ${recommendedSkill
+      ? `<div class="lesson-box" style="margin-bottom:0; padding:14px; border-left: 4px solid #F02D00 !important;">
+           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+             <span class="skill-cat-tag" style="background:#ffdad3 !important; color:#b41f00 !important;">🎯 RECOMENDACIÓN PERSONALIZADA (${savedQuiz.top1Match || 98}% MATCH)</span>
+             <span style="font-size:11.5px; color:var(--text-muted);">Diagnóstico activo</span>
+           </div>
+           <h4 style="font-size:15px; color:#1b1b1d !important; margin-bottom:6px;">Tu Curso Ideal: ${recommendedSkill.title}</h4>
+           <p style="font-size:13px; color:#5e3f39; line-height:1.5; margin-bottom:10px;">
+             ${savedQuiz.reasonSummary || 'Seleccionado especialmente según tus respuestas en el cuestionario inicial.'}
+           </p>
+           <div style="display:flex; gap:8px; flex-wrap:wrap;">
+             <button type="button" class="btn-primary-full" style="width:auto; padding:8px 14px; font-size:12.5px;" onclick="closeMailboxModal(); launchRecommendedCourseFromQuiz('${recommendedSkill.id}', 'start');">
+               🚀 Ir a mi Curso Ideal
+             </button>
+             <button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="closeMailboxModal(); openCourseQuizModal(true);">
+               🔄 Repetir Test
+             </button>
+           </div>
+         </div>`
+      : `<div class="lesson-box" style="margin-bottom:0; padding:14px; border-left: 4px solid #F02D00 !important;">
+           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+             <span class="skill-cat-tag" style="background:#ffdad3 !important; color:#b41f00 !important;">🧭 TEST DE ORIENTACIÓN (+25 PTS)</span>
+             <span style="font-size:11.5px; color:var(--text-muted);">Nuevo</span>
+           </div>
+           <h4 style="font-size:15px; color:#1b1b1d !important; margin-bottom:6px;">¿Aún no descubriste cuál es tu Curso Ideal?</h4>
+           <p style="font-size:13px; color:#5e3f39; line-height:1.5; margin-bottom:10px;">
+             Responde 4 preguntas rápidas para que te recomendemos tu ruta de estudio ideal y recibe <strong>+25 PTS gratis</strong>.
+           </p>
+           <button type="button" class="btn-primary-full" style="width:auto; padding:8px 14px; font-size:12.5px;" onclick="closeMailboxModal(); openCourseQuizModal(true);">
+             🎯 Hacer el Test de 1 Minuto (+25 PTS)
+           </button>
+         </div>`
+    }
+
+    <div class="lesson-box" style="margin-bottom:0; padding:14px; border-left: 4px solid #007D8A !important;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+        <span class="skill-cat-tag" style="background:#e0f2fe !important; color:#006874 !important;">💎 ESTADO DE TU BILLETERA GAMIFICADA</span>
+        <span style="font-size:11.5px; color:var(--text-muted);">Saldo en vivo</span>
       </div>
-    `;
-  } else {
-    listEl.innerHTML = emails
-      .map(em => {
-        const dt = new Date(em.createdAt).toLocaleString('es-ES', {
-          day: '2-digit',
-          month: 'short',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-        return `
-          <div class="lesson-box" style="margin-bottom:0; padding:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
-              <span class="skill-cat-tag">${em.category || 'NOTIFICACIÓN'}</span>
-              <span style="font-size:11.5px; color:var(--text-muted);">${dt} • Para: <strong>${em.to}</strong></span>
-            </div>
-            <h4 style="font-size:15px; color:#fff; margin-bottom:8px;">${em.subject}</h4>
-            <div style="font-size:13px; color:var(--text-main); line-height:1.55;">
-              ${em.bodyHtml}
-            </div>
-            ${em.ctaUrl && em.ctaLabel
-              ? `<div style="margin-top:12px;">
-                   <button type="button" class="btn-primary-full" style="width:auto; padding:8px 16px; font-size:12.5px;" onclick="handleSimulatedEmailAction('${em.ctaUrl}')">
-                     ${em.ctaLabel}
-                   </button>
-                 </div>`
-              : ''
-            }
-          </div>
-        `;
-      })
-      .join('');
-  }
+      <h4 style="font-size:15px; color:#1b1b1d !important; margin-bottom:6px;">Tienes ${state.points} PTS y 👑 ${state.vipPoints} VP disponibles</h4>
+      <p style="font-size:13px; color:#5e3f39; line-height:1.5; margin-bottom:10px;">
+        ${state.freeTrialBonusClaimed
+          ? 'Ya reclamaste tu bono de bienvenida de +50 PTS. Completa los módulos prácticos de tus cursos para seguir sumando puntos.'
+          : '¡Tienes disponible tu primera misión interactiva de Python con un bono gratuito de +50 PTS y +50 XP!'
+        }
+      </p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        ${!state.freeTrialBonusClaimed
+          ? `<button type="button" class="btn-primary-full" style="width:auto; padding:8px 14px; font-size:12.5px;" onclick="closeMailboxModal(); startFreeTrialModule();">
+               🎁 Reclamar +50 PTS en Misión 1
+             </button>`
+          : `<button type="button" class="btn-secondary" style="padding:8px 12px; font-size:12px;" onclick="closeMailboxModal(); switchAppTab('rewards');">
+               🎁 Ir a la Bóveda de Recompensas
+             </button>`
+        }
+      </div>
+    </div>
 
+    ${recentLedger.length > 0
+      ? `<div class="lesson-box" style="margin-bottom:0; padding:14px;">
+           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+             <span class="skill-cat-tag">⚡ ÚLTIMOS MOVIMIENTOS DE PUNTOS</span>
+             <span style="font-size:11.5px; color:var(--text-muted);">${recentLedger.length} recientes</span>
+           </div>
+           <div style="display:flex; flex-direction:column; gap:6px;">
+             ${recentLedger.map(tx => `
+               <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; padding:6px 8px; background:#f6f3f5; border-radius:8px;">
+                 <span style="color:#1b1b1d; font-weight:600;">${tx.reason}</span>
+                 <strong style="color:${(tx.deltaPTS || 0) >= 0 ? '#007D8A' : '#dc2626'}; white-space:nowrap; margin-left:8px;">
+                   ${(tx.deltaPTS || 0) >= 0 ? '+' : ''}${tx.deltaPTS || 0} PTS
+                 </strong>
+               </div>
+             `).join('')}
+           </div>
+         </div>`
+      : ''
+    }
+  `;
+
+  const emailsHtml =
+    emails.length === 0
+      ? `<div class="certificate-card" style="text-align:center; padding:14px;">
+           <h4 style="color:#1b1b1d; font-size:14.5px;">📬 Bandeja de Correos Oficiales al día</h4>
+           <p style="font-size:12.5px; color:var(--text-muted); margin-top:4px;">
+             Cuando te registres, verifiques tu cuenta, realices una compra o envíes una consulta a soporte, recibirás copia oficial aquí mismo.
+           </p>
+         </div>`
+      : emails
+          .map(em => {
+            const dt = new Date(em.createdAt).toLocaleString('es-ES', {
+              day: '2-digit',
+              month: 'short',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            return `
+              <div class="lesson-box" style="margin-bottom:0; padding:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                  <span class="skill-cat-tag">${em.category || 'NOTIFICACIÓN'}</span>
+                  <span style="font-size:11.5px; color:var(--text-muted);">${dt} • Para: <strong>${em.to}</strong></span>
+                </div>
+                <h4 style="font-size:15px; color:#1b1b1d !important; margin-bottom:8px;">${em.subject}</h4>
+                <div style="font-size:13px; color:var(--text-main); line-height:1.55;">
+                  ${em.bodyHtml}
+                </div>
+                ${em.ctaUrl && em.ctaLabel
+                  ? `<div style="margin-top:12px;">
+                       <button type="button" class="btn-primary-full" style="width:auto; padding:8px 16px; font-size:12.5px;" onclick="handleSimulatedEmailAction('${em.ctaUrl}')">
+                         ${em.ctaLabel}
+                       </button>
+                     </div>`
+                  : ''
+                }
+              </div>
+            `;
+          })
+          .join('');
+
+  listEl.innerHTML = systemNotificationsHtml + emailsHtml;
   modal.classList.add('open');
 };
 
