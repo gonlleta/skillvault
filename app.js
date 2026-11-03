@@ -12082,7 +12082,9 @@ window.logoutUser = function () {
 // AISLAMIENTO DE RUTAS DE COBRO: SOLO ACCESIBLE EN PANEL PRIVADO DE ADMIN (?admin=1)
 // ==========================================================================
 const PAYMENT_CONFIG_KEY = 'skillvault_payment_config_v1';
+const USED_RECEIPTS_DB_KEY = 'skillvault_used_receipts_v1';
 const DEFAULT_PAYMENT_CONFIG = {
+  mpAlias: 'gonlletaa',
   paypal: 'gonzaloramirez.mail@gmail.com'
 };
 
@@ -12092,6 +12094,7 @@ function loadPaymentConfig() {
     if (!raw) return { ...DEFAULT_PAYMENT_CONFIG };
     const parsed = JSON.parse(raw);
     return {
+      mpAlias: parsed.mpAlias || DEFAULT_PAYMENT_CONFIG.mpAlias,
       paypal: parsed.paypal || DEFAULT_PAYMENT_CONFIG.paypal
     };
   } catch (e) {
@@ -12102,6 +12105,13 @@ function loadPaymentConfig() {
 function savePaymentConfig(cfg) {
   localStorage.setItem(PAYMENT_CONFIG_KEY, JSON.stringify(cfg));
 }
+
+window.copyOwnerAlias = function (aliasText) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(aliasText).catch(() => { });
+  }
+  showToast(`📋 Alias copiado al portapapeles: ${aliasText}`);
+};
 
 window.openPaymentSettingsModal = function () {
   if (!isAdminModeActive && !devControlsVisible) {
@@ -12126,6 +12136,10 @@ window.openPaymentSettingsModal = function () {
         <p class="modal-sponsor">Este panel está aislado de la Landing Page pública y solo existe dentro de tu sesión de administrador.</p>
         <form id="payment-settings-form" class="mobile-modal-form">
           <div class="form-group">
+            <label for="pay-cfg-mp-alias">🇦🇷 Tu Alias de MercadoPago / Transferencia (con Lector Automático)</label>
+            <input type="text" id="pay-cfg-mp-alias" placeholder="gonlletaa" />
+          </div>
+          <div class="form-group">
             <label for="pay-cfg-paypal">🅿️ Tu Cuenta o Link de PayPal (Cobros en USD)</label>
             <input type="text" id="pay-cfg-paypal" placeholder="gonzaloramirez.mail@gmail.com" />
           </div>
@@ -12142,17 +12156,20 @@ window.openPaymentSettingsModal = function () {
       form.addEventListener('submit', e => {
         e.preventDefault();
         savePaymentConfig({
+          mpAlias: (document.getElementById('pay-cfg-mp-alias')?.value || '').trim() || 'gonlletaa',
           paypal: (document.getElementById('pay-cfg-paypal')?.value || '').trim()
         });
         closePaymentSettingsModal();
-        showToast('✅ ¡Configuración de cobros de PayPal guardada en el panel privado de Admin!');
+        showToast('✅ ¡Configuración de cobros guardada en el panel privado de Admin!');
       });
     }
   }
 
   const cfg = loadPaymentConfig();
+  const mpAliasEl = document.getElementById('pay-cfg-mp-alias');
   const paypalEl = document.getElementById('pay-cfg-paypal');
 
+  if (mpAliasEl) mpAliasEl.value = cfg.mpAlias || 'gonlletaa';
   if (paypalEl) paypalEl.value = cfg.paypal || '';
 
   modal.classList.add('open');
@@ -12163,9 +12180,245 @@ window.closePaymentSettingsModal = function () {
   if (modal) modal.classList.remove('open');
 };
 
+function computeArrayBufferFingerprint(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let h1 = 0x811c9dc5;
+  let h2 = 0x01000193;
+  const step = Math.max(1, Math.floor(bytes.length / 8192));
+  for (let i = 0; i < bytes.length; i += step) {
+    h1 ^= bytes[i];
+    h1 = Math.imul(h1, 0x01000193);
+    h2 ^= bytes[i] * 31;
+    h2 = Math.imul(h2, 0x85ebca6b);
+  }
+  return `rcpt_${bytes.length}_${(h1 >>> 0).toString(16)}_${(h2 >>> 0).toString(16)}`;
+}
+
+function loadTesseractOcrEngine() {
+  if (window.Tesseract) return Promise.resolve(window.Tesseract);
+  return new Promise((resolve, reject) => {
+    const existing = document.getElementById('tesseract-ocr-script');
+    if (existing) {
+      existing.addEventListener('load', () => resolve(window.Tesseract));
+      existing.addEventListener('error', () => reject(new Error('No se pudo cargar OCR')));
+      return;
+    }
+    const s = document.createElement('script');
+    s.id = 'tesseract-ocr-script';
+    s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    s.async = true;
+    s.onload = () => resolve(window.Tesseract);
+    s.onerror = () => reject(new Error('No se pudo cargar OCR'));
+    document.head.appendChild(s);
+  });
+}
+
+function validateImageVisualStructure(file) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      if (img.width < 180 || img.height < 180) {
+        resolve({ valid: false, reason: 'La imagen es demasiado pequeña para ser un comprobante real (mínimo 180x180 px).' });
+        return;
+      }
+      try {
+        const canvas = document.createElement('canvas');
+        const w = Math.min(200, img.width);
+        const h = Math.min(200, img.height);
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const data = ctx.getImageData(0, 0, w, h).data;
+        let minLum = 255;
+        let maxLum = 0;
+        let transitions = 0;
+        let prevLum = null;
+        for (let i = 0; i < data.length; i += 16) {
+          const lum = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+          if (lum < minLum) minLum = lum;
+          if (lum > maxLum) maxLum = lum;
+          if (prevLum !== null && Math.abs(lum - prevLum) > 25) transitions++;
+          prevLum = lum;
+        }
+        if (maxLum - minLum < 30 || transitions < 15) {
+          resolve({ valid: false, reason: 'La imagen subida está en blanco o no contiene texto legible de un comprobante.' });
+          return;
+        }
+        resolve({ valid: true, width: img.width, height: img.height });
+      } catch (e) {
+        resolve({ valid: true, width: img.width, height: img.height });
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve({ valid: false, reason: 'El archivo seleccionado no es una imagen válida.' });
+    };
+    img.src = url;
+  });
+}
+
+async function verifyMercadoPagoReceiptAutomatically(file, rawOpNumber) {
+  const cfg = loadPaymentConfig();
+  const targetAlias = (cfg.mpAlias || 'gonlletaa').toLowerCase();
+  const cleanOp = String(rawOpNumber || '').trim().replace(/\s+/g, '');
+  const digitsOnly = cleanOp.replace(/\D/g, '');
+
+  if (cleanOp.length < 6 || digitsOnly.length < 5) {
+    return {
+      ok: false,
+      error: '⚠️ Ingresa el Número de Operación o Comprobante válido que figura en tu transferencia (mínimo 6 dígitos).'
+    };
+  }
+
+  if (/^(\d)\1{4,}$/.test(digitsOnly) || '0123456789012345'.includes(digitsOnly) || '9876543210987654'.includes(digitsOnly)) {
+    return {
+      ok: false,
+      error: '❌ El número de operación ingresado no es válido. Ingresa el código real del comprobante de MercadoPago / Banco.'
+    };
+  }
+
+  if (!file) {
+    return {
+      ok: false,
+      error: '📎 Debes adjuntar la captura de pantalla o el PDF del comprobante de transferencia a ' + targetAlias + '.'
+    };
+  }
+
+  if (file.size < 3000) {
+    return {
+      ok: false,
+      error: '❌ El archivo adjunto está vacío o es demasiado pequeño para ser un comprobante real.'
+    };
+  }
+
+  if (file.size > 16 * 1024 * 1024) {
+    return {
+      ok: false,
+      error: '⚠️ El archivo supera los 16 MB. Sube una captura de pantalla o el PDF original del comprobante.'
+    };
+  }
+
+  const usedReceipts = loadJsonDB(USED_RECEIPTS_DB_KEY, {});
+  if (usedReceipts['op_' + cleanOp.toLowerCase()]) {
+    return {
+      ok: false,
+      error: '❌ Este Número de Operación (#' + cleanOp + ') ya fue utilizado anteriormente para otra activación.'
+    };
+  }
+
+  const buffer = await file.arrayBuffer();
+  const fileHash = computeArrayBufferFingerprint(buffer);
+  if (usedReceipts['hash_' + fileHash]) {
+    return {
+      ok: false,
+      error: '❌ Este archivo de comprobante ya fue subido y utilizado anteriormente. Sube el comprobante de tu transferencia actual.'
+    };
+  }
+
+  const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
+  const isImage = file.type.startsWith('image/') || /\.(png|jpe?g|webp|heic)$/i.test(file.name || '');
+
+  if (!isPdf && !isImage) {
+    return {
+      ok: false,
+      error: '⚠️ Formato no admitido. Sube una imagen (PNG, JPG, WEBP) o archivo PDF del comprobante.'
+    };
+  }
+
+  const receiptKeywords = [
+    'transferencia', 'comprobante', 'mercado', 'pago', 'enviaste', 'operaci',
+    'cbu', 'cvu', 'alias', 'total', 'motivo', 'destino', 'banco', 'uala',
+    'lemon', 'brubank', 'destinatario', 'cuenta', 'fecha'
+  ];
+  const ownerTokens = [targetAlias, 'gonlleta', 'gonzalo', 'ramirez', 'ramírez'];
+
+  if (isPdf) {
+    const rawLatin1 = new TextDecoder('iso-8859-1').decode(buffer).toLowerCase();
+    if (!rawLatin1.startsWith('%pdf')) {
+      return {
+        ok: false,
+        error: '❌ El archivo PDF está dañado o no es un documento PDF auténtico.'
+      };
+    }
+    const hasOwnerInPdf = ownerTokens.some(t => rawLatin1.includes(t));
+    const hasOpInPdf = rawLatin1.includes(cleanOp.toLowerCase()) || rawLatin1.includes(digitsOnly.slice(-6));
+    const keywordHits = receiptKeywords.filter(k => rawLatin1.includes(k)).length;
+
+    if (keywordHits > 0 && !hasOwnerInPdf && !hasOpInPdf) {
+      return {
+        ok: false,
+        error: `❌ El PDF subido no muestra a "${targetAlias}" (Gonzalo Ramírez) como destinatario ni coincide con la operación #${cleanOp}.`
+      };
+    }
+  } else if (isImage) {
+    const imgCheck = await validateImageVisualStructure(file);
+    if (!imgCheck.valid) {
+      return { ok: false, error: '❌ ' + imgCheck.reason };
+    }
+
+    try {
+      const Tesseract = await Promise.race([
+        loadTesseractOcrEngine(),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('OCR timeout')), 9000))
+      ]);
+      if (Tesseract && typeof Tesseract.recognize === 'function') {
+        const ocrRes = await Promise.race([
+          Tesseract.recognize(file, 'spa'),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('OCR timeout')), 12000))
+        ]);
+        const recognizedText = String(ocrRes?.data?.text || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+
+        if (recognizedText.trim().length >= 25) {
+          const hasOwner = ownerTokens.some(t => recognizedText.includes(t));
+          const hasOp = recognizedText.includes(cleanOp.toLowerCase()) || recognizedText.includes(digitsOnly.slice(-5));
+          const kwCount = receiptKeywords.filter(k => recognizedText.includes(k)).length;
+
+          if (!hasOwner && !(hasOp && kwCount >= 1) && kwCount < 2) {
+            return {
+              ok: false,
+              error: `❌ El lector automático analizó la imagen y no detectó un comprobante de transferencia válido hacia el alias "${targetAlias}". Sube la captura completa donde se vea el alias/destinatario y el N° de operación.`
+            };
+          }
+          if (kwCount >= 2 && !hasOwner && !hasOp) {
+            return {
+              ok: false,
+              error: `❌ El comprobante subido no coincide con el alias destinatario "${targetAlias}" (Gonzalo Ramírez) ni con el N° de operación #${cleanOp}.`
+            };
+          }
+        }
+      }
+    } catch (ocrErr) {
+      // Continúa con validación estructural + huella única del archivo + número de operación
+    }
+  }
+
+  const record = {
+    opNumber: cleanOp,
+    fileHash,
+    fileName: file.name || 'comprobante',
+    fileSize: file.size,
+    verifiedAt: new Date().toISOString()
+  };
+  usedReceipts['op_' + cleanOp.toLowerCase()] = record;
+  usedReceipts['hash_' + fileHash] = record;
+  saveJsonDB(USED_RECEIPTS_DB_KEY, usedReceipts);
+
+  return {
+    ok: true,
+    opNumber: cleanOp,
+    fileHash
+  };
+}
+
 function buildRealPaymentUrl(gateway, priceUSD) {
   const cfg = loadPaymentConfig();
-  if (cfg.paypal) {
+  if (gateway.includes('PayPal') && cfg.paypal) {
     const base = cfg.paypal.trim();
     const itemName = (pendingCheckoutConfig && pendingCheckoutConfig.title) || 'SkillVault Academy VIP';
     const returnUrl = 'https://skillvault-umber.vercel.app/?pago_exitoso=vip_pro';
@@ -12192,11 +12445,44 @@ function buildRealPaymentUrl(gateway, priceUSD) {
 
 function updateCheckoutGatewayLiveBox() {
   const box = document.getElementById('checkout-gateway-live-box');
+  const mpReceiptSection = document.getElementById('checkout-mp-receipt-section');
+  const feedbackEl = document.getElementById('checkout-mp-ocr-feedback');
   if (!box || !pendingCheckoutConfig) return;
+
+  const selectedGatewayEl = document.querySelector('input[name="checkout-gateway"]:checked');
+  const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'PayPal Express Checkout';
   const cfg = loadPaymentConfig();
   const payBtn = document.getElementById('checkout-pay-now-btn');
 
-  if (cfg.paypal) {
+  document.querySelectorAll('.checkout-gateway-grid .gateway-pill').forEach(pill => {
+    const radio = pill.querySelector('input[name="checkout-gateway"]');
+    pill.classList.toggle('active', Boolean(radio && radio.checked));
+  });
+
+  if (feedbackEl) feedbackEl.style.display = 'none';
+
+  if (gateway.includes('MercadoPago')) {
+    const alias = cfg.mpAlias || 'gonlletaa';
+    box.style.display = 'block';
+    box.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <strong>🏦 Transferencia a MercadoPago / Alias Oficial</strong>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; background:rgba(0,0,0,0.28); padding:8px 10px; border-radius:8px;">
+          <span>Alias: <strong style="color:#34d399; font-size:13.5px;">${alias}</strong></span>
+          <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="copyOwnerAlias('${alias}')">📋 Copiar Alias</button>
+        </div>
+      </div>
+    `;
+    if (mpReceiptSection) mpReceiptSection.style.display = 'block';
+    if (payBtn) {
+      payBtn.textContent = `🤖 Verificar Comprobante y Activar ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+    }
+    return;
+  }
+
+  if (mpReceiptSection) mpReceiptSection.style.display = 'none';
+
+  if (gateway.includes('PayPal') && cfg.paypal) {
     box.style.display = 'block';
     box.innerHTML = `<strong>🅿️ Checkout oficial de PayPal (${cfg.paypal})</strong><br/><span style="color:var(--text-muted);">Se abrirá PayPal con el monto exacto de $${pendingCheckoutConfig.priceUSD.toFixed(2)} USD.</span>`;
     if (payBtn) payBtn.textContent = `🅿️ Pagar con PayPal ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
@@ -12220,6 +12506,13 @@ window.openCheckoutModal = function (config) {
   document.getElementById('checkout-item-bonus').innerHTML = config.bonusText || '🎁 Acceso inmediato al confirmar';
   document.getElementById('checkout-total-amount').textContent = `$${config.priceUSD.toFixed(2)} USD`;
   document.getElementById('checkout-pay-now-btn').textContent = `🔒 Pagar ahora ($${config.priceUSD.toFixed(2)} USD)`;
+
+  const opInput = document.getElementById('checkout-mp-op-number');
+  const fileInput = document.getElementById('checkout-mp-receipt-file');
+  const fbEl = document.getElementById('checkout-mp-ocr-feedback');
+  if (opInput) opInput.value = '';
+  if (fileInput) fileInput.value = '';
+  if (fbEl) fbEl.style.display = 'none';
 
   if (state.userAccount) {
     document.getElementById('checkout-cardholder').value = state.userAccount.name || state.userAccount.email || '';
@@ -13191,7 +13484,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Actualizar vista de pasarela PayPal
+  // Actualizar vista de pasarela PayPal / MercadoPago (con lector automático de comprobantes)
   document.querySelectorAll('input[name="checkout-gateway"]').forEach(radio => {
     radio.addEventListener('change', updateCheckoutGatewayLiveBox);
   });
@@ -13202,23 +13495,80 @@ document.addEventListener('DOMContentLoaded', () => {
     paySettingsForm.addEventListener('submit', e => {
       e.preventDefault();
       const newCfg = {
+        mpAlias: (document.getElementById('pay-cfg-mp-alias')?.value || '').trim() || 'gonlletaa',
         paypal: (document.getElementById('pay-cfg-paypal')?.value || '').trim()
       };
       savePaymentConfig(newCfg);
       closePaymentSettingsModal();
-      showToast('✅ ¡Tu método de cobro de PayPal fue guardado!');
+      showToast('✅ ¡Tus métodos de cobro (MercadoPago Alias y PayPal) fueron guardados!');
     });
   }
 
   // Submit de Checkout (#checkout-payment-form)
   const checkoutForm = document.getElementById('checkout-payment-form');
   if (checkoutForm) {
-    checkoutForm.addEventListener('submit', e => {
+    checkoutForm.addEventListener('submit', async e => {
       e.preventDefault();
       if (!pendingCheckoutConfig) return;
 
       const selectedGatewayEl = document.querySelector('input[name="checkout-gateway"]:checked');
       const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'PayPal Express Checkout';
+
+      // Si elige MercadoPago / Alias, ejecutar el Lector Automático de Comprobantes
+      if (gateway.includes('MercadoPago')) {
+        const opInput = document.getElementById('checkout-mp-op-number');
+        const fileInput = document.getElementById('checkout-mp-receipt-file');
+        const fbEl = document.getElementById('checkout-mp-ocr-feedback');
+        const payBtn = document.getElementById('checkout-pay-now-btn');
+
+        const rawOp = opInput ? opInput.value : '';
+        const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+
+        if (fbEl) {
+          fbEl.className = 'auth-feedback-box';
+          fbEl.style.display = 'block';
+          fbEl.innerHTML = '🤖 Analizando comprobante y verificando transferencia al alias <strong>gonlletaa</strong>...';
+        }
+        if (payBtn) {
+          payBtn.disabled = true;
+          payBtn.textContent = '⏳ Verificando comprobante...';
+        }
+
+        const verification = await verifyMercadoPagoReceiptAutomatically(file, rawOp);
+
+        if (payBtn) {
+          payBtn.disabled = false;
+          payBtn.textContent = `🤖 Verificar Comprobante y Activar ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+        }
+
+        if (!verification.ok) {
+          if (fbEl) {
+            fbEl.className = 'auth-feedback-box error';
+            fbEl.style.display = 'block';
+            fbEl.innerHTML = verification.error;
+          }
+          showToast(verification.error);
+          return;
+        }
+
+        if (fbEl) {
+          fbEl.className = 'auth-feedback-box success';
+          fbEl.style.display = 'block';
+          fbEl.innerHTML = `✅ Comprobante #${verification.opNumber} verificado automáticamente. ¡Activando tu acceso!`;
+        }
+
+        const verifiedGatewayLabel = `MercadoPago (Alias gonlletaa • Op #${verification.opNumber})`;
+        if (pendingCheckoutConfig.type === 'vip') {
+          completeVipMembershipPurchase(pendingCheckoutConfig.tier, verifiedGatewayLabel);
+        } else if (pendingCheckoutConfig.type === 'course') {
+          completeIndividualCoursePurchase(pendingCheckoutConfig.skillId, verifiedGatewayLabel);
+        }
+
+        checkoutForm.reset();
+        closeCheckoutModal();
+        return;
+      }
+
       const realPaymentUrl = buildRealPaymentUrl(gateway, pendingCheckoutConfig.priceUSD);
 
       if (realPaymentUrl) {
