@@ -8339,7 +8339,7 @@ function getDefaultMobileCategory() {
         return topSkill.category;
       }
     }
-  } catch (e) {}
+  } catch (e) { }
   return 'Programación';
 }
 
