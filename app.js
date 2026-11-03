@@ -10952,7 +10952,7 @@ const FOOTER_INFO_CONTENT = {
       <div class="lesson-box">
         <h4>Tu privacidad y seguridad son nuestra prioridad</h4>
         <p style="color:var(--text-muted); margin-bottom:12px;">• <strong>Encriptación SSL de 256 bits:</strong> Toda la comunicación entre tu navegador y SkillVault viaja cifrada bajo estándares bancarios.</p>
-        <p style="color:var(--text-muted); margin-bottom:12px;">• <strong>Procesamiento Seguro (PayPal y MercadoPago):</strong> SkillVault nunca almacena los datos completos de tus tarjetas de crédito; los pagos son procesados directamente por pasarelas certificadas PCI-DSS Nivel 1.</p>
+        <p style="color:var(--text-muted); margin-bottom:12px;">• <strong>Procesamiento Seguro (PayPal Checkout):</strong> SkillVault nunca almacena los datos completos de tus tarjetas de crédito; los pagos son procesados directamente por pasarelas certificadas PCI-DSS Nivel 1.</p>
         <p style="color:var(--text-muted);">• <strong>Cero Spam:</strong> Tus datos de progreso académico y correo jamás se venden ni comparten con terceros.</p>
       </div>
     `
@@ -12083,8 +12083,6 @@ window.logoutUser = function () {
 // ==========================================================================
 const PAYMENT_CONFIG_KEY = 'skillvault_payment_config_v1';
 const DEFAULT_PAYMENT_CONFIG = {
-  mpLink: '',
-  mpAlias: 'gonlletaa',
   paypal: 'gonzaloramirez.mail@gmail.com'
 };
 
@@ -12094,8 +12092,6 @@ function loadPaymentConfig() {
     if (!raw) return { ...DEFAULT_PAYMENT_CONFIG };
     const parsed = JSON.parse(raw);
     return {
-      mpLink: parsed.mpLink || DEFAULT_PAYMENT_CONFIG.mpLink,
-      mpAlias: parsed.mpAlias || DEFAULT_PAYMENT_CONFIG.mpAlias,
       paypal: parsed.paypal || DEFAULT_PAYMENT_CONFIG.paypal
     };
   } catch (e) {
@@ -12130,14 +12126,6 @@ window.openPaymentSettingsModal = function () {
         <p class="modal-sponsor">Este panel está aislado de la Landing Page pública y solo existe dentro de tu sesión de administrador.</p>
         <form id="payment-settings-form" class="mobile-modal-form">
           <div class="form-group">
-            <label for="pay-cfg-mp-link">🏦 Link de Pago de MercadoPago (Opcional)</label>
-            <input type="url" id="pay-cfg-mp-link" placeholder="Ej: https://mpago.la/..." />
-          </div>
-          <div class="form-group">
-            <label for="pay-cfg-mp-alias">🇦🇷 Tu Alias o CVU de MercadoPago / Banco</label>
-            <input type="text" id="pay-cfg-mp-alias" placeholder="gonlletaa" />
-          </div>
-          <div class="form-group">
             <label for="pay-cfg-paypal">🅿️ Tu Cuenta o Link de PayPal (Cobros en USD)</label>
             <input type="text" id="pay-cfg-paypal" placeholder="gonzaloramirez.mail@gmail.com" />
           </div>
@@ -12154,23 +12142,17 @@ window.openPaymentSettingsModal = function () {
       form.addEventListener('submit', e => {
         e.preventDefault();
         savePaymentConfig({
-          mpLink: (document.getElementById('pay-cfg-mp-link')?.value || '').trim(),
-          mpAlias: (document.getElementById('pay-cfg-mp-alias')?.value || '').trim(),
           paypal: (document.getElementById('pay-cfg-paypal')?.value || '').trim()
         });
         closePaymentSettingsModal();
-        showToast('✅ ¡Configuración de cobros (PayPal y MercadoPago) guardada en el panel privado de Admin!');
+        showToast('✅ ¡Configuración de cobros de PayPal guardada en el panel privado de Admin!');
       });
     }
   }
 
   const cfg = loadPaymentConfig();
-  const mpLinkEl = document.getElementById('pay-cfg-mp-link');
-  const mpAliasEl = document.getElementById('pay-cfg-mp-alias');
   const paypalEl = document.getElementById('pay-cfg-paypal');
 
-  if (mpLinkEl) mpLinkEl.value = cfg.mpLink || '';
-  if (mpAliasEl) mpAliasEl.value = cfg.mpAlias || '';
   if (paypalEl) paypalEl.value = cfg.paypal || '';
 
   modal.classList.add('open');
@@ -12181,19 +12163,9 @@ window.closePaymentSettingsModal = function () {
   if (modal) modal.classList.remove('open');
 };
 
-window.copyOwnerAlias = function (aliasText) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(aliasText).catch(() => { });
-  }
-  showToast(`📋 Alias copiado: ${aliasText}`);
-};
-
 function buildRealPaymentUrl(gateway, priceUSD) {
   const cfg = loadPaymentConfig();
-  if (gateway.includes('MercadoPago') && cfg.mpLink) {
-    return cfg.mpLink;
-  }
-  if (gateway.includes('PayPal') && cfg.paypal) {
+  if (cfg.paypal) {
     const base = cfg.paypal.trim();
     const itemName = (pendingCheckoutConfig && pendingCheckoutConfig.title) || 'SkillVault Academy VIP';
     const returnUrl = 'https://skillvault-umber.vercel.app/?pago_exitoso=vip_pro';
@@ -12221,35 +12193,10 @@ function buildRealPaymentUrl(gateway, priceUSD) {
 function updateCheckoutGatewayLiveBox() {
   const box = document.getElementById('checkout-gateway-live-box');
   if (!box || !pendingCheckoutConfig) return;
-  const selectedGatewayEl = document.querySelector('input[name="checkout-gateway"]:checked');
-  const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'PayPal Express Checkout';
   const cfg = loadPaymentConfig();
   const payBtn = document.getElementById('checkout-pay-now-btn');
 
-  if (gateway.includes('MercadoPago')) {
-    if (cfg.mpLink || cfg.mpAlias) {
-      box.style.display = 'block';
-      box.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:6px;">
-          <strong>🏦 Pago directo por MercadoPago</strong>
-          ${cfg.mpAlias
-          ? `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; background:rgba(0,0,0,0.25); padding:8px 10px; border-radius:8px;">
-                  <span>Alias/CVU: <strong style="color:#34d399;">${cfg.mpAlias}</strong></span>
-                  <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="copyOwnerAlias('${cfg.mpAlias}')">📋 Copiar</button>
-                 </div>`
-          : ''
-        }
-          ${cfg.mpLink ? `<span style="color:var(--text-muted);">Al tocar el botón se abrirá tu checkout oficial de MercadoPago.</span>` : ''}
-        </div>
-      `;
-      if (payBtn) {
-        payBtn.textContent = cfg.mpLink
-          ? `🏦 Ir a MercadoPago ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`
-          : `✅ Ya transferí al Alias ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
-      }
-      return;
-    }
-  } else if (gateway.includes('PayPal') && cfg.paypal) {
+  if (cfg.paypal) {
     box.style.display = 'block';
     box.innerHTML = `<strong>🅿️ Checkout oficial de PayPal (${cfg.paypal})</strong><br/><span style="color:var(--text-muted);">Se abrirá PayPal con el monto exacto de $${pendingCheckoutConfig.priceUSD.toFixed(2)} USD.</span>`;
     if (payBtn) payBtn.textContent = `🅿️ Pagar con PayPal ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
@@ -12369,7 +12316,7 @@ window.openCloudConfigModal = async function () {
           <button class="modal-close" type="button" onclick="closeCloudConfigModal()">✕</button>
         </div>
         <h2>Base de Datos en la Nube, Correos Reales y Webhooks</h2>
-        <p class="modal-sponsor">Conecta tu proyecto de <strong>Supabase</strong> (sincronización entre PC/Celular), <strong>Resend</strong> (emails reales) y tus <strong>Webhooks de MercadoPago/PayPal</strong>. También puedes configurarlos como Variables de Entorno en Vercel.</p>
+        <p class="modal-sponsor">Conecta tu proyecto de <strong>Supabase</strong> (sincronización entre PC/Celular), <strong>Resend</strong> (emails reales) y tus <strong>Webhooks de PayPal</strong>. También puedes configurarlos como Variables de Entorno en Vercel.</p>
         <div id="cloud-status-pill-box" style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-size: 12.5px; line-height: 1.6;">
           🔄 Comprobando estado de endpoints Serverless (<code>/api/cloud-sync</code>, <code>/api/send-email</code>, <code>/api/payment-webhook</code>)...
         </div>
@@ -12387,7 +12334,7 @@ window.openCloudConfigModal = async function () {
             <input type="password" id="cloud-cfg-resend-key" placeholder="re_123456789..." />
           </div>
           <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 12px; color: #cbd5e1;">
-            🔗 <strong>URL de tu Webhook para pegar en MercadoPago / PayPal:</strong><br/>
+            🔗 <strong>URL de tu Webhook para pegar en PayPal:</strong><br/>
             <code style="color: #34d399; word-break: break-all;">${window.location.origin}/api/payment-webhook</code>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
@@ -12699,7 +12646,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 150);
   }
 
-  // Detector automático de retorno tras Pago Exitoso en MercadoPago / PayPal (?pago_exitoso=vip_pro)
+  // Detector automático de retorno tras Pago Exitoso en PayPal (?pago_exitoso=vip_pro)
   const pagoExitoso = urlParams.get('pago_exitoso') || urlParams.get('payment_status');
   if (pagoExitoso === 'vip_pro' || pagoExitoso === 'vip_founder' || pagoExitoso === 'approved' || pagoExitoso === '1') {
     const savedPendingRaw = localStorage.getItem('skillvault_pending_checkout_v1');
@@ -12709,10 +12656,10 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) { }
 
     if (pendingOrder && pendingOrder.type === 'course') {
-      setTimeout(() => completeIndividualCoursePurchase(pendingOrder.skillId, 'MercadoPago Verificado'), 400);
+      setTimeout(() => completeIndividualCoursePurchase(pendingOrder.skillId, 'PayPal Verificado'), 400);
     } else {
       const tier = pagoExitoso === 'vip_founder' || (pendingOrder && pendingOrder.tier === 'founder') ? 'annual' : 'monthly';
-      setTimeout(() => completeVipMembershipPurchase(tier, 'MercadoPago Verificado'), 400);
+      setTimeout(() => completeVipMembershipPurchase(tier, 'PayPal Verificado'), 400);
     }
     localStorage.removeItem('skillvault_pending_checkout_v1');
     window.history.replaceState({}, document.title, window.location.pathname);
@@ -13244,7 +13191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Actualizar vista de pasarela al cambiar entre MercadoPago / PayPal
+  // Actualizar vista de pasarela PayPal
   document.querySelectorAll('input[name="checkout-gateway"]').forEach(radio => {
     radio.addEventListener('change', updateCheckoutGatewayLiveBox);
   });
@@ -13255,13 +13202,11 @@ document.addEventListener('DOMContentLoaded', () => {
     paySettingsForm.addEventListener('submit', e => {
       e.preventDefault();
       const newCfg = {
-        mpLink: (document.getElementById('pay-cfg-mp-link')?.value || '').trim(),
-        mpAlias: (document.getElementById('pay-cfg-mp-alias')?.value || '').trim(),
         paypal: (document.getElementById('pay-cfg-paypal')?.value || '').trim()
       };
       savePaymentConfig(newCfg);
       closePaymentSettingsModal();
-      showToast('✅ ¡Tus métodos de cobro reales (MercadoPago y PayPal) fueron guardados!');
+      showToast('✅ ¡Tu método de cobro de PayPal fue guardado!');
     });
   }
 
@@ -13273,7 +13218,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!pendingCheckoutConfig) return;
 
       const selectedGatewayEl = document.querySelector('input[name="checkout-gateway"]:checked');
-      const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'MercadoPago';
+      const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'PayPal Express Checkout';
       const realPaymentUrl = buildRealPaymentUrl(gateway, pendingCheckoutConfig.priceUSD);
 
       if (realPaymentUrl) {

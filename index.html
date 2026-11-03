@@ -518,10 +518,6 @@
             </p>
             <div class="trust-strip-pills">
               <span class="trust-pill-item">
-                <span class="material-symbols-outlined" style="font-size: 16px; color: #0057c0;">account_balance_wallet</span>
-                MercadoPago Oficial
-              </span>
-              <span class="trust-pill-item">
                 <span class="material-symbols-outlined" style="font-size: 16px; color: #0057c0;">payment</span>
                 PayPal Checkout
               </span>
@@ -1115,23 +1111,6 @@
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                 </svg>
               </a>
-              <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
-                aria-label="Síguenos en X (Twitter)" title="X / Twitter">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  aria-hidden="true">
-                  <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
-                  <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
-                </svg>
-              </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
-                aria-label="Suscríbete en YouTube" title="YouTube">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  aria-hidden="true">
-                  <path
-                    d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
-                  <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
-                </svg>
-              </a>
               <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
                 aria-label="Únete a nuestra comunidad en Discord" title="Comunidad Discord">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1144,15 +1123,6 @@
                     d="M15.5 17c0 1 1.5 3 2 3 1.5 0 2.833-1.667 3.5-3 .667-1.667.5-5.833-1.5-11.5-1.457-1.015-3-1.34-4.5-1.5l-1 2.5" />
                   <path
                     d="M8.5 17c0 1-1.356 3-1.832 3-1.429 0-2.698-1.667-3.333-3-.635-1.667-.476-5.833 1.428-11.5C6.151 4.485 7.5 4.16 9 4l1 2.5" />
-                </svg>
-              </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-icon-btn"
-                aria-label="Síguenos en LinkedIn" title="LinkedIn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  aria-hidden="true">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                  <rect x="2" y="9" width="4" height="12" />
-                  <circle cx="4" cy="4" r="2" />
                 </svg>
               </a>
             </div>
@@ -1212,15 +1182,6 @@
           </div>
 
           <div class="payment-badges-row" aria-label="Métodos de pago y certificaciones de seguridad">
-            <div class="trust-payment-badge" title="Pagos directos y seguros con MercadoPago">
-              <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                aria-hidden="true">
-                <rect x="2" y="5" width="20" height="14" rx="3" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-              </svg>
-              <span><strong>MercadoPago</strong> Oficial</span>
-            </div>
-
             <div class="trust-payment-badge" title="Protección al comprador con PayPal">
               <svg class="pay-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 aria-hidden="true">
@@ -1585,18 +1546,13 @@
         </div>
       </div>
 
-      <!-- Selector de Pasarela (PayPal / MercadoPago) -->
+      <!-- Selector de Pasarela (PayPal) -->
       <form id="checkout-payment-form" class="mobile-modal-form">
-        <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Elige tu pasarela de pago
-          preferida:</label>
-        <div class="checkout-gateway-grid">
+        <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Método de pago seguro:</label>
+        <div class="checkout-gateway-grid" style="grid-template-columns: 1fr;">
           <label class="gateway-pill active">
             <input type="radio" name="checkout-gateway" value="PayPal Express Checkout" checked />
-            <span>🅿️ PayPal</span>
-          </label>
-          <label class="gateway-pill">
-            <input type="radio" name="checkout-gateway" value="MercadoPago" />
-            <span>🏦 MercadoPago</span>
+            <span>🅿️ PayPal Express Checkout</span>
           </label>
         </div>
 
