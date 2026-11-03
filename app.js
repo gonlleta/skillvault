@@ -5323,7 +5323,7 @@ const EXCLUSIVE_VIP_REWARDS = [
     icon: '🏆',
     title: 'Pack Maestro VIP: Todos los Cursos Completos Descargables + Plantillas Pro',
     costVIPPoints: 260,
-    description: 'Paquete descargable con las guías completas, resúmenes ejecutivos y plantillas de los 16 cursos completos de la academia.',
+    description: 'Paquete descargable con las guías completas, resúmenes ejecutivos y plantillas de los 17 cursos completos de la academia.',
     deliverable: 'Pack Maestro VIP de Cursos Completos desbloqueado: #SV-VIP-PACK-001 (Descarga directa habilitada).'
   },
   {
@@ -14235,4 +14235,4 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => { });
   });
-}
+}     
