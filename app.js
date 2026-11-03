@@ -28,14 +28,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Python es un lenguaje de programación interpretado y de tipado dinámico. Esto significa que no necesitas declarar explícitamente si una variable es un número entero (int), un decimal (float) o una cadena de texto (str); el intérprete asigna el tipo en tiempo de ejecución según el valor almacenado.",
           "En entornos empresariales, las variables se utilizan para parametrizar reportes financieros, calcular márgenes e inyectar valores dinámicos usando f-strings (cadenas formateadas con el prefijo f antes de las comillas).",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, usa nombres descriptivos en formato snake_case (ej. costo_unitario, tasa_impuesto). Segundo, el operador // realiza división entera (descarta decimales) y ** calcula potencias. Y tercero, las f-strings permiten evaluar expresiones directamente dentro de llaves {}.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Sumar un string \"100\" con un entero 50 lanzará un TypeError. Convierte siempre entradas de texto con int() o float() antes de operar. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando automatizas reportes contables o de ventas, separar los datos de entrada (como ingresos brutos, costos fijos y porcentaje de comisión) en variables independientes te permite actualizar una sola cifra arriba y recalcular todo el informe en milisegundos sin tocar las fórmulas.",
+          "En el bloque de código de abajo verás cómo calcular el descuento de una pasarela de pagos, obtener la utilidad neta real y mostrar el resultado final con el modificador :.2f dentro de una f-string para que el importe aparezca redondeado exactamente a dos centavos como en un resumen bancario."
         ],
         "keyPoints": [
           "Usa nombres descriptivos en formato snake_case (ej. costo_unitario, tasa_impuesto).",
           "El operador // realiza división entera (descarta decimales) y ** calcula potencias.",
           "Las f-strings permiten evaluar expresiones directamente dentro de llaves {}.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "El formato {variable:.2f} dentro de una f-string redondea cualquier número decimal a 2 cifras exactas sin alterar el valor guardado en memoria."
         ],
         "code": "# Cálculo automatizado de rentabilidad neta mensual\ningresos_brutos = 4850.75\ncosto_servidor = 120.00\ncomision_pasarela = 0.035  # 3.5% por transacción\n\ndescuento_pasarela = ingresos_brutos * comision_pasarela\nutilidad_neta = ingresos_brutos - costo_servidor - descuento_pasarela\nmargen_porcentual = (utilidad_neta / ingresos_brutos) * 100\n\nprint(f\"Utilidad Neta: ${utilidad_neta:.2f} USD ({margen_porcentual:.1f}% de margen)\")",
         "warning": "⚠️ Error común: Sumar un string \"100\" con un entero 50 lanzará un TypeError. Convierte siempre entradas de texto con int() o float() antes de operar.",
@@ -50,15 +50,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Usa nombres descriptivos en formato snake_case (ej. costo_unitario, tasa_impuesto).",
-          "Paso 3 (Validación y Control de Calidad): El operador // realiza división entera (descarta decimales) y ** calcula potencias.",
-          "Paso 4 (Puesta en Marcha y Medición): Las f-strings permiten evaluar expresiones directamente dentro de llaves {}."
+          "Paso 1 (Abrir el entorno): Abre Google Colab (colab.research.google.com) y crea una celda de código nueva.",
+          "Paso 2 (Definir variables base): Declara en snake_case tus ingresos brutos, costos fijos y la tasa decimal de comisión (por ejemplo 0.035 para 3.5%).",
+          "Paso 3 (Procesar las fórmulas): Calcula en variables separadas el descuento de la pasarela, la utilidad neta y el porcentaje de margen.",
+          "Paso 4 (Imprimir con formato contable): Ejecuta print(f\"...\") usando :.2f en los dólares y :.1f en el porcentaje para obtener un reporte limpio."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Variables, Tipado Dinámico y Operadores Aritméticos",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Sumar un string \"100\" con un entero 50 lanzará un TypeError. Convierte siempre entradas de texto con int() o f...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Usa nombres descriptivos en formato snake_case (ej. costo_unitario, tasa_impuesto).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Tienda Online con Cierres de Caja Manuales",
+          "scenario": "Una tienda de comercio electrónico calculaba sus ganancias mensuales a mano en una calculadora, olvidando descontar el 3.5% de la pasarela de pago y mezclando textos con números al exportar los reportes.",
+          "result": "Reemplazaron el cálculo manual por este script parametrizado de 8 líneas en Python, logrando cierres de caja exactos al centavo en menos de 1 segundo."
         }
       },
       {
@@ -67,14 +67,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Para que un script tome decisiones autónomas —como aprobar un pago, bloquear un intento sospechoso o aplicar un descuento por volumen— utilizamos bloques condicionales combinados con operadores lógicos (and, or, not).",
           "Python evalúa las condiciones de arriba hacia abajo. En cuanto una condición if o elif resulta verdadera (True), ejecuta ese bloque e ignora el resto de la estructura.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, la indentación (4 espacios) no es estética: define qué líneas pertenecen al bloque condicional. Segundo, usa == para comparar igualdad de valores y != para verificar desigualdad. Y tercero, el operador \"and\" exige que ambas condiciones sean verdaderas simultáneamente.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca uses \"=\" (asignación) dentro de un \"if\"; para comparar igualdad debes escribir siempre doble signo igual \"==\". Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El orden en que escribes tus bloques if y elif es determinante: siempre debes colocar primero la condición más restrictiva o crítica (por ejemplo, verificar si una cuenta registra deuda activa) antes de evaluar beneficios o descuentos por volumen.",
+          "En la función clasificar_cliente del ejemplo práctico observarás cómo Python evalúa la fila de arriba hacia abajo: si tiene_deuda es True, corta inmediatamente la ejecución devolviendo la alerta de suspensión, sin importar cuánto haya comprado ese cliente en el año."
         ],
         "keyPoints": [
           "La indentación (4 espacios) no es estética: define qué líneas pertenecen al bloque condicional.",
           "Usa == para comparar igualdad de valores y != para verificar desigualdad.",
           "El operador \"and\" exige que ambas condiciones sean verdaderas simultáneamente.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Ordena siempre tus bloques elif desde el umbral numérico más exigente (ej. >= 5000) hacia el menor (ej. >= 1000) para evitar que un rango inferior capture clientes VIP."
         ],
         "code": "def clasificar_cliente(compras_anuales_usd, tiene_deuda):\n    if tiene_deuda:\n        return \"⛔ Cuenta suspendida hasta regularizar saldo\"\n    elif compras_anuales_usd >= 5000:\n        return \"👑 Cliente Corporativo VIP (20% Descuento)\"\n    elif compras_anuales_usd >= 1000:\n        return \"⭐ Cliente Frecuente (10% Descuento)\"\n    else:\n        return \"👤 Cliente Estándar (Sin descuento)\"\n\nprint(clasificar_cliente(6200, False))",
         "warning": "⚠️ Nunca uses \"=\" (asignación) dentro de un \"if\"; para comparar igualdad debes escribir siempre doble signo igual \"==\".",
@@ -89,15 +89,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): La indentación (4 espacios) no es estética: define qué líneas pertenecen al bloque condicional.",
-          "Paso 3 (Validación y Control de Calidad): Usa == para comparar igualdad de valores y != para verificar desigualdad.",
-          "Paso 4 (Puesta en Marcha y Medición): El operador \"and\" exige que ambas condiciones sean verdaderas simultáneamente."
+          "Paso 1 (Definir la función y sus entradas): Declara def clasificar_cliente(compras_anuales_usd, tiene_deuda): respetando los dos puntos finales.",
+          "Paso 2 (Bloquear casos críticos primero): Coloca en el primer if la validación de bloqueo (tiene_deuda) con 4 espacios de sangría.",
+          "Paso 3 (Escalonar los rangos de mayor a menor): Añade los bloques elif evaluando primero >= 5000 y luego >= 1000.",
+          "Paso 4 (Probar casos borde): Llama a la función pasando distintos montos y valores True/False para comprobar cada rama."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Estructuras de Control Condicional (if / elif / else) y Lógica Booleana",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Nunca uses \"=\" (asignación) dentro de un \"if\"; para comparar igualdad debes escribir siempre doble signo igual...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (La indentación (4 espacios) no es estética: define qué líneas pertenecen al bloque condicional.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Mayorista B2B que Otorgaba Descuentos a Cuentas Morosas",
+          "scenario": "Un distribuidor mayorista evaluaba primero el volumen de compras anuales antes de revisar si el cliente tenía facturas vencidas, otorgando 20% de descuento automático a cuentas con deuda.",
+          "result": "Al reordenar el condicional colocando la verificación de deuda en el primer if, bloquearon el 100% de los descuentos improcedentes desde el primer día."
         }
       },
       {
@@ -106,14 +106,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En automatización real rara vez procesas un solo dato; trabajas con colecciones de cientos o miles de registros (clientes, facturas, pedidos). Las listas [] almacenan secuencias ordenadas, mientras que los diccionarios {} guardan pares clave-valor ideales para representar objetos tipo JSON.",
           "Combinar una lista de diccionarios con un bucle \"for\" o una \"list comprehension\" te permite filtrar, transformar y auditar bases de datos enteras en milisegundos.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, lista.append(item) agrega un elemento al final de la lista. Segundo, diccionario.get(\"clave\", valor_por_defecto) evita errores KeyError si la clave no existe. Y tercero, las comprensiones de listas [x for x in datos if condicion] son más rápidas y legibles.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Modificar el tamaño de una lista mientras la estás recorriendo en el mismo bucle for puede saltar elementos. Crea siempre una lista nueva filtrada. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando recibes datos desde una base de datos o una API externa, cada registro suele representarse como un diccionario {} dentro de una lista []. Recorrer esa estructura con comprensiones de listas te ahorra decenas de líneas de código repetitivo.",
+          "En el código de abajo verás cómo partimos de una lista de facturas reales, filtramos en una sola línea únicamente aquellas con estado pagada: False, sumamos el monto total adeudado con sum() y generamos los avisos personalizados para cada cliente."
         ],
         "keyPoints": [
           "lista.append(item) agrega un elemento al final de la lista.",
           "diccionario.get(\"clave\", valor_por_defecto) evita errores KeyError si la clave no existe.",
           "Las comprensiones de listas [x for x in datos if condicion] son más rápidas y legibles.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Combinar sum(f[\"monto\"] for f in pendientes) permite totalizar miles de facturas filtradas en una sola línea sin crear contadores manuales."
         ],
         "code": "facturas = [\n    {\"id\": \"F-101\", \"cliente\": \"Acme Corp\", \"monto\": 1200, \"pagada\": True},\n    {\"id\": \"F-102\", \"cliente\": \"Beta LLC\",  \"monto\": 850,  \"pagada\": False},\n    {\"id\": \"F-103\", \"cliente\": \"Nova Tech\", \"monto\": 2300, \"pagada\": False},\n]\n\npendientes = [f for f in facturas if not f[\"pagada\"]]\ntotal_por_cobrar = sum(f[\"monto\"] for f in pendientes)\n\nfor fac in pendientes:\n    print(f\"Enviar recordatorio a {fac['cliente']} por ${fac['monto']} USD\")\nprint(f\"Total pendiente de cobro: ${total_por_cobrar} USD\")",
         "warning": "⚠️ Modificar el tamaño de una lista mientras la estás recorriendo en el mismo bucle for puede saltar elementos. Crea siempre una lista nueva filtrada.",
@@ -128,15 +128,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): lista.append(item) agrega un elemento al final de la lista.",
-          "Paso 3 (Validación y Control de Calidad): diccionario.get(\"clave\", valor_por_defecto) evita errores KeyError si la clave no existe.",
-          "Paso 4 (Puesta en Marcha y Medición): Las comprensiones de listas [x for x in datos if condicion] son más rápidas y legibles."
+          "Paso 1 (Estructurar la colección): Carga tu lista de diccionarios verificando que cada registro tenga las claves id, cliente, monto y pagada.",
+          "Paso 2 (Filtrar en una lista nueva): Crea la lista pendientes usando [f for f in facturas if not f[\"pagada\"]] sin alterar la lista original.",
+          "Paso 3 (Calcular el total acumulado): Aplica la función sum() sobre el campo monto de la lista ya filtrada.",
+          "Paso 4 (Emitir el aviso individual): Recorre pendientes con un bucle for para imprimir el recordatorio personalizado de cada cliente."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Listas, Diccionarios e Iteración Eficiente con Bucles For",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Modificar el tamaño de una lista mientras la estás recorriendo en el mismo bucle for puede saltar elementos. C...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (lista.append(item) agrega un elemento al final de la lista.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Estudio Contable con 600 Facturas Mensuales",
+          "scenario": "Un estudio contable filtraba a mano en planillas quiénes debían cuotas mensuales, demorando 4 horas cada lunes y salteando clientes por error.",
+          "result": "Implementaron este filtro con comprensiones de listas en Python, identificando el total por cobrar y la lista de deudores en 0.2 segundos."
         }
       },
       {
@@ -145,14 +145,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Un script profesional que corre en un servidor no puede colapsar a mitad de la noche porque un archivo venía vacío o una API tardó en responder. Para eso encapsulamos la lógica en funciones reutilizables con \"def\" y protegemos las operaciones críticas con bloques try / except.",
           "Cuando ocurre una excepción dentro del bloque \"try\", Python salta inmediatamente al bloque \"except\", registra el incidente y permite que el resto de los registros continúen procesándose sin interrupción.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, toda función debe tener una única responsabilidad clara y devolver un resultado con \"return\". Segundo, captura excepciones específicas como ValueError, ZeroDivisionError o KeyError. Y tercero, el bloque \"finally\" se ejecuta siempre, ocurra o no un error (útil para cerrar conexiones).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Evita usar un \"except:\" vacío sin especificar el error, ya que ocultará errores de programación que deberías detectar. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "En entornos de trabajo reales, los datos de entrada suelen traer sorpresas: días feriados con 0 clientes, celdas vacías o textos donde debía ir un número. Si no envuelves tus cálculos en un bloque try / except, un solo dato anómalo detendrá todo tu reporte.",
+          "Observa en el ejemplo cómo la función calcular_ticket_promedio separa la división normal dentro de try y define respuestas seguras y controladas cuando ocurre un ZeroDivisionError (división por cero) o un TypeError (tipos incompatibles)."
         ],
         "keyPoints": [
           "Toda función debe tener una única responsabilidad clara y devolver un resultado con \"return\".",
           "Captura excepciones específicas como ValueError, ZeroDivisionError o KeyError.",
           "El bloque \"finally\" se ejecuta siempre, ocurra o no un error (útil para cerrar conexiones).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Devolver un valor seguro (como 0.0 o None) dentro del bloque except permite que el resto de tu programa continúe procesando los demás días del mes sin caerse."
         ],
         "code": "def calcular_ticket_promedio(total_ventas, cantidad_clientes):\n    try:\n        promedio = total_ventas / cantidad_clientes\n        return round(promedio, 2)\n    except ZeroDivisionError:\n        print(\"⚠️ Alerta: Día sin clientes registrados. Retornando 0.0\")\n        return 0.0\n    except TypeError:\n        print(\"❌ Error: Los valores ingresados deben ser numéricos.\")\n        return None\n\nprint(calcular_ticket_promedio(1500, 0))  # No rompe el programa: devuelve 0.0",
         "warning": "⚠️ Evita usar un \"except:\" vacío sin especificar el error, ya que ocultará errores de programación que deberías detectar.",
@@ -167,15 +167,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 3
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Toda función debe tener una única responsabilidad clara y devolver un resultado con \"return\".",
-          "Paso 3 (Validación y Control de Calidad): Captura excepciones específicas como ValueError, ZeroDivisionError o KeyError.",
-          "Paso 4 (Puesta en Marcha y Medición): El bloque \"finally\" se ejecuta siempre, ocurra o no un error (útil para cerrar conexiones)."
+          "Paso 1 (Encapsular la operación): Crea la función con def y coloca el cálculo de división dentro del bloque try.",
+          "Paso 2 (Capturar división por cero): Añade except ZeroDivisionError: para devolver 0.0 cuando un local haya tenido 0 clientes en el día.",
+          "Paso 3 (Capturar datos mal tipados): Añade except TypeError: para atajar casos donde llegue texto o None en vez de números.",
+          "Paso 4 (Verificar la resiliencia): Prueba llamar a la función con (1500, 0) y comprueba que imprime la alerta y sigue funcionando."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Funciones Modulares y Manejo Robusto de Errores (try / except)",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Evita usar un \"except:\" vacío sin especificar el error, ya que ocultará errores de programación que deberías d...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Toda función debe tener una única responsabilidad clara y devolver un resultado con \"return\".), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Tablero de Ventas de Franquicias que Colapsaba los Domingos",
+          "scenario": "El reporte automático de una cadena de locales se rompía todos los domingos porque las sucursales cerradas registraban 0 clientes y disparaban un ZeroDivisionError.",
+          "result": "Al proteger la función con bloques except específicos para ZeroDivisionError y TypeError, el reporte pasó a ejecutarse los 365 días del año sin interrupciones."
         }
       },
       {
@@ -335,14 +335,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "La diferencia entre una respuesta genérica y un entregable de nivel consultoría senior radica en cómo acotas el espacio de búsqueda probabilístico del modelo de lenguaje (LLM). El framework R-C-T-R-F estructura el prompt en 5 capas obligatorias: Rol, Contexto, Tarea, Restricciones y Formato de Salida.",
           "Además, el uso de delimitadores claros (como etiquetas XML <contexto>...</contexto> o bloques Markdown ###) evita que el modelo confunda las instrucciones del sistema con los datos de entrada que debe analizar (previniendo ataques de Prompt Injection).",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, rol: Define el perfil técnico, años de experiencia y criterio de evaluación. Segundo, restricciones negativas: Especifica qué NO debe hacer (ej. \"No uses jerga genérica, no inventes métricas\"). Y tercero, delimitadores XML: Separan limpiamente las reglas de negocio de los textos del usuario.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca mezcles instrucciones y datos no confiables del usuario en el mismo párrafo sin delimitadores; un usuario podría escribir \"Ignora lo anterior\" y secuestrar el prompt. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "La diferencia entre obtener una respuesta genérica de ChatGPT y obtener un entregable listo para enviar a un cliente radica en separar claramente las instrucciones de tu sistema respecto de los datos crudos que vas a analizar.",
+          "En la plantilla práctica de abajo verás cómo las etiquetas XML (<rol>, <contexto>, <tarea>, <restricciones> y <datos_usuario>) actúan como paredes contenedoras para que el modelo entienda exactamente qué regla aplicar y sobre qué texto trabajar."
         ],
         "keyPoints": [
           "Rol: Define el perfil técnico, años de experiencia y criterio de evaluación.",
           "Restricciones negativas: Especifica qué NO debe hacer (ej. \"No uses jerga genérica, no inventes métricas\").",
           "Delimitadores XML: Separan limpiamente las reglas de negocio de los textos del usuario.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Definir el formato exacto de salida (tabla, JSON o lista con límite de palabras) elimina las introducciones de relleno como \"¡Claro! Aquí tienes...\"."
         ],
         "code": "<rol>\nActúa como Auditor Senior de Ciberseguridad especializado en aplicaciones SaaS B2B.\n</rol>\n<contexto>\nNuestra API recibe formularios públicos de clientes y los guarda en PostgreSQL.\n</contexto>\n<tarea>\nAnaliza el código adjunto en <codigo_fuente> y detecta las 3 vulnerabilidades más críticas.\n</tarea>\n<restricciones>\n- No incluyas introducciones ni saludos.\n- Basa cada hallazgo en el estándar OWASP Top 10.\n</restricciones>\n<formato_salida>\nTabla Markdown con columnas: [Severidad | Línea | Vulnerabilidad | Parche de Código].\n</formato_salida>",
         "warning": "⚠️ Nunca mezcles instrucciones y datos no confiables del usuario en el mismo párrafo sin delimitadores; un usuario podría escribir \"Ignora lo anterior\" y secuestrar el prompt.",
@@ -357,15 +357,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Rol: Define el perfil técnico, años de experiencia y criterio de evaluación.",
-          "Paso 3 (Validación y Control de Calidad): Restricciones negativas: Especifica qué NO debe hacer (ej. \"No uses jerga genérica, no inventes métricas\").",
-          "Paso 4 (Puesta en Marcha y Medición): Delimitadores XML: Separan limpiamente las reglas de negocio de los textos del usuario."
+          "Paso 1 (Asignar el Rol experto): Abre el bloque <rol> especificando la especialidad, años de experiencia y criterio profesional que debe adoptar la IA.",
+          "Paso 2 (Fijar Tarea y Restricciones): Detalla en <tarea> y <restricciones> qué debe producir y qué tiene prohibido inventar o asumir.",
+          "Paso 3 (Aislar el texto de entrada): Pega el correo, documento o consulta real encerrado estrictamente entre <datos_usuario> y </datos_usuario>.",
+          "Paso 4 (Exigir el Formato final): Cierra con <formato_salida> indicando la estructura exacta en que necesitas recibir la respuesta."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Arquitectura R-C-T-R-F y Delimitadores Estructurales",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Nunca mezcles instrucciones y datos no confiables del usuario en el mismo párrafo sin delimitadores; un usuari...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Rol: Define el perfil técnico, años de experiencia y criterio de evaluación.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Consultora Legal que Tardaba 40 Minutos por Contrato",
+          "scenario": "Un equipo legal pegaba contratos enteros en ChatGPT diciendo solo \"revisa este texto\", obteniendo resúmenes vagos que omitían cláusulas de penalidad críticas.",
+          "result": "Adoptaron la plantilla R-C-T-R-F con delimitadores XML y redujeron la auditoría inicial de cada contrato a 90 segundos con precisión estandarizada."
         }
       },
       {
@@ -374,14 +374,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Cuando necesitas que un modelo clasifique tickets de soporte, extraiga entidades o redacte con un estilo muy específico, explicar las reglas en abstracto (Zero-Shot) suele fallar en casos borde. La técnica Few-Shot consiste en inyectar de 2 a 5 pares de ejemplo (Entrada -> Salida ideal) antes de pedirle que resuelva el caso real.",
           "Los ejemplos actúan como anclas de formato y criterio: el modelo imita exactamente la longitud, estructura y lógica de clasificación demostrada en los ejemplos previos.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, incluye casos borde (edge cases) dentro de tus ejemplos Few-Shot. Segundo, mantén exactamente el mismo esquema de etiquetas en todos los ejemplos. Y tercero, 3 ejemplos bien diversos superan a 20 párrafos de explicación teórica.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si tus ejemplos Few-Shot tienen formatos inconsistentes entre sí, el modelo replicará esa misma inconsistencia en producción. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando necesitas que la Inteligencia Artificial respete el tono exacto de tu marca o clasifique cientos de mensajes con un formato idéntico, darle 2 o 3 ejemplos concretos (Few-Shot) es mucho más efectivo que escribir largas explicaciones teóricas.",
+          "Observa en el bloque práctico cómo le mostramos al modelo tres pares de Entrada y Salida con el esquema exacto (Sentimiento | Urgencia | Acción) antes de entregarle el mensaje nuevo que debe clasificar al final."
         ],
         "keyPoints": [
           "Incluye casos borde (edge cases) dentro de tus ejemplos Few-Shot.",
           "Mantén exactamente el mismo esquema de etiquetas en todos los ejemplos.",
           "3 ejemplos bien diversos superan a 20 párrafos de explicación teórica.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Incluir un ejemplo ambiguo o sarcástico dentro de tus muestras Few-Shot entrena al modelo para no confundirse con clientes irónicos."
         ],
         "code": "Clasifica el sentimiento y la urgencia del mensaje del cliente:\n\nEjemplo 1:\nEntrada: \"Llevo 3 días sin poder facturar y mi tienda está frenada, necesito ayuda ya.\"\nSalida: {\"sentimiento\": \"negativo\", \"urgencia\": \"critica\", \"area\": \"facturacion\"}\n\nEjemplo 2:\nEntrada: \"Me encanta la nueva función de reportes, ¿planean agregar exportación a Excel?\"\nSalida: {\"sentimiento\": \"positivo\", \"urgencia\": \"baja\", \"area\": \"producto\"}\n\nCaso Real:\nEntrada: \"El cobro de este mes vino duplicado en mi tarjeta Visa terminada en 4412.\"\nSalida:",
         "warning": "⚠️ Si tus ejemplos Few-Shot tienen formatos inconsistentes entre sí, el modelo replicará esa misma inconsistencia en producción.",
@@ -396,15 +396,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Incluye casos borde (edge cases) dentro de tus ejemplos Few-Shot.",
-          "Paso 3 (Validación y Control de Calidad): Mantén exactamente el mismo esquema de etiquetas en todos los ejemplos.",
-          "Paso 4 (Puesta en Marcha y Medición): 3 ejemplos bien diversos superan a 20 párrafos de explicación teórica."
+          "Paso 1 (Redactar la instrucción base): Escribe en una línea qué tarea de clasificación o redacción debe realizar el modelo.",
+          "Paso 2 (Armar 3 ejemplos representativos): Incluye un caso positivo, un reclamo urgente y un caso borde manteniendo idénticas las claves de salida.",
+          "Paso 3 (Dejar abierto el caso actual): Escribe al final la nueva Entrada real y termina con \"Salida:\" para que el modelo complete solo ese bloque.",
+          "Paso 4 (Verificar consistencia): Comprueba que la respuesta respete exactamente los mismos separadores y etiquetas que tus ejemplos."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Few-Shot Prompting y Calibración de Tono/Estructura",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Si tus ejemplos Few-Shot tienen formatos inconsistentes entre sí, el modelo replicará esa misma inconsistencia...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Incluye casos borde (edge cases) dentro de tus ejemplos Few-Shot.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: E-Commerce con 450 Consultas Diarias en Atención al Cliente",
+          "scenario": "Los operadores clasificaban a mano los tickets entrantes porque la IA respondía cada vez con párrafos distintos que no podían conectarse a su planilla.",
+          "result": "Con un prompt Few-Shot de 3 ejemplos fijos, automatizaron el etiquetado del 98% de los tickets entrantes en formato estructurado."
         }
       },
       {
@@ -413,14 +413,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Los LLMs generan texto token por token. Si les pides que den directamente el resultado final de un problema matemático, financiero o arquitectónico complejo, tienen alta probabilidad de alucinar porque intentan \"adivinar\" la respuesta antes de procesar los pasos intermedios.",
           "Con Chain-of-Thought (CoT) obligamos al modelo a descomponer el problema paso a paso dentro de un bloque <razonamiento> antes de emitir su <respuesta_final>. De este modo, los tokens del razonamiento sirven como memoria de trabajo para llegar a una conclusión exacta.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, exige que el modelo valide sus propios cálculos antes de dar el veredicto. Segundo, usa etiquetas <analisis_paso_a_paso> y luego <veredicto_final> para poder ocultar el borrador en tu app. Y tercero, reduce drásticamente los errores lógicos en auditoría de código y finanzas.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si pides primero el resultado JSON y después la explicación, el modelo ya habrá comprometido un número posiblemente erróneo y solo inventará una justificación. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Los modelos de lenguaje generan texto palabra por palabra hacia adelante: si le pides un resultado numérico o financiero en la primera línea, la IA adivinará una cifra rápida y luego inventará argumentos para intentar justificarla.",
+          "En el ejemplo de abajo forzamos al modelo a abrir primero la etiqueta <analisis_paso_a_paso> para desglosar cada costo y verificar su propia cuenta antes de emitir el dictamen final dentro de <veredicto_final>."
         ],
         "keyPoints": [
           "Exige que el modelo valide sus propios cálculos antes de dar el veredicto.",
           "Usa etiquetas <analisis_paso_a_paso> y luego <veredicto_final> para poder ocultar el borrador en tu app.",
           "Reduce drásticamente los errores lógicos en auditoría de código y finanzas.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "En aplicaciones web puedes ocultar al usuario el bloque <analisis_paso_a_paso> y mostrar en pantalla únicamente el contenido limpio de <veredicto_final>."
         ],
         "code": "Resuelve el siguiente caso financiero siguiendo estrictamente estos pasos:\n1. En <calculo_paso_a_paso>, desglosa los ingresos, resta costos variables (15%) y costos fijos ($1,200).\n2. En <verificacion>, comprueba si la suma de partes coincide con el total bruto.\n3. En <resultado_json>, entrega únicamente el objeto JSON final con la utilidad neta.",
         "warning": "⚠️ Si pides primero el resultado JSON y después la explicación, el modelo ya habrá comprometido un número posiblemente erróneo y solo inventará una justificación.",
@@ -435,15 +435,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Exige que el modelo valide sus propios cálculos antes de dar el veredicto.",
-          "Paso 3 (Validación y Control de Calidad): Usa etiquetas <analisis_paso_a_paso> y luego <veredicto_final> para poder ocultar el borrador en tu app.",
-          "Paso 4 (Puesta en Marcha y Medición): Reduce drásticamente los errores lógicos en auditoría de código y finanzas."
+          "Paso 1 (Prohibir respuestas impulsivas): Indica explícitamente al inicio del prompt que debe calcular cada etapa antes de dar el veredicto.",
+          "Paso 2 (Exigir desglose intermedio): Pide que extraiga los datos numéricos y ejecute las fórmulas dentro de <analisis_paso_a_paso>.",
+          "Paso 3 (Añadir paso de auto-auditoría): Incluye una instrucción para que verifique si el resultado cumple las condiciones del problema.",
+          "Paso 4 (Extraer el dictamen): Solicita la conclusión ejecutiva o el JSON final dentro de la etiqueta <veredicto_final>."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Chain-of-Thought (Cadena de Pensamiento) y Auto-Verificación",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Si pides primero el resultado JSON y después la explicación, el modelo ya habrá comprometido un número posible...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Exige que el modelo valide sus propios cálculos antes de dar el veredicto.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Agencia Inmobiliaria con Errores en Cálculos de Rentabilidad",
+          "scenario": "Usaban IA para pre-evaluar carpetas de inversión inmobiliaria, pero cuando pedían directamente el porcentaje de retorno anual el modelo cometía errores aritméticos en 1 de cada 4 informes.",
+          "result": "Al obligar a la IA a razonar primero en <analisis_paso_a_paso>, redujeron los errores de cálculo a cero y aceleraron las tasaciones."
         }
       },
       {
@@ -452,14 +452,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Un Agente de IA se diferencia de un simple chatbot porque funciona en un ciclo autónomo (Observación -> Pensamiento -> Acción -> Observación) y tiene acceso a herramientas externas (consultar bases de datos SQL, llamar APIs de pagos, enviar correos).",
           "Para conectar un LLM con código real en JavaScript o Python, configuramos salidas estructuradas (Structured Outputs / JSON Schema) garantizando que la respuesta nunca contenga texto libre fuera del JSON válido.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, el ciclo ReAct (Reason + Act) permite al agente decidir qué herramienta invocar y con qué parámetros. Segundo, valida siempre los argumentos que el agente envía a una herramienta antes de ejecutar acciones destructivas. Y tercero, define temperaturas bajas (0.0 a 0.2) para tareas de extracción de datos y agentes.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca permitas que un agente ejecute reembolsos o borrado de datos en producción sin una validación determinista o confirmación humana (Human-in-the-Loop). Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Un Agente de IA moderno no solo conversa: puede conectarse con tus sistemas para consultar el estado de un envío, buscar stock en tu base de datos o agendar un turno real mediante esquemas JSON estrictos (Tool Calling).",
+          "En el código de abajo verás cómo se define la herramienta consultar_estado_pedido con JSON Schema: especificamos exactamente qué formato debe tener el order_id (con patrón regex) para que la IA nunca invoque tu servidor con datos incompletos."
         ],
         "keyPoints": [
           "El ciclo ReAct (Reason + Act) permite al agente decidir qué herramienta invocar y con qué parámetros.",
           "Valida siempre los argumentos que el agente envía a una herramienta antes de ejecutar acciones destructivas.",
           "Define temperaturas bajas (0.0 a 0.2) para tareas de extracción de datos y agentes.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "La propiedad additionalProperties: false en tu JSON Schema impide que el modelo invente parámetros inexistentes al llamar a tu API."
         ],
         "code": "// Definición de herramienta (Tool) para un Agente de Soporte\nconst tools = [{\n  name: \"consultar_estado_pedido\",\n  description: \"Obtiene el estado logístico y fecha de entrega de una orden por su ID.\",\n  parameters: {\n    type: \"object\",\n    properties: {\n      order_id: { type: \"string\", pattern: \"^ORD-[0-9]{5}$\" }\n    },\n    required: [\"order_id\"]\n  }\n}];",
         "warning": "⚠️ Nunca permitas que un agente ejecute reembolsos o borrado de datos en producción sin una validación determinista o confirmación humana (Human-in-the-Loop).",
@@ -474,15 +474,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): El ciclo ReAct (Reason + Act) permite al agente decidir qué herramienta invocar y con qué parámetros.",
-          "Paso 3 (Validación y Control de Calidad): Valida siempre los argumentos que el agente envía a una herramienta antes de ejecutar acciones destructivas.",
-          "Paso 4 (Puesta en Marcha y Medición): Define temperaturas bajas (0.0 a 0.2) para tareas de extracción de datos y agentes."
+          "Paso 1 (Nombrar y describir la función): Define un nombre claro en snake_case y explica en description cuándo debe usarse esa herramienta.",
+          "Paso 2 (Tipar cada parámetro): Declara en properties el tipo exacto (string, number, enum) y las reglas de validación de cada dato.",
+          "Paso 3 (Bloquear campos extraños): Añade required con los campos obligatorios y additionalProperties: false para blindar el esquema.",
+          "Paso 4 (Validar en tu backend): Recibe los argumentos sugeridos por el modelo en tu servidor y verifica permisos antes de ejecutar la consulta."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Agentes Autónomos, Uso de Herramientas (Tool Calling) y JSON Schema",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Nunca permitas que un agente ejecute reembolsos o borrado de datos en producción sin una validación determinis...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (El ciclo ReAct (Reason + Act) permite al agente decidir qué herramienta invocar y con qué parámetros.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Bot de Logística que Consultaba Pedidos en Tiempo Real",
+          "scenario": "Una empresa de envíos quería que su asistente respondiera dónde estaba cada paquete sin que un empleado tuviera que buscar el código en el sistema.",
+          "result": "Conectaron su API de rastreo mediante este JSON Schema de Tool Calling, resolviendo automáticamente el 82% de las consultas de seguimiento las 24 horas."
         }
       },
       {
@@ -642,14 +642,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El error financiero #1 de profesionales y freelancers es ahorrar \"lo que sobra a fin de mes\". La ley de Parkinson aplicada al dinero demuestra que los gastos siempre se expanden hasta consumir todo el ingreso disponible si no existe una separación previa automática.",
           "En un sistema de flujo de caja blindado, apenas ingresa el capital se divide en 3 conductos automáticos: 50% máximo para costos fijos de vida, 20% mínimo que se transfiere el día 1 a cuentas de inversión/activos, y 30% para estilo de vida libre de culpa.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, págate a ti mismo primero: el 20% de inversión sale el mismo día que cobras. Segundo, diferencia un Activo (pone dinero en tu bolsillo) de un Pasivo (extrae flujo de caja cada mes). Y tercero, si tus costos fijos superan el 60%, tu prioridad no es invertir en activos volátiles sino reducir estructura o aumentar ingresos.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Financiar gastos de estilo de vida con tarjeta de crédito pagando solo el \"pago mínimo\" genera tasas compuestas en tu contra de más del 60% al 120% anual. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El secreto para construir capital sin sufrir a fin de mes no es anotar cada café que tomas, sino automatizar la separación de tu ingreso el mismo día en que entra a tu cuenta bancaria siguiendo la proporción 50 / 30 / 20.",
+          "En el cuadro práctico de abajo verás cómo se distribuye un ingreso neto de $2,500 USD en tres cuentas separadas y por qué el 20% de inversión ($500 USD) debe transferirse en el Día 1 como si fuera el recibo de luz más importante del mes."
         ],
         "keyPoints": [
           "Págate a ti mismo primero: el 20% de inversión sale el mismo día que cobras.",
           "Diferencia un Activo (pone dinero en tu bolsillo) de un Pasivo (extrae flujo de caja cada mes).",
           "Si tus costos fijos superan el 60%, tu prioridad no es invertir en activos volátiles sino reducir estructura o aumentar ingresos.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Programar una transferencia automática el día 1 de cobro hacia tu cuenta de inversión elimina la tentación de gastar ese excedente a fin de mes."
         ],
         "code": "Ingreso Neto Mensual: $2,500 USD\n├─ 🏦 20% Inversión Automática Día 1:  $500 USD -> Cartera Indexada / Liquidez\n├─ 🏠 50% Costos Fijos Operativos:    $1,250 USD -> Vivienda, Servicios, Herramientas\n└─ 🎯 30% Estilo de Vida & Ocio:      $750 USD -> Salidas, Gustos sin endeudarse",
         "warning": "⚠️ Financiar gastos de estilo de vida con tarjeta de crédito pagando solo el \"pago mínimo\" genera tasas compuestas en tu contra de más del 60% al 120% anual.",
@@ -664,15 +664,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Págate a ti mismo primero: el 20% de inversión sale el mismo día que cobras.",
-          "Paso 3 (Validación y Control de Calidad): Diferencia un Activo (pone dinero en tu bolsillo) de un Pasivo (extrae flujo de caja cada mes).",
-          "Paso 4 (Puesta en Marcha y Medición): Si tus costos fijos superan el 60%, tu prioridad no es invertir en activos volátiles sino reducir estructura o aumentar ingresos."
+          "Paso 1 (Calcular tu ingreso neto real): Toma el monto exacto que llega a tu bolsillo cada mes después de impuestos y descuentos.",
+          "Paso 2 (Auditar tu bloque del 50%): Suma alquiler, servicios, comida y transporte básico; verifica que no superen la mitad de tu ingreso.",
+          "Paso 3 (Fijar tope al 30% variable): Asigna un límite claro para salidas, suscripciones y compras personales en una tarjeta o cuenta separada.",
+          "Paso 4 (Automatizar el 20% patrimonial): Configura en tu banco o bróker el envío automático del 20% el mismo día que recibes tus ingresos."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Arquitectura del Flujo de Caja y Regla 50 / 30 / 20 Automatizada",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Financiar gastos de estilo de vida con tarjeta de crédito pagando solo el \"pago mínimo\" genera tasas compuesta...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Págate a ti mismo primero: el 20% de inversión sale el mismo día que cobras.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Profesional Freelance que Ganaba Bien pero Terminaba en Cero",
+          "scenario": "Un diseñador cobraba $2,500 USD mensuales en una única cuenta corriente y mezclaba alquiler, salidas e impuestos, llegando al día 28 sin capacidad de ahorro.",
+          "result": "Al separar su flujo en 3 cuentas y automatizar el retiro de $500 USD el día 1 de cada mes, acumuló $6,000 USD de capital invertido en su primer año."
         }
       },
       {
@@ -681,14 +681,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Antes de invertir en renta variable, acciones tecnológicas o criptoactivos, todo inversor profesional construye su \"foso defensivo\": un Fondo de Reserva equivalente a entre 3 y 6 meses de sus costos fijos básicos.",
           "El objetivo de este fondo NO es hacerse rico, sino evitar que una urgencia médica, rotura de equipo de trabajo o caída temporal de clientes te obligue a malvender tus inversiones a largo plazo en el peor momento del mercado.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, el fondo de emergencia debe estar en instrumentos de liquidez inmediata y riesgo casi nulo (Money Market, cuentas remuneradas en moneda dura o letras del tesoro a corto plazo). Segundo, si tus costos fijos son $1,000 USD/mes, tu escudo completo es de $3,000 a $6,000 USD. Y tercero, nunca inviertas tu fondo de emergencia en activos que puedan caer un 40% en una semana.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Mantener el fondo de emergencia en efectivo físico sin rendimiento pierde entre 3% y 5% anual de poder adquisitivo incluso en dólares por la inflación. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Antes de comprar acciones, índices o criptomonedas, necesitas construir tu escudo protector: un Fondo de Emergencia equivalente a entre 3 y 6 meses de tus costos básicos de vida (nunca de tu sueldo total, sino de lo que necesitas para vivir).",
+          "Observa en el ejemplo cómo para un costo fijo mensual de $1,250 USD se estructura un escudo de $5,000 USD dividido en dos tramos de liquidez inmediata (Money Market y Letras del Tesoro) que rinden interés diario sin riesgo de caída."
         ],
         "keyPoints": [
           "El fondo de emergencia debe estar en instrumentos de liquidez inmediata y riesgo casi nulo (Money Market, cuentas remuneradas en moneda dura o letras del tesoro a corto plazo).",
           "Si tus costos fijos son $1,000 USD/mes, tu escudo completo es de $3,000 a $6,000 USD.",
           "Nunca inviertas tu fondo de emergencia en activos que puedan caer un 40% en una semana.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Separar el Fondo de Emergencia en una cuenta remunerada distinta a la de uso diario evita que lo gastes por impulso y te protege ante cualquier imprevisto."
         ],
         "code": "Cálculo del Escudo de Liquidez Personal:\nCostos Fijos Mensuales = $900 USD\nMeta Mínima (3 meses)  = $2,700 USD (En cuenta remunerada disponible 24/7)\nMeta Óptima (6 meses)  = $5,400 USD (Cobertura total ante imprevistos)",
         "warning": "⚠️ Mantener el fondo de emergencia en efectivo físico sin rendimiento pierde entre 3% y 5% anual de poder adquisitivo incluso en dólares por la inflación.",
@@ -703,15 +703,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): El fondo de emergencia debe estar en instrumentos de liquidez inmediata y riesgo casi nulo (Money Market, cuentas remuneradas en moneda dura o letras del tesoro a corto plazo).",
-          "Paso 3 (Validación y Control de Calidad): Si tus costos fijos son $1,000 USD/mes, tu escudo completo es de $3,000 a $6,000 USD.",
-          "Paso 4 (Puesta en Marcha y Medición): Nunca inviertas tu fondo de emergencia en activos que puedan caer un 40% en una semana."
+          "Paso 1 (Sumar tus gastos vitales de 1 mes): Totaliza únicamente vivienda, alimentación, salud, servicios e impuestos indispensables.",
+          "Paso 2 (Definir tu multiplicador de seguridad): Multiplica ese monto por 3 meses (si tienes ingresos estables) o por 6 meses (si eres independiente).",
+          "Paso 3 (Alojar el Tramo 1 inmediato): Coloca 1 mes de gastos en un fondo Money Market con rescate instantáneo 24/7.",
+          "Paso 4 (Alojar el Tramo 2 remunerado): Coloca los meses restantes en Letras del Tesoro o bonos soberanos T-Bills de muy corto plazo."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Fondo de Emergencia y Liquidez vs. Rentabilidad",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Mantener el fondo de emergencia en efectivo físico sin rendimiento pierde entre 3% y 5% anual de poder adquisi...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (El fondo de emergencia debe estar en instrumentos de liquidez inmediata y riesgo casi nulo (Money Market, cuentas remuneradas en moneda dura o letras del tesoro a corto plazo).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Programador Independiente ante una Reparación Imprevista",
+          "scenario": "Un desarrollador tenía todos sus ahorros metidos en activos volátiles; cuando su computadora de trabajo falló en plena caída del mercado, tuvo que vender a pérdida un -35% para reponerla.",
+          "result": "Tras constituir su escudo líquido de 4 meses en Money Market al 4.8% anual, cubrió futuros imprevistos al instante sin tocar su cartera de largo plazo."
         }
       },
       {
@@ -720,14 +720,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En el interés simple solo ganas rendimientos sobre tu capital inicial. En el interés compuesto, las ganancias de cada período se suman al capital base, de modo que en el siguiente ciclo ganas intereses sobre los intereses previos, formando una curva exponencial: Capital_Final = Capital_Inicial * (1 + r)^n.",
           "Un atajo mental usado por banqueros e inversores es la \"Regla del 72\": si divides el número 72 entre la tasa de rendimiento anual esperada, obtienes cuántos años tardará tu capital en duplicarse sin aportar un dólar extra.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, regla del 72: Al 8% anual, tu dinero se duplica cada 9 años (72 / 8 = 9). Segundo, al 12% anual, tu dinero se duplica cada 6 años (72 / 12 = 6). Y tercero, la variable más poderosa de la fórmula exponencial no es el monto inicial, sino el exponente \"n\" (el tiempo de permanencia sin interrumpir el proceso).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Las comisiones anuales de administración superiores al 2% parecen pequeñas, pero en 20 años pueden devorar hasta el 30% de tu beneficio compuesto. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El interés compuesto parece lento durante los primeros 3 años, pero se vuelve exponencial cuando las ganancias acumuladas empiezan a generar más dinero por sí solas que los nuevos aportes que haces desde tu sueldo.",
+          "En la simulación real de abajo puedes ver cómo invertir $300 USD al mes en un índice diversificado al 10% anual transforma $72,000 USD puestos de tu bolsillo en un patrimonio de $227,810 USD gracias a los $155,810 USD de intereses compuestos."
         ],
         "keyPoints": [
           "Regla del 72: Al 8% anual, tu dinero se duplica cada 9 años (72 / 8 = 9).",
           "Al 12% anual, tu dinero se duplica cada 6 años (72 / 12 = 6).",
           "La variable más poderosa de la fórmula exponencial no es el monto inicial, sino el exponente \"n\" (el tiempo de permanencia sin interrumpir el proceso).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Aplicando la Regla del 72 (72 dividido la tasa anual), al 10% anual tu capital invertido se duplica aproximadamente cada 7.2 años."
         ],
         "code": "Simulación de $300 USD/mes invertidos al 10% anual compuesto:\n- Año 5:   Aportado: $18,000  | Valor Cartera: ~$23,231 USD\n- Año 15:  Aportado: $54,000  | Valor Cartera: ~$124,341 USD\n- Año 25:  Aportado: $90,000  | Valor Cartera: ~$398,050 USD (¡$308,050 son puro interés compuesto!)",
         "warning": "⚠️ Las comisiones anuales de administración superiores al 2% parecen pequeñas, pero en 20 años pueden devorar hasta el 30% de tu beneficio compuesto.",
@@ -742,15 +742,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 3
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Regla del 72: Al 8% anual, tu dinero se duplica cada 9 años (72 / 8 = 9).",
-          "Paso 3 (Validación y Control de Calidad): Al 12% anual, tu dinero se duplica cada 6 años (72 / 12 = 6).",
-          "Paso 4 (Puesta en Marcha y Medición): La variable más poderosa de la fórmula exponencial no es el monto inicial, sino el exponente \"n\" (el tiempo de permanencia sin interrumpir el proceso)."
+          "Paso 1 (Estimar tu tiempo de duplicación): Divide 72 por la rentabilidad anual esperada de tu cartera (ej. 72 / 9% = 8 años para duplicar).",
+          "Paso 2 (Definir tu cuota mensual sostenible): Elige un monto fijo en dólares que puedas aportar todos los meses sin interrumpir.",
+          "Paso 3 (Elegir instrumentos de acumulación): Invierte en ETFs o fondos que reinviertan los dividendos automáticamente sin cobrar comisiones altas.",
+          "Paso 4 (Mantener la constancia plurianual): Evita retirar las ganancias intermedias para no reiniciar el efecto bola de nieve."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Matemática del Interés Compuesto y la Regla del 72",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Las comisiones anuales de administración superiores al 2% parecen pequeñas, pero en 20 años pueden devorar has...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Regla del 72: Al 8% anual, tu dinero se duplica cada 9 años (72 / 8 = 9).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Plan de Retiro Temprano con Aportes de $300 USD Mensuales",
+          "scenario": "Una pareja posponía empezar a invertir porque creía que $300 USD al mes era muy poco dinero para construir un capital relevante.",
+          "result": "Al automatizar su aporte mensual en un ETF indexado al S&P 500 y reinvertir dividendos, superaron los $21,600 USD en los primeros 5 años con crecimiento acelerado."
         }
       },
       {
@@ -759,14 +759,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Intentar adivinar el piso y el techo exacto del mercado (\"Market Timing\") hace que el 90% de los inversores minoristas compren caro por euforia (FOMO) y vendan barato por pánico. La estrategia institucional probada es el DCA (Dollar-Cost Averaging): invertir una suma fija todos los meses sin importar las noticias.",
           "Combina el DCA con una arquitectura de cartera \"Core-Satellite\" (Núcleo-Satélite): el 80% de tu portafolio en el Núcleo (ETFs indexados globales como S&P 500, bonos y liquidez) y solo un 10% a 20% máximo en Satélites de alto riesgo/asimetría (acciones individuales o Bitcoin).",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, con DCA, cuando el mercado baja tu cuota mensual compra automáticamente más unidades a precio de descuento. Segundo, nunca arriesgues más del 1% al 2% de tu patrimonio total en una sola operación especulativa. Y tercero, una pérdida del 50% en un activo exige una ganancia del +100% posterior solo para volver a quedar empatado.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si un proyecto promete \"rentabilidades garantizadas del 10% mensual en dólares sin riesgo\", aléjate: matemáticamente es un esquema Ponzi. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "En las inversiones existe una trampa matemática que todo principiante debe conocer: las pérdidas y las ganancias no son simétricas. Si una inversión cae un 50%, no te alcanza con ganar un 50% después; necesitas ganar un +100% solo para empatar.",
+          "Por eso en el esquema práctico combinamos la estrategia DCA (comprar un monto fijo todos los meses sin adivinar techos ni pisos) con una cartera Núcleo-Satélite donde el 80% está seguro en índices globales y nunca arriesgas más del 5% en un activo individual."
         ],
         "keyPoints": [
           "Con DCA, cuando el mercado baja tu cuota mensual compra automáticamente más unidades a precio de descuento.",
           "Nunca arriesgues más del 1% al 2% de tu patrimonio total en una sola operación especulativa.",
           "Una pérdida del 50% en un activo exige una ganancia del +100% posterior solo para volver a quedar empatado.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Con compras periódicas DCA (Dollar-Cost Averaging), cuando el mercado baja tu cuota mensual compra automáticamente más unidades a precio de descuento."
         ],
         "code": "Asimetría Matemática de las Pérdidas:\n- Si pierdes 10% -> Necesitas ganar +11.1% para recuperar tu capital.\n- Si pierdes 25% -> Necesitas ganar +33.3% para recuperar tu capital.\n- Si pierdes 50% -> Necesitas ganar +100.0% para recuperar tu capital.\n- Si pierdes 80% -> Necesitas ganar +400.0% para recuperar tu capital.",
         "warning": "⚠️ Si un proyecto promete \"rentabilidades garantizadas del 10% mensual en dólares sin riesgo\", aléjate: matemáticamente es un esquema Ponzi.",
@@ -781,15 +781,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Con DCA, cuando el mercado baja tu cuota mensual compra automáticamente más unidades a precio de descuento.",
-          "Paso 3 (Validación y Control de Calidad): Nunca arriesgues más del 1% al 2% de tu patrimonio total en una sola operación especulativa.",
-          "Paso 4 (Puesta en Marcha y Medición): Una pérdida del 50% en un activo exige una ganancia del +100% posterior solo para volver a quedar empatado."
+          "Paso 1 (Blindar el 80% en el Núcleo): Asigna el 80% de tu portafolio a ETFs amplios (S&P 500 / MSCI World) y bonos del Tesoro.",
+          "Paso 2 (Acotar el 20% Satélite): Limita los activos de alto crecimiento o cripto (BTC/ETH) a un máximo del 15-20% del total.",
+          "Paso 3 (Aplicar la regla del 5% máximo): Verifica que ninguna acción o proyecto individual represente más del 5% de tu patrimonio.",
+          "Paso 4 (Ejecutar compras DCA el mismo día del mes): Invierte tu cuota mensual en fecha fija sin dejarte llevar por noticias ni euforia."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Gestión de Riesgo, DCA (Dollar-Cost Averaging) y Cartera Núcleo-Satélite",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Si un proyecto promete \"rentabilidades garantizadas del 10% mensual en dólares sin riesgo\", aléjate: matemátic...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Con DCA, cuando el mercado baja tu cuota mensual compra automáticamente más unidades a precio de descuento.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Inversor que Pasó de Perder con Modas a Crecer de Forma Estable",
+          "scenario": "Un ahorrista ponía el 70% de su dinero en una sola acción de moda cuando veía noticias alcistas, sufriendo caídas del 45% que tardaban años en recuperarse.",
+          "result": "Reestructuró su capital bajo el modelo 80% Núcleo / 20% Satélite con compras DCA mensuales, logrando un rendimiento anualizado del +11.4% con baja volatilidad."
         }
       },
       {
@@ -949,14 +949,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El buen diseño de interfaces no se basa en gustos subjetivos, sino en cómo el cerebro humano procesa información visual y toma decisiones en milisegundos. Tres leyes científicas gobiernan toda interfaz rentable:",
           "1) Ley de Hick: El tiempo que tarda un usuario en decidir aumenta logarítmicamente con el número de opciones disponibles. 2) Ley de Fitts: El tiempo para tocar un objetivo (como el botón de compra) depende de su tamaño y cercanía al pulgar/cursor. 3) Ley de Jakob: Los usuarios pasan la mayor parte de su tiempo en otras webs, por lo que prefieren que tu sitio funcione con patrones familiares.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, no pongas 8 botones distintos en el encabezado; deja 1 única acción primaria destacada. Segundo, en pantallas móviles, los botones de conversión deben medir al menos 48px de alto y estar al alcance del pulgar. Y tercero, usa iconos y flujos de carrito estándar para no obligar al usuario a \"aprender\" a usar tu web.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Reinventar la ubicación del botón de cierre o del carrito de compras por \"originalidad artística\" destruye la tasa de conversión. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando un visitante entra a tu página web desde el celular, su cerebro evalúa en menos de 3 segundos si entiende qué ofreces y dónde debe tocar. Si lo obligas a elegir entre 10 botones distintos, sufre fatiga de decisión y cierra la pestaña.",
+          "En la comparativa del bloque práctico verás cómo al aplicar la Ley de Hick (una sola acción clara por pantalla) y la Ley de Fitts (un botón de 52px de alto al alcance del pulgar), la tasa de conversión se triplica sin gastar un centavo más en publicidad."
         ],
         "keyPoints": [
           "No pongas 8 botones distintos en el encabezado; deja 1 única acción primaria destacada.",
           "En pantallas móviles, los botones de conversión deben medir al menos 48px de alto y estar al alcance del pulgar.",
           "Usa iconos y flujos de carrito estándar para no obligar al usuario a \"aprender\" a usar tu web.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Mantener el carrito y el menú en las ubicaciones estándar que el usuario ya conoce (Ley de Jakob) evita que pierda tiempo buscando cómo comprar."
         ],
         "code": "Auditoría UX Rápida:\n❌ Menú con 12 links + 4 popups + 6 planes de precios -> Parálisis por análisis (Ley de Hick).\n✅ Propuesta clara + 2 planes comparables (1 recomendado) + 1 CTA contrastante -> Alta conversión.",
         "warning": "⚠️ Reinventar la ubicación del botón de cierre o del carrito de compras por \"originalidad artística\" destruye la tasa de conversión.",
@@ -971,15 +971,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): No pongas 8 botones distintos en el encabezado; deja 1 única acción primaria destacada.",
-          "Paso 3 (Validación y Control de Calidad): En pantallas móviles, los botones de conversión deben medir al menos 48px de alto y estar al alcance del pulgar.",
-          "Paso 4 (Puesta en Marcha y Medición): Usa iconos y flujos de carrito estándar para no obligar al usuario a \"aprender\" a usar tu web."
+          "Paso 1 (Auditar la cantidad de enlaces): Cuenta cuántos botones o links compiten en la primera pantalla y elimina los que distraigan de la compra.",
+          "Paso 2 (Agrandar el área táctil en móvil): Asegúrate de que el botón principal tenga al menos 48px a 52px de altura y ocupe el ancho cómodo del pulgar.",
+          "Paso 3 (Destacar por contraste visual): Aplica un color de alto contraste exclusivamente al botón de acción principal (CTA).",
+          "Paso 4 (Verificar patrones familiares): Comprueba que el flujo de navegación siga las convenciones que tus clientes ya usan todos los días."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Las 3 Leyes Cognitivas del Diseño UI/UX (Hick, Fitts y Jakob)",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Reinventar la ubicación del botón de cierre o del carrito de compras por \"originalidad artística\" destruye la ...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (No pongas 8 botones distintos en el encabezado; deja 1 única acción primaria destacada.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Academia Online que Triplicó Registros Simplificando su Menú",
+          "scenario": "La portada móvil de una academia tenía 9 botones en el encabezado, un carrusel lento y un botón de registro diminuto en color gris que nadie veía.",
+          "result": "Eliminaron las distracciones dejando una única propuesta central y un botón fijo de 52px, elevando la conversión de visitas a registros del 1.1% al 3.8%."
         }
       },
       {
@@ -988,14 +988,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "La sección \"Above the Fold\" (lo que el visitante ve en los primeros 4 segundos sin hacer scroll) determina si se queda o cierra la pestaña. Debe responder instantáneamente tres preguntas: ¿Qué es esto?, ¿Qué gano yo hoy? y ¿Qué debo hacer ahora?",
           "El botón de acción (CTA) nunca debe describir el trámite burocrático (\"Enviar\", \"Registrarse\", \"Pagar\"), sino el beneficio inmediato que el usuario obtiene al hacer clic (\"Desbloquear mi Acceso VIP\", \"Crear mi Cuenta Gratis en 30s\").",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, titular orientado a resultados: \"[Resultado concreto] en [Tiempo] sin [Objeción principal]\". Segundo, micro-copy debajo del CTA: Reduce la ansiedad aclarando \"Acceso inmediato • Garantía de 14 días\". Y tercero, contraste visual: El CTA primario debe usar un color de acento que no compita con el fondo.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Un botón que dice \"Enviar formulario\" convierte hasta un 35% menos que un botón orientado al beneficio real del usuario. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El área \"Above the Fold\" (lo primero que se ve apenas carga tu web, antes de deslizar hacia abajo) define el 80% del éxito de tu página: allí el usuario debe entender de inmediato qué resultado logrará y por qué debería confiar en ti.",
+          "Observa en la plantilla Hero de abajo cómo se combinan 5 piezas en orden psicológico: una insignia para el perfil ideal, un titular de beneficio concreto, un subtítulo de mecanismo, un botón en primera persona y un micro-texto que elimina el miedo justo debajo del clic."
         ],
         "keyPoints": [
           "Titular orientado a resultados: \"[Resultado concreto] en [Tiempo] sin [Objeción principal]\".",
           "Micro-copy debajo del CTA: Reduce la ansiedad aclarando \"Acceso inmediato • Garantía de 14 días\".",
           "Contraste visual: El CTA primario debe usar un color de acento que no compita con el fondo.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Colocar debajo del botón principal una línea breve con garantía, pago seguro y acceso inmediato reduce drásticamente la duda de último segundo."
         ],
         "code": "Estructura Hero de Alta Conversión:\n[Etiqueta de Autoridad]: ⭐ Usado por +4,200 desarrolladores y creadores\n[Titular H1]: Domina las habilidades más rentables con proyectos reales paso a paso.\n[Subtítulo]: Sin teoría de relleno. Aprende en módulos prácticos y certifica tu nivel.\n[Botón CTA Primario]: 🚀 Comenzar Curso Ahora ->\n[Reductor de Fricción]: 🔒 Pago 100% seguro • Acceso vitalicio inmediato",
         "warning": "⚠️ Un botón que dice \"Enviar formulario\" convierte hasta un 35% menos que un botón orientado al beneficio real del usuario.",
@@ -1010,15 +1010,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Titular orientado a resultados: \"[Resultado concreto] en [Tiempo] sin [Objeción principal]\".",
-          "Paso 3 (Validación y Control de Calidad): Micro-copy debajo del CTA: Reduce la ansiedad aclarando \"Acceso inmediato • Garantía de 14 días\".",
-          "Paso 4 (Puesta en Marcha y Medición): Contraste visual: El CTA primario debe usar un color de acento que no compita con el fondo."
+          "Paso 1 (Escribir la ceja de calificación): Añade arriba del título una etiqueta corta que identifique para quién es la solución y el nivel de valoración.",
+          "Paso 2 (Reescribir el H1 orientado al resultado): Cambia frases vagas como \"Bienvenido a nuestra web\" por el logro medible que obtendrá el cliente.",
+          "Paso 3 (Redactar el botón en primera persona): Usa un verbo de beneficio directo como \"Quiero Desbloquear Mi Acceso Ahora\" en vez de \"Enviar\".",
+          "Paso 4 (Añadir el reductor de fricción): Coloca justo debajo del botón los sellos de acceso instantáneo y garantía de reembolso."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Anatomía del \"Above the Fold\" y Botones de Llamado a la Acción (CTA)",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Un botón que dice \"Enviar formulario\" convierte hasta un 35% menos que un botón orientado al beneficio real de...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Titular orientado a resultados: \"[Resultado concreto] en [Tiempo] sin [Objeción principal]\".), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Software Contable que Duplicó sus Pruebas Gratuitas",
+          "scenario": "La web abría con el eslogan \"Innovación en la nube para tu empresa\" y un botón que decía \"Registrarse\", sin aclarar si pedían tarjeta de crédito.",
+          "result": "Cambiaron al titular \"Factura en 30 segundos desde el celular\" con el micro-copy \"Gratis por 14 días • Sin tarjeta\", subiendo los registros un +115%."
         }
       },
       {
@@ -1027,14 +1027,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Cada campo adicional que pides en un formulario de pago o registro reduce la tasa de conversión entre un 7% y un 12%. Si para vender un curso digital pides código postal, teléfono fijo, empresa y fecha de nacimiento, estás regalando la mitad de tus ventas.",
           "Al presentar precios, el \"Efecto Anclaje y Señuelo\" muestra cómo un plan intermedio o VIP bien estructurado —que incluye bonos de alto valor percibido por poca diferencia de precio respecto a comprar por separado— guía naturalmente al 70% de los compradores hacia la opción más rentable.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, pide solo lo indispensable en el checkout (Email + Método de pago). Segundo, la Prueba Social específica (\"Martín G. aumentó sus ventas un 34% en 2 semanas\") vence a los elogios vagos (\"Muy buena página\"). Y tercero, destaca visualmente el plan recomendado con un borde contrastante y etiqueta de \"Más Elegido\".",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca uses testimonios falsos ni contadores de escasez que se reinician al refrescar la página: destruyen la confianza de marca de forma irreversible. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El momento más delicado de toda venta online es el Checkout: cada campo innecesario que le pides completar al comprador (como código postal, teléfono fijo, empresa o repetir contraseña) aumenta el abandono del carrito.",
+          "En el ejemplo práctico verás cómo reducir el formulario de 11 campos a solo 2 pasos simples y presentar una tabla de precios con anclaje claro hace que el plan completo se perciba como la opción más inteligente y conveniente."
         ],
         "keyPoints": [
           "Pide solo lo indispensable en el checkout (Email + Método de pago).",
           "La Prueba Social específica (\"Martín G. aumentó sus ventas un 34% en 2 semanas\") vence a los elogios vagos (\"Muy buena página\").",
           "Destaca visualmente el plan recomendado con un borde contrastante y etiqueta de \"Más Elegido\".",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Mostrar testimonios verificables con nombre, profesión y resultado concreto justo al lado del botón de pago disipa la desconfianza final."
         ],
         "code": "Comparativa de Conversión en Formularios de Checkout:\n- Formulario de 9 campos (Nombre, Apellido, DNI, Dirección, Ciudad, CP, Teléfono, Email, Clave): 2.1% conversión.\n- Checkout Express de 2 pasos (Email + Pago con 1 clic): 6.8% conversión (+223% más ventas con el mismo tráfico).",
         "warning": "⚠️ Nunca uses testimonios falsos ni contadores de escasez que se reinician al refrescar la página: destruyen la confianza de marca de forma irreversible.",
@@ -1049,15 +1049,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 3
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Pide solo lo indispensable en el checkout (Email + Método de pago).",
-          "Paso 3 (Validación y Control de Calidad): La Prueba Social específica (\"Martín G. aumentó sus ventas un 34% en 2 semanas\") vence a los elogios vagos (\"Muy buena página\").",
-          "Paso 4 (Puesta en Marcha y Medición): Destaca visualmente el plan recomendado con un borde contrastante y etiqueta de \"Más Elegido\"."
+          "Paso 1 (Podar el formulario de pago): Elimina todos los campos que no sean estrictamente indispensables para entregar el acceso y emitir el recibo.",
+          "Paso 2 (Activar autocompletado y teclado numérico): Configura inputmode=\"numeric\" en los campos de tarjeta o documento para facilitar la carga en celular.",
+          "Paso 3 (Diseñar el anclaje de planes): Presenta el valor individual frente al pase completo destacando visualmente el ahorro con la etiqueta \"MÁS ELEGIDO\".",
+          "Paso 4 (Ubicar prueba social en el checkout): Añade garantías visibles y casos reales junto al resumen del pedido."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Fricción en el Checkout, Efecto Señuelo (Decoy) y Prueba Social",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Nunca uses testimonios falsos ni contadores de escasez que se reinician al refrescar la página: destruyen la c...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Pide solo lo indispensable en el checkout (Email + Método de pago).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Tienda Digital con 78% de Abandono en la Pantalla de Pago",
+          "scenario": "Un checkout exigía llenar 12 campos obligatorios incluyendo dirección física para comprar un curso descargable, frustrando a los usuarios de celular.",
+          "result": "Simplificaron el pago a Nombre, Email y método de cobro en un solo clic, reduciendo el abandono y aumentando las ventas cobradas en un +64%."
         }
       },
       {
@@ -1066,14 +1066,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En Growth y UX todo cambio se valida con datos. El embudo de conversión mide qué porcentaje de visitantes pasa de una etapa a la siguiente: Visitas -> Clic en el Curso -> Inicio de Checkout -> Compra Confirmada.",
           "En una prueba A/B dividimos el tráfico en dos grupos simultáneos (50% ve la Versión A original y 50% ve la Versión B con un único cambio, por ejemplo un nuevo titular) para medir científicamente cuál genera más ingresos por visitante (RPV).",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, cambia una sola variable clave por experimento A/B para saber exactamente qué causó la mejora. Segundo, mide siempre la tasa de conversión a pago real, no solo los clics superficiales. Y tercero, si el 40% inicia el checkout pero solo el 5% termina pagando, el problema está en los métodos de pago o costos sorpresa.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: No des por ganador un Test A/B con apenas 20 visitas; necesitas una muestra representativa para que el resultado no sea puro azar. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Los mejores diseñadores no discuten por gustos personales: miden en qué paso exacto del embudo se están perdiendo los visitantes y lanzan experimentos A/B cambiando una sola pieza a la vez para comprobar con datos reales qué versión vende más.",
+          "Observa en el cálculo de impacto CRO del bloque práctico cómo al subir la tasa de conversión de una tienda del 1.5% al 2.4% con el mismo tráfico de 10,000 visitas, la facturación mensual salta de $7,500 a $12,000 USD sin gastar un dólar extra en anuncios."
         ],
         "keyPoints": [
           "Cambia una sola variable clave por experimento A/B para saber exactamente qué causó la mejora.",
           "Mide siempre la tasa de conversión a pago real, no solo los clics superficiales.",
           "Si el 40% inicia el checkout pero solo el 5% termina pagando, el problema está en los métodos de pago o costos sorpresa.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Si tu embudo recibe muchos clics en el botón de compra pero pocos pagos completados, el problema no es el diseño de la portada sino la pasarela de cobro."
         ],
         "code": "Cálculo de Impacto CRO (Conversion Rate Optimization):\nTráfico mensual: 10,000 visitas | Ticket promedio: $29 USD\n- Antes (Conversión 1.5%):  150 ventas = $4,350 USD / mes\n- Después (Conversión 3.0%): 300 ventas = $8,700 USD / mes\n👉 ¡Duplicaste la facturación sin gastar $1 dólar extra en publicidad!",
         "warning": "⚠️ No des por ganador un Test A/B con apenas 20 visitas; necesitas una muestra representativa para que el resultado no sea puro azar.",
@@ -1088,15 +1088,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Cambia una sola variable clave por experimento A/B para saber exactamente qué causó la mejora.",
-          "Paso 3 (Validación y Control de Calidad): Mide siempre la tasa de conversión a pago real, no solo los clics superficiales.",
-          "Paso 4 (Puesta en Marcha y Medición): Si el 40% inicia el checkout pero solo el 5% termina pagando, el problema está en los métodos de pago o costos sorpresa."
+          "Paso 1 (Mapear los 4 escalones del embudo): Mide cuántas personas pasan de Visita -> Clic en CTA -> Inicio de Checkout -> Compra Confirmada.",
+          "Paso 2 (Detectar el cuello de botella): Identifica en cuál de esos pasos cae más porcentaje de usuarios para enfocar allí tu mejora.",
+          "Paso 3 (Formular una hipótesis de 1 variable): Crea una Variante B cambiando únicamente el titular o el checkout sin mezclar 5 cambios juntos.",
+          "Paso 4 (Evaluar con volumen suficiente): Espera a reunir al menos 100 conversiones antes de declarar ganadora a la nueva versión."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Métricas de Embudo (Funnel) y Experimentación con Tests A/B",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (No des por ganador un Test A/B con apenas 20 visitas; necesitas una muestra representativa para que el resulta...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Cambia una sola variable clave por experimento A/B para saber exactamente qué causó la mejora.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: E-Commerce que Ganó +$4,500 USD/mes Optimizado su Embudo",
+          "scenario": "El dueño quería duplicar el gasto en anuncios porque sentía que vendía poco, sin notar que el 82% de los usuarios que abrían el checkout se iban sin pagar.",
+          "result": "Detectaron la fuga en el paso 3 del embudo, agregaron pagos locales rápidos en un test A/B y sumaron $4,500 USD mensuales extra con el mismo tráfico."
         }
       },
       {
@@ -1256,14 +1256,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Una API REST es el contrato de comunicación entre el Frontend (navegador o app móvil) y el Backend (servidor y base de datos). En REST, las URLs representan recursos en plural (ej. /api/v1/cursos) y la acción a realizar se define mediante el verbo HTTP.",
           "Un backend profesional responde siempre con el código de estado HTTP semántico correcto para que el cliente sepa exactamente qué ocurrió sin tener que adivinar.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, gET (leer recursos), POST (crear nuevo), PUT/PATCH (actualizar), DELETE (eliminar). Segundo, códigos 2xx = Éxito (200 OK, 201 Created). Códigos 4xx = Error del cliente (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found). Y tercero, códigos 5xx = Fallo interno del servidor (500 Internal Server Error).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca uses una petición GET para borrar datos o realizar cobros; las peticiones GET deben ser idempotentes y de solo lectura. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Una API REST bien diseñada actúa como un contrato predecible entre el navegador y el servidor: utiliza sustantivos en plural para las rutas (/api/courses), verbos HTTP para indicar la acción y códigos de estado claros para responder qué ocurrió.",
+          "En el código Express de abajo verás cómo antes de crear un curso con POST validamos que el título y el precio sean correctos (devolviendo 400 Bad Request si faltan datos) y respondemos 201 Created con el recurso recién generado."
         ],
         "keyPoints": [
           "GET (leer recursos), POST (crear nuevo), PUT/PATCH (actualizar), DELETE (eliminar).",
           "Códigos 2xx = Éxito (200 OK, 201 Created). Códigos 4xx = Error del cliente (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found).",
           "Códigos 5xx = Fallo interno del servidor (500 Internal Server Error).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Nunca confíes en las validaciones hechas solo en el navegador: un atacante puede enviar peticiones directas con Postman o curl saltándose tu interfaz."
         ],
         "code": "// Ejemplo de Endpoint REST en Node.js / Express\napp.post('/api/v1/courses', authenticateAdmin, async (req, res) => {\n  const { title, priceUSD } = req.body;\n  if (!title || priceUSD < 0) {\n    return res.status(400).json({ error: \"Título obligatorio y precio válido.\" });\n  }\n  const newCourse = await db.courses.create({ title, priceUSD });\n  return res.status(201).json({ data: newCourse });\n});",
         "warning": "⚠️ Nunca uses una petición GET para borrar datos o realizar cobros; las peticiones GET deben ser idempotentes y de solo lectura.",
@@ -1278,15 +1278,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): GET (leer recursos), POST (crear nuevo), PUT/PATCH (actualizar), DELETE (eliminar).",
-          "Paso 3 (Validación y Control de Calidad): Códigos 2xx = Éxito (200 OK, 201 Created). Códigos 4xx = Error del cliente (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found).",
-          "Paso 4 (Puesta en Marcha y Medición): Códigos 5xx = Fallo interno del servidor (500 Internal Server Error)."
+          "Paso 1 (Definir la ruta y el verbo HTTP): Crea el endpoint app.post(\"/api/courses\", ...) usando sustantivos en plural.",
+          "Paso 2 (Validar el cuerpo de entrada): Verifica en el servidor que title tenga longitud válida y que priceUSD sea un número positivo.",
+          "Paso 3 (Retornar 400 ante datos inválidos): Corta la ejecución con return res.status(400).json({ error: ... }) si falla alguna regla.",
+          "Paso 4 (Persistir y responder 201): Guarda el registro en la base de datos y devuelve el objeto creado con código 201."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Diseño de APIs RESTful, Verbos HTTP y Códigos de Estado",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Nunca uses una petición GET para borrar datos o realizar cobros; las peticiones GET deben ser idempotentes y d...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (GET (leer recursos), POST (crear nuevo), PUT/PATCH (actualizar), DELETE (eliminar).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Plataforma Educativa que Recibía Precios Negativos por API",
+          "scenario": "Una aplicación validaba los precios únicamente en el formulario HTML del navegador; un usuario modificó la petición HTTP enviando priceUSD: -50 y alteró su saldo.",
+          "result": "Al añadir validación estricta de tipos y rangos en el endpoint POST del servidor con respuestas 400 y 422, blindaron todas las operaciones comerciales."
         }
       },
       {
@@ -1295,14 +1295,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En una base de datos relacional (PostgreSQL, MySQL), la información se organiza en tablas normalizadas para evitar duplicar datos. Cada fila tiene una Clave Primaria única (Primary Key) y se relaciona con otras tablas mediante Claves Foráneas (Foreign Keys).",
           "Cuando una tabla crece a cientos de miles de filas, buscar por email o por usuario sin un Índice (INDEX) obliga al motor a escanear toda la tabla fila por fila (Full Table Scan). Un índice B-Tree reduce esa búsqueda de segundos a menos de 1 milisegundo.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, usa restricciones NOT NULL y UNIQUE en campos críticos como el email. Segundo, las transacciones ACID garantizan que un pago y la entrega del curso se guarden juntos o se reviertan ambos si algo falla. Y tercero, usa consultas parametrizadas ($1, $2) para impedir al 100% ataques de Inyección SQL.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Jamás concatenes variables del usuario directamente en un string SQL (`\"SELECT * FROM users WHERE email = '\" + input + \"'\"`); usa siempre parámetros preparados. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "En una base de datos profesional de PostgreSQL, la estructura de tus tablas debe impedir por sí misma que se guarden datos corruptos: correos duplicados, importes negativos o compras huérfanas que no pertenecen a ningún usuario real.",
+          "Observa en el script SQL de abajo cómo combinamos restricciones NOT NULL, UNIQUE, CHECK (amount_paid >= 0), claves foráneas REFERENCES users(id) y un índice B-Tree para que buscar las compras de un alumno entre un millón de filas tarde menos de 1 milisegundo."
         ],
         "keyPoints": [
           "Usa restricciones NOT NULL y UNIQUE en campos críticos como el email.",
           "Las transacciones ACID garantizan que un pago y la entrega del curso se guarden juntos o se reviertan ambos si algo falla.",
           "Usa consultas parametrizadas ($1, $2) para impedir al 100% ataques de Inyección SQL.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Crear índices CREATE INDEX sobre las columnas que usas en tus filtros WHERE y claves foráneas evita que la base de datos tenga que leer la tabla entera en cada consulta."
         ],
         "code": "CREATE TABLE users (\n  id SERIAL PRIMARY KEY,\n  email VARCHAR(255) UNIQUE NOT NULL,\n  is_vip BOOLEAN DEFAULT FALSE,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE enrollments (\n  id SERIAL PRIMARY KEY,\n  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n  course_id VARCHAR(64) NOT NULL,\n  amount_paid NUMERIC(10, 2) NOT NULL\n);\n\nCREATE INDEX idx_enrollments_user ON enrollments(user_id);",
         "warning": "⚠️ Jamás concatenes variables del usuario directamente en un string SQL (`\"SELECT * FROM users WHERE email = '\" + input + \"'\"`); usa siempre parámetros preparados.",
@@ -1317,15 +1317,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Usa restricciones NOT NULL y UNIQUE en campos críticos como el email.",
-          "Paso 3 (Validación y Control de Calidad): Las transacciones ACID garantizan que un pago y la entrega del curso se guarden juntos o se reviertan ambos si algo falla.",
-          "Paso 4 (Puesta en Marcha y Medición): Usa consultas parametrizadas ($1, $2) para impedir al 100% ataques de Inyección SQL."
+          "Paso 1 (Diseñar la tabla maestra): Crea la tabla users con su clave primaria SERIAL PRIMARY KEY y la restricción UNIQUE en el email.",
+          "Paso 2 (Vincular la tabla relacional): Crea enrollments conectando user_id mediante REFERENCES users(id) ON DELETE CASCADE.",
+          "Paso 3 (Blindar importes con CHECK): Añade CHECK (amount_paid >= 0) sobre una columna NUMERIC(10, 2) exacta para dinero.",
+          "Paso 4 (Indexar búsquedas frecuentes): Ejecuta CREATE INDEX idx_enrollments_user_id ON enrollments(user_id); para acelerar las lecturas."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Modelado de Bases de Datos Relacionales SQL e Índices",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Jamás concatenes variables del usuario directamente en un string SQL (`\"SELECT * FROM users WHERE email = '\" +...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Usa restricciones NOT NULL y UNIQUE en campos críticos como el email.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Sistema de Suscripciones que Tardaba 6 Segundos en Cargar el Perfil",
+          "scenario": "Una web con 180,000 compras guardaba los precios en tipo FLOAT (generando errores de centavos) y carecía de índice en la columna user_id.",
+          "result": "Migraron los importes a NUMERIC(10,2) y añadieron el índice B-Tree sobre user_id, bajando el tiempo de consulta de 6,000 ms a 1.4 ms."
         }
       },
       {
@@ -1334,14 +1334,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Para generar reportes de negocio —como saber cuánto ha facturado cada curso o qué alumnos VIP tienen más compras— combinamos tablas usando cláusulas JOIN y funciones de agregación (SUM, COUNT, AVG) agrupadas con GROUP BY.",
           "La diferencia clave entre INNER JOIN y LEFT JOIN es que INNER JOIN solo devuelve filas que tienen coincidencia en ambas tablas, mientras que LEFT JOIN conserva todos los registros de la tabla izquierda aunque tengan 0 compras en la tabla derecha.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, wHERE filtra filas individuales ANTES de agrupar; HAVING filtra grupos DESPUÉS del GROUP BY. Segundo, cOALESCE(SUM(monto), 0) convierte valores nulos en 0 para reportes limpios. Y tercero, selecciona solo las columnas necesarias en lugar de hacer SELECT * en producción.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Hacer un JOIN sin especificar la condición \"ON\" genera un producto cartesiano que multiplica todas las filas contra todas y puede colgar el servidor. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando armas el panel de administración de un negocio, necesitas cruzar la tabla de usuarios con la tabla de pagos para saber cuánto invirtió cada cliente, incluyendo a quienes se registraron gratis y todavía tienen $0 en compras.",
+          "En la consulta SQL del bloque práctico verás por qué usamos LEFT JOIN en lugar de INNER JOIN y cómo la función COALESCE(SUM(e.amount_paid), 0) convierte los valores nulos de los usuarios sin compras en un 0.00 limpio para tu reporte."
         ],
         "keyPoints": [
           "WHERE filtra filas individuales ANTES de agrupar; HAVING filtra grupos DESPUÉS del GROUP BY.",
           "COALESCE(SUM(monto), 0) convierte valores nulos en 0 para reportes limpios.",
           "Selecciona solo las columnas necesarias en lugar de hacer SELECT * en producción.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Recuerda la diferencia en una frase: WHERE filtra filas individuales antes de agrupar, mientras que HAVING filtra grupos después de haber calculado SUM() o COUNT()."
         ],
         "code": "-- Reporte de ingresos totales por alumno (incluyendo alumnos con $0 en compras)\nSELECT \n  u.email,\n  u.is_vip,\n  COUNT(e.id) AS cursos_comprados,\n  COALESCE(SUM(e.amount_paid), 0) AS total_invertido_usd\nFROM users u\nLEFT JOIN enrollments e ON u.id = e.user_id\nGROUP BY u.id, u.email, u.is_vip\nORDER BY total_invertido_usd DESC;",
         "warning": "⚠️ Hacer un JOIN sin especificar la condición \"ON\" genera un producto cartesiano que multiplica todas las filas contra todas y puede colgar el servidor.",
@@ -1356,15 +1356,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): WHERE filtra filas individuales ANTES de agrupar; HAVING filtra grupos DESPUÉS del GROUP BY.",
-          "Paso 3 (Validación y Control de Calidad): COALESCE(SUM(monto), 0) convierte valores nulos en 0 para reportes limpios.",
-          "Paso 4 (Puesta en Marcha y Medición): Selecciona solo las columnas necesarias en lugar de hacer SELECT * en producción."
+          "Paso 1 (Seleccionar columnas y agregaciones): Escribe SELECT con el id, email, COUNT() de cursos y COALESCE(SUM(...), 0) para el total.",
+          "Paso 2 (Unir con LEFT JOIN): Conecta users u con enrollments e mediante ON e.user_id = u.id para no perder a los alumnos con 0 compras.",
+          "Paso 3 (Agrupar por entidad): Añade GROUP BY u.id, u.email para consolidar todas las compras de cada estudiante en una sola fila.",
+          "Paso 4 (Ordenar y limitar): Cierra con ORDER BY total_spent DESC LIMIT 20 para obtener el ranking de mejores clientes sin saturar la memoria."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Consultas Avanzadas con INNER JOIN, LEFT JOIN y Agregaciones",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Hacer un JOIN sin especificar la condición \"ON\" genera un producto cartesiano que multiplica todas las filas c...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (WHERE filtra filas individuales ANTES de agrupar; HAVING filtra grupos DESPUÉS del GROUP BY.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Panel de Métricas que Ocultaba al 70% de los Usuarios Registrados",
+          "scenario": "El desarrollador había usado INNER JOIN para listar a los usuarios en el panel de control, por lo que todos los alumnos recién registrados sin compras desaparecían de la lista.",
+          "result": "Al cambiar la consulta a LEFT JOIN con COALESCE, el panel mostró el 100% de la base de usuarios con sus respectivos saldos y compras reales."
         }
       },
       {
@@ -1373,14 +1373,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En ningún sistema serio se guardan contraseñas en texto plano ni con algoritmos reversibles. Las contraseñas se procesan con funciones de hashing criptográfico lento con \"Salt\" (como Argon2id o Bcrypt), de modo que ni siquiera el administrador de la base de datos pueda leer la clave original.",
           "Una vez autenticado el usuario, el servidor puede emitir un JSON Web Token (JWT) firmado digitalmente con una clave secreta. En cada petición futura, el backend verifica la firma criptográfica del token antes de autorizar el acceso.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, el \"Salt\" agrega datos aleatorios únicos a cada contraseña antes de hashearla para inutilizar tablas Rainbow. Segundo, un JWT consta de 3 partes separadas por puntos: Header.Payload.Signature. Y tercero, el Payload de un JWT está codificado en Base64 (cualquiera puede leerlo), pero nadie puede modificarlo sin invalidar la Firma (Signature).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca guardes secretos privados ni contraseñas dentro del Payload de un JWT, porque Base64 NO es cifrado: es solo codificación legible. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "La regla número uno de seguridad en cualquier aplicación con usuarios es jamás guardar contraseñas en texto plano: siempre debes transformarlas con un algoritmo lento con sal aleatoria como bcrypt o Argon2 antes de guardarlas en SQL.",
+          "En el código de abajo verás el flujo completo de inicio de sesión: buscamos al usuario con una consulta parametrizada ($1) que impide ataques de Inyección SQL, comparamos el hash con bcrypt.compare() y emitimos un token JWT firmado que expira en 2 horas."
         ],
         "keyPoints": [
           "El \"Salt\" agrega datos aleatorios únicos a cada contraseña antes de hashearla para inutilizar tablas Rainbow.",
           "Un JWT consta de 3 partes separadas por puntos: Header.Payload.Signature.",
           "El Payload de un JWT está codificado en Base64 (cualquiera puede leerlo), pero nadie puede modificarlo sin invalidar la Firma (Signature).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Usa siempre un mensaje de error unificado (\"Credenciales inválidas\") tanto si falló el email como la contraseña, para no revelarle a un atacante qué correos existen en tu base."
         ],
         "code": "// Verificación segura de contraseña y emisión de JWT\nconst isValid = await bcrypt.compare(plainPassword, user.password_hash);\nif (!isValid) return res.status(401).json({ error: \"Credenciales inválidas\" });\n\nconst token = jwt.sign(\n  { sub: user.id, role: user.is_vip ? \"vip\" : \"standard\" },\n  process.env.JWT_SECRET,\n  { expiresIn: \"2h\" }\n);",
         "warning": "⚠️ Nunca guardes secretos privados ni contraseñas dentro del Payload de un JWT, porque Base64 NO es cifrado: es solo codificación legible.",
@@ -1395,15 +1395,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): El \"Salt\" agrega datos aleatorios únicos a cada contraseña antes de hashearla para inutilizar tablas Rainbow.",
-          "Paso 3 (Validación y Control de Calidad): Un JWT consta de 3 partes separadas por puntos: Header.Payload.Signature.",
-          "Paso 4 (Puesta en Marcha y Medición): El Payload de un JWT está codificado en Base64 (cualquiera puede leerlo), pero nadie puede modificarlo sin invalidar la Firma (Signature)."
+          "Paso 1 (Consultar con parámetros seguros): Busca al usuario usando $1 en tu consulta SQL en lugar de concatenar variables de texto.",
+          "Paso 2 (Verificar el hash con Bcrypt): Ejecuta await bcrypt.compare(password, user.password_hash) para validar la clave sin desencriptarla.",
+          "Paso 3 (Firmar el token JWT con datos mínimos): Incluye en jwt.sign() únicamente el sub (ID) y el role, fijando expiresIn: \"2h\".",
+          "Paso 4 (Entregar en cookie segura): Envía el token en una cookie con banderas HttpOnly y Secure para proteger la sesión."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Hashing de Contraseñas con Bcrypt/Argon2 y Sesiones con JWT",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Nunca guardes secretos privados ni contraseñas dentro del Payload de un JWT, porque Base64 NO es cifrado: es s...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (El \"Salt\" agrega datos aleatorios únicos a cada contraseña antes de hashearla para inutilizar tablas Rainbow.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Auditoría de Seguridad para Aprobar Integración Bancaria",
+          "scenario": "Una startup guardaba tokens de sesión sin fecha de expiración en localStorage y concatenaba el email directamente en la consulta SQL de login.",
+          "result": "Implementaron consultas parametrizadas, hashing con bcrypt (factor 12) y JWT con expiración corta en cookies HttpOnly, superando la auditoría externa sin observaciones."
         }
       },
       {
@@ -1564,14 +1564,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El 85% de los desarrolladores fracasa al lanzar un SaaS porque pasa 6 meses encerrado programando funciones que nadie pidió. La regla de oro del Micro-SaaS rentable es: no busques \"ideas geniales\", busca procesos aburridos, manuales y costosos que las empresas ya estén pagando por resolver hoy en hojas de cálculo.",
           "Antes de construir el producto completo, creas una Landing Page de validación con una oferta concreta y un flujo de pre-registro o pre-venta. Si nadie está dispuesto a dejar su tarjeta o agendar una demo de 15 minutos, ahorraste meses de tu vida.",
-          "En la práctica diaria dentro de Curso Secreto VIP, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, enfócate en nichos B2B (empresas y profesionales): tienen presupuesto y pagan por ahorrar tiempo o ganar más dinero. Segundo, vende un \"analgésico\" (resuelve un problema urgente hoy), no una \"vitamina\" (algo que sería lindo tener algún día). Y tercero, meta de validación: conseguir 5 a 10 compromisos reales en 72 horas.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Que tus amigos te digan \"qué buena idea\" no es validación. La única validación real en los negocios es una transacción o un compromiso concreto. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El 90% de los programadores que fracasan lanzando un SaaS cometen el mismo error: se encierran 4 meses a programar funciones complejas para un problema que a ninguna empresa le urge pagar hoy.",
+          "En la matriz del ejemplo práctico verás por qué descartamos de inmediato las ideas de entretenimiento o \"vitaminas\" y nos enfocamos en dolores B2B \"analgésicos\": tareas repetitivas o pérdidas de dinero que un negocio ya sufre todas las semanas."
         ],
         "keyPoints": [
           "Enfócate en nichos B2B (empresas y profesionales): tienen presupuesto y pagan por ahorrar tiempo o ganar más dinero.",
           "Vende un \"analgésico\" (resuelve un problema urgente hoy), no una \"vitamina\" (algo que sería lindo tener algún día).",
           "Meta de validación: conseguir 5 a 10 compromisos reales en 72 horas.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Si logras que 5 dueños de negocio paguen por adelantado un acceso fundador con descuento antes de programar, habrás validado que tu SaaS es rentable."
         ],
         "code": "Matriz de Evaluación de Ideas Micro-SaaS:\n1. ¿El cliente objetivo pierde >5 horas/semana o >$500/mes por este problema? -> SÍ\n2. ¿Puedo construir la función central (Core Loop) en un fin de semana?        -> SÍ\n3. ¿Existe un canal claro donde encontrar a 100 de estos clientes hoy mismo?   -> SÍ",
         "warning": "⚠️ Que tus amigos te digan \"qué buena idea\" no es validación. La única validación real en los negocios es una transacción o un compromiso concreto.",
@@ -1586,15 +1586,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Enfócate en nichos B2B (empresas y profesionales): tienen presupuesto y pagan por ahorrar tiempo o ganar más dinero.",
-          "Paso 3 (Validación y Control de Calidad): Vende un \"analgésico\" (resuelve un problema urgente hoy), no una \"vitamina\" (algo que sería lindo tener algún día).",
-          "Paso 4 (Puesta en Marcha y Medición): Meta de validación: conseguir 5 a 10 compromisos reales en 72 horas."
+          "Paso 1 (Identificar un dolor costoso B2B): Busca un rubro donde las empresas pierdan horas de sueldo o ventas por hacer un proceso a mano.",
+          "Paso 2 (Entrevistar sobre el pasado real): Habla con 10 dueños del rubro y pregúntales cuánto gastan hoy intentando resolver ese problema.",
+          "Paso 3 (Publicar una Landing de Smoke Test): Arma en 1 tarde una página explicando el resultado exacto con un botón de reserva o pre-venta.",
+          "Paso 4 (Validar con tarjeta en mano): Comienza el desarrollo únicamente cuando al menos 3 a 5 clientes hayan confirmado su reserva."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Validación de Dolor Agudo B2B antes de Escribir Código",
-          "scenario": "Un equipo que trabajaba en Curso Secreto VIP cometía frecuentemente el error de ignorar esta regla (Que tus amigos te digan \"qué buena idea\" no es validación. La única validación real en los negocios es una tra...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Enfócate en nichos B2B (empresas y profesionales): tienen presupuesto y pagan por ahorrar tiempo o ganar más dinero.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Micro-SaaS de Recordatorios para Clínicas Validado en 48 Horas",
+          "scenario": "Una fundadora dudaba entre crear una app de recetas para consumidores finales o un sistema que confirmara turnos médicos por WhatsApp para evitar ausencias.",
+          "result": "Hizo 8 llamadas a clínicas odontológicas, pre-vendió 4 suscripciones fundadoras de $49 USD/mes en dos días y financió el desarrollo con dinero de clientes."
         }
       },
       {
@@ -1603,14 +1603,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Un MVP no es un producto lleno de errores, sino un producto que hace UNA sola cosa extraordinariamente bien. Para lanzar en 7 días, apóyate en un stack moderno o plantilla base (Boilerplate) que ya resuelva autenticación, cobros con Stripe/MercadoPago y base de datos.",
           "Elimina todo lo secundario en la versión 1.0: no programes modo claro/oscuro, sistema de afiliados, 14 idiomas ni paneles de configuración complejos. Construye únicamente el \"Core Value Loop\" por el que el cliente saca la tarjeta.",
-          "En la práctica diaria dentro de Curso Secreto VIP, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, día 1-2: Base de datos y flujo principal (Core Feature). Segundo, día 3-4: Interfaz limpia y conexión con pasarela de suscripciones. Y tercero, día 5-7: Onboarding guiado en menos de 2 minutos hasta el \"Momento Aha!\" (cuando el usuario recibe el primer resultado).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si el usuario tarda más de 3 minutos después de registrarse en experimentar el valor real de tu herramienta, el 80% abandonará y no volverá a entrar. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Para lanzar tu Micro-SaaS en 7 días debes aplicar un recorte quirúrgico de alcance (Scope Cutting): tu versión 1.0 no necesita modo oscuro, panel de equipos ni 15 integraciones; solo necesita resolver el problema principal en menos de 90 segundos.",
+          "Observa en el cuadro práctico cómo dejamos afuera todo el ruido secundario y concentramos las 72 horas de construcción en las 3 piezas que generan ingresos: Login rápido, la Función Central que entrega el \"Momento ¡Aha!\" y el botón de cobro recurrente."
         ],
         "keyPoints": [
           "Día 1-2: Base de datos y flujo principal (Core Feature).",
           "Día 3-4: Interfaz limpia y conexión con pasarela de suscripciones.",
           "Día 5-7: Onboarding guiado en menos de 2 minutos hasta el \"Momento Aha!\" (cuando el usuario recibe el primer resultado).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Cuanto menos tiempo transcurra desde que el usuario se registra hasta que obtiene su primer resultado real (Time-to-Value), mayor será el porcentaje que pase a plan pago."
         ],
         "code": "Recorte Radical de Alcance (Scope Cutting) para lanzar en 7 días:\n✅ INCLUIR EN V1.0: Login mágico + Función principal automatizada + Cobro de suscripción.\n❌ POSPONER A V2.0: App móvil nativa, API pública, multi-idioma, sub-cuentas de equipo.",
         "warning": "⚠️ Si el usuario tarda más de 3 minutos después de registrarse en experimentar el valor real de tu herramienta, el 80% abandonará y no volverá a entrar.",
@@ -1625,15 +1625,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Día 1-2: Base de datos y flujo principal (Core Feature).",
-          "Paso 3 (Validación y Control de Calidad): Día 3-4: Interfaz limpia y conexión con pasarela de suscripciones.",
-          "Paso 4 (Puesta en Marcha y Medición): Día 5-7: Onboarding guiado en menos de 2 minutos hasta el \"Momento Aha!\" (cuando el usuario recibe el primer resultado)."
+          "Paso 1 (Anotar la única promesa central): Define en un renglón qué resultado concreto obtendrá el usuario en sus primeros 2 minutos dentro de tu app.",
+          "Paso 2 (Tachar funciones secundarias): Mueve a una lista para el mes 2 todo lo que sea configuración avanzada, perfiles múltiples o diseño accesorio.",
+          "Paso 3 (Usar un stack todo-en-uno): Apóyate en Supabase para base de datos y login listos en minutos sin programar servidores desde cero.",
+          "Paso 4 (Conectar la pasarela de suscripción): Integra Stripe o MercadoPago desde el día 1 para que cualquier usuario pueda activar su plan al instante."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Construcción del MVP (Producto Mínimo Viable) en 72 Horas",
-          "scenario": "Un equipo que trabajaba en Curso Secreto VIP cometía frecuentemente el error de ignorar esta regla (Si el usuario tarda más de 3 minutos después de registrarse en experimentar el valor real de tu herramienta, e...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Día 1-2: Base de datos y flujo principal (Core Feature).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Generador Automático de Presupuestos Lanzado en un Fin de Semana",
+          "scenario": "Un desarrollador llevaba 5 meses intentando terminar un sistema ERP gigante para contratistas y seguía con $0 de facturación.",
+          "result": "Recortó el proyecto a una sola función que genera presupuestos en PDF con un clic en 60 segundos, lo lanzó un lunes y consiguió sus primeros 18 suscriptores pagos esa misma semana."
         }
       },
       {
@@ -1642,14 +1642,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El valor de un negocio de software por suscripción (que suele venderse por múltiplos de 3x a 5x su facturación anual ARR) depende de cuatro indicadores matemáticos: MRR (Monthly Recurring Revenue), Churn Rate (tasa de cancelación mensual), CAC (Costo de Adquisición de Cliente) y LTV (Valor de Vida del Cliente).",
           "Si tu Churn mensual es del 20%, significa que cada 5 meses pierdes toda tu base de clientes y corres en una cinta sin avanzar. En cambio, con un Churn menor al 5% mensual y un ratio LTV / CAC mayor a 3, tienes una máquina predecible de flujo de caja.",
-          "En la práctica diaria dentro de Curso Secreto VIP, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, mRR = Cantidad de clientes activos × Ticket promedio mensual (ARPU). Segundo, lTV (Lifetime Value) = Ticket mensual promedio / Tasa de Churn mensual. Y tercero, regla de salud SaaS: El LTV debe ser al menos 3 veces mayor que lo que te cuesta adquirir al cliente (LTV >= 3 × CAC).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca ofrezcas solo un plan barato de $3/mes: atrae a los clientes que más soporte exigen y más rápido cancelan. Posiciona planes desde $19-$49/mes con opción anual (2 meses gratis). Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Un negocio de software por suscripción se gobierna con 4 números simples: cuánto facturas fijo cada mes (MRR), qué porcentaje de clientes cancela (Churn), cuánto dinero te deja un cliente en toda su vida (LTV) y cuánto te cuesta conseguirlo (CAC).",
+          "En el cálculo real de abajo verás cómo un Micro-SaaS con 100 clientes de $50 USD/mes genera $5,000 USD mensuales y por qué un LTV de $1,250 USD frente a un costo de adquisición de $250 USD (ratio 5x) te da una máquina altamente rentable."
         ],
         "keyPoints": [
           "MRR = Cantidad de clientes activos × Ticket promedio mensual (ARPU).",
           "LTV (Lifetime Value) = Ticket mensual promedio / Tasa de Churn mensual.",
           "Regla de salud SaaS: El LTV debe ser al menos 3 veces mayor que lo que te cuesta adquirir al cliente (LTV >= 3 × CAC).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Reducir el Churn mensual del 8% al 4% duplica automáticamente el valor de vida de cada cliente (LTV) sin necesidad de conseguir un solo comprador nuevo."
         ],
         "code": "Ejemplo Real de Economía Unitaria SaaS:\n- Precio Suscripción (ARPU): $30 USD / mes\n- Churn Mensual (Cancelaciones): 5% (0.05) -> El cliente promedio se queda 20 meses.\n- LTV (Valor total por cliente): $30 / 0.05 = $600 USD.\n- Si tu CAC (costo de adquirir 1 cliente) es $80 USD -> Ratio LTV/CAC = 7.5x (¡Altamente rentable!)",
         "warning": "⚠️ Nunca ofrezcas solo un plan barato de $3/mes: atrae a los clientes que más soporte exigen y más rápido cancelan. Posiciona planes desde $19-$49/mes con opción anual (2 meses gratis).",
@@ -1664,15 +1664,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 3
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): MRR = Cantidad de clientes activos × Ticket promedio mensual (ARPU).",
-          "Paso 3 (Validación y Control de Calidad): LTV (Lifetime Value) = Ticket mensual promedio / Tasa de Churn mensual.",
-          "Paso 4 (Puesta en Marcha y Medición): Regla de salud SaaS: El LTV debe ser al menos 3 veces mayor que lo que te cuesta adquirir al cliente (LTV >= 3 × CAC)."
+          "Paso 1 (Calcular tu MRR actual): Multiplica tu cantidad de clientes activos por el abono mensual promedio (ARPU).",
+          "Paso 2 (Medir tu Churn mensual): Divide los clientes que cancelaron este mes entre el total de clientes que tenías al inicio del mes.",
+          "Paso 3 (Obtener tu LTV real): Divide el ticket mensual (ARPU) entre la tasa decimal de Churn (ej. $50 / 0.04 = $1,250 USD).",
+          "Paso 4 (Verificar la salud LTV / CAC): Comprueba que tu LTV sea al menos 3 veces superior a lo que inviertes para adquirir un cliente."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Las 4 Métricas Financieras que Gobiernan un SaaS (MRR, Churn, LTV y CAC)",
-          "scenario": "Un equipo que trabajaba en Curso Secreto VIP cometía frecuentemente el error de ignorar esta regla (Nunca ofrezcas solo un plan barato de $3/mes: atrae a los clientes que más soporte exigen y más rápido cancela...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (MRR = Cantidad de clientes activos × Ticket promedio mensual (ARPU).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Micro-SaaS que Duplicó su Valor Corrigiendo la Fuga del Mes 1",
+          "scenario": "Una herramienta de reportes tenía buenas ventas nuevas pero perdía el 10% de sus usuarios cada mes porque olvidaban entrar a configurar su cuenta.",
+          "result": "Agregaron una plantilla pre-cargada al registrarse y un resumen semanal por correo, bajando el Churn al 3.2% y elevando el LTV por cliente de $400 a $1,250 USD."
         }
       },
       {
@@ -1681,14 +1681,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "\"Constrúyelo y vendrán solos\" es un mito. En las primeras semanas, el crecimiento proviene de canales de alcance directo y demostraciones de valor en público: prospección personalizada con loom/video corto, herramientas gratuitas satélite (Engineering as Marketing) y comunidades del nicho.",
           "Además, implementar cobro anual con descuento (ej. \"Paga 10 meses, lleva 12\") inyecta flujo de caja inmediato el día 1 que te permite financiar nuevas funciones y publicidad con el propio dinero de las ventas.",
-          "En la práctica diaria dentro de Curso Secreto VIP, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, engineering as Marketing: Crea una calculadora o micro-herramienta gratuita que atraiga tráfico orgánico y derive hacia tu SaaS principal. Segundo, contacto directo: Envía 20 mensajes personalizados por día mostrando cómo resolviste un caso específico de su negocio. Y tercero, integra un bucle viral o sello \"Powered by [Tu SaaS]\" en los reportes o páginas que tus usuarios compartan.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: No gastes miles de dólares en anuncios pagados antes de haber cerrado tus primeros 15 clientes de forma directa y haber pulido las objeciones de venta. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Para llegar a tus primeros $5,000 USD de ingreso recurrente mensual no necesitas millones de descargas: solo necesitas 100 pequeñas empresas que paguen $50 USD al mes o 50 empresas que paguen $99 USD al mes.",
+          "En la hoja de ruta del ejemplo práctico verás cómo conseguir tus primeros 100 clientes en tres etapas ordenadas: primero alcance directo personalizado (clientes 1 al 20), luego contenido y herramientas gratuitas (clientes 21 al 60) y finalmente afiliados y anuncios con retorno probado."
         ],
         "keyPoints": [
           "Engineering as Marketing: Crea una calculadora o micro-herramienta gratuita que atraiga tráfico orgánico y derive hacia tu SaaS principal.",
           "Contacto directo: Envía 20 mensajes personalizados por día mostrando cómo resolviste un caso específico de su negocio.",
           "Integra un bucle viral o sello \"Powered by [Tu SaaS]\" en los reportes o páginas que tus usuarios compartan.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Ofrecer un plan anual pagando 10 meses (2 meses gratis) te inyecta efectivo inmediato hoy mismo y asegura que ese cliente permanezca todo el año."
         ],
         "code": "Meta Financiera de un Micro-SaaS Independiente:\n- 35 clientes en Plan Pro ($29/mes)   = $1,015 USD / mes\n- 15 clientes en Plan Élite ($79/mes) = $1,185 USD / mes\n- Total MRR = $2,200 USD / mes ($26,400 USD / año de ingreso recurrente con 92% de margen neto)",
         "warning": "⚠️ No gastes miles de dólares en anuncios pagados antes de haber cerrado tus primeros 15 clientes de forma directa y haber pulido las objeciones de venta.",
@@ -1703,15 +1703,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Engineering as Marketing: Crea una calculadora o micro-herramienta gratuita que atraiga tráfico orgánico y derive hacia tu SaaS principal.",
-          "Paso 3 (Validación y Control de Calidad): Contacto directo: Envía 20 mensajes personalizados por día mostrando cómo resolviste un caso específico de su negocio.",
-          "Paso 4 (Puesta en Marcha y Medición): Integra un bucle viral o sello \"Powered by [Tu SaaS]\" en los reportes o páginas que tus usuarios compartan."
+          "Paso 1 (Cerrar los primeros 20 en directo): Contacta por LinkedIn, correo o WhatsApp a negocios del nicho mostrándoles un video corto de cómo resuelve su problema.",
+          "Paso 2 (Crear una mini-herramienta gratuita): Publica una calculadora o auditor gratuito en tu web que atraiga interesados y les ofrezca tu SaaS al final.",
+          "Paso 3 (Activar planes anuales en el checkout): Añade la opción de pago anual con 16% de ahorro para acelerar tu flujo de caja.",
+          "Paso 4 (Escalar canales rentables): Invierte parte del MRR cobrado en alianzas con creadores del nicho y campañas de búsqueda con intención de compra."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Estrategia de Distribución y Adquisición de los Primeros 100 Clientes",
-          "scenario": "Un equipo que trabajaba en Curso Secreto VIP cometía frecuentemente el error de ignorar esta regla (No gastes miles de dólares en anuncios pagados antes de haber cerrado tus primeros 15 clientes de forma direct...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Engineering as Marketing: Crea una calculadora o micro-herramienta gratuita que atraiga tráfico orgánico y derive hacia tu SaaS principal.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: De 0 a 110 Clientes Activos en 4 Meses sin Inversores",
+          "scenario": "El creador de un SaaS para inmobiliarias gastó $600 USD en anuncios fríos el día del lanzamiento sin haber hablado antes con ningún corredor inmobiliario.",
+          "result": "Pausó los anuncios, cerró sus primeros 22 clientes por mensaje directo con demos de 1 minuto, ajustó su web con las palabras exactas de esos clientes y escaló a $5,400 USD de MRR."
         }
       },
       {
@@ -1871,14 +1871,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El ataque Cross-Site Scripting (XSS) ocurre cuando una aplicación web renderiza datos ingresados por un usuario directamente en el navegador de otros usuarios sin escaparlos ni validarlos. Si un atacante inyecta una etiqueta <script> dentro de un comentario o perfil y tu frontend usa innerHTML, el navegador ejecutará ese código con los permisos de la víctima.",
           "Existen tres variantes principales: Stored XSS (el payload queda guardado en la base de datos), Reflected XSS (viaja en un parámetro de la URL) y DOM-based XSS (ocurre íntegramente en el cliente al manipular el DOM de forma insegura).",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, usa textContent en lugar de innerHTML siempre que insertes texto proveniente de usuarios. Segundo, si necesitas renderizar HTML enriquecido, sanitiza antes con librerías auditadas como DOMPurify. Y tercero, configura la cabecera Content-Security-Policy (CSP) para prohibir la ejecución de scripts inline no autorizados.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Validar solo con JavaScript en el formulario del navegador no protege tu servidor: el atacante puede enviar el payload directo por cURL o Postman. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El ataque Cross-Site Scripting (XSS) ocurre cuando una página web toma un texto escrito por un usuario (como un comentario, nombre de perfil o búsqueda) y lo incrusta directamente en el HTML sin neutralizar las etiquetas <script> o eventos ocultos.",
+          "En el código comparativo de abajo verás por qué usar innerHTML abre la puerta para que un atacante robe la sesión de otros usuarios, mientras que asignar el dato con textContent convierte cualquier intento de código malicioso en simple texto inofensivo."
         ],
         "keyPoints": [
           "Usa textContent en lugar de innerHTML siempre que insertes texto proveniente de usuarios.",
           "Si necesitas renderizar HTML enriquecido, sanitiza antes con librerías auditadas como DOMPurify.",
           "Configura la cabecera Content-Security-Policy (CSP) para prohibir la ejecución de scripts inline no autorizados.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Si tu aplicación necesita mostrar texto enriquecido (negritas o listas), pásalo siempre antes por una librería verificada como DOMPurify.sanitize()."
         ],
         "code": "// ❌ VULNERABLE A XSS:\ncomentarioDiv.innerHTML = \"<p>Usuario dijo: \" + inputDelUsuario + \"</p>\";\n\n// ✅ SEGURO CONTRA XSS:\nconst p = document.createElement(\"p\");\np.textContent = `Usuario dijo: ${inputDelUsuario}`;\ncomentarioDiv.appendChild(p);",
         "warning": "⚠️ Validar solo con JavaScript en el formulario del navegador no protege tu servidor: el atacante puede enviar el payload directo por cURL o Postman.",
@@ -1893,15 +1893,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Usa textContent en lugar de innerHTML siempre que insertes texto proveniente de usuarios.",
-          "Paso 3 (Validación y Control de Calidad): Si necesitas renderizar HTML enriquecido, sanitiza antes con librerías auditadas como DOMPurify.",
-          "Paso 4 (Puesta en Marcha y Medición): Configura la cabecera Content-Security-Policy (CSP) para prohibir la ejecución de scripts inline no autorizados."
+          "Paso 1 (Localizar inserciones dinámicas): Busca en tu código JavaScript todas las líneas que usen .innerHTML, .outerHTML o document.write().",
+          "Paso 2 (Reemplazar por asignación segura): Cambia .innerHTML por .textContent siempre que estés mostrando nombres, correos, comentarios o búsquedas.",
+          "Paso 3 (Crear nodos del DOM de forma explícita): Usa document.createElement() y asigna el texto dentro de cada nodo por separado.",
+          "Paso 4 (Activar cabecera CSP): Configura Content-Security-Policy en tu servidor para bloquear la ejecución de scripts inline no autorizados."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Cross-Site Scripting (XSS) y Sanitización del DOM",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Validar solo con JavaScript en el formulario del navegador no protege tu servidor: el atacante puede enviar el...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Usa textContent en lugar de innerHTML siempre que insertes texto proveniente de usuarios.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Foro de Clientes Blindado contra Robo de Sesiones por XSS",
+          "scenario": "Una plataforma de soporte insertaba el nombre del cliente con innerHTML en el panel del administrador; un atacante puso un script como nombre y capturó la sesión del soporte.",
+          "result": "Sustituyeron todas las inserciones por textContent e implementaron una política CSP estricta, bloqueando el 100% de las inyecciones de scripts."
         }
       },
       {
@@ -1910,14 +1910,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En un ataque CSRF (Cross-Site Request Forgery), el atacante engaña al navegador de un usuario que ya tiene sesión abierta en tu web (por ejemplo, un banco o panel de pagos) para que envíe una petición oculta hacia tu servidor desde otro sitio malicioso.",
           "Como los navegadores adjuntan automáticamente las cookies de sesión del dominio destino, si no configuras el atributo SameSite=Strict o SameSite=Lax ni verificas un Token Anti-CSRF único por formulario, el servidor creerá que la acción fue voluntaria.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, httpOnly impide que scripts en JavaScript (document.cookie) puedan leer o robar la cookie de sesión en caso de XSS. Segundo, secure obliga a que la cookie viaje únicamente sobre conexiones cifradas HTTPS. Y tercero, sameSite=Strict o Lax bloquea el envío automático de cookies en peticiones originadas desde sitios externos.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Guardar tokens de sesión sensibles en localStorage los deja 100% expuestos si ocurre cualquier vulnerabilidad XSS en tu página o en una librería de terceros. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Incluso si tu página no tiene fallos XSS, un atacante puede engañar a un usuario con sesión iniciada para que desde otra web trampa dispare en segundo plano un cambio de contraseña o una transferencia (ataque CSRF).",
+          "Observa en la configuración de servidor del bloque práctico cómo al combinar las tres banderas de seguridad en la cookie de sesión (HttpOnly, Secure y SameSite: \"strict\"), protegemos el token tanto contra lectura por JavaScript como contra envíos desde dominios ajenos."
         ],
         "keyPoints": [
           "HttpOnly impide que scripts en JavaScript (document.cookie) puedan leer o robar la cookie de sesión en caso de XSS.",
           "Secure obliga a que la cookie viaje únicamente sobre conexiones cifradas HTTPS.",
           "SameSite=Strict o Lax bloquea el envío automático de cookies en peticiones originadas desde sitios externos.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Para acciones críticas como cambiar el correo de la cuenta o retirar fondos, combina cookies SameSite con un token Anti-CSRF o confirmación de contraseña."
         ],
         "code": "// Configuración blindada de Cookie de Sesión en el Servidor\nres.cookie('session_token', tokenFirmado, {\n  httpOnly: true,     // Invisible para document.cookie (Mitiga robo por XSS)\n  secure: true,       // Solo se transmite por HTTPS\n  sameSite: 'strict', // No se adjunta en peticiones cross-site (Mitiga CSRF)\n  maxAge: 3600000     // Expira en 1 hora\n});",
         "warning": "⚠️ Guardar tokens de sesión sensibles en localStorage los deja 100% expuestos si ocurre cualquier vulnerabilidad XSS en tu página o en una librería de terceros.",
@@ -1932,15 +1932,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): HttpOnly impide que scripts en JavaScript (document.cookie) puedan leer o robar la cookie de sesión en caso de XSS.",
-          "Paso 3 (Validación y Control de Calidad): Secure obliga a que la cookie viaje únicamente sobre conexiones cifradas HTTPS.",
-          "Paso 4 (Puesta en Marcha y Medición): SameSite=Strict o Lax bloquea el envío automático de cookies en peticiones originadas desde sitios externos."
+          "Paso 1 (Eliminar tokens sensibles de localStorage): Mueve el almacenamiento del token de sesión desde localStorage hacia una cookie gestionada por el servidor.",
+          "Paso 2 (Activar HttpOnly: true): Impide que cualquier script en el navegador pueda leer el contenido de la cookie mediante document.cookie.",
+          "Paso 3 (Forzar canal cifrado con Secure: true): Garantiza que la cookie viaje únicamente a través de conexiones HTTPS encriptadas.",
+          "Paso 4 (Configurar SameSite: \"strict\" o \"lax\"): Bloquea el envío automático de la cookie en peticiones maliciosas originadas en sitios externos."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Ataques CSRF, Cookies HttpOnly / SameSite y Tokens Anti-CSRF",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Guardar tokens de sesión sensibles en localStorage los deja 100% expuestos si ocurre cualquier vulnerabilidad ...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (HttpOnly impide que scripts en JavaScript (document.cookie) puedan leer o robar la cookie de sesión en caso de XSS.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Billetera Virtual que Blindó sus Transferencias contra CSRF",
+          "scenario": "Una aplicación financiera guardaba la sesión en una cookie sin atributo SameSite, permitiendo que formularios ocultos en páginas externas intentaran enviar peticiones en nombre del usuario.",
+          "result": "Configuraron HttpOnly, Secure y SameSite=\"strict\" junto con tokens Anti-CSRF por operación, eliminando por completo el vector de falsificación de peticiones."
         }
       },
       {
@@ -1949,14 +1949,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "La Política del Mismo Origen (Same-Origin Policy) de los navegadores impide que un script alojado en un dominio malicioso lea las respuestas de tu API. CORS es el mecanismo mediante el cual tu servidor declara explícitamente qué orígenes externos tienen permiso para consumir sus respuestas.",
           "Un error crítico en producción es configurar Access-Control-Allow-Origin: * junto con credenciales activas, lo cual expone los endpoints privados de tus usuarios a cualquier web de internet.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, define una lista blanca (Whitelist) estricta de dominios permitidos en CORS. Segundo, las peticiones complejas (PUT, DELETE o con JSON) disparan antes una petición Preflight con el verbo OPTIONS. Y tercero, añade X-Content-Type-Options: nosniff y X-Frame-Options: DENY (para evitar Clickjacking con iframes ocultos).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Recuerda que CORS lo aplica el navegador: no sustituye la autenticación en el backend contra ataques directos desde servidores externos. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Muchas veces por apuro durante el desarrollo se deja configurado Access-Control-Allow-Origin: * en el servidor, permitiendo que cualquier página desconocida en internet pueda hacer peticiones a tu API desde el navegador.",
+          "En el código de abajo verás cómo implementar una lista blanca estricta (allowedOrigins) que verifica el dominio exacto de cada petición y cómo añadir las 3 cabeceras HTTP que impiden que tu web sea incrustada en un iframe invisible (Clickjacking)."
         ],
         "keyPoints": [
           "Define una lista blanca (Whitelist) estricta de dominios permitidos en CORS.",
           "Las peticiones complejas (PUT, DELETE o con JSON) disparan antes una petición Preflight con el verbo OPTIONS.",
           "Añade X-Content-Type-Options: nosniff y X-Frame-Options: DENY (para evitar Clickjacking con iframes ocultos).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "La cabecera Strict-Transport-Security (HSTS) le ordena al navegador que nunca acepte conectarse a tu dominio por HTTP sin cifrar."
         ],
         "code": "// Configuración segura de CORS con lista blanca de orígenes\nconst allowedOrigins = ['https://skillvault.app', 'https://admin.skillvault.app'];\napp.use(cors({\n  origin: (origin, callback) => {\n    if (!origin || allowedOrigins.includes(origin)) callback(null, true);\n    else callback(new Error('Origen bloqueado por política CORS'));\n  },\n  credentials: true\n}));",
         "warning": "⚠️ Recuerda que CORS lo aplica el navegador: no sustituye la autenticación en el backend contra ataques directos desde servidores externos.",
@@ -1971,15 +1971,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Define una lista blanca (Whitelist) estricta de dominios permitidos en CORS.",
-          "Paso 3 (Validación y Control de Calidad): Las peticiones complejas (PUT, DELETE o con JSON) disparan antes una petición Preflight con el verbo OPTIONS.",
-          "Paso 4 (Puesta en Marcha y Medición): Añade X-Content-Type-Options: nosniff y X-Frame-Options: DENY (para evitar Clickjacking con iframes ocultos)."
+          "Paso 1 (Definir la lista blanca de dominios): Declara en un array allowedOrigins únicamente tus dominios reales de producción y tu puerto local de pruebas.",
+          "Paso 2 (Validar el origen en el middleware CORS): Permite el acceso solo si el origin entrante figura explícitamente en tu lista blanca.",
+          "Paso 3 (Bloquear iframes maliciosos): Añade la cabecera X-Frame-Options: DENY para evitar ataques de Clickjacking sobre tus botones.",
+          "Paso 4 (Añadir nosniff y HSTS): Configura X-Content-Type-Options: nosniff y Strict-Transport-Security en todas las respuestas."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: CORS (Cross-Origin Resource Sharing) y Cabeceras de Seguridad HTTP",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Recuerda que CORS lo aplica el navegador: no sustituye la autenticación en el backend contra ataques directos ...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Define una lista blanca (Whitelist) estricta de dominios permitidos en CORS.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: API Corporativa Protegida contra Accesos Cruzados y Clickjacking",
+          "scenario": "Una empresa tenía su API con CORS abierto a \"*\" y sin protección de iframes; una web clonada superpuso un iframe invisible para capturar clics de usuarios.",
+          "result": "Restringieron CORS a su dominio oficial y activaron X-Frame-Options: DENY + HSTS, neutralizando el sitio clonado de inmediato."
         }
       },
       {
@@ -1988,14 +1988,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Sin un limitador de tasa de peticiones (Rate Limiting), un atacante puede probar 50,000 combinaciones de contraseñas por minuto en tu endpoint de login (Credential Stuffing) o agotar el saldo de tu API de Inteligencia Artificial en segundos.",
           "Asimismo, cuando tu backend recibe una URL proporcionada por el usuario para descargar una imagen o webhook, debes validar que no apunte a direcciones internas privadas (como 127.0.0.1 o 169.254.169.254 de metadatos cloud) para prevenir ataques SSRF (Server-Side Request Forgery).",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, aplica Rate Limiting por IP y por ID de usuario (ej. máximo 5 intentos de login fallidos cada 15 minutos). Segundo, devuelve el código HTTP 429 Too Many Requests cuando se supere el umbral permitido. Y tercero, en SSRF, bloquea rangos de IPs locales/privadas (127.0.0.0/8, 10.0.0.0/8, 192.168.0.0/16, 169.254.169.254).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si tu servidor está detrás de Cloudflare o un proxy inverso (Nginx), configura \"trust proxy\" para leer la IP real del cliente y no bloquear la IP del propio proxy. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Si tu endpoint de inicio de sesión o recuperación de clave no tiene un límite de intentos por minuto, un atacante puede usar un programa automático para probar 50,000 contraseñas filtradas en pocos minutos hasta adivinar la cuenta de un cliente.",
+          "En el ejemplo práctico verás cómo configurar un Rate Limiter en Express que permite un máximo de 5 intentos cada 15 minutos por IP y devuelve el código estándar 429 Too Many Requests cuando detecta un ataque de fuerza bruta."
         ],
         "keyPoints": [
           "Aplica Rate Limiting por IP y por ID de usuario (ej. máximo 5 intentos de login fallidos cada 15 minutos).",
           "Devuelve el código HTTP 429 Too Many Requests cuando se supere el umbral permitido.",
           "En SSRF, bloquea rangos de IPs locales/privadas (127.0.0.0/8, 10.0.0.0/8, 192.168.0.0/16, 169.254.169.254).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Si tu servidor recibe enlaces o URLs enviadas por el usuario (por ejemplo para cargar un avatar), bloquea siempre los rangos locales (127.0.0.1, 10.x, 169.254.x) para evitar ataques SSRF."
         ],
         "code": "// Rate Limiter para proteger el endpoint de Autenticación\nconst loginLimiter = rateLimit({\n  windowMs: 15 * 60 * 1000, // Ventana de 15 minutos\n  max: 5,                   // Máximo 5 intentos por IP\n  statusCode: 429,\n  message: { error: \"Demasiados intentos. Espera 15 minutos.\" }\n});\napp.post('/api/v1/auth/login', loginLimiter, loginController);",
         "warning": "⚠️ Si tu servidor está detrás de Cloudflare o un proxy inverso (Nginx), configura \"trust proxy\" para leer la IP real del cliente y no bloquear la IP del propio proxy.",
@@ -2010,15 +2010,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Aplica Rate Limiting por IP y por ID de usuario (ej. máximo 5 intentos de login fallidos cada 15 minutos).",
-          "Paso 3 (Validación y Control de Calidad): Devuelve el código HTTP 429 Too Many Requests cuando se supere el umbral permitido.",
-          "Paso 4 (Puesta en Marcha y Medición): En SSRF, bloquea rangos de IPs locales/privadas (127.0.0.0/8, 10.0.0.0/8, 192.168.0.0/16, 169.254.169.254)."
+          "Paso 1 (Activar trust proxy): Configura app.set(\"trust proxy\", 1) si tu servidor corre en Vercel, Render, Cloudflare o detrás de Nginx.",
+          "Paso 2 (Configurar ventana y tope de intentos): Define windowMs de 15 minutos y un máximo de 5 intentos para rutas sensibles como /api/login.",
+          "Paso 3 (Responder 429 con cabeceras estándar): Devuelve un mensaje claro indicando cuántos minutos debe esperar antes de volver a intentar.",
+          "Paso 4 (Validar URLs externas contra SSRF): Si tu backend hace fetch() de una URL provista por el usuario, verifica que sea HTTPS y que no apunte a IPs privadas."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Rate Limiting, Fuerza Bruta y Prevención de SSRF",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Si tu servidor está detrás de Cloudflare o un proxy inverso (Nginx), configura \"trust proxy\" para leer la IP r...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Aplica Rate Limiting por IP y por ID de usuario (ej. máximo 5 intentos de login fallidos cada 15 minutos).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: E-Commerce que Detuvo 140,000 Intentos de Credential Stuffing",
+          "scenario": "Un bot automatizado enviaba 800 peticiones por minuto al endpoint de login probando combinaciones de correos y claves robadas de otras webs, ralentizando además la base de datos.",
+          "result": "Al activar el Rate Limiter de 5 intentos cada 15 minutos con trust proxy configurado, cortaron el ataque en seco y redujeron la carga del servidor en un 75%."
         }
       },
       {
@@ -2178,14 +2178,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Un LLM base no conoce los documentos privados de tu empresa, tus contratos en PDF ni el stock actualizado hace 5 minutos. Muchos principiantes creen que deben reentrenar el modelo (Fine-Tuning) cada vez que cambia un precio, lo cual es lento, costoso y propenso a que el modelo igual invente datos.",
           "La arquitectura RAG (Generación Aumentada por Recuperación) resuelve esto en dos fases: primero busca los fragmentos relevantes en tu base documental verificada y luego se los inyecta en el prompt al modelo exigiéndole que responda basándose exclusivamente en esa evidencia.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, fine-Tuning enseña estilo, tono o formato; RAG inyecta hechos dinámicos, privados y actualizables al instante. Segundo, con RAG puedes controlar permisos por usuario (qué documentos tiene permiso de consultar cada rol) y citar la página exacta de la fuente. Y tercero, si revocas o actualizas un documento en la base vectorial, el cambio se refleja en el próximo segundo sin reentrenar nada.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: El Fine-Tuning NUNCA debe usarse como reemplazo de una base de datos para hechos que cambian con frecuencia (precios, inventario, normativas). Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando una empresa quiere que un chatbot responda sobre su catálogo de precios, manuales técnicos o reglamentos internos, reentrenar el modelo (Fine-Tuning) es lento, costoso y queda desactualizado apenas cambia un precio.",
+          "En el diagrama del flujo RAG del bloque práctico verás cómo en lugar de modificar el cerebro del modelo, buscamos en milisegundos los párrafos exactos dentro de tus PDFs privados y se los entregamos a la IA en el prompt para que responda citando la página real."
         ],
         "keyPoints": [
           "Fine-Tuning enseña estilo, tono o formato; RAG inyecta hechos dinámicos, privados y actualizables al instante.",
           "Con RAG puedes controlar permisos por usuario (qué documentos tiene permiso de consultar cada rol) y citar la página exacta de la fuente.",
           "Si revocas o actualizas un documento en la base vectorial, el cambio se refleja en el próximo segundo sin reentrenar nada.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Con RAG puedes controlar permisos de acceso en tiempo real: un cliente solo consulta documentos públicos, mientras un gerente consulta reportes internos."
         ],
         "code": "Flujo de una Consulta en Arquitectura RAG:\n1. Usuario pregunta: \"¿Cuál es la política de reembolso para planes anuales?\"\n2. Retriever busca en Base Vectorial -> Recupera Top 3 fragmentos del Manual Legal 2026.\n3. Prompt Aumentado = [Instrucción: Responde SOLO usando este contexto] + [Top 3 fragmentos] + [Pregunta].\n4. LLM genera respuesta precisa citando el Artículo 4.2 del documento.",
         "warning": "⚠️ El Fine-Tuning NUNCA debe usarse como reemplazo de una base de datos para hechos que cambian con frecuencia (precios, inventario, normativas).",
@@ -2200,15 +2200,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Fine-Tuning enseña estilo, tono o formato; RAG inyecta hechos dinámicos, privados y actualizables al instante.",
-          "Paso 3 (Validación y Control de Calidad): Con RAG puedes controlar permisos por usuario (qué documentos tiene permiso de consultar cada rol) y citar la página exacta de la fuente.",
-          "Paso 4 (Puesta en Marcha y Medición): Si revocas o actualizas un documento en la base vectorial, el cambio se refleja en el próximo segundo sin reentrenar nada."
+          "Paso 1 (Reunir y limpiar la base de conocimiento): Convierte tus PDFs, manuales o políticas actuales a texto limpio conservando el título y número de página.",
+          "Paso 2 (Indexar para búsqueda rápida): Divide los documentos en fragmentos y guárdalos en tu base de datos para poder consultarlos en tiempo real.",
+          "Paso 3 (Recuperar los fragmentos relevantes): Cuando el usuario hace una pregunta, busca primero los 3 a 5 pasajes que hablan exactamente de ese tema.",
+          "Paso 4 (Generar respuesta con cita obligatoria): Pasa esos pasajes al LLM exigiéndole responder solo con esa información y citar el documento fuente."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Qué es RAG (Retrieval-Augmented Generation) vs. Fine-Tuning",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (El Fine-Tuning NUNCA debe usarse como reemplazo de una base de datos para hechos que cambian con frecuencia (p...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Fine-Tuning enseña estilo, tono o formato; RAG inyecta hechos dinámicos, privados y actualizables al instante.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Software Contable que Redujo en 78% los Tickets de Soporte Humano",
+          "scenario": "Cada vez que cambiaba una normativa impositiva, el chatbot entrenado respondía con leyes viejas del año anterior y confundía a los clientes.",
+          "result": "Migraron a una arquitectura RAG donde basta subir el nuevo PDF normativo para que el asistente responda al instante citando el artículo vigente."
         }
       },
       {
@@ -2217,14 +2217,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "La búsqueda tradicional por palabras clave (como LIKE en SQL) falla si el usuario busca \"cancelar suscripción\" pero el documento dice \"baja de membresía\". Los modelos de Embeddings transforman cualquier oración o párrafo en un vector numérico de alta dimensión (ej. una lista de 768 o 1536 números flotantes) que captura su significado semántico.",
           "En ese espacio multidimensional, dos textos que hablan del mismo concepto quedan ubicados muy cerca entre sí (forman un ángulo pequeño), aunque no compartan ni una sola palabra exacta.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, la Similitud Coseno mide el coseno del ángulo entre dos vectores: 1.0 significa dirección idéntica, 0 ortogonal/sin relación. Segundo, debes usar exactamente el mismo modelo de Embeddings tanto para indexar tus documentos como para vectorizar la pregunta del usuario. Y tercero, bases vectoriales populares: pgvector (en PostgreSQL), Pinecone, Qdrant y Weaviate.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si indexas tus documentos con un modelo de embeddings (ej. 1536 dimensiones) y luego vectorizas las consultas con otro modelo distinto, los vectores serán incompatibles y devolverán basura. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "¿Cómo logra un sistema RAG encontrar el párrafo correcto aunque el cliente pregunte \"¿Cómo pido que me devuelvan la plata?\" y tu manual diga \"Política de Reembolsos y Cancelaciones\"? Gracias a los Embeddings Vectoriales.",
+          "En la consulta SQL con pgvector de abajo verás cómo cada texto se transforma en una lista de coordenadas numéricas (por ejemplo 1536 números) donde las ideas con el mismo significado quedan muy cerca entre sí al medir su distancia coseno (<=>)."
         ],
         "keyPoints": [
           "La Similitud Coseno mide el coseno del ángulo entre dos vectores: 1.0 significa dirección idéntica, 0 ortogonal/sin relación.",
           "Debes usar exactamente el mismo modelo de Embeddings tanto para indexar tus documentos como para vectorizar la pregunta del usuario.",
           "Bases vectoriales populares: pgvector (en PostgreSQL), Pinecone, Qdrant y Weaviate.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Normalizar la longitud de los vectores a 1 permite que el cálculo de similitud coseno sea instantáneo incluso sobre cientos de miles de documentos."
         ],
         "code": "-- Consulta de búsqueda semántica con pgvector en PostgreSQL\n-- El operador <=> calcula la distancia coseno entre el vector de la pregunta y los documentos\nSELECT id, titulo, contenido_chunk,\n       1 - (embedding <=> $1::vector) AS similitud_coseno\nFROM documentos_chunks\nWHERE 1 - (embedding <=> $1::vector) > 0.78\nORDER BY embedding <=> $1::vector ASC\nLIMIT 4;",
         "warning": "⚠️ Si indexas tus documentos con un modelo de embeddings (ej. 1536 dimensiones) y luego vectorizas las consultas con otro modelo distinto, los vectores serán incompatibles y devolverán basura.",
@@ -2239,15 +2239,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): La Similitud Coseno mide el coseno del ángulo entre dos vectores: 1.0 significa dirección idéntica, 0 ortogonal/sin relación.",
-          "Paso 3 (Validación y Control de Calidad): Debes usar exactamente el mismo modelo de Embeddings tanto para indexar tus documentos como para vectorizar la pregunta del usuario.",
-          "Paso 4 (Puesta en Marcha y Medición): Bases vectoriales populares: pgvector (en PostgreSQL), Pinecone, Qdrant y Weaviate."
+          "Paso 1 (Elegir un único modelo de embeddings): Define el modelo (por ejemplo text-embedding-3-small de 1536 dimensiones) y úsalo tanto al guardar como al buscar.",
+          "Paso 2 (Crear la columna vector en PostgreSQL): Activa la extensión pgvector y define la columna embedding vector(1536) en tu tabla de fragmentos.",
+          "Paso 3 (Convertir la pregunta del usuario): Al recibir una consulta en el chat, llama a la API de embeddings para obtener el vector de esa pregunta.",
+          "Paso 4 (Ordenar por distancia coseno <=>): Ejecuta la consulta SQL ordenando por embedding <=> $1 LIMIT 5 y filtrando por un umbral mínimo de similitud."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Embeddings Vectoriales y Matemática de Similitud Coseno",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Si indexas tus documentos con un modelo de embeddings (ej. 1536 dimensiones) y luego vectorizas las consultas ...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (La Similitud Coseno mide el coseno del ángulo entre dos vectores: 1.0 significa dirección idéntica, 0 ortogonal/sin relación.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Buscador Médico Interno que Entiende Sinónimos y Síntomas",
+          "scenario": "El buscador tradicional de una clínica solo encontraba documentos si el médico escribía la palabra exacta del título, fallando el 60% de las búsquedas.",
+          "result": "Implementaron búsqueda semántica con embeddings y pgvector, elevando la tasa de hallazgo relevante al 94% en menos de 80 milisegundos."
         }
       },
       {
@@ -2256,14 +2256,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "No puedes convertir un libro PDF de 300 páginas en un único vector, porque el significado específico de cada párrafo se diluiría en un promedio general inútil. Tampoco conviene cortar por palabras sueltas porque pierden todo su contexto. El proceso de dividir documentos en bloques semánticos óptimos se denomina \"Chunking\".",
           "La práctica profesional consiste en dividir en bloques de entre 300 y 600 tokens respetando límites de párrafos o encabezados Markdown, aplicando un \"Chunk Overlap\" (solapamiento del 10% al 20% entre el final de un bloque y el comienzo del siguiente) para que ninguna idea quede cortada por la mitad.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, chunks demasiado grandes -> Introducen ruido en el vector y consumen demasiados tokens en el prompt. Segundo, chunks demasiado pequeños -> Una frase como \"El costo es de $45\" queda separada del párrafo anterior que decía a qué producto se refería. Y tercero, enriquece cada Chunk con metadatos (título del documento, sección, fecha) antes de vectorizarlo.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Cortar tablas financieras o bloques de código por conteo fijo de caracteres sin respetar saltos de línea rompe las filas y hace que el LLM lea números cruzados. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "No puedes meter un libro entero de 300 páginas en cada pregunta porque sería carísimo y el modelo perdería el foco, pero tampoco puedes cortar el texto cada 100 letras a ciegas porque partirías las frases y tablas por la mitad.",
+          "Observa en la configuración de abajo cómo el RecursiveCharacterTextSplitter divide el texto respetando primero los saltos de párrafo (\\n\\n), mantiene fragmentos de unos 600 tokens con un solapamiento (chunkOverlap) de 100 tokens y adjunta los metadatos de archivo y página."
         ],
         "keyPoints": [
           "Chunks demasiado grandes -> Introducen ruido en el vector y consumen demasiados tokens en el prompt.",
           "Chunks demasiado pequeños -> Una frase como \"El costo es de $45\" queda separada del párrafo anterior que decía a qué producto se refería.",
           "Enriquece cada Chunk con metadatos (título del documento, sección, fecha) antes de vectorizarlo.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Adjuntar en metadata el nombre del documento, la sección y la fecha de vigencia te permite filtrar documentos vencidos antes de enviárselos a la IA."
         ],
         "code": "// Ejemplo de configuración de Recursive Character Text Splitter\nconst splitter = new RecursiveCharacterTextSplitter({\n  chunkSize: 500,       // Tamaño objetivo por fragmento\n  chunkOverlap: 80,     // 80 caracteres compartidos con el fragmento contiguo\n  separators: [\"\\n## \", \"\\n\\n\", \"\\n\", \". \", \" \"]\n});",
         "warning": "⚠️ Cortar tablas financieras o bloques de código por conteo fijo de caracteres sin respetar saltos de línea rompe las filas y hace que el LLM lea números cruzados.",
@@ -2278,15 +2278,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Chunks demasiado grandes -> Introducen ruido en el vector y consumen demasiados tokens en el prompt.",
-          "Paso 3 (Validación y Control de Calidad): Chunks demasiado pequeños -> Una frase como \"El costo es de $45\" queda separada del párrafo anterior que decía a qué producto se refería.",
-          "Paso 4 (Puesta en Marcha y Medición): Enriquece cada Chunk con metadatos (título del documento, sección, fecha) antes de vectorizarlo."
+          "Paso 1 (Definir el tamaño del fragmento): Configura chunkSize entre 400 y 800 tokens para que cada bloque contenga una idea completa sin ruido.",
+          "Paso 2 (Activar el solapamiento del 15-20%): Configura chunkOverlap entre 80 y 120 tokens para no cortar oraciones que queden justo en el borde.",
+          "Paso 3 (Jerarquizar los separadores): Usa [\"\\n\\n\", \"\\n\", \". \", \" \"] para que el corte respete siempre párrafos y oraciones completas.",
+          "Paso 4 (Enriquecer con metadatos): Guarda junto a cada fragmento el título de la sección padre, el archivo de origen y el número de página."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Estrategias de Chunking (Fragmentación) y Solapamiento (Overlap)",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Cortar tablas financieras o bloques de código por conteo fijo de caracteres sin respetar saltos de línea rompe...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Chunks demasiado grandes -> Introducen ruido en el vector y consumen demasiados tokens en el prompt.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Asistente de Recursos Humanos que Cortaba las Tablas de Licencias",
+          "scenario": "Una empresa dividía su manual de empleados cada 500 caracteres fijos sin solapamiento, haciendo que el título de una licencia quedara en un bloque y la cantidad de días en otro.",
+          "result": "Al pasar a fragmentación recursiva por párrafos con 15% de solapamiento y metadatos de sección, la precisión de las respuestas subió del 61% al 96%."
         }
       },
       {
@@ -2295,14 +2295,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "La búsqueda puramente vectorial es excelente para conceptos semánticos, pero puede fallar cuando el usuario busca un código de pieza exacto (\"SKU-9941-X\"), un número de ley o un apellido específico. Por eso los sistemas RAG de nivel industrial implementan Búsqueda Híbrida: combinan búsqueda léxica exacta (BM25 / Full-Text Search) + búsqueda vectorial semántica.",
           "Finalmente, para reducir las alucinaciones a casi cero, se instruye al modelo con una cláusula de abstención explícita: si la respuesta no se encuentra en los fragmentos recuperados, debe responder \"No cuento con información verificada en la documentación sobre ese punto\" en lugar de adivinar.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, reciprocal Rank Fusion (RRF) combina los rankings de BM25 (palabras exactas) y de Embeddings (significado). Segundo, un modelo Cross-Encoder (Re-Ranker) reordena los Top 15 candidatos para quedarse con los 4 más relevantes. Y tercero, pide siempre que el modelo devuelva el ID del fragmento citado junto a cada afirmación.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Pasar 30 fragmentos irrelevantes al prompt empeora la respuesta por el fenómeno \"Lost in the Middle\" (los modelos prestan menos atención a la mitad de contextos gigantes). Es mejor filtrar los 4 o 5 mejores. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "La búsqueda vectorial es excelente para entender conceptos, pero a veces falla cuando alguien busca un código exacto como \"Error E-4092\" o un número de repuesto. Por eso los sistemas profesionales combinan búsqueda vectorial con búsqueda de palabras exactas (BM25).",
+          "Además, en el Prompt de Sistema Anti-Alucinación de abajo verás cómo blindamos al modelo con temperatura 0.0 y la orden estricta de responder únicamente con los fragmentos recuperados, diciendo \"No cuento con esa información\" si el dato no figura en el contexto."
         ],
         "keyPoints": [
           "Reciprocal Rank Fusion (RRF) combina los rankings de BM25 (palabras exactas) y de Embeddings (significado).",
           "Un modelo Cross-Encoder (Re-Ranker) reordena los Top 15 candidatos para quedarse con los 4 más relevantes.",
           "Pide siempre que el modelo devuelva el ID del fragmento citado junto a cada afirmación.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Exigir que cada afirmación termine con su cita entre corchetes (ej. [Fuente: Manual.pdf, Pág. 12]) te permite verificar en 1 segundo que la IA no inventó nada."
         ],
         "code": "Prompt de Sistema Anti-Alucinación para RAG:\n\"Responde a la consulta del usuario utilizando ÚNICAMENTE los fragmentos provistos en <documentos>.\n- Si los fragmentos no contienen el dato exacto para responder, di explícitamente: 'Esa información no figura en la documentación oficial.'\n- PROHIBIDO extrapolar, asumir o usar conocimiento externo.\n- Al final de cada oración, cita la fuente entre corchetes, ej: [Doc-14].\"",
         "warning": "⚠️ Pasar 30 fragmentos irrelevantes al prompt empeora la respuesta por el fenómeno \"Lost in the Middle\" (los modelos prestan menos atención a la mitad de contextos gigantes). Es mejor filtrar los 4 o 5 mejores.",
@@ -2317,15 +2317,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Reciprocal Rank Fusion (RRF) combina los rankings de BM25 (palabras exactas) y de Embeddings (significado).",
-          "Paso 3 (Validación y Control de Calidad): Un modelo Cross-Encoder (Re-Ranker) reordena los Top 15 candidatos para quedarse con los 4 más relevantes.",
-          "Paso 4 (Puesta en Marcha y Medición): Pide siempre que el modelo devuelva el ID del fragmento citado junto a cada afirmación."
+          "Paso 1 (Combinar búsqueda Híbrida): Ejecuta en paralelo la búsqueda vectorial (significado) y la búsqueda léxica BM25 (códigos y nombres exactos).",
+          "Paso 2 (Reordenar los mejores candidatos): Toma los mejores resultados y quédate con los 4 o 5 fragmentos de mayor relevancia real.",
+          "Paso 3 (Fijar temperatura en 0.0): Configura temperature: 0.0 en la llamada al modelo para eliminar respuestas creativas o inventadas.",
+          "Paso 4 (Inyectar el prompt con regla de abstención): Pasa los fragmentos dentro de <contexto_recuperado> y exige citas textuales obligatorias."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Búsqueda Híbrida (BM25 + Vectorial), Re-Ranking y Control de Alucinaciones",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Pasar 30 fragmentos irrelevantes al prompt empeora la respuesta por el fenómeno \"Lost in the Middle\" (los mode...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Reciprocal Rank Fusion (RRF) combina los rankings de BM25 (palabras exactas) y de Embeddings (significado).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Catálogo Industrial con 12,000 Códigos de Repuestos sin Alucinaciones",
+          "scenario": "Los clientes buscaban códigos de piezas específicos (como \"Válvula VX-880\") y la búsqueda puramente vectorial traía válvulas parecidas pero de otro modelo.",
+          "result": "Activaron Búsqueda Híbrida (Vectorial + BM25) con prompt anti-alucinación y citas obligatorias, logrando 99.2% de exactitud técnica."
         }
       },
       {
@@ -2485,14 +2485,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "JavaScript se ejecuta en un único hilo principal (Single-Threaded), pero puede manejar miles de operaciones de red y temporizadores sin congelar la interfaz gracias al Event Loop (Bucle de Eventos) del navegador o de Node.js.",
           "Cuando el Call Stack (pila de ejecución síncrona) queda vacío, el Event Loop procesa primero TODA la cola de Microtareas (como callbacks de Promesas .then y async/await) antes de pasar a ejecutar la siguiente Macrotarea (como setTimeout o setInterval).",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, el código síncrono bloqueante (ej. un bucle while pesado) congela el renderizado de la página. Segundo, las Microtasks (Promesas) tienen prioridad estricta sobre las Macrotasks (setTimeout, incluso con 0ms). Y tercero, un setTimeout(fn, 0) no se ejecuta en 0ms exactos, sino recién cuando el Call Stack y la cola de Microtasks terminan.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si encolas microtareas recursivas infinitas, bloquearás el hilo principal igual que con un bucle infinito síncrono. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Aunque JavaScript ejecuta tu código en un solo hilo principal, puede manejar descargas de datos, temporizadores y clics al mismo tiempo gracias al Event Loop, que organiza las tareas pendientes en dos filas con distinta prioridad.",
+          "En el código de abajo verás por qué un Promise.then() (Microtarea) se ejecuta siempre inmediatamente después del código normal y antes que cualquier setTimeout (Macrotarea), incluso cuando el temporizador dice 0 milisegundos."
         ],
         "keyPoints": [
           "El código síncrono bloqueante (ej. un bucle while pesado) congela el renderizado de la página.",
           "Las Microtasks (Promesas) tienen prioridad estricta sobre las Macrotasks (setTimeout, incluso con 0ms).",
           "Un setTimeout(fn, 0) no se ejecuta en 0ms exactos, sino recién cuando el Call Stack y la cola de Microtasks terminan.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Si ejecutas un bucle pesado de millones de cálculos síncronos en el hilo principal, congelarás el scroll y los botones de toda la página web."
         ],
         "code": "console.log(\"1. Inicio síncrono\");\n\nsetTimeout(() => {\n  console.log(\"4. Macrotask (setTimeout 0ms)\");\n}, 0);\n\nPromise.resolve().then(() => {\n  console.log(\"3. Microtask (Promise.then)\");\n});\n\nconsole.log(\"2. Fin síncrono\");\n// Orden exacto impreso en consola: 1 -> 2 -> 3 -> 4",
         "warning": "⚠️ Si encolas microtareas recursivas infinitas, bloquearás el hilo principal igual que con un bucle infinito síncrono.",
@@ -2507,15 +2507,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): El código síncrono bloqueante (ej. un bucle while pesado) congela el renderizado de la página.",
-          "Paso 3 (Validación y Control de Calidad): Las Microtasks (Promesas) tienen prioridad estricta sobre las Macrotasks (setTimeout, incluso con 0ms).",
-          "Paso 4 (Puesta en Marcha y Medición): Un setTimeout(fn, 0) no se ejecuta en 0ms exactos, sino recién cuando el Call Stack y la cola de Microtasks terminan."
+          "Paso 1 (Identificar el código síncrono): Ubica las instrucciones directas que entran y salen del Call Stack de inmediato (pasos 1 y 2 del ejemplo).",
+          "Paso 2 (Reconocer la cola de Microtareas): Ten presente que todas las Promesas resueltas (.then / await) tienen prioridad absoluta al vaciarse el stack.",
+          "Paso 3 (Reconocer la cola de Macrotareas): Ubica allí los setTimeout, setInterval y eventos de interfaz que esperan a que no queden microtareas.",
+          "Paso 4 (Comprobar en la consola): Abre las herramientas de desarrollador (F12 -> Console), pega el ejemplo y verifica el orden exacto 1 -> 2 -> 3 -> 4."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: El Event Loop, Call Stack, Microtasks y Macrotasks",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Si encolas microtareas recursivas infinitas, bloquearás el hilo principal igual que con un bucle infinito sínc...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (El código síncrono bloqueante (ej. un bucle while pesado) congela el renderizado de la página.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Interfaz de Trading Web que se Congelaba al Actualizar Precios",
+          "scenario": "Un panel financiero procesaba miles de filas de forma síncrona dentro de cada evento y asumía que un setTimeout(fn, 0) correría antes que las promesas pendientes.",
+          "result": "Al reordenar el flujo asíncrono respetando la prioridad de Microtareas y fraccionar el procesamiento, la interfaz mantuvo 60 cuadros por segundo fluidos."
         }
       },
       {
@@ -2524,14 +2524,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Uno de los cuellos de botella más frecuentes en aplicaciones web es usar múltiples \"await\" en serie para peticiones HTTP independientes entre sí. Si pides el perfil del usuario (400ms), luego las notificaciones (400ms) y luego el catálogo (400ms) uno detrás de otro, el usuario esperará 1,200ms en blanco.",
           "Cuando las peticiones no dependen una del resultado de la anterior, dispararlas en paralelo con Promise.all() o Promise.allSettled() reduce el tiempo total al de la petición más lenta (400ms), triplicando la velocidad de carga.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, promise.all([p1, p2, p3]) resuelve cuando todas terminan, o rechaza inmediatamente si una sola falla. Segundo, promise.allSettled([p1, p2, p3]) espera a todas y te informa cuáles tuvieron éxito (fulfilled) y cuáles fallaron (rejected) sin abortar las demás. Y tercero, usa await secuencial solo cuando la petición B necesita un dato devuelto por la petición A.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si una de las 3 promesas dentro de Promise.all() falla y no es una función crítica (ej. cargar un banner secundario), usa Promise.allSettled() para no romper toda la pantalla. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Uno de los errores que más vuelve lentas a las aplicaciones web modernas es poner varios await seguidos en fila cuando las peticiones no dependen una de la otra, haciendo que el usuario espere la suma de todos los tiempos.",
+          "En el código comparativo de abajo verás cómo pasar de tres await en serie (1200 ms en total) a un único Promise.all() en paralelo reduce la carga de la pantalla a 400 ms (el tiempo de la llamada más lenta)."
         ],
         "keyPoints": [
           "Promise.all([p1, p2, p3]) resuelve cuando todas terminan, o rechaza inmediatamente si una sola falla.",
           "Promise.allSettled([p1, p2, p3]) espera a todas y te informa cuáles tuvieron éxito (fulfilled) y cuáles fallaron (rejected) sin abortar las demás.",
           "Usa await secuencial solo cuando la petición B necesita un dato devuelto por la petición A.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Siempre que hagas una petición fetch(), recuerda que un error del servidor (404 o 500) no salta al catch por sí solo: debes verificar if (!res.ok)."
         ],
         "code": "// ❌ LENTO (En serie: 400ms + 400ms + 400ms = 1200ms)\nconst perfil = await fetchPerfil();\nconst cursos = await fetchCursos();\nconst avisos = await fetchAvisos();\n\n// ✅ RÁPIDO (En paralelo con Promise.all: ~400ms en total)\nconst [perfil, cursos, avisos] = await Promise.all([\n  fetchPerfil(),\n  fetchCursos(),\n  fetchAvisos()\n]);",
         "warning": "⚠️ Si una de las 3 promesas dentro de Promise.all() falla y no es una función crítica (ej. cargar un banner secundario), usa Promise.allSettled() para no romper toda la pantalla.",
@@ -2546,15 +2546,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Promise.all([p1, p2, p3]) resuelve cuando todas terminan, o rechaza inmediatamente si una sola falla.",
-          "Paso 3 (Validación y Control de Calidad): Promise.allSettled([p1, p2, p3]) espera a todas y te informa cuáles tuvieron éxito (fulfilled) y cuáles fallaron (rejected) sin abortar las demás.",
-          "Paso 4 (Puesta en Marcha y Medición): Usa await secuencial solo cuando la petición B necesita un dato devuelto por la petición A."
+          "Paso 1 (Detectar llamadas independientes): Revisa en tu función async si la segunda petición realmente necesita un dato de la primera para empezar.",
+          "Paso 2 (Agrupar con Promise.all): Lanza todas las peticiones independientes juntas dentro de await Promise.all([fetch1, fetch2, fetch3]).",
+          "Paso 3 (Usar Promise.allSettled en tableros): Si alguna tarjeta secundaria puede fallar sin romper la página, usa Promise.allSettled().",
+          "Paso 4 (Desestructurar los resultados): Recibe las respuestas en paralelo con const [user, courses, stats] = await Promise.all(...)."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Async / Await en Serie vs. Concurrencia Paralela con Promise.all",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Si una de las 3 promesas dentro de Promise.all() falla y no es una función crítica (ej. cargar un banner secun...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Promise.all([p1, p2, p3]) resuelve cuando todas terminan, o rechaza inmediatamente si una sola falla.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Panel de Alumno que Bajó su Carga Inicial de 2.4s a 0.6s",
+          "scenario": "Al iniciar sesión, la aplicación pedía primero el perfil, esperaba a que terminara para pedir los cursos, luego los certificados y por último las notificaciones.",
+          "result": "Unificaron las 4 consultas independientes con Promise.all(), reduciendo el tiempo de espera del usuario en un 75% desde el primer día."
         }
       },
       {
@@ -2563,14 +2563,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En JavaScript, los tipos primitivos (number, string, boolean) se copian por valor, pero los Objetos y Arrays se asignan y comparan por referencia en memoria. Si haces const copia = estadoOriginal y luego modificas copia.puntos = 900, estarás mutando también el objeto original.",
           "Los frameworks reactivos modernos detectan si deben actualizar la pantalla comparando referencias (prevState !== nextState). Si mutas un array con .push() sobre la misma referencia en lugar de crear una copia nueva con el operador spread [...items, nuevo], los componentes pueden no enterarse del cambio.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, para agregar sin mutar: const nuevaLista = [...listaActual, nuevoItem]. Segundo, para eliminar sin mutar: const filtrada = listaActual.filter(item => item.id !== idABorrar). Y tercero, el operador spread {...obj} hace una copia superficial (Shallow Copy); para objetos anidados profundos usa structuredClone(obj).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Hacer `{ ...usuario }` no clona los sub-objetos internos (`usuario.configuracion`); para clonar toda la jerarquía en navegadores modernos usa `structuredClone(usuario)`. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "En React, la interfaz solo se actualiza en pantalla cuando detecta que el estado apunta a una referencia de memoria nueva. Si modificas un array u objeto directamente con .push() o cambiando una propiedad interna, React no se enterará del cambio.",
+          "Observa en el ejemplo práctico cómo para marcar una tarea como completada dentro de una lista usamos .map() devolviendo un objeto nuevo ({ ...item, completed: true }) únicamente para el elemento modificado, manteniendo el resto intacto."
         ],
         "keyPoints": [
           "Para agregar sin mutar: const nuevaLista = [...listaActual, nuevoItem].",
           "Para eliminar sin mutar: const filtrada = listaActual.filter(item => item.id !== idABorrar).",
           "El operador spread {...obj} hace una copia superficial (Shallow Copy); para objetos anidados profundos usa structuredClone(obj).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Para eliminar un elemento del estado en React sin mutar el array original, utiliza siempre lista.filter(item => item.id !== idAEliminar)."
         ],
         "code": "// Actualización inmutable de un ítem dentro de un array de estado\nfunction marcarCursoCompletado(cursos, idCurso) {\n  return cursos.map(curso =>\n    curso.id === idCurso\n      ? { ...curso, completado: true, fechaFin: Date.now() }\n      : curso\n  );\n}",
         "warning": "⚠️ Hacer `{ ...usuario }` no clona los sub-objetos internos (`usuario.configuracion`); para clonar toda la jerarquía en navegadores modernos usa `structuredClone(usuario)`.",
@@ -2585,15 +2585,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Para agregar sin mutar: const nuevaLista = [...listaActual, nuevoItem].",
-          "Paso 3 (Validación y Control de Calidad): Para eliminar sin mutar: const filtrada = listaActual.filter(item => item.id !== idABorrar).",
-          "Paso 4 (Puesta en Marcha y Medición): El operador spread {...obj} hace una copia superficial (Shallow Copy); para objetos anidados profundos usa structuredClone(obj)."
+          "Paso 1 (Prohibir mutaciones directas): Nunca uses .push(), .splice(), .sort() ni asignaciones directas sobre una variable de estado de React.",
+          "Paso 2 (Agregar elementos con Spread): Para añadir un ítem al estado, crea un array nuevo con setItems(prev => [...prev, nuevoItem]).",
+          "Paso 3 (Actualizar un ítem con .map): Recorre el array con .map() y clona con { ...item, campo: nuevoValor } solo el ítem cuyo id coincida.",
+          "Paso 4 (Clonar profundo cuando haya anidación): Si necesitas copiar un objeto complejo con varios niveles internos, utiliza structuredClone(obj)."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Inmutabilidad de Estado, Referencias en Memoria y Efectos Secundarios",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Hacer `{ ...usuario }` no clona los sub-objetos internos (`usuario.configuracion`); para clonar toda la jerarq...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Para agregar sin mutar: const nuevaLista = [...listaActual, nuevoItem].), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Carrito de Compras que No Actualizaba el Total al Cambiar Cantidades",
+          "scenario": "Un desarrollador modificaba directamente item.qty += 1 dentro del array del carrito y llamaba a setCart(cart), pero la pantalla seguía mostrando el número viejo.",
+          "result": "Reemplazaron la mutación directa por una actualización inmutable con .map() y operador spread, logrando que el carrito y el total reaccionen al instante."
         }
       },
       {
@@ -2602,14 +2602,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Si conectas un campo de búsqueda directamente a un endpoint del servidor en el evento \"input\", un usuario que escriba \"curso de python\" (15 letras) disparará 15 peticiones HTTP seguidas en 2 segundos, saturando tu backend y provocando condiciones de carrera (Race Conditions) donde una respuesta vieja pisa a una nueva.",
           "La técnica de \"Debounce\" pospone la ejecución de la función hasta que el usuario deje de teclear durante un intervalo determinado (ej. 300ms), enviando una única petición limpia.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, debounce: Espera a que cese la ráfaga de eventos (ideal para buscadores en vivo y autoguardado). Segundo, throttle: Garantiza que la función se ejecute como máximo 1 vez cada X milisegundos (ideal para eventos de scroll o resize). Y tercero, usa AbortController para cancelar peticiones fetch en vuelo si el usuario cambia de pestaña o vuelve a escribir.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Olvidar limpiar intervalos (clearInterval) o EventListeners globales cuando un componente se destruye causa Memory Leaks que degradan el navegador. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Si conectas una llamada al servidor directamente al evento de teclado de un buscador, un usuario que escriba \"curso python\" (12 letras) disparará 12 peticiones seguidas a tu base de datos en menos de dos segundos.",
+          "En el código de abajo verás cómo la función debounce() actúa como un amortiguador inteligente: reinicia la cuenta regresiva con cada tecla y solo dispara la búsqueda real cuando el usuario deja de escribir durante 300 milisegundos."
         ],
         "keyPoints": [
           "Debounce: Espera a que cese la ráfaga de eventos (ideal para buscadores en vivo y autoguardado).",
           "Throttle: Garantiza que la función se ejecute como máximo 1 vez cada X milisegundos (ideal para eventos de scroll o resize).",
           "Usa AbortController para cancelar peticiones fetch en vuelo si el usuario cambia de pestaña o vuelve a escribir.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Si usas temporizadores o escuchadores de eventos dentro de un useEffect en React, devuelve siempre una función de limpieza (cleanup) para evitar fugas de memoria."
         ],
         "code": "function debounce(fn, delayMs = 300) {\n  let timerId = null;\n  return function (...args) {\n    clearTimeout(timerId);\n    timerId = setTimeout(() => {\n      fn.apply(this, args);\n    }, delayMs);\n  };\n}\n\nconst buscarEnServidor = debounce((texto) => fetch(`/api/search?q=${texto}`), 300);",
         "warning": "⚠️ Olvidar limpiar intervalos (clearInterval) o EventListeners globales cuando un componente se destruye causa Memory Leaks que degradan el navegador.",
@@ -2624,15 +2624,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Debounce: Espera a que cese la ráfaga de eventos (ideal para buscadores en vivo y autoguardado).",
-          "Paso 3 (Validación y Control de Calidad): Throttle: Garantiza que la función se ejecute como máximo 1 vez cada X milisegundos (ideal para eventos de scroll o resize).",
-          "Paso 4 (Puesta en Marcha y Medición): Usa AbortController para cancelar peticiones fetch en vuelo si el usuario cambia de pestaña o vuelve a escribir."
+          "Paso 1 (Crear la función envolvente debounce): Declara una variable timerId que guarde la referencia del temporizador activo.",
+          "Paso 2 (Cancelar el envío anterior): Llama a clearTimeout(timerId) cada vez que el usuario vuelva a presionar una tecla antes de los 300 ms.",
+          "Paso 3 (Programar la ejecución definitiva): Inicia un nuevo setTimeout(() => fn(...args), 300) que solo se completará cuando haya una pausa.",
+          "Paso 4 (Limpiar al desmontar el componente): Añade return () => clearTimeout(timerId) en tu componente para liberar memoria al cambiar de vista."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Debouncing, Throttling y Prevención de Fugas de Memoria (Memory Leaks)",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Olvidar limpiar intervalos (clearInterval) o EventListeners globales cuando un componente se destruye causa Me...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Debounce: Espera a que cese la ráfaga de eventos (ideal para buscadores en vivo y autoguardado).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Buscador de Catálogo que Redujo en 88% la Carga del Servidor",
+          "scenario": "El buscador en vivo de una tienda disparaba una consulta SQL por cada letra tecleada, saturando la base de datos en horas pico y mostrando resultados desordenados.",
+          "result": "Aplicaron un debounce de 300 ms junto con AbortController, reduciendo las peticiones al servidor en un 88% y dejando la búsqueda instantánea."
         }
       },
       {
@@ -2792,14 +2792,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Muchos emprendedores confunden facturación con ganancia y quiebran vendiendo mucho. Para entender la rentabilidad real de cada venta debes separar los Costos Variables (aquellos que sólo existen cuando vendes una unidad adicional: comisión de pasarela de pago, costo de mercadería, tokens de API por usuario) de los Costos Fijos (alquiler, sueldos fijos, servidores base que pagas vendas 0 o 1,000 unidades).",
           "El Margen de Contribución Unitario es el Precio de Venta menos el Costo Variable Unitario. Ese dinero es lo que \"contribuye\" cada venta individual a pagar tus Costos Fijos mensuales; una vez cubiertos los costos fijos, cada dólar de margen de contribución adicional es utilidad neta pura.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, margen de Contribución ($) = Precio de Venta Unitario - Costo Variable Unitario. Segundo, razón de Contribución (%) = (Margen de Contribución / Precio de Venta) × 100. Y tercero, si tu Margen de Contribución es negativo, pierdes más dinero cuantas más unidades vendes.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Hacer un descuento del 30% sobre el precio final NO reduce tu ganancia un 30%: si tu margen era del 40%, un descuento del 30% destruye el 75% de tu ganancia por unidad. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Facturar mucho no significa ganar dinero: para saber cuánto te queda realmente limpio por cada venta debes restarle al precio todos los Costos Variables que se disparan únicamente cuando vendes una unidad más (comisiones, pasarela, envío o soporte directo).",
+          "En el análisis unitario del bloque práctico verás cómo de un producto de $50 USD, tras descontar pasarela ($2.00), soporte ($3.00) y costo de adquisición ($15.00), tu Margen de Contribución real es de $30.00 USD (60%) para cubrir tus costos fijos y generar ganancia."
         ],
         "keyPoints": [
           "Margen de Contribución ($) = Precio de Venta Unitario - Costo Variable Unitario.",
           "Razón de Contribución (%) = (Margen de Contribución / Precio de Venta) × 100.",
           "Si tu Margen de Contribución es negativo, pierdes más dinero cuantas más unidades vendes.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Hacer un descuento del 20% sobre el precio final no reduce tu ganancia un 20%: suele recortar tu margen neto a la mitad porque tus costos variables no bajan."
         ],
         "code": "Análisis Unitario de un Producto Digital de $50 USD:\n- Precio de Venta:                     $50.00 USD\n- Costo Variable Pasarela (4% + $0.5): -$2.50 USD\n- Costo Variable Soporte/API por uso:  -$3.50 USD\n-------------------------------------------------\n= Margen de Contribución Unitario:     $44.00 USD (88% de margen de contribución)",
         "warning": "⚠️ Hacer un descuento del 30% sobre el precio final NO reduce tu ganancia un 30%: si tu margen era del 40%, un descuento del 30% destruye el 75% de tu ganancia por unidad.",
@@ -2814,15 +2814,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Margen de Contribución ($) = Precio de Venta Unitario - Costo Variable Unitario.",
-          "Paso 3 (Validación y Control de Calidad): Razón de Contribución (%) = (Margen de Contribución / Precio de Venta) × 100.",
-          "Paso 4 (Puesta en Marcha y Medición): Si tu Margen de Contribución es negativo, pierdes más dinero cuantas más unidades vendes."
+          "Paso 1 (Anotar el precio de venta neto): Registra cuánto paga efectivamente el cliente por una unidad de tu producto o servicio.",
+          "Paso 2 (Desglosar todos los costos variables unitarios): Suma comisión de pasarela, impuestos directos por venta, entrega y publicidad por cliente.",
+          "Paso 3 (Restar para hallar el Margen de Contribución): Calcula Precio de Venta menos Costo Variable Unitario para saber cuánto te deja cada venta.",
+          "Paso 4 (Simular antes de hacer descuentos): Verifica en tu planilla cómo impacta cualquier promoción sobre tu margen limpio antes de publicarla."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Costos Fijos, Costos Variables y Margen de Contribución Unitario",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Hacer un descuento del 30% sobre el precio final NO reduce tu ganancia un 30%: si tu margen era del 40%, un de...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Margen de Contribución ($) = Precio de Venta Unitario - Costo Variable Unitario.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Agencia que Facturaba $12,000 USD/mes pero No Veía Ganancias",
+          "scenario": "Un estudio ofrecía 25% de descuento para cerrar rápido sin haber calculado que el 65% de cada venta se iba en horas de freelancers y comisiones de pago.",
+          "result": "Calcularon su Margen de Contribución unitario real, eliminaron los descuentos impulsivos y subieron su ganancia neta de bolsillo del 8% al 38%."
         }
       },
       {
@@ -2831,14 +2831,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El Punto de Equilibrio (Break-Even) indica exactamente cuántas unidades necesitas vender en un mes para que tu utilidad operativa sea $0 (ni ganas ni pierdes: cubres el 100% de tus costos fijos y variables).",
           "La fórmula es: Punto de Equilibrio (en unidades) = Costos Fijos Mensuales Totales / Margen de Contribución Unitario. A partir de la unidad siguiente al punto de equilibrio, la empresa entra en zona de ganancias reales.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, break-Even (Unidades) = Costos Fijos Totales / (Precio Unitario - Costo Variable Unitario). Segundo, para bajar tu punto de equilibrio tienes 3 palancas: reducir costos fijos, subir el precio o bajar el costo variable. Y tercero, en software y educación digital, el alto margen de contribución (>85%) permite alcanzar el punto de equilibrio con muy pocas ventas.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca dividas los Costos Fijos por el Precio Bruto de venta olvidando restar antes los Costos Variables, o subestimarás cuántas ventas necesitas. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El Punto de Equilibrio (Break-Even Point) es el número exacto de ventas que necesitas hacer cada mes para pagar todos tus gastos fijos (alquiler, sueldos, software, internet) y quedar exactamente en $0, sin perder ni ganar.",
+          "Observa en el cálculo de abajo qué simple es la cuenta: si tus Costos Fijos del mes son $1,500 USD y cada venta te deja $30 USD limpios de Margen de Contribución, necesitas exactamente 50 ventas para cubrir el mes; desde la venta 51 en adelante, todo es ganancia neta."
         ],
         "keyPoints": [
           "Break-Even (Unidades) = Costos Fijos Totales / (Precio Unitario - Costo Variable Unitario).",
           "Para bajar tu punto de equilibrio tienes 3 palancas: reducir costos fijos, subir el precio o bajar el costo variable.",
           "En software y educación digital, el alto margen de contribución (>85%) permite alcanzar el punto de equilibrio con muy pocas ventas.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Convertir tu Punto de Equilibrio mensual en una meta diaria o semanal (ej. 50 ventas al mes = 12.5 ventas por semana) te permite corregir el rumbo a tiempo."
         ],
         "code": "Cálculo de Punto de Equilibrio Mensual:\n- Costos Fijos Mensuales (Herramientas, Servidores, Sueldo base): $2,200 USD\n- Margen de Contribución por Curso Vendido:                       $44 USD\n👉 Punto de Equilibrio = $2,200 / $44 = 50 ventas al mes.\n(De la venta #1 a la #50 pagas la estructura; desde la venta #51 ganas $44 limpios por cada venta).",
         "warning": "⚠️ Nunca dividas los Costos Fijos por el Precio Bruto de venta olvidando restar antes los Costos Variables, o subestimarás cuántas ventas necesitas.",
@@ -2853,15 +2853,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Break-Even (Unidades) = Costos Fijos Totales / (Precio Unitario - Costo Variable Unitario).",
-          "Paso 3 (Validación y Control de Calidad): Para bajar tu punto de equilibrio tienes 3 palancas: reducir costos fijos, subir el precio o bajar el costo variable.",
-          "Paso 4 (Puesta en Marcha y Medición): En software y educación digital, el alto margen de contribución (>85%) permite alcanzar el punto de equilibrio con muy pocas ventas."
+          "Paso 1 (Sumar tus Costos Fijos Mensuales): Totaliza todos los gastos que debes pagar todos los meses vendas 0 o vendas 1,000 unidades.",
+          "Paso 2 (Tomar tu Margen de Contribución Unitario): Usa el monto limpio que te deja cada venta después de restar los costos variables.",
+          "Paso 3 (Dividir Fijos sobre Margen Unitario): Calcula Costos Fijos / Margen Unitario para saber cuántas unidades necesitas vender para empatar.",
+          "Paso 4 (Redondear siempre hacia arriba): Si la división da 50.2 unidades, tu meta mínima real es de 51 ventas cerradas en el mes."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Cálculo del Punto de Equilibrio (Break-Even Point)",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Nunca dividas los Costos Fijos por el Precio Bruto de venta olvidando restar antes los Costos Variables, o sub...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Break-Even (Unidades) = Costos Fijos Totales / (Precio Unitario - Costo Variable Unitario).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Academia Digital con Meta Clara de Equilibrio Semanal",
+          "scenario": "Los socios no sabían cuántas membresías necesitaban vender por semana para cubrir sus $1,500 USD de estructura fija y tomaban decisiones a ciegas.",
+          "result": "Fijaron su Punto de Equilibrio en 50 ventas mensuales (13 por semana), alcanzándolo el día 14 de cada mes y operando con utilidad neta el resto del mes."
         }
       },
       {
@@ -2870,14 +2870,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Fijar precios sumando tus horas o costos más un 20% (Cost-Plus Pricing) es la peor estrategia en servicios profesionales y tecnología: te castiga por volverte más rápido y eficiente. Al cliente corporativo no le importa cuántas horas tardaste en escribir un script; le importa cuánto dinero le hace ganar o ahorrar ese script.",
           "Con Value-Based Pricing (Precio Basado en Valor), primero cuantificas el impacto económico anual que el problema le genera al cliente (ej. pierde $24,000 USD/año en tareas manuales y errores) y posicionas tu solución como una fracción de ese retorno (ej. $2,400 USD, ofreciendo un ROI de 10x).",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, nunca des un presupuesto sin antes diagnosticar cuánto le cuesta hoy el problema al cliente. Segundo, ancla tu precio contra el costo de la inacción (lo que perderá en los próximos 12 meses si no lo resuelve). Y tercero, presenta 3 opciones escalonadas (Esencial, Profesional, Élite) para que el cliente compare tus planes entre sí y no contra la competencia.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Competir por ser \"el más barato del mercado\" atrae a los clientes más conflictivos y te deja sin margen para ofrecer un servicio de excelencia. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cobrar por hora o sumando un pequeño porcentaje a tus costos (Cost-Plus) funciona para productos físicos básicos, pero en servicios profesionales, software o automatización te castiga por ser rápido y eficiente.",
+          "En el diálogo de anclaje de valor del bloque práctico verás cómo cambiar la conversación: en lugar de cotizar \"10 horas de programación\", cuantificamos que el problema le hace perder $48,000 USD al año a la empresa y fijamos un precio de $3,500 USD con retorno de 13 a 1."
         ],
         "keyPoints": [
           "Nunca des un presupuesto sin antes diagnosticar cuánto le cuesta hoy el problema al cliente.",
           "Ancla tu precio contra el costo de la inacción (lo que perderá en los próximos 12 meses si no lo resuelve).",
           "Presenta 3 opciones escalonadas (Esencial, Profesional, Élite) para que el cliente compare tus planes entre sí y no contra la competencia.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Un cliente empresarial aprueba sin dudar un presupuesto de $3,000 USD cuando le demuestras con sus propios números que esa solución le ahorrará $30,000 USD al año."
         ],
         "code": "Conversación de Anclaje de Valor B2B:\n- Impacto detectado: El equipo pierde 40 hs/mes cargando facturas ($1,500 USD/mes = $18,000 USD/año).\n- Propuesta de Automatización Llave en Mano: $1,800 USD pago único.\n- Argumento financiero: \"El sistema se paga solo en los primeros 36 días y les ahorra $16,200 USD netos este año.\"",
         "warning": "⚠️ Competir por ser \"el más barato del mercado\" atrae a los clientes más conflictivos y te deja sin margen para ofrecer un servicio de excelencia.",
@@ -2892,15 +2892,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Nunca des un presupuesto sin antes diagnosticar cuánto le cuesta hoy el problema al cliente.",
-          "Paso 3 (Validación y Control de Calidad): Ancla tu precio contra el costo de la inacción (lo que perderá en los próximos 12 meses si no lo resuelve).",
-          "Paso 4 (Puesta en Marcha y Medición): Presenta 3 opciones escalonadas (Esencial, Profesional, Élite) para que el cliente compare tus planes entre sí y no contra la competencia."
+          "Paso 1 (Cuantificar el costo del problema actual): Pregúntale al cliente cuántas horas o ventas pierde por semana debido al proceso manual.",
+          "Paso 2 (Anclar el impacto anual en dólares): Multiplica esa pérdida mensual por 12 meses para que ambas partes vean el tamaño real del problema.",
+          "Paso 3 (Fijar tu precio como fracción del retorno): Ubica tu tarifa entre el 10% y el 20% del beneficio anual que le generará tu solución.",
+          "Paso 4 (Presentar la inversión frente al ahorro): Muestra en el presupuesto cuánto dinero recupera el cliente ya desde el primer trimestre."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Cost-Plus Pricing vs. Value-Based Pricing (Precio Basado en Valor)",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Competir por ser \"el más barato del mercado\" atrae a los clientes más conflictivos y te deja sin margen para o...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Nunca des un presupuesto sin antes diagnosticar cuánto le cuesta hoy el problema al cliente.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Consultor de Automatización que Pasó de Cobrar $400 a $3,200 USD",
+          "scenario": "Un especialista cobraba $20 USD la hora y como resolvía las integraciones en 20 horas solo ganaba $400 USD por sistemas que ahorraban dos sueldos enteros.",
+          "result": "Adoptó Value-Based Pricing anclado al ahorro anual del cliente, cerrando el mismo proyecto en $3,200 USD con mayor satisfacción de la empresa."
         }
       },
       {
@@ -2909,14 +2909,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El costo más difícil y caro de cualquier negocio es conseguir que un desconocido saque la tarjeta por primera vez (CAC). Una vez que el cliente confía y está comprando, aumentar el Ticket Promedio de Orden (AOV) mediante un Order Bump o un Upsell complementario multiplica el margen neto de forma inmediata.",
           "Un \"Order Bump\" es un complemento de bajo costo y alta utilidad que se añade con 1 solo clic en el checkout (ej. \"+$9 USD por las plantillas listas para usar\"), mientras que un \"Upsell\" ofrece la versión acelerada o membresía completa justo después de la compra.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, aOV (Average Order Value) = Ingresos Totales / Número Total de Pedidos. Segundo, si el 30% de tus compradores añade un Order Bump de $15 USD, tu ingreso sube sin gastar $1 más en marketing. Y tercero, el complemento debe ahorrar tiempo o acelerar la implementación del producto principal.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: El Order Bump debe entenderse en una sola oración; si requiere 5 párrafos de explicación, distraerá al comprador de completar la compra principal. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Una vez que ya hiciste el esfuerzo y pagaste la publicidad para que un cliente confíe y abra su billetera, la forma más rápida de duplicar las ganancias de tu negocio es aumentar el monto de esa compra (Ticket Promedio o AOV).",
+          "Observa en la simulación real de abajo cómo al agregar una casilla opcional de complemento (Order Bump de $19 USD) en el checkout que acepta apenas el 30% de los compradores, la ganancia neta final del negocio sube un +38% con exactamente el mismo tráfico."
         ],
         "keyPoints": [
           "AOV (Average Order Value) = Ingresos Totales / Número Total de Pedidos.",
           "Si el 30% de tus compradores añade un Order Bump de $15 USD, tu ingreso sube sin gastar $1 más en marketing.",
           "El complemento debe ahorrar tiempo o acelerar la implementación del producto principal.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Diseñar una tabla de 3 planes (Básico, PRO recomendado en el centro y Premium arriba) guía naturalmente al 65% de los compradores hacia el plan del medio."
         ],
         "code": "Impacto de un Order Bump en la Rentabilidad Neta:\n- 100 ventas de curso a $20 USD (CAC $12 USD) -> Utilidad sin Bump: $800 USD.\n- Añades Order Bump de $15 USD (35% lo acepta = +$525 USD puros sin costo publicitario extra).\n👉 La utilidad neta salta de $800 a $1,325 USD (+65.6% más ganancia neta).",
         "warning": "⚠️ El Order Bump debe entenderse en una sola oración; si requiere 5 párrafos de explicación, distraerá al comprador de completar la compra principal.",
@@ -2931,15 +2931,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): AOV (Average Order Value) = Ingresos Totales / Número Total de Pedidos.",
-          "Paso 3 (Validación y Control de Calidad): Si el 30% de tus compradores añade un Order Bump de $15 USD, tu ingreso sube sin gastar $1 más en marketing.",
-          "Paso 4 (Puesta en Marcha y Medición): El complemento debe ahorrar tiempo o acelerar la implementación del producto principal."
+          "Paso 1 (Estructurar 3 niveles de precios): Crea una opción de entrada, tu plan central recomendado (\"MÁS ELEGIDO\") y una opción superior completa.",
+          "Paso 2 (Crear un complemento de acción rápida): Diseña una plantilla, pack de recursos o soporte prioritario que acelere el resultado del producto principal.",
+          "Paso 3 (Ubicar el Order Bump en el checkout): Añade una casilla de 1 solo clic antes de pagar para sumar ese complemento con descuento exclusivo.",
+          "Paso 4 (Medir el nuevo Ticket Promedio AOV): Divide tu facturación total entre el número de pedidos y verifica la subida de tu utilidad neta."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Psicología de Precios, Upsells, Cross-Sells y Maximización del Ticket Promedio (AOV)",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (El Order Bump debe entenderse en una sola oración; si requiere 5 párrafos de explicación, distraerá al comprad...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (AOV (Average Order Value) = Ingresos Totales / Número Total de Pedidos.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Tienda de Cursos que Subió un +38% su Ganancia Neta en 24 Horas",
+          "scenario": "Vendían únicamente un curso individual de $35 USD y después de pagar $20 USD de publicidad por cada comprador les quedaban solo $15 USD limpios.",
+          "result": "Añadieron un pack de plantillas descargables por +$19 USD en el checkout y el Pase VIP completo, elevando la utilidad neta en +$570 USD cada 100 ventas."
         }
       },
       {
@@ -3099,14 +3099,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El error más común al redactar una página de ventas o un anuncio es escribir igual para todo el mundo. Eugene Schwartz demostró en \"Breakthrough Advertising\" que todo comprador potencial se encuentra en uno de 5 niveles de consciencia, y el titular debe adaptarse exactamente a ese nivel:",
           "1) Inconsciente (no sabe que tiene un problema), 2) Consciente del Problema (siente el dolor pero no conoce soluciones), 3) Consciente de la Solución (sabe que existen métodos pero no conoce tu producto), 4) Consciente del Producto (conoce tu oferta pero duda si es para él), 5) Totalmente Consciente (solo necesita el precio y un disparador para comprar hoy).",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, a un público Consciente del Problema se le entra por el síntoma concreto y el costo de no resolverlo. Segundo, a un público Consciente de la Solución se le demuestra por qué tu mecanismo único supera a las alternativas tradicionales. Y tercero, al público Totalmente Consciente no le des 10 páginas de introducción: dale la oferta directa, el bono y el botón.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Hablar de características técnicas y descuentos en la primera línea a un usuario que aún no entiende qué problema resuelves genera rechazo inmediato. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El error más caro al escribir una página de ventas o un anuncio es hablarle a todo el mundo como si ya te conocieran: una persona que recién descubre que pierde tiempo necesita un mensaje muy distinto al de alguien que ya está comparando precios.",
+          "En el cuadro práctico de abajo verás cómo adaptamos el titular para los 5 niveles de consciencia de Eugene Schwartz: desde tocar el síntoma diario en el Nivel 2 hasta presentar una oferta directa e irresistible en el Nivel 5."
         ],
         "keyPoints": [
           "A un público Consciente del Problema se le entra por el síntoma concreto y el costo de no resolverlo.",
           "A un público Consciente de la Solución se le demuestra por qué tu mecanismo único supera a las alternativas tradicionales.",
           "Al público Totalmente Consciente no le des 10 páginas de introducción: dale la oferta directa, el bono y el botón.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Para audiencias que ya probaron otras opciones sin éxito (Nivel 3 y 4), la clave es explicar tu Mecanismo Único: por qué tu método sí funciona de forma distinta."
         ],
         "code": "Adaptación del Titular según el Nivel de Consciencia:\n- Nivel 2 (Consciente del Problema): \"¿Pierdes 2 horas al día conciliando pagos a mano en Excel?\"\n- Nivel 3 (Consciente de la Solución): \"Cómo automatizar tu facturación en 5 minutos sin contratar programadores.\"\n- Nivel 5 (Totalmente Consciente): \"Pase Anual SkillVault PRO — Activa hoy tu acceso con +100 VP de bono.\"",
         "warning": "⚠️ Hablar de características técnicas y descuentos en la primera línea a un usuario que aún no entiende qué problema resuelves genera rechazo inmediato.",
@@ -3121,15 +3121,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): A un público Consciente del Problema se le entra por el síntoma concreto y el costo de no resolverlo.",
-          "Paso 3 (Validación y Control de Calidad): A un público Consciente de la Solución se le demuestra por qué tu mecanismo único supera a las alternativas tradicionales.",
-          "Paso 4 (Puesta en Marcha y Medición): Al público Totalmente Consciente no le des 10 páginas de introducción: dale la oferta directa, el bono y el botón."
+          "Paso 1 (Diagnosticar de dónde viene el lector): Identifica si llega desde un anuncio frío en redes (Nivel 2) o desde tu propia lista de contactos (Nivel 4-5).",
+          "Paso 2 (Escribir el titular para ese nivel exacto): Abre con el dolor cotidiano si es tráfico frío, o con el mecanismo y resultado si ya busca solución.",
+          "Paso 3 (Conectar con el Mecanismo Único): Explica en dos frases sencillas cuál es la pieza práctica que hace que tu sistema dé resultados reales.",
+          "Paso 4 (Llevar al siguiente escalón de consciencia): Guía al lector párrafo a párrafo hasta que esté listo para evaluar tu oferta al final."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Los 5 Niveles de Consciencia del Mercado (Eugene Schwartz)",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Hablar de características técnicas y descuentos en la primera línea a un usuario que aún no entiende qué probl...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (A un público Consciente del Problema se le entra por el síntoma concreto y el costo de no resolverlo.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Campaña de Anuncios que Bajó a la Mitad su Costo por Cliente",
+          "scenario": "Una empresa mostraba un anuncio frío que decía \"Compra nuestro Plan Pro con 20% OFF\" a personas que ni siquiera sabían qué hacía la herramienta.",
+          "result": "Cambiaron el titular a Nivel 2 enfocándose en el dolor diario del cliente y su mecanismo de 3 pasos, duplicando los clics y reduciendo el costo por venta un 52%."
         }
       },
       {
@@ -3138,14 +3138,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Los grandes copywriters no escriben por \"inspiración\", sino ensamblando bloques lógicos probados. El framework más efectivo para páginas de aterrizaje, correos y guiones de video es P-A-S: Problema -> Agitación -> Solución.",
           "Primero describes el Problema con las mismas palabras que usa el cliente en su mente; luego Agitas mostrando las consecuencias reales (tiempo perdido, dinero desperdiciado, frustración) si todo sigue igual dentro de 6 meses; y finalmente presentas tu producto como el puente lógico e inevitable hacia la Solución.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, característica vs. Beneficio: \"Tiene 4 módulos en texto\" es una característica; \"Aprende a tu ritmo en 40 minutos y aplícalo hoy mismo\" es el beneficio. Segundo, usa la prueba del \"¿Y qué con eso?\": después de cada afirmación técnica, traduce cómo mejora la vida o el bolsillo del lector. Y tercero, mantén párrafos cortos de 2 a 3 líneas para facilitar la lectura escaneable (Skimming).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Agitar el problema no significa exagerar con promesas irreales; significa cuantificar con realismo el costo de seguir posponiendo la solución. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando te sientas frente a una hoja en blanco para redactar un anuncio, un correo o la descripción de un servicio, no necesitas inspiración artística: necesitas aplicar la estructura P-A-S (Problema -> Agitación -> Solución).",
+          "Observa en el ejemplo práctico cómo en solo 3 párrafos describimos primero el problema exacto que vive el lector un viernes a la tarde, agitamos cuánto le cuesta seguir así y finalmente presentamos la solución traduciendo cada característica en un beneficio concreto."
         ],
         "keyPoints": [
           "Característica vs. Beneficio: \"Tiene 4 módulos en texto\" es una característica; \"Aprende a tu ritmo en 40 minutos y aplícalo hoy mismo\" es el beneficio.",
           "Usa la prueba del \"¿Y qué con eso?\": después de cada afirmación técnica, traduce cómo mejora la vida o el bolsillo del lector.",
           "Mantén párrafos cortos de 2 a 3 líneas para facilitar la lectura escaneable (Skimming).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Aplica siempre la prueba del \"¿Y eso en qué me beneficia?\": después de mencionar cualquier dato técnico, escribe \"...para que puedas [resultado en su vida]\"."
         ],
         "code": "Aplicación Práctica del Framework P-A-S:\n[P - Problema]: Tienes visitantes entrando a tu web todos los días, pero el 98% se va sin comprar.\n[A - Agitación]: Cada semana que pasa con un embudo roto estás pagando tráfico y esfuerzo para regalarle clientes a tu competencia.\n[S - Solución]: Con el sistema de conversión de 4 pasos optimizarás tus titulares y tu checkout hoy mismo para duplicar tus cierres.",
         "warning": "⚠️ Agitar el problema no significa exagerar con promesas irreales; significa cuantificar con realismo el costo de seguir posponiendo la solución.",
@@ -3160,15 +3160,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Característica vs. Beneficio: \"Tiene 4 módulos en texto\" es una característica; \"Aprende a tu ritmo en 40 minutos y aplícalo hoy mismo\" es el beneficio.",
-          "Paso 3 (Validación y Control de Calidad): Usa la prueba del \"¿Y qué con eso?\": después de cada afirmación técnica, traduce cómo mejora la vida o el bolsillo del lector.",
-          "Paso 4 (Puesta en Marcha y Medición): Mantén párrafos cortos de 2 a 3 líneas para facilitar la lectura escaneable (Skimming)."
+          "Paso 1 (Describir el Problema con escena real): Abre mencionando la situación frustrante tal como la vive y la comenta tu cliente en su día a día.",
+          "Paso 2 (Agitar el costo de no hacer nada): Muestra con empatía qué ocurre con su tiempo, su dinero o su tranquilidad si deja pasar otros 6 meses igual.",
+          "Paso 3 (Presentar la Solución como puente): Introduce tu producto o servicio como el camino directo y probado para salir de esa situación.",
+          "Paso 4 (Traducir características a beneficios): Convierte cada módulo o función técnica en horas ahorradas o dinero ganado por el comprador."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Frameworks de Persuasión Estructurada (PAS y AIDA)",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Agitar el problema no significa exagerar con promesas irreales; significa cuantificar con realismo el costo de...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Característica vs. Beneficio: \"Tiene 4 módulos en texto\" es una característica; \"Aprende a tu ritmo en 40 minutos y aplícalo hoy mismo\" es el beneficio.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Página de Servicios que Triplicó las Consultas de Presupuesto",
+          "scenario": "Un contador publicaba en su web una lista fría de trámites (\"Liquidación de IVA, Ingresos Brutos, Balances\") que no generaba ningún mensaje.",
+          "result": "Reescribió su portada con la fórmula P-A-S enfocada en evitar multas y pagar solo lo justo, triplicando las solicitudes de clientes en 3 semanas."
         }
       },
       {
@@ -3177,14 +3177,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En el instante previo a comprar, todo cliente tiene 4 objeciones universales silenciosas: 1) \"¿Funcionará para mi caso específico?\", 2) \"¿Tengo el tiempo/capacidad para implementarlo?\", 3) \"¿Vale lo que cuesta?\", y 4) \"¿Qué pasa si me arrepiento?\".",
           "En lugar de ignorar esas dudas, una página de alta conversión las responde proactivamente mediante casos de estudio, demostración del producto por dentro y una Garantía de Inversión de Riesgo (Risk Reversal) que transfiere el riesgo del comprador hacia el vendedor.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, una sección de Preguntas Frecuentes (FAQ) estratégica no es para relleno: sirve para derribar las 5 objeciones principales de compra. Segundo, muestra capturas o vistas previas reales de lo que recibirá adentro inmediatamente tras pagar. Y tercero, cuanto menor sea el riesgo percibido por el comprador, mayor será la tasa de cierre.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si ocultas qué incluye exactamente el producto o cómo es por dentro, la incertidumbre frena la compra. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Incluso cuando una persona desea tu producto, segundos antes de pagar aparecen en su mente 3 miedos silenciosos: \"¿Tendré tiempo?\", \"¿Será demasiado difícil para mí?\" y \"¿Qué pasa si pago y no me sirve?\".",
+          "En la matriz del bloque práctico verás cómo desactivar esas tres objeciones una por una dentro de la misma página y cómo redactar una Garantía de Inversión de Riesgo que pasa toda la seguridad hacia el lado del comprador."
         ],
         "keyPoints": [
           "Una sección de Preguntas Frecuentes (FAQ) estratégica no es para relleno: sirve para derribar las 5 objeciones principales de compra.",
           "Muestra capturas o vistas previas reales de lo que recibirá adentro inmediatamente tras pagar.",
           "Cuanto menor sea el riesgo percibido por el comprador, mayor será la tasa de cierre.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Ubicar un bloque de 4 o 5 Preguntas Frecuentes (FAQ) estratégicas justo debajo de los precios cierra las ventas de los compradores más analíticos."
         ],
         "code": "Desarme de las 3 Objeciones Clásicas en la Página de Ventas:\n1. Objeción de Tiempo -> \"Módulos prácticos paso a paso con plantillas copiables.\"\n2. Objeción de Nivel  -> \"Explicado desde cero paso a paso, sin requerir conocimientos previos.\"\n3. Objeción de Valor  -> \"Incluye acceso a la Bóveda de Herramientas y Cursos Completos.\"",
         "warning": "⚠️ Si ocultas qué incluye exactamente el producto o cómo es por dentro, la incertidumbre frena la compra.",
@@ -3199,15 +3199,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Una sección de Preguntas Frecuentes (FAQ) estratégica no es para relleno: sirve para derribar las 5 objeciones principales de compra.",
-          "Paso 3 (Validación y Control de Calidad): Muestra capturas o vistas previas reales de lo que recibirá adentro inmediatamente tras pagar.",
-          "Paso 4 (Puesta en Marcha y Medición): Cuanto menor sea el riesgo percibido por el comprador, mayor será la tasa de cierre."
+          "Paso 1 (Listar las 3 excusas reales de no compra): Anota las dudas de tiempo, nivel previo y confianza que más te preguntan por chat.",
+          "Paso 2 (Responder cada objeción con un dato concreto): Sustituye promesas vagas por hechos verificables (ej. \"Módulos prácticos de 15 min desde cero\").",
+          "Paso 3 (Redactar tu bloque de Garantía visible): Coloca un sello claro de satisfacción de 7 o 14 días junto al botón de inscripción.",
+          "Paso 4 (Armar el FAQ de cierre bajo la tabla de planes): Incluye cada objeción como pregunta y respóndela eliminando el miedo final."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Matriz de Desarme de Objeciones e Inversión de Riesgo (Risk Reversal)",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Si ocultas qué incluye exactamente el producto o cómo es por dentro, la incertidumbre frena la compra....), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Una sección de Preguntas Frecuentes (FAQ) estratégica no es para relleno: sirve para derribar las 5 objeciones principales de compra.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Curso Online que Subió un +42% sus Ventas Desarmando la Objeción de Nivel",
+          "scenario": "Muchos visitantes salían de la página de pago porque temían no saber matemáticas ni programación previa para entender las clases.",
+          "result": "Agregaron el bloque de desarme de objeciones explicando que empezaba desde cero absoluto + garantía de 7 días, elevando las ventas un +42%."
         }
       },
       {
@@ -3216,14 +3216,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Más del 70% de las personas que visitan una oferta por primera vez no compran en esa primera sesión. Si capturas su contacto ofreciendo un recurso o curso introductorio gratuito (Lead Magnet), puedes activar una secuencia automatizada de correos que aporte valor real y convierta a lo largo de los días siguientes.",
           "Para que tus correos lleguen a la bandeja principal y no a la carpeta de Spam, tu dominio de envío debe tener configurados en sus registros DNS tres protocolos de autenticación criptográfica: SPF, DKIM y DMARC.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, sPF declara qué servidores tienen permiso para enviar correos en nombre de tu dominio. Segundo, dKIM añade una firma criptográfica al encabezado de cada correo para probar que no fue alterado en tránsito. Y tercero, secuencia ideal de 4 correos: 1) Entrega inmediata de valor, 2) Caso práctico + error común, 3) Resolución de objeción principal, 4) Invitación clara a pasar al nivel VIP.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Enviar correos masivos desde una cuenta gratuita (@gmail.com) o desde un dominio sin registros SPF y DKIM hará que Gmail y Outlook bloqueen tus envíos. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "La mayoría de las personas no compra en su primera visita a tu web: si capturas su correo entregándoles un regalo útil (como un test vocacional o una guía rápida), puedes enviarles una secuencia automática de 4 días que construya confianza y cierre la venta.",
+          "En la arquitectura de 4 correos del ejemplo práctico verás qué enviar cada día (Valor inmediato -> Caso de éxito -> Derribo de objeción -> Cierre con urgencia) y cómo configurar SPF, DKIM y DMARC para que tus mensajes lleguen siempre a la bandeja principal."
         ],
         "keyPoints": [
           "SPF declara qué servidores tienen permiso para enviar correos en nombre de tu dominio.",
           "DKIM añade una firma criptográfica al encabezado de cada correo para probar que no fue alterado en tránsito.",
           "Secuencia ideal de 4 correos: 1) Entrega inmediata de valor, 2) Caso práctico + error común, 3) Resolución de objeción principal, 4) Invitación clara a pasar al nivel VIP.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Terminar cada correo con una Postdata (P.D.) que resuma el beneficio y repita el enlace de acción captura a los lectores que escanean rápido desde el celular."
         ],
         "code": "Arquitectura de Secuencia Automatizada Post-Registro (4 Días):\n- Día 0 (Inmediato): Entrega del acceso gratuito + Victoria rápida en 5 minutos.\n- Día 1 (Educativo): \"El error que comete el 80% al intentar [Habilidad] y cómo evitarlo.\"\n- Día 2 (Prueba):    Caso real desglosado paso a paso + Presentación del Pase VIP.\n- Día 4 (Cierre):    Resumen de beneficios + Bono de puntos por activación.",
         "warning": "⚠️ Enviar correos masivos desde una cuenta gratuita (@gmail.com) o desde un dominio sin registros SPF y DKIM hará que Gmail y Outlook bloqueen tus envíos.",
@@ -3238,15 +3238,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): SPF declara qué servidores tienen permiso para enviar correos en nombre de tu dominio.",
-          "Paso 3 (Validación y Control de Calidad): DKIM añade una firma criptográfica al encabezado de cada correo para probar que no fue alterado en tránsito.",
-          "Paso 4 (Puesta en Marcha y Medición): Secuencia ideal de 4 correos: 1) Entrega inmediata de valor, 2) Caso práctico + error común, 3) Resolución de objeción principal, 4) Invitación clara a pasar al nivel VIP."
+          "Paso 1 (Autenticar tu dominio en DNS): Configura los registros SPF, DKIM y DMARC en tu proveedor de dominio y envía siempre desde una dirección corporativa.",
+          "Paso 2 (Programar los Correos 1 y 2 de valor y prueba): Entrega el recurso prometido en el minuto 0 y envía una historia real con números a las 24 horas.",
+          "Paso 3 (Programar los Correos 3 y 4 de objeciones y cierre): A las 48h responde la duda principal del comprador y a las 72h presenta la oferta con bono.",
+          "Paso 4 (Dejar una sola llamada a la acción): Incluye un único objetivo y enlace principal por correo para maximizar la tasa de clics."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Secuencias de Email Automatizadas y Entregabilidad (SPF, DKIM y DMARC)",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Enviar correos masivos desde una cuenta gratuita (@gmail.com) o desde un dominio sin registros SPF y DKIM hará...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (SPF declara qué servidores tienen permiso para enviar correos en nombre de tu dominio.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Secuencia Automatizada de 4 Días que Recupera el 28% de las Ventas",
+          "scenario": "Una plataforma dejaba ir al 97% de las personas que hacían su test gratuito porque no les enviaba ningún seguimiento automático por correo.",
+          "result": "Activaron esta secuencia de 4 días con dominio autenticado (SPF/DKIM), generando un 28% de ventas adicionales en piloto automático."
         }
       },
       {
@@ -3407,14 +3407,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Vender \"desarrollo a medida general\" te obliga a presupuestar desde cero cada vez, lidiar con alcances infinitos y competir por precio con miles de freelancers. El modelo de alta rentabilidad es el \"Servicio Productizado\" (Productized Service): resolver UN problema específico para UN tipo de empresa con un alcance fijo, plazo fijo y precio fijo.",
           "Los mejores nichos B2B para automatización e IA son aquellos con alto valor por cliente y cuellos de botella operativos: clínicas privadas, estudios jurídicos/contables, inmobiliarias, e-commerce medianos y empresas de logística.",
-          "En la práctica diaria dentro de Curso Secreto VIP, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, no vendas \"horas de programación en Python o IA\"; vende \"Sistema de Respuesta, Calificación y Agendamiento Automático 24/7\". Segundo, al estandarizar el 80% de la arquitectura técnica, entregas en 5 días lo que a otro le toma 2 meses. Y tercero, tu margen bruto supera el 85% porque reutilizas tus propios módulos y plantillas probadas.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca aceptes clientes de 10 industrias distintas en tu primer trimestre; al enfocarte en 1 vertical puedes reutilizar exactamente el mismo sistema y casos de éxito. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Si intentas vender \"servicios de marketing y programación para cualquier negocio\", competirás por precio contra miles de freelancers baratos. Las agencias que cobran $2,000+ USD hacen exactamente lo opuesto: eligen un solo nicho rentable y empaquetan una solución repetible.",
+          "En la comparativa del bloque práctico verás la diferencia entre una agencia tradicional que cotiza cada proyecto desde cero y un Servicio Productizado que instala el mismo sistema probado en 7 días con un 80% de margen de ganancia."
         ],
         "keyPoints": [
           "No vendas \"horas de programación en Python o IA\"; vende \"Sistema de Respuesta, Calificación y Agendamiento Automático 24/7\".",
           "Al estandarizar el 80% de la arquitectura técnica, entregas en 5 días lo que a otro le toma 2 meses.",
           "Tu margen bruto supera el 85% porque reutilizas tus propios módulos y plantillas probadas.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Al especializarte en un solo rubro (por ejemplo clínicas estéticas o inmobiliarias), el caso de éxito del primer cliente te vende automáticamente a los siguientes diez."
         ],
         "code": "Comparativa de Posicionamiento Comercial:\n❌ Freelancer Genérico: \"Hago scripts en Python, páginas web y chatbots a $15/hora.\"\n✅ Oferta B2B Productizada: \"Implementamos en 7 días un Agente de IA + CRM que califica consultas y agenda reuniones en automático para Clínicas Dentales — Garantizando 0 leads perdidos fuera de horario.\"",
         "warning": "⚠️ Nunca aceptes clientes de 10 industrias distintas en tu primer trimestre; al enfocarte en 1 vertical puedes reutilizar exactamente el mismo sistema y casos de éxito.",
@@ -3429,15 +3429,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): No vendas \"horas de programación en Python o IA\"; vende \"Sistema de Respuesta, Calificación y Agendamiento Automático 24/7\".",
-          "Paso 3 (Validación y Control de Calidad): Al estandarizar el 80% de la arquitectura técnica, entregas en 5 días lo que a otro le toma 2 meses.",
-          "Paso 4 (Puesta en Marcha y Medición): Tu margen bruto supera el 85% porque reutilizas tus propios módulos y plantillas probadas."
+          "Paso 1 (Seleccionar un nicho con ticket alto): Elige empresas donde cada cliente nuevo valga entre $500 y $5,000 USD (salud privada, legal, B2B, inmuebles).",
+          "Paso 2 (Aislar su cuello de botella comercial): Detecta dónde pierden ventas hoy (por ejemplo, tardar 4 horas en responder mensajes de interesados).",
+          "Paso 3 (Empaquetar tu Servicio Productizado): Ponle nombre propio a tu sistema, plazo fijo de entrega (7 días) y un resultado concreto.",
+          "Paso 4 (Crear tu plantilla maestra reutilizable): Construye una vez el flujo base para poder clonarlo en cada nuevo cliente en pocas horas."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Selección de Nicho Rentable y Empaquetado de Oferta \"Productized Service\"",
-          "scenario": "Un equipo que trabajaba en Curso Secreto VIP cometía frecuentemente el error de ignorar esta regla (Nunca aceptes clientes de 10 industrias distintas en tu primer trimestre; al enfocarte en 1 vertical puedes re...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (No vendas \"horas de programación en Python o IA\"; vende \"Sistema de Respuesta, Calificación y Agendamiento Automático 24/7\".), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: De Freelancer Todoterreno de $300 USD a Agencia Especializada de $2,200 USD",
+          "scenario": "Un programador hacía páginas web a medida para todo tipo de comercios locales, tardando 6 semanas por cliente y ganando muy poco.",
+          "result": "Empaquetó un \"Sistema de Calificación y Turnos con IA en 7 Días\" exclusivo para clínicas dentales, pasando a cobrar $2,200 USD por instalación y entregando en 48 horas."
         }
       },
       {
@@ -3446,14 +3446,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En ventas High-Ticket ($1,500 a $4,000 USD) nunca se envía un PDF con precios por chat en frío. El proceso profesional consta de una llamada diagnóstica de 20 minutos estructurada como la consulta de un médico: antes de recetar tu solución, cuantificas con los propios números del cliente cuánto dinero pierde cada mes por su proceso actual.",
           "Haces tres preguntas financieras clave: 1) ¿Cuántas consultas o pedidos reciben al mes?, 2) ¿Cuántos se pierden o demoran por falta de seguimiento inmediato?, y 3) ¿Cuál es el valor promedio de cada cliente cerrado (LTV)?",
-          "En la práctica diaria dentro de Curso Secreto VIP, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, si el cliente pierde 10 ventas al mes de $300 USD por responder tarde, su problema le cuesta $3,000 USD/mes ($36,000 USD/año). Segundo, cuando el propio prospecto dice en voz alta que pierde $36,000 USD al año, una inversión de $2,000 USD por resolverlo se percibe como una ganga absoluta. Y tercero, vende siempre contra el costo comprobado del problema, nunca contra tu costo de vida.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si pasas los primeros 15 minutos de la reunión hablando de APIs, vectores, JSON y servidores en vez de hablar del negocio del cliente, perderás la venta. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "En ventas B2B de alto valor jamás se envía un PDF con precios por correo sin antes tener una llamada de diagnóstico donde el propio dueño de la empresa calcule junto a ti cuánto dinero está perdiendo todos los meses por no resolver el problema.",
+          "Observa en el guion en vivo del bloque práctico las 4 preguntas exactas para hacer esa cuenta en la llamada: al descubrir que pierde $4,000 USD mensuales en consultas no atendidas ($48,000 USD al año), tu inversión de $2,000 USD se vende sola."
         ],
         "keyPoints": [
           "Si el cliente pierde 10 ventas al mes de $300 USD por responder tarde, su problema le cuesta $3,000 USD/mes ($36,000 USD/año).",
           "Cuando el propio prospecto dice en voz alta que pierde $36,000 USD al año, una inversión de $2,000 USD por resolverlo se percibe como una ganga absoluta.",
           "Vende siempre contra el costo comprobado del problema, nunca contra tu costo de vida.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Haz que el prospecto diga los números en voz alta durante la llamada; cuando la cifra sale de su propia boca, no la discute al momento del cierre."
         ],
         "code": "Guion de Cuantificación de ROI en Vivo:\n1. \"Me comentas que reciben 300 consultas mensuales y tardan 6 horas en responder.\"\n2. \"Si recuperar solo el 5% de esas consultas representa 15 ventas nuevas a $200 USD cada una, hablamos de $3,000 USD extra cada mes ($36,000 al año).\"\n3. \"Nuestro sistema de implementación completa tiene una inversión única de $1,800 USD: con el primer mes de mejora queda 100% amortizado.\"",
         "warning": "⚠️ Si pasas los primeros 15 minutos de la reunión hablando de APIs, vectores, JSON y servidores en vez de hablar del negocio del cliente, perderás la venta.",
@@ -3468,15 +3468,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Si el cliente pierde 10 ventas al mes de $300 USD por responder tarde, su problema le cuesta $3,000 USD/mes ($36,000 USD/año).",
-          "Paso 3 (Validación y Control de Calidad): Cuando el propio prospecto dice en voz alta que pierde $36,000 USD al año, una inversión de $2,000 USD por resolverlo se percibe como una ganga absoluta.",
-          "Paso 4 (Puesta en Marcha y Medición): Vende siempre contra el costo comprobado del problema, nunca contra tu costo de vida."
+          "Paso 1 (Preguntar el volumen mensual de consultas): Averigua cuántos mensajes o prospectos recibe hoy la empresa por mes.",
+          "Paso 2 (Identificar la fuga por demora): Pregunta cuántos de esos contactos se enfrían por responderles horas después o fuera de horario.",
+          "Paso 3 (Multiplicar por el valor de cada cliente): Calcula en vivo con el dueño cuántos dólares por mes y por año representan esas ventas perdidas.",
+          "Paso 4 (Presentar tu sistema frente a esa pérdida): Muestra cómo recuperar apenas 2 o 3 de esos clientes al mes ya paga el 100% de tu implementación."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Auditoría Diagnóstica y Cálculo de ROI en la Llamada de Descubrimiento",
-          "scenario": "Un equipo que trabajaba en Curso Secreto VIP cometía frecuentemente el error de ignorar esta regla (Si pasas los primeros 15 minutos de la reunión hablando de APIs, vectores, JSON y servidores en vez de hablar ...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Si el cliente pierde 10 ventas al mes de $300 USD por responder tarde, su problema le cuesta $3,000 USD/mes ($36,000 USD/año).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Cierre de Contrato de $2,500 USD en Primera Llamada con Inmobiliaria",
+          "scenario": "Una inmobiliaria recibía 300 consultas de portales los fines de semana y recién las respondía el lunes al mediodía, cuando el interesado ya había visitado otra propiedad.",
+          "result": "Al cuantificar en la llamada que perdían 2 comisiones mensuales ($3,600 USD/mes), aprobaron en el acto el sistema automatizado de $2,500 USD."
         }
       },
       {
@@ -3485,14 +3485,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El secreto para que una agencia o consultora tecnológica construya riqueza predecible es no quedarse únicamente con el pago único de instalación (Setup Fee). Toda implementación de software, bots o automatizaciones requiere monitoreo de APIs, actualizaciones de prompts, servidores y optimización mensual.",
           "Por eso estructuramos cada contrato en dos partes: 1) Pago de Implementación Inicial (ej. $1,800 USD, 50% al iniciar y 50% contra entrega en 7 días) + 2) Abono de Mantenimiento, Soporte y Optimización Continua (ej. $250 a $400 USD/mes recurrentes).",
-          "En la práctica diaria dentro de Curso Secreto VIP, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, con solo 10 clientes activos en abono de $300 USD/mes, tienes $3,000 USD/mes de ingreso base recurrente antes de vender un solo proyecto nuevo. Segundo, define claramente un SLA (Acuerdo de Nivel de Servicio) y qué incluye el abono mensual (monitoreo, reportes, consumo de API hasta X volumen). Y tercero, ofrece bonificar el primer mes de mantenimiento si abonan el 100% del Setup al contado.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca incluyas \"desarrollo ilimitado de nuevas funciones\" dentro del abono básico mensual; el abono cubre mantenimiento, hosting y optimización del flujo contratado. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El mejor modelo financiero para una agencia moderna combina dos ingresos en cada contrato: un cobro inicial de instalación (Setup Fee de $1,500 a $2,500 USD) que te da liquidez inmediata, más una iguala mensual fija (Retainer de $400 a $800 USD/mes) por mantenimiento.",
+          "En la tabla económica del ejemplo práctico verás cómo con una cartera pequeña de apenas 8 clientes activos construyes $4,000 USD/mes de ingreso recurrente fijo que cubre todos tus gastos, mientras cada nuevo Setup anual es ganancia pura."
         ],
         "keyPoints": [
           "Con solo 10 clientes activos en abono de $300 USD/mes, tienes $3,000 USD/mes de ingreso base recurrente antes de vender un solo proyecto nuevo.",
           "Define claramente un SLA (Acuerdo de Nivel de Servicio) y qué incluye el abono mensual (monitoreo, reportes, consumo de API hasta X volumen).",
           "Ofrece bonificar el primer mes de mantenimiento si abonan el 100% del Setup al contado.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Deja escrito en una cláusula simple del contrato qué incluye el abono mensual (monitoreo, consumo y ajustes de prompt) para evitar que te pidan proyectos nuevos gratis."
         ],
         "code": "Economía de una Cartera de 8 Clientes B2B en 6 Meses:\n- Ingresos por Setup Inicial (8 × $1,800 USD):     $14,400 USD\n- Ingreso Recurrente Mensual (8 × $300 USD/mes):    $2,400 USD / mes ($28,800 USD/año ARR)\n- Tiempo operativo de mantenimiento con plantillas: ~4 horas totales a la semana.",
         "warning": "⚠️ Nunca incluyas \"desarrollo ilimitado de nuevas funciones\" dentro del abono básico mensual; el abono cubre mantenimiento, hosting y optimización del flujo contratado.",
@@ -3507,15 +3507,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Con solo 10 clientes activos en abono de $300 USD/mes, tienes $3,000 USD/mes de ingreso base recurrente antes de vender un solo proyecto nuevo.",
-          "Paso 3 (Validación y Control de Calidad): Define claramente un SLA (Acuerdo de Nivel de Servicio) y qué incluye el abono mensual (monitoreo, reportes, consumo de API hasta X volumen).",
-          "Paso 4 (Puesta en Marcha y Medición): Ofrece bonificar el primer mes de mantenimiento si abonan el 100% del Setup al contado."
+          "Paso 1 (Fijar el Setup Fee de instalación): Cotiza el armado inicial y puesta en marcha entre $1,500 y $2,500 USD (en 1 pago o 50% al iniciar y 50% al entregar).",
+          "Paso 2 (Establecer el Retainer mensual obligatorio): Define el abono mensual de $400 a $800 USD/mes por servidor, mantenimiento, optimización y reportes.",
+          "Paso 3 (Delimitar el alcance por escrito): Separa claramente en tu propuesta el mantenimiento del sistema actual respecto del desarrollo de módulos nuevos.",
+          "Paso 4 (Automatizar el cobro recurrente): Suscribe al cliente a débito automático mensual el día de la entrega para no perseguir pagos cada mes."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Estructura de Cobro Híbrida: Setup Inicial + Iguala Mensual Recurrente (Retainer)",
-          "scenario": "Un equipo que trabajaba en Curso Secreto VIP cometía frecuentemente el error de ignorar esta regla (Nunca incluyas \"desarrollo ilimitado de nuevas funciones\" dentro del abono básico mensual; el abono cubre mant...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Con solo 10 clientes activos en abono de $300 USD/mes, tienes $3,000 USD/mes de ingreso base recurrente antes de vender un solo proyecto nuevo.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Agencia Boutique con 9 Clientes Activos y $4,950 USD/mes de Retainers",
+          "scenario": "Una agencia cobraba solo pagos únicos al entregar y cada principio de mes arrancaba con $0 de facturación asegurada y mucha presión comercial.",
+          "result": "Implementaron el modelo híbrido ($1,800 USD de Setup + $550 USD/mes de Retainer), alcanzando $4,950 USD mensuales fijos con solo 9 empresas en cartera."
         }
       },
       {
@@ -3524,14 +3524,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Los dueños de empresas reciben decenas de correos genéricos copiados y pegados que borran sin leer. La forma de lograr tasas de respuesta superiores al 25% es enviar una micro-demostración personalizada de 90 segundos (en video Loom o prototipo funcional) usando el nombre y caso real de su empresa.",
           "Cuando un dueño de clínica o inmobiliaria ve un prototipo funcionando con su propio logo que responde en 2 segundos una consulta real de sus servicios, la barrera de escepticismo desaparece y pide agendar la llamada de implementación.",
-          "En la práctica diaria dentro de Curso Secreto VIP, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, investiga 3 minutos antes de contactar: detecta si tardan en responder en WhatsApp/Web o si su formulario es lento. Segundo, mensaje de 4 líneas: 1) Observación específica de su web, 2) Costo de ese cuello de botella, 3) Link a demo de 90s armada para ellos, 4) Invitación sin presión. Y tercero, pide referidos a cada cliente satisfecho a los 30 días de entrega a cambio de 1 mes de abono bonificado.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: No envíes propuestas de 15 páginas y déjalas \"para que lo piensen\"; revisa siempre la propuesta en vivo en una llamada de 15 minutos para resolver dudas en el momento. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Los dueños de empresas reciben decenas de mensajes genéricos por semana que borran sin leer. La forma infalible de que te respondan en el día es enviarles un mensaje de 4 líneas acompañado de una demostración de 60 segundos hecha con el nombre real de su negocio.",
+          "En la plantilla de prospección del bloque práctico verás cómo avisarle a un director que probaste su canal de contacto un sábado, mostrarle un bot respondiendo con los servicios reales de su clínica en un video corto y ofrecerle una llamada de 15 minutos sin presión."
         ],
         "keyPoints": [
           "Investiga 3 minutos antes de contactar: detecta si tardan en responder en WhatsApp/Web o si su formulario es lento.",
           "Mensaje de 4 líneas: 1) Observación específica de su web, 2) Costo de ese cuello de botella, 3) Link a demo de 90s armada para ellos, 4) Invitación sin presión.",
           "Pide referidos a cada cliente satisfecho a los 30 días de entrega a cambio de 1 mes de abono bonificado.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Enviar 10 videos personalizados de 60 segundos por día genera más reuniones agendadas y cierres reales que enviar 1,000 correos masivos copiados y pegados."
         ],
         "code": "Plantilla de Prospección B2B de Alta Respuesta:\n\"Hola [Nombre], ayer probé hacer una consulta desde la web de [Empresa] y noté que no tienen calificación automática fuera de horario.\nArmé un prototipo rápido de 60 segundos entrenado con los servicios reales de [Empresa] para mostrarte cómo podría agendar esas consultas en automático en tu calendario: [Link Video 60s].\n¿Te sirve si te muestro el jueves en 15 min cómo conectarlo a su flujo actual?\"",
         "warning": "⚠️ No envíes propuestas de 15 páginas y déjalas \"para que lo piensen\"; revisa siempre la propuesta en vivo en una llamada de 15 minutos para resolver dudas en el momento.",
@@ -3546,15 +3546,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Investiga 3 minutos antes de contactar: detecta si tardan en responder en WhatsApp/Web o si su formulario es lento.",
-          "Paso 3 (Validación y Control de Calidad): Mensaje de 4 líneas: 1) Observación específica de su web, 2) Costo de ese cuello de botella, 3) Link a demo de 90s armada para ellos, 4) Invitación sin presión.",
-          "Paso 4 (Puesta en Marcha y Medición): Pide referidos a cada cliente satisfecho a los 30 días de entrega a cambio de 1 mes de abono bonificado."
+          "Paso 1 (Armar una lista de 50 empresas calificadas): Busca en Google Maps, Instagram o LinkedIn negocios activos de tu nicho que inviertan en publicidad.",
+          "Paso 2 (Probar su velocidad de atención actual): Escríbeles una consulta común de cliente y anota cuánto tardan en responder.",
+          "Paso 3 (Grabar un Loom de 60 segundos con su marca): Muestra en pantalla tu plantilla respondiendo al instante con el nombre y servicios de esa empresa.",
+          "Paso 4 (Enviar mensaje corto + seguimiento a las 48h): Usa el guion de 4 líneas sin links de pago y haz un seguimiento amable a los 2 días."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Prospección B2B con Demos Personalizadas y Cierre de Contratos",
-          "scenario": "Un equipo que trabajaba en Curso Secreto VIP cometía frecuentemente el error de ignorar esta regla (No envíes propuestas de 15 páginas y déjalas \"para que lo piensen\"; revisa siempre la propuesta en vivo en una...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Investiga 3 minutos antes de contactar: detecta si tardan en responder en WhatsApp/Web o si su formulario es lento.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: 6 Reuniones Cualificadas y 2 Clientes Cerrados con 25 Videos Loom",
+          "scenario": "Un consultor enviaba cientos de mensajes fríos por LinkedIn ofreciendo \"soluciones de inteligencia artificial\" y tenía 0% de respuesta.",
+          "result": "Grabó 25 videos personalizados de 1 minuto mostrando el bot configurado para cada empresa: obtuvo 11 respuestas entusiastas, 6 llamadas y cerró 2 contratos de $2,000 USD."
         }
       },
       {
@@ -3714,14 +3714,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En plataformas de orquestación visual como n8n o Make, todo flujo comienza con un Disparador (Trigger). Existen dos paradigmas de comunicación entre aplicaciones: Polling (consultar periódicamente \"¿hay datos nuevos?\" cada 5 o 15 minutos) y Webhooks (la aplicación origen envía una petición HTTP POST instantánea a tu URL apenas ocurre el evento).",
           "Para bots de atención al cliente, pagos o reservas, los Webhooks son obligatorios: consumen cero operaciones mientras no hay actividad y disparan el flujo en menos de 100 milisegundos.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, polling desperdicia recursos consultando APIs vacías y añade latencia de varios minutos. Segundo, un Webhook recibe un Payload JSON en el cuerpo (Body) y cabeceras (Headers) de autenticación. Y tercero, verifica siempre la firma HMAC (ej. X-Hub-Signature-256) del Webhook para asegurar que el mensaje proviene realmente de Meta o Stripe.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Tu nodo de Webhook debe responder un código HTTP 200 OK en menos de 3 a 5 segundos; si el flujo tarda más, responde 200 inmediatamente y procesa la IA en segundo plano. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Para que un bot de WhatsApp o un sistema de cobros responda en el acto sin gastar servidor de más, usamos Webhooks: un timbre automático que avisa a tu flujo de n8n en el mismo milisegundo en que el cliente envía un mensaje.",
+          "En el JSON del bloque práctico verás qué datos exactos llegan cuando entra un mensaje (remitente, texto, message_id y timestamp) y por qué tu primer paso debe ser devolver 200 OK de inmediato antes de llamar a la Inteligencia Artificial."
         ],
         "keyPoints": [
           "Polling desperdicia recursos consultando APIs vacías y añade latencia de varios minutos.",
           "Un Webhook recibe un Payload JSON en el cuerpo (Body) y cabeceras (Headers) de autenticación.",
           "Verifica siempre la firma HMAC (ej. X-Hub-Signature-256) del Webhook para asegurar que el mensaje proviene realmente de Meta o Stripe.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Si tu flujo tarda más de 5 segundos en responder 200 OK al Webhook de Meta o Stripe, la plataforma creerá que falló y te volverá a enviar el mismo mensaje."
         ],
         "code": "// Estructura de Payload JSON recibido en un Webhook de n8n / Make\n{\n  \"event\": \"whatsapp.message.received\",\n  \"timestamp\": 1761580000,\n  \"data\": {\n    \"from\": \"+5491122334455\",\n    \"contact_name\": \"Martín Gómez\",\n    \"message_id\": \"wamid.HBgNNTQ5MTEyMjMzNDQ1NRUCABIYFDNB\",\n    \"text\": \"Hola, quiero agendar una demostración del plan corporativo\"\n  }\n}",
         "warning": "⚠️ Tu nodo de Webhook debe responder un código HTTP 200 OK en menos de 3 a 5 segundos; si el flujo tarda más, responde 200 inmediatamente y procesa la IA en segundo plano.",
@@ -3736,15 +3736,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Polling desperdicia recursos consultando APIs vacías y añade latencia de varios minutos.",
-          "Paso 3 (Validación y Control de Calidad): Un Webhook recibe un Payload JSON en el cuerpo (Body) y cabeceras (Headers) de autenticación.",
-          "Paso 4 (Puesta en Marcha y Medición): Verifica siempre la firma HMAC (ej. X-Hub-Signature-256) del Webhook para asegurar que el mensaje proviene realmente de Meta o Stripe."
+          "Paso 1 (Crear el nodo Webhook en n8n): Añade el disparador Webhook, configúralo en método POST y copia la URL de prueba/producción.",
+          "Paso 2 (Configurar respuesta inmediata 200 OK): Activa que el Webhook confirme la recepción apenas entra el evento sin esperar al final del flujo.",
+          "Paso 3 (Extraer las variables limpias en un nodo Set): Toma del JSON entrante los campos from (teléfono), text (mensaje) y message_id.",
+          "Paso 4 (Continuar el procesamiento asíncrono): Conecta a continuación el nodo de IA, la base de datos y el envío de respuesta por WhatsApp."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: Arquitectura de Automatización: Webhooks en Tiempo Real vs. Polling",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Tu nodo de Webhook debe responder un código HTTP 200 OK en menos de 3 a 5 segundos; si el flujo tarda más, res...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Polling desperdicia recursos consultando APIs vacías y añade latencia de varios minutos.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Bot de Restaurante que Eliminó las Respuestas Triplicadas",
+          "scenario": "Un bot tardaba 9 segundos en consultar a la IA antes de responder al Webhook de Meta; WhatsApp reenviaba el evento 3 veces y el cliente recibía 3 saludos repetidos.",
+          "result": "Separaron la confirmación inmediata 200 OK del procesamiento del Agente en n8n, dejando las respuestas instantáneas y sin duplicados."
         }
       },
       {
@@ -3753,14 +3753,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Para conectar un bot empresarial sin riesgo de bloqueo de número se utiliza la API Oficial de WhatsApp Cloud (Meta for Developers). Meta aplica una regla técnica estricta llamada \"Ventana de Conversación de 24 Horas\": cuando un usuario te escribe por primera vez, se abre una ventana de 24 horas durante la cual el bot puede responder con mensajes de texto libre sin límite.",
           "Una vez transcurridas 24 horas desde el último mensaje del cliente, la ventana se cierra y solo puedes volver a iniciar contacto enviando una Plantilla Pre-aprobada (Template Message) con variables dinámicas.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, mensajes iniciados por el usuario (Service Conversations): permiten respuestas libres del Agente IA durante 24 horas. Segundo, mensajes fuera de la ventana de 24h (Marketing / Utility Templates): requieren plantilla aprobada por Meta. Y tercero, usa un buffer/acumulador de 4 a 6 segundos en n8n (con Redis) para agrupar cuando un usuario envía 4 mensajes cortos seguidos (\"Hola\", \"Quiero saber\", \"el precio\", \"del curso\").",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si no implementas un buffer de agrupación de segundos, cuando un usuario escriba 3 líneas separadas tu bot le responderá 3 veces seguidas de forma robótica y gastará el triple de tokens. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "En la vida real la gente en WhatsApp casi nunca escribe un solo párrafo ordenado: manda 4 mensajes cortitos seguidos en 4 segundos (\"Hola\" / \"Buenas tardes\" / \"Quería saber el precio\" / \"Para 2 personas\"). Si no agrupas esa ráfaga, tu bot responderá 4 veces.",
+          "Observa en la lógica de Buffer del bloque práctico cómo al guardar cada fragmento en una lista temporal por número de teléfono y esperar 5 segundos de silencio antes de unir todo con espacios, el Agente de IA recibe una sola oración limpia y completa."
         ],
         "keyPoints": [
           "Mensajes iniciados por el usuario (Service Conversations): permiten respuestas libres del Agente IA durante 24 horas.",
           "Mensajes fuera de la ventana de 24h (Marketing / Utility Templates): requieren plantilla aprobada por Meta.",
           "Usa un buffer/acumulador de 4 a 6 segundos en n8n (con Redis) para agrupar cuando un usuario envía 4 mensajes cortos seguidos (\"Hola\", \"Quiero saber\", \"el precio\", \"del curso\").",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Recuerda que en WhatsApp Cloud API tienes una ventana gratuita de 24 horas desde el último mensaje del cliente para responder con texto libre."
         ],
         "code": "Lógica de Debounce / Buffer de Mensajes en WhatsApp con Redis:\n1. Llega mensaje \"Hola\" de +54911... -> Guardar en lista Redis [key: chat_54911].\n2. Esperar 5 segundos.\n3. ¿Llegó otro mensaje (\"precio por favor\") en esos 5s?\n   - SÍ -> Concatenar en un solo bloque: \"Hola precio por favor\" y enviar 1 sola vez al Agente IA.\n   - NO -> Procesar y responder.",
         "warning": "⚠️ Si no implementas un buffer de agrupación de segundos, cuando un usuario escriba 3 líneas separadas tu bot le responderá 3 veces seguidas de forma robótica y gastará el triple de tokens.",
@@ -3775,15 +3775,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Mensajes iniciados por el usuario (Service Conversations): permiten respuestas libres del Agente IA durante 24 horas.",
-          "Paso 3 (Validación y Control de Calidad): Mensajes fuera de la ventana de 24h (Marketing / Utility Templates): requieren plantilla aprobada por Meta.",
-          "Paso 4 (Puesta en Marcha y Medición): Usa un buffer/acumulador de 4 a 6 segundos en n8n (con Redis) para agrupar cuando un usuario envía 4 mensajes cortos seguidos (\"Hola\", \"Quiero saber\", \"el precio\", \"del curso\")."
+          "Paso 1 (Acumular el mensaje por número de teléfono): Guarda el texto recién llegado en una clave temporal asociada al teléfono del usuario.",
+          "Paso 2 (Esperar una ventana breve de 4 a 5 segundos): Añade una pausa corta para verificar si el usuario sigue escribiendo otra línea debajo.",
+          "Paso 3 (Unificar la ráfaga en un solo texto): Si ya pasaron los 5 segundos sin nuevos mensajes, concatena los fragmentos en una única consulta.",
+          "Paso 4 (Enviar al Agente de IA y limpiar el buffer): Pasa el texto unificado a la IA para que dé una sola respuesta coherente y vacía la cola temporal."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: WhatsApp Business Cloud API, Ventana de 24h y Plantillas HSM",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Si no implementas un buffer de agrupación de segundos, cuando un usuario escriba 3 líneas separadas tu bot le ...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Mensajes iniciados por el usuario (Service Conversations): permiten respuestas libres del Agente IA durante 24 horas.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Clínica Estética que Ahorró 65% en Consumo de Tokens de OpenAI",
+          "scenario": "Cada paciente enviaba entre 3 y 5 mensajes cortos seguidos; el flujo disparaba una llamada a GPT por cada línea suelta y confundía la conversación.",
+          "result": "Implementaron el buffer agrupador de 5 segundos en n8n, reduciendo un 65% el gasto de API y logrando conversaciones 100% naturales."
         }
       },
       {
@@ -3792,14 +3792,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Las APIs de modelos de lenguaje son \"Stateless\" (sin estado): no recuerdan qué hablaste hace 10 segundos a menos que le envíes el historial reciente de esa conversación. En n8n o Make, utilizamos el número de teléfono del cliente como `session_id` único en una base de datos (PostgreSQL / Redis) para recuperar los últimos 6 a 10 mensajes.",
           "Además, cuando el Agente detecta que el usuario ya entregó los datos clave (Nombre, Email, Presupuesto y Fecha deseada), invoca automáticamente una herramienta para crear o actualizar el trato en el CRM (HubSpot, Pipedrive, Google Sheets o Airtable) usando \"Upsert\" por teléfono o email.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, usa una ventana deslizante (Window Buffer Memory) de los últimos 8-10 mensajes para no agotar tokens con historiales eternos. Segundo, la operación \"Upsert\" (Update or Insert) actualiza el contacto si ya existe en el CRM o lo crea si es nuevo, evitando duplicados. Y tercero, incluye una herramienta de \"Derivar a Humano\" cuando el cliente pide hablar con un asesor o tiene un reclamo complejo.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si olvidas pausar el flag `bot_activo = false` en la base de datos cuando derivas la conversación a un vendedor humano, el bot seguirá metiéndose en la charla encima del vendedor. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Para que el bot recuerde cómo se llama el cliente y de qué hablaron hace dos minutos, pero sin mezclar la charla del Cliente A con la del Cliente B, el nodo de memoria de n8n necesita una llave única por conversación (session_id).",
+          "En el esquema del nodo AI Agent de abajo verás cómo usamos el número de teléfono del cliente como session_id con una ventana de los últimos 10 mensajes, y cómo conectamos una operación Upsert para guardar sus datos en el CRM sin duplicar fichas."
         ],
         "keyPoints": [
           "Usa una ventana deslizante (Window Buffer Memory) de los últimos 8-10 mensajes para no agotar tokens con historiales eternos.",
           "La operación \"Upsert\" (Update or Insert) actualiza el contacto si ya existe en el CRM o lo crea si es nuevo, evitando duplicados.",
           "Incluye una herramienta de \"Derivar a Humano\" cuando el cliente pide hablar con un asesor o tiene un reclamo complejo.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Limitar la memoria conversacional a los últimos 10 o 15 mensajes mantiene al bot enfocado en el tema actual y evita pagar tokens por charlas del mes pasado."
         ],
         "code": "Flujo del Nodo AI Agent en n8n:\n[Input]: Mensaje unificado del usuario + Teléfono como Session ID\n  ├─ 🧠 Memory: Postgres Chat Memory (Últimos 10 mensajes de ese teléfono)\n  ├─ 📚 Tool 1: Consultar_Disponibilidad_Calendario(fecha)\n  ├─ 📝 Tool 2: Guardar_Lead_CRM(nombre, telefono, interes)\n  └─ 🚨 Tool 3: Pausar_Bot_Y_Notificar_Humano(motivo)",
         "warning": "⚠️ Si olvidas pausar el flag `bot_activo = false` en la base de datos cuando derivas la conversación a un vendedor humano, el bot seguirá metiéndose en la charla encima del vendedor.",
@@ -3814,15 +3814,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Usa una ventana deslizante (Window Buffer Memory) de los últimos 8-10 mensajes para no agotar tokens con historiales eternos.",
-          "Paso 3 (Validación y Control de Calidad): La operación \"Upsert\" (Update or Insert) actualiza el contacto si ya existe en el CRM o lo crea si es nuevo, evitando duplicados.",
-          "Paso 4 (Puesta en Marcha y Medición): Incluye una herramienta de \"Derivar a Humano\" cuando el cliente pide hablar con un asesor o tiene un reclamo complejo."
+          "Paso 1 (Conectar el nodo Window Buffer Memory): Engancha un bloque de memoria al nodo AI Agent dentro de tu lienzo de n8n.",
+          "Paso 2 (Asignar el teléfono como Session ID): Configura Session Key = {{ $json.from }} para que cada número de WhatsApp tenga su propio historial aislado.",
+          "Paso 3 (Fijar ventana de 10 mensajes): Establece Context Window Length en 10 para mantener respuestas rápidas y económicas.",
+          "Paso 4 (Sincronizar con el CRM usando Upsert): Al capturar nombre o email, usa la operación Upsert en Google Sheets o Supabase usando el teléfono como clave."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Memoria Conversacional por `session_id` y Sincronización con CRM",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Si olvidas pausar el flag `bot_activo = false` en la base de datos cuando derivas la conversación a un vendedo...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Usa una ventana deslizante (Window Buffer Memory) de los últimos 8-10 mensajes para no agotar tokens con historiales eternos.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Concesionaria que Eliminó los Contactos Duplicados en su Planilla CRM",
+          "scenario": "Cada vez que un interesado volvía a escribir por WhatsApp, la automatización usaba \"Insert Row\" y creaba 8 filas repetidas para la misma persona.",
+          "result": "Cambiaron a la operación Upsert por número de teléfono y memoria por session_id, manteniendo una única ficha actualizada por comprador."
         }
       },
       {
@@ -3831,14 +3831,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En automatizaciones empresariales las APIs externas a veces sufren micro-cortes (error 502, 503 o 429). Un flujo frágil pierde la venta cuando eso pasa; una arquitectura resiliente configura reintentos automáticos con \"Exponential Backoff\" (esperar 2s en el primer fallo, 4s en el segundo, 8s en el tercero) y un \"Error Workflow\" que alerta por Slack/Telegram.",
           "Asimismo, guardar el `message_id` único de cada evento procesado garantiza la \"Idempotencia\": si por un fallo de red llega dos veces el mismo webhook de pago o mensaje, el sistema comprueba que ese ID ya fue ejecutado y lo ignora limpiamente.",
-          "En la práctica diaria dentro de Inteligencia Artificial, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, idempotencia: Registrar el `event_id` o `message_id` en base de datos antes de ejecutar cobros o envíos. Segundo, exponential Backoff: Evita saturar una API caída espaciando progresivamente los reintentos. Y tercero, dead Letter Queue (DLQ): Guarda en una tabla de respaldo cualquier evento que haya fallado tras 3 reintentos para reprocesarlo con 1 clic.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca pongas reintentos inmediatos infinitos sin pausa cuando recibes un error 429 (Rate Limit): solo lograrás que el proveedor bloquee tu API Key permanentemente. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "¿Qué pasa si la API de OpenAI o de Google Sheets tiene un micro-corte de 2 segundos a las 3 de la mañana? Un flujo profesional en n8n nunca pierde un cliente: reintenta automáticamente y registra cada message_id para no cobrar ni agendar dos veces.",
+          "En el pseudocódigo de Idempotencia del bloque práctico verás cómo antes de ejecutar cualquier acción verificamos si ese message_id ya figura en nuestra tabla de eventos procesados, y cómo activar los reintentos automáticos en la pestaña Settings de cada nodo."
         ],
         "keyPoints": [
           "Idempotencia: Registrar el `event_id` o `message_id` en base de datos antes de ejecutar cobros o envíos.",
           "Exponential Backoff: Evita saturar una API caída espaciando progresivamente los reintentos.",
           "Dead Letter Queue (DLQ): Guarda en una tabla de respaldo cualquier evento que haya fallado tras 3 reintentos para reprocesarlo con 1 clic.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Configurar un Error Workflow en n8n que te envíe un aviso inmediato por Telegram o WhatsApp si algo falla te da tranquilidad total las 24 horas."
         ],
         "code": "Verificación de Idempotencia antes de Procesar un Webhook:\n1. Leer header o campo único: event_id = payload.message_id\n2. Consultar DB: SELECT 1 FROM processed_events WHERE id = event_id\n   - Si YA EXISTE -> Detener flujo y devolver 200 OK (Evita cobro o envío duplicado).\n   - Si NO EXISTE -> INSERT INTO processed_events (id) VALUES (event_id) y continuar flujo.",
         "warning": "⚠️ Nunca pongas reintentos inmediatos infinitos sin pausa cuando recibes un error 429 (Rate Limit): solo lograrás que el proveedor bloquee tu API Key permanentemente.",
@@ -3853,15 +3853,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Idempotencia: Registrar el `event_id` o `message_id` en base de datos antes de ejecutar cobros o envíos.",
-          "Paso 3 (Validación y Control de Calidad): Exponential Backoff: Evita saturar una API caída espaciando progresivamente los reintentos.",
-          "Paso 4 (Puesta en Marcha y Medición): Dead Letter Queue (DLQ): Guarda en una tabla de respaldo cualquier evento que haya fallado tras 3 reintentos para reprocesarlo con 1 clic."
+          "Paso 1 (Consultar si el message_id ya existe): Antes de procesar el flujo, verifica en tu tabla de control si ese ID único de mensaje ya fue atendido.",
+          "Paso 2 (Registrar el ID y avanzar): Si es nuevo, guárdalo como procesado y continúa normalmente; si ya existía, detén el flujo en silencio.",
+          "Paso 3 (Activar Retry On Fail en nodos externos): Entra a Settings de tus nodos HTTP/OpenAI y activa 3 reintentos con espera incremental.",
+          "Paso 4 (Vincular un flujo de alerta de errores): Asigna un Error Trigger que te notifique al celular con el nombre del nodo si un error persiste."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Idempotencia, Reintentos con Exponential Backoff y Flujos de Error",
-          "scenario": "Un equipo que trabajaba en Inteligencia Artificial cometía frecuentemente el error de ignorar esta regla (Nunca pongas reintentos inmediatos infinitos sin pausa cuando recibes un error 429 (Rate Limit): solo lograrás...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Idempotencia: Registrar el `event_id` o `message_id` en base de datos antes de ejecutar cobros o envíos.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Sistema de Reservas con 99.9% de Confiabilidad ante Micro-Cortes",
+          "scenario": "Cuando la API externa tardaba más de lo normal, el flujo se detenía con error rojo y el cliente quedaba sin respuesta en WhatsApp.",
+          "result": "Activaron clave de idempotencia por message_id + 3 reintentos con espera progresiva y alertas en Telegram, logrando 0 reservas perdidas en 6 meses."
         }
       },
       {
@@ -4021,14 +4021,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En plataformas de video corto vertical (TikTok, Instagram Reels, YouTube Shorts), el algoritmo mide una métrica inicial crítica llamada \"Hook Rate\" (o Thumbstop Ratio): qué porcentaje de usuarios que pasa por tu video se queda mirando más allá de los primeros 3 segundos en vez de deslizar hacia arriba (Swipe Away).",
           "Para superar el 75% de retención en los primeros 3 segundos nunca empieces diciendo \"Hola amigos, hoy les voy a hablar de...\". Debes sincronizar un Triple Gancho en el segundo 0.1: Gancho Verbal (una afirmación contraintuitiva o promesa específica), Gancho Visual (movimiento en cámara o prueba en pantalla) y Gancho Textual (titular corto en el centro superior).",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, elimina todos los silencios iniciales: el primer fotograma ya debe tener voz y movimiento. Segundo, abre un \"Bucle Abierto\" (Open Loop) de curiosidad que solo se resuelve al final del video. Y tercero, un buen Hook Rate en contenido educativo vertical se ubica por encima del 70% a 80%.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si el titular en pantalla repite exactamente las mismas 15 palabras que estás diciendo en voz alta, saturas la lectura; usa en pantalla un resumen visual de 4 a 5 palabras de alto impacto. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "En TikTok, Reels y YouTube Shorts no compites contra otros creadores de tu rubro: compites contra el pulgar del usuario que tarda 1.5 segundos en deslizar hacia arriba si el inicio de tu video es lento o predecible.",
+          "En la comparativa del bloque práctico verás por qué prohibimos saludar con \"Hola amigos, hoy les voy a hablar de...\" y en su lugar sincronizamos en el segundo 0.0 los tres ganchos al mismo tiempo: movimiento visual, frase de choque y titular grande en pantalla."
         ],
         "keyPoints": [
           "Elimina todos los silencios iniciales: el primer fotograma ya debe tener voz y movimiento.",
           "Abre un \"Bucle Abierto\" (Open Loop) de curiosidad que solo se resuelve al final del video.",
           "Un buen Hook Rate en contenido educativo vertical se ubica por encima del 70% a 80%.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Si tu Hook Rate (porcentaje de personas que se quedan pasando los primeros 3 segundos) supera el 35%, el algoritmo empujará tu video a miles de cuentas nuevas."
         ],
         "code": "Comparativa de Apertura en los Primeros 3 Segundos:\n❌ Apertura Débil (32% retención): \"Hola a todos, mi nombre es Juan y hoy veremos 3 tips de finanzas...\"\n✅ Triple Gancho Viral (81% retención):\n   - [Voz 0.0s]: \"Este error silencioso en tu tarjeta te está quitando $400 dólares al año...\"\n   - [Visual]: Zoom rápido + Resumen bancario subrayado en rojo en pantalla.\n   - [Texto en pantalla]: EL ERROR DE LOS $400 USD 💳",
         "warning": "⚠️ Si el titular en pantalla repite exactamente las mismas 15 palabras que estás diciendo en voz alta, saturas la lectura; usa en pantalla un resumen visual de 4 a 5 palabras de alto impacto.",
@@ -4043,15 +4043,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Elimina todos los silencios iniciales: el primer fotograma ya debe tener voz y movimiento.",
-          "Paso 3 (Validación y Control de Calidad): Abre un \"Bucle Abierto\" (Open Loop) de curiosidad que solo se resuelve al final del video.",
-          "Paso 4 (Puesta en Marcha y Medición): Un buen Hook Rate en contenido educativo vertical se ubica por encima del 70% a 80%."
+          "Paso 1 (Recortar el silencio inicial al milisegundo): Corta el clip para que la primera palabra empiece exactamente en el fotograma 0.0 sin tomar aire antes.",
+          "Paso 2 (Colocar el Gancho Textual en el centro): Añade un titular corto de 4 a 6 palabras con alto contraste en el tercio central-superior.",
+          "Paso 3 (Sumar movimiento en el primer segundo): Inicia el plano acercando la cámara (zoom-in) o mostrando el resultado visual de inmediato.",
+          "Paso 4 (Abrir un bucle de curiosidad): Formula la primera frase de modo que el espectador necesite ver los siguientes 15 segundos para descubrir la respuesta."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: La Regla de los 3 Segundos y el Triple Gancho (Visual, Auditivo y Textual)",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Si el titular en pantalla repite exactamente las mismas 15 palabras que estás diciendo en voz alta, saturas la...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Elimina todos los silencios iniciales: el primer fotograma ya debe tener voz y movimiento.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Cuenta Educativa que Pasó de 800 a 45,000 Vistas por Video",
+          "scenario": "Un creador grababa excelentes consejos pero empezaba cada video saludando durante 5 segundos con plano fijo; el 82% de la audiencia deslizaba antes del segundo 3.",
+          "result": "Eliminó los saludos y aplicó el Triple Gancho en el segundo 0.0, subiendo su Hook Rate del 18% al 44% y multiplicando su alcance orgánico."
         }
       },
       {
@@ -4060,14 +4060,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Una vez que capturaste la atención en los primeros 3 segundos, tu enemigo es la habituación visual: si el plano queda fijo e inmóvil durante 12 segundos seguidos, el cerebro del espectador entra en piloto automático y desliza.",
           "La edición de alta retención introduce un \"Pattern Interrupt\" (interrupción de patrón visual o auditivo) cada 3 a 5 segundos: un cambio de escala (zoom in 115% / zoom out 100%), un B-Roll (video o captura superpuesta que ilustra lo que dices), un gráfico animado o un cambio de ángulo.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, recorta las respiraciones y pausas muertas entre frases (Jump Cuts limpios o corte en J-Cut). Segundo, j-Cut: Hacer que el audio de la siguiente escena entre 0.2 segundos antes de que cambie la imagen suaviza el ritmo y mantiene al cerebro enganchado. Y tercero, no abuses de efectos caóticos sin sentido: cada elemento visual debe reforzar la comprensión de la idea.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Poner 20 transiciones giratorias mareantes en 10 segundos agota al espectador; alterna cortes limpios de escala (100% -> 115%) con B-Rolls demostrativos. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Una vez que atrapaste la atención en los primeros 3 segundos, el desafío es mantener la curva de retención plana: si dejas la misma toma quieta durante 12 segundos seguidos, el cerebro del espectador se acostumbra, se aburre y se va.",
+          "Observa en la línea de tiempo de 0s a 15s del bloque práctico cómo insertamos un \"Pattern Interrupt\" (cambio de estímulo) cada 3 a 5 segundos alternando zooms suaves, imágenes de apoyo (B-Roll), palabras resaltadas y cortes en J-Cut sin pausas muertas."
         ],
         "keyPoints": [
           "Recorta las respiraciones y pausas muertas entre frases (Jump Cuts limpios o corte en J-Cut).",
           "J-Cut: Hacer que el audio de la siguiente escena entre 0.2 segundos antes de que cambie la imagen suaviza el ritmo y mantiene al cerebro enganchado.",
           "No abuses de efectos caóticos sin sentido: cada elemento visual debe reforzar la comprensión de la idea.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Recortar las pausas donde respiras entre frase y frase le da a tu video un ritmo ágil y profesional que aumenta el tiempo promedio de visualización."
         ],
         "code": "Línea de Tiempo de Edición de Alta Retención (0s a 15s):\n- 00s - 03s: Plano medio con zoom progresivo + Gancho visual en pantalla.\n- 03s - 07s: [Pattern Interrupt #1] Captura de pantalla real con resaltador animado.\n- 07s - 11s: [Pattern Interrupt #2] Vuelta al hablante en encuadre 115% + Icono flotante.\n- 11s - 15s: [Pattern Interrupt #3] Demostración del resultado final en vivo.",
         "warning": "⚠️ Poner 20 transiciones giratorias mareantes en 10 segundos agota al espectador; alterna cortes limpios de escala (100% -> 115%) con B-Rolls demostrativos.",
@@ -4082,15 +4082,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Recorta las respiraciones y pausas muertas entre frases (Jump Cuts limpios o corte en J-Cut).",
-          "Paso 3 (Validación y Control de Calidad): J-Cut: Hacer que el audio de la siguiente escena entre 0.2 segundos antes de que cambie la imagen suaviza el ritmo y mantiene al cerebro enganchado.",
-          "Paso 4 (Puesta en Marcha y Medición): No abuses de efectos caóticos sin sentido: cada elemento visual debe reforzar la comprensión de la idea."
+          "Paso 1 (Eliminar todos los silencios muertos): Pega los clips de voz en la línea de tiempo quitando los huecos vacíos entre oraciones.",
+          "Paso 2 (Adelantar el audio con J-Cut): Haz que el audio de la frase siguiente empiece 0.2 segundos antes de que cambie la imagen para dar fluidez.",
+          "Paso 3 (Alternar el encuadre cada 4 segundos): Combina un plano al 100% de escala con el siguiente al 112% (jump-cut invisible) o inserta un B-Roll.",
+          "Paso 4 (Revisar la gráfica de retención): Publica y mira en analíticas en qué segundo exacto cae la línea para corregir ese tramo en tu próximo video."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Curvas de Retención, Pacing y \"Pattern Interrupts\" cada 3 a 5 Segundos",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Poner 20 transiciones giratorias mareantes en 10 segundos agota al espectador; alterna cortes limpios de escal...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Recorta las respiraciones y pausas muertas entre frases (Jump Cuts limpios o corte en J-Cut).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Marca de E-Commerce que Duplicó las Ventas desde Reels Orgánicos",
+          "scenario": "Sus videos de 30 segundos tenían una caída brusca en el segundo 6 porque mostraban a una persona hablando quieta frente a una pared blanca.",
+          "result": "Añadieron cambios de plano y clips de demostración cada 3.5 segundos con cortes J-Cut, subiendo la retención media del 24% al 62%."
         }
       },
       {
@@ -4099,14 +4099,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El 50% de la percepción de calidad de un video proviene del audio. Una voz grabada con eco o tapada por la música de fondo hace que la gente abandone de inmediato, mientras que un buen diseño sonoro guía la atención de forma subconsciente.",
           "Asimismo, dado que más del 35% de los usuarios consume contenido con el volumen bajo o en lugares públicos, los subtítulos dinámicos ubicados en la \"Zona Segura\" (centro-medio de la pantalla, lejos de los botones de la interfaz de TikTok/Reels) son obligatorios.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, voz principal entre -6 dB y -3 dB; música de fondo entre -24 dB y -30 dB (que acompañe sin competir con la voz). Segundo, efectos de sonido (SFX) sutiles a -15 dB: \"Whoosh\" en transiciones, \"Pop\" al aparecer texto y \"Riser\" antes de revelar el dato clave. Y tercero, resalta en color (amarillo, verde esmeralda o cian) solo las palabras clave de alto impacto dentro del subtítulo.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca coloques los subtítulos pegados al borde inferior ni al margen derecho: quedarán tapados por la descripción del video y por los iconos de \"Me gusta / Compartir\". Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "En el video vertical moderno, el sonido y los subtítulos hacen la mitad del trabajo de retención: quien mira con auriculares siente el impacto de las transiciones sonoras (SFX), y quien mira en silencio en el transporte público lee los subtítulos dinámicos.",
+          "En la tabla de mezcla de audio del bloque práctico verás los niveles exactos en decibeles (Voz clara adelante en -6 dB, efectos sutiles en -16 dB y música de fondo en -24 dB) para que la música acompañe sin tapar jamás lo que estás diciendo."
         ],
         "keyPoints": [
           "Voz principal entre -6 dB y -3 dB; música de fondo entre -24 dB y -30 dB (que acompañe sin competir con la voz).",
           "Efectos de sonido (SFX) sutiles a -15 dB: \"Whoosh\" en transiciones, \"Pop\" al aparecer texto y \"Riser\" antes de revelar el dato clave.",
           "Resalta en color (amarillo, verde esmeralda o cian) solo las palabras clave de alto impacto dentro del subtítulo.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Ubica siempre tus subtítulos en el centro-medio de la pantalla: si los pones muy abajo o a la derecha, los botones e íconos de TikTok/Instagram los taparán."
         ],
         "code": "Mezcla de Niveles de Audio Estándar para Reels / Shorts / TikTok:\n🎙️ Voz Principal (Limpiada y comprimida):  -6 dB a -3 dB\n🔊 Efectos SFX (Whoosh, Pops, Clicks):     -14 dB a -18 dB\n🎵 Música Instrumental de Fondo (Ducking): -26 dB a -30 dB",
         "warning": "⚠️ Nunca coloques los subtítulos pegados al borde inferior ni al margen derecho: quedarán tapados por la descripción del video y por los iconos de \"Me gusta / Compartir\".",
@@ -4121,15 +4121,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Voz principal entre -6 dB y -3 dB; música de fondo entre -24 dB y -30 dB (que acompañe sin competir con la voz).",
-          "Paso 3 (Validación y Control de Calidad): Efectos de sonido (SFX) sutiles a -15 dB: \"Whoosh\" en transiciones, \"Pop\" al aparecer texto y \"Riser\" antes de revelar el dato clave.",
-          "Paso 4 (Puesta en Marcha y Medición): Resalta en color (amarillo, verde esmeralda o cian) solo las palabras clave de alto impacto dentro del subtítulo."
+          "Paso 1 (Nivelar la voz principal primero): Ajusta tu pista de voz entre -6 dB y -3 dB para que se escuche fuerte, nítida y pareja en cualquier celular.",
+          "Paso 2 (Bajar la música ambiental): Coloca la pista musical entre -22 dB y -26 dB, apenas perceptible por debajo de tu voz.",
+          "Paso 3 (Marcar cambios visuales con SFX suaves): Añade un whoosh o pop sutil en -15 dB justo cuando aparece un texto o gráfico clave en pantalla.",
+          "Paso 4 (Generar subtítulos de 2 a 3 palabras en Zona Segura): Usa tipografía gruesa con borde oscuro ubicada en el centro lejos de los bordes de la app."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Diseño Sonoro (SFX, Risers, Hits) y Subtitulado Dinámico Inteligente",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Nunca coloques los subtítulos pegados al borde inferior ni al margen derecho: quedarán tapados por la descripc...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Voz principal entre -6 dB y -3 dB; música de fondo entre -24 dB y -30 dB (que acompañe sin competir con la voz).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Canal de Finanzas que Mejoró un +48% su Tiempo de Visualización",
+          "scenario": "Usaban música de tendencia demasiado alta que competía con la voz y ponían subtítulos diminutos abajo del todo que quedaban tapados por la descripción.",
+          "result": "Estandarizaron la mezcla de audio (-6 dB voz / -24 dB música) y subieron los subtítulos a la zona segura central, ganando +48% de retención completa."
         }
       },
       {
@@ -4138,14 +4138,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El algoritmo de recomendación funciona por lotes (Batch Testing): primero muestra tu video a 300-500 personas y evalúa 3 señales ponderadas: 1) Porcentaje medio reproducido y tasa de finalización (Completion Rate), 2) Veces que se comparte por mensaje directo o se guarda (Shares & Saves), y 3) Reproducciones repetidas (Re-watches).",
           "Para disparar la tasa de finalización al >100%, el cierre del video no debe sonar a despedida (\"Bueno, eso fue todo, síganme\"): si anuncias que el video ya terminó, el espectador se va 5 segundos antes. Entrega el punto más valioso al final y conecta la última frase con la primera (Seamless Loop).",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, estructura ganadora de 45s: Gancho (0-3s) -> Agitación/Contexto (3-10s) -> Desarrollo en 3 pasos rápidos (10-38s) -> Remate + CTA integrado sin pausa (38-45s). Segundo, los \"Guardados\" (Saves) y \"Compartidos\" (Shares) valen mucho más para el alcance viral que un simple \"Like\". Y tercero, diseña contenido \"Guarda esto para cuando...\" o comparativas prácticas que la audiencia quiera reenviar a un colega.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Decir \"Antes de terminar el video, no olvides suscribirte...\" provoca una caída vertical del 60% en la gráfica de retención en los últimos 5 segundos. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El indicador número uno que mira el algoritmo para hacer viral un video de 30 o 45 segundos es si la gente lo mira hasta el último segundo (Completion Rate) e incluso si vuelve a empezar (Re-watch) sin darse cuenta.",
+          "Observa en la técnica de Loop Infinito del bloque práctico cómo el cierre del video entrega el último consejo en el segundo 28 e inmediatamente pronuncia la mitad de una frase que se completa de forma exacta con la primera palabra del segundo 0.0."
         ],
         "keyPoints": [
           "Estructura ganadora de 45s: Gancho (0-3s) -> Agitación/Contexto (3-10s) -> Desarrollo en 3 pasos rápidos (10-38s) -> Remate + CTA integrado sin pausa (38-45s).",
           "Los \"Guardados\" (Saves) y \"Compartidos\" (Shares) valen mucho más para el alcance viral que un simple \"Like\".",
           "Diseña contenido \"Guarda esto para cuando...\" o comparativas prácticas que la audiencia quiera reenviar a un colega.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Terminar tu video con una consigna concreta (\"Comenta la palabra PLANTILLA y te la envío\") multiplica los comentarios y dispara el alcance del algoritmo."
         ],
         "code": "Técnica de Bucle Infinito (Seamless Loop) entre el Final y el Inicio:\n- Final del guion (seg 44): \"...y esa es la única razón por la que...\"\n- Inicio del guion (seg 00): \"...el 90% pierde dinero al configurar su campaña.\"\n(Mientras el espectador procesa el corte, el video ya volvió a empezar sumando +110% de retención).",
         "warning": "⚠️ Decir \"Antes de terminar el video, no olvides suscribirte...\" provoca una caída vertical del 60% en la gráfica de retención en los últimos 5 segundos.",
@@ -4160,15 +4160,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Estructura ganadora de 45s: Gancho (0-3s) -> Agitación/Contexto (3-10s) -> Desarrollo en 3 pasos rápidos (10-38s) -> Remate + CTA integrado sin pausa (38-45s).",
-          "Paso 3 (Validación y Control de Calidad): Los \"Guardados\" (Saves) y \"Compartidos\" (Shares) valen mucho más para el alcance viral que un simple \"Like\".",
-          "Paso 4 (Puesta en Marcha y Medición): Diseña contenido \"Guarda esto para cuando...\" o comparativas prácticas que la audiencia quiera reenviar a un colega."
+          "Paso 1 (Escribir el final conectado al inicio): Diseña la última oración de tu guion para que funcione como el puente directo hacia tu gancho del segundo 0.",
+          "Paso 2 (Prohibir las frases de despedida): Elimina por completo cierres como \"En resumen...\", \"Para ir terminando...\" o \"Nos vemos en el próximo video\".",
+          "Paso 3 (Entregar el punto más fuerte al final): Guarda el dato o truco más valioso para los últimos 5 segundos del video.",
+          "Paso 4 (Recortar el último fotograma al ras): Corta el final exacto en la última sílaba para que al repetirse el video el empalme sea imperceptible."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Algoritmo de Distribución, Estructura de Guion y Loop Infinito",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Decir \"Antes de terminar el video, no olvides suscribirte...\" provoca una caída vertical del 60% en la gráfica...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Estructura ganadora de 45s: Gancho (0-3s) -> Agitación/Contexto (3-10s) -> Desarrollo en 3 pasos rápidos (10-38s) -> Remate + CTA integrado sin pausa (38-45s).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Short con 125% de Retención Media gracias al Loop Infinito",
+          "scenario": "El creador se despedía durante los últimos 6 segundos pidiendo que lo siguieran, provocando que el 70% de la gente cerrara el video antes de que terminara.",
+          "result": "Quitó la despedida y conectó la última frase con el inicio en un Loop Infinito, logrando que la audiencia viera el comienzo una segunda vez (125% de retención)."
         }
       },
       {
@@ -4328,14 +4328,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Lanzar anuncios de conversión sin medir qué anuncio generó cada venta es tirar dinero a ciegas. El Píxel de Meta/TikTok es un script que corre en el navegador del usuario y reporta eventos (PageView, InitiateCheckout, Purchase). Sin embargo, debido a los bloqueadores de anuncios y las restricciones de cookies en iOS/Safari, el Píxel del navegador pierde entre un 20% y un 35% de las conversiones reales.",
           "La solución profesional es implementar en paralelo la API de Conversiones (CAPI) desde el servidor backend, enviando un identificador único de evento (`event_id`) en ambos canales para que Meta deduplique y registre el 100% de las ventas sin contarlas doble.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, eventos estándar del embudo: ViewContent -> AddToCart -> InitiateCheckout -> Purchase (con valor y moneda). Segundo, sin `event_id` compartido entre Píxel y CAPI, cada compra se contabilizaría dos veces en el administrador de anuncios. Y tercero, optimiza siempre tus campañas de venta por el evento final \"Purchase\" (Compra), nunca por \"Clics en el enlace\".",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si optimizas una campaña pidiendo \"Tráfico / Clics baratos\", el algoritmo buscará usuarios que hacen clic en todo pero jamás compran nada. Si quieres ventas, optimiza por Conversiones (Purchase). Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Hoy en día muchos navegadores y teléfonos bloquean las cookies tradicionales. Si solo instalas el Píxel básico en tu web, Meta perderá el rastro de entre el 20% y el 35% de tus ventas reales y no sabrá a qué anuncio atribuirlas.",
+          "En el código de abajo verás cómo solucionar esto de raíz enviando el evento Purchase con un identificador único (event_id) tanto desde el navegador (Píxel) como desde tu servidor (API de Conversiones CAPI) para que Meta los unifique sin contar doble."
         ],
         "keyPoints": [
           "Eventos estándar del embudo: ViewContent -> AddToCart -> InitiateCheckout -> Purchase (con valor y moneda).",
           "Sin `event_id` compartido entre Píxel y CAPI, cada compra se contabilizaría dos veces en el administrador de anuncios.",
           "Optimiza siempre tus campañas de venta por el evento final \"Purchase\" (Compra), nunca por \"Clics en el enlace\".",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Optimiza siempre tus campañas de ventas para el evento final \"Compra\" (Purchase): si optimizas para \"Clics en el enlace\", el algoritmo solo te buscará curiosos que tocan todo pero nunca compran."
         ],
         "code": "// Envío de Evento Purchase con event_id para Deduplicación (Píxel + CAPI)\nconst uniqueEventId = \"ord_\" + order.id;\n\n// 1. En el Navegador (Píxel):\nfbq('track', 'Purchase', { value: 29.00, currency: 'USD' }, { eventID: uniqueEventId });\n\n// 2. En el Servidor (CAPI):\nsendServerEvent({ event_name: 'Purchase', event_id: uniqueEventId, value: 29.00 });",
         "warning": "⚠️ Si optimizas una campaña pidiendo \"Tráfico / Clics baratos\", el algoritmo buscará usuarios que hacen clic en todo pero jamás compran nada. Si quieres ventas, optimiza por Conversiones (Purchase).",
@@ -4350,15 +4350,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Eventos estándar del embudo: ViewContent -> AddToCart -> InitiateCheckout -> Purchase (con valor y moneda).",
-          "Paso 3 (Validación y Control de Calidad): Sin `event_id` compartido entre Píxel y CAPI, cada compra se contabilizaría dos veces en el administrador de anuncios.",
-          "Paso 4 (Puesta en Marcha y Medición): Optimiza siempre tus campañas de venta por el evento final \"Purchase\" (Compra), nunca por \"Clics en el enlace\"."
+          "Paso 1 (Generar un event_id único por orden): Al confirmarse un pago (ej. orden #99481), crea el identificador único order_99481_pur.",
+          "Paso 2 (Disparar el Píxel en el navegador): Ejecuta fbq(\"track\", \"Purchase\", { value, currency: \"USD\" }, { eventID }) en la pantalla de agradecimiento.",
+          "Paso 3 (Enviar el mismo evento por Servidor CAPI): Remite desde tu backend hacia Meta el evento con el mismo event_id y el email hasheado en SHA-256.",
+          "Paso 4 (Verificar la Deduplicación en el Administrador): Comprueba en la pestaña \"Probar eventos\" de Meta que ambos envíos se fusionen correctamente."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: El Píxel de Seguimiento, API de Conversiones (CAPI) y Deduplicación",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Si optimizas una campaña pidiendo \"Tráfico / Clics baratos\", el algoritmo buscará usuarios que hacen clic en t...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Eventos estándar del embudo: ViewContent -> AddToCart -> InitiateCheckout -> Purchase (con valor y moneda).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Tienda Online que Recuperó el 32% de las Ventas No Atribuidas",
+          "scenario": "El administrador de anuncios mostraba solo 65 ventas al mes cuando en la cuenta bancaria habían entrado 96 pagos reales, impidiendo escalar las campañas ganadoras.",
+          "result": "Implementaron CAPI junto al Píxel con deduplicación por event_id, alcanzando una calificación de calidad de coincidencia de 8.9/10 y atribución exacta."
         }
       },
       {
@@ -4367,14 +4367,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En los algoritmos publicitarios modernos con IA (Advantage+ / Broad Targeting), la hiper-segmentación manual de intereses pequeños quedó obsoleta: es el propio anuncio (el video, el titular y el mensaje) quien segmenta y filtra a tu comprador ideal según quién se detiene a mirarlo.",
           "Para testear nuevos anuncios usamos ABO (presupuesto a nivel de conjunto de anuncios) para forzar que cada variante reciba una inversión equitativa; para escalar a los anuncios ganadores usamos CBO / Advantage+ (presupuesto a nivel de campaña) para que el algoritmo distribuya el dinero dinámicamente hacia el mejor rendimiento.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, fase de Testeo (ABO): Asegura que un anuncio nuevo tenga suficientes impresiones antes de juzgarlo. Segundo, fase de Escalado (CBO): El algoritmo asigna automáticamente más presupuesto al conjunto que consigue compras más baratas. Y tercero, prueba al menos 3 ángulos de venta distintos (ej. Ahorro de tiempo, Status/Certificación, Miedo a quedarse atrás).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si metes un anuncio nuevo de cero junto a un anuncio que ya lleva 50,000 impresiones dentro de un mismo conjunto, el algoritmo gastará el 95% del presupuesto en el viejo y no dejará despegar al nuevo. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "En el Administrador de Anuncios moderno ya no hace falta armar 15 conjuntos de anuncios con intereses rebuscados: el algoritmo de Meta es tan avanzado que analiza quiénes se quedan mirando tu video y busca compradores similares automáticamente.",
+          "Observa en la estructura limpia del bloque práctico cómo utilizamos una campaña de testeo ABO (presupuesto por conjunto) con audiencia amplia (Broad: edad y país) donde probamos 3 videos con ángulos psicológicos bien diferentes entre sí."
         ],
         "keyPoints": [
           "Fase de Testeo (ABO): Asegura que un anuncio nuevo tenga suficientes impresiones antes de juzgarlo.",
           "Fase de Escalado (CBO): El algoritmo asigna automáticamente más presupuesto al conjunto que consigue compras más baratas.",
           "Prueba al menos 3 ángulos de venta distintos (ej. Ahorro de tiempo, Status/Certificación, Miedo a quedarse atrás).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Probar 3 anuncios que ataquen 3 dolores distintos rinde diez veces más que probar el mismo anuncio cambiándole solo el color del fondo."
         ],
         "code": "Arquitectura Limpia de Cuenta Publicitaria:\n📁 Campaña 1: TESTEO DE CREATIVOS (Modo ABO)\n   ├─ Conjunto A (Ángulo Dolor/Tiempo):   3 videos con ganchos distintos ($10/día)\n   └─ Conjunto B (Ángulo Caso de Éxito):  3 videos demostrativos ($10/día)\n📁 Campaña 2: ESCALADO GANADORES (Modo CBO)\n   └─ Solo entran los anuncios que lograron CPA rentable y ROAS > 2.5x",
         "warning": "⚠️ Si metes un anuncio nuevo de cero junto a un anuncio que ya lleva 50,000 impresiones dentro de un mismo conjunto, el algoritmo gastará el 95% del presupuesto en el viejo y no dejará despegar al nuevo.",
@@ -4389,15 +4389,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Fase de Testeo (ABO): Asegura que un anuncio nuevo tenga suficientes impresiones antes de juzgarlo.",
-          "Paso 3 (Validación y Control de Calidad): Fase de Escalado (CBO): El algoritmo asigna automáticamente más presupuesto al conjunto que consigue compras más baratas.",
-          "Paso 4 (Puesta en Marcha y Medición): Prueba al menos 3 ángulos de venta distintos (ej. Ahorro de tiempo, Status/Certificación, Miedo a quedarse atrás)."
+          "Paso 1 (Crear 1 Campaña con objetivo Ventas): Entra a adsmanager.facebook.com, selecciona el objetivo \"Ventas\" y elige presupuesto ABO para la fase de prueba.",
+          "Paso 2 (Configurar el Conjunto en Broad): Define país, rango de edad e idioma dejando los intereses abiertos para que el algoritmo encuentre compradores sin trabas.",
+          "Paso 3 (Cargar 3 creativos con ángulos distintos): Sube un video enfocado en ahorro de tiempo, otro con demostración del producto y otro con caso de éxito.",
+          "Paso 4 (Dejar correr 72 horas sin tocar): No edites el presupuesto ni los textos en las primeras 48-72 horas para no reiniciar el aprendizaje del algoritmo."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Estructura de Campañas (ABO vs. CBO) y Segmentación por el Creativo",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Si metes un anuncio nuevo de cero junto a un anuncio que ya lleva 50,000 impresiones dentro de un mismo conjun...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Fase de Testeo (ABO): Asegura que un anuncio nuevo tenga suficientes impresiones antes de juzgarlo.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: E-Commerce que Bajó su Costo por Compra de $28 a $11 USD",
+          "scenario": "Tenían 14 conjuntos de anuncios diminutos de $3 USD/día superpuestos entre sí que competían en la misma subasta y encarecían los costos.",
+          "result": "Consolidaron la cuenta en 1 campaña limpia con audiencia Broad y 3 videos con ángulos distintos, reduciendo el costo por compra un 60% en la primera semana."
         }
       },
       {
@@ -4406,14 +4406,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Cuando una campaña no es rentable, un comprador de medios profesional no \"apaga todo y empieza de nuevo\": lee las métricas en cascada para diagnosticar en qué eslabón exacto está el problema (¿es el anuncio o es la página web?).",
           "Si el CTR (porcentaje de clics salientes) es bajo (<0.8%), el problema está en el anuncio (el gancho o la oferta en el video no despiertan interés). En cambio, si el CTR es excelente (>2.0%) y el CPC es barato, pero nadie compra en la web (CPA altísimo), el anuncio está haciendo bien su trabajo y el problema está en la Landing Page o en el Checkout.",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, cPM (Costo por 1,000 impresiones): Mide cuán cara está la subasta en ese público. Segundo, cTR Saliente Único (Outbound CTR): Porcentaje de personas que vieron el anuncio e hicieron clic hacia tu web (meta saludable >1.2% - 1.5%). Y tercero, rOAS (Return On Ad Spend) = Ingresos por Ventas atribuidas / Inversión Publicitaria (ej. gastar $100 y facturar $350 = ROAS 3.5x).",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: No confundas \"CTR (Todos)\" con \"CTR de clics en el enlace saliente\": el primero cuenta también a quienes tocaron para leer comentarios o pausar el video. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando una campaña no vende lo esperado, los principiantes apagan todo a ciegas y empiezan de cero. Los profesionales leen las métricas en orden como una radiografía para saber en 30 segundos qué pieza exacta deben ajustar.",
+          "En la guía de diagnóstico rápido del bloque práctico verás los 3 casos clásicos: si el CTR de enlace es menor a 1% falla el anuncio; si el CTR es alto (>2%) pero nadie compra en la web, el anuncio funciona perfecto y lo que debes arreglar es tu página o checkout."
         ],
         "keyPoints": [
           "CPM (Costo por 1,000 impresiones): Mide cuán cara está la subasta en ese público.",
           "CTR Saliente Único (Outbound CTR): Porcentaje de personas que vieron el anuncio e hicieron clic hacia tu web (meta saludable >1.2% - 1.5%).",
           "ROAS (Return On Ad Spend) = Ingresos por Ventas atribuidas / Inversión Publicitaria (ej. gastar $100 y facturar $350 = ROAS 3.5x).",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Mira siempre el indicador \"CTR (Porcentaje de clics en el enlace)\" y no el \"CTR (Todos)\", ya que este último cuenta también los \"Me gusta\" o clics en \"Ver más\"."
         ],
         "code": "Diagnóstico Rápido de Embudo Publicitario:\nCaso 1: CTR Saliente = 0.4% | CPC = $2.80 USD -> ❌ El anuncio no engancha. Cambiar los primeros 3s del video.\nCaso 2: CTR Saliente = 2.6% | CPC = $0.25 USD | 0 Ventas -> ❌ La Landing Page no convierte o el Checkout falla.",
         "warning": "⚠️ No confundas \"CTR (Todos)\" con \"CTR de clics en el enlace saliente\": el primero cuenta también a quienes tocaron para leer comentarios o pausar el video.",
@@ -4428,15 +4428,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): CPM (Costo por 1,000 impresiones): Mide cuán cara está la subasta en ese público.",
-          "Paso 3 (Validación y Control de Calidad): CTR Saliente Único (Outbound CTR): Porcentaje de personas que vieron el anuncio e hicieron clic hacia tu web (meta saludable >1.2% - 1.5%).",
-          "Paso 4 (Puesta en Marcha y Medición): ROAS (Return On Ad Spend) = Ingresos por Ventas atribuidas / Inversión Publicitaria (ej. gastar $100 y facturar $350 = ROAS 3.5x)."
+          "Paso 1 (Personalizar tus columnas en Meta Ads): Agrega a tu vista las columnas: Importe gastado, CPM, CTR (enlace), CPC (enlace), Pagos iniciados, Compras y ROAS.",
+          "Paso 2 (Evaluar la atracción del anuncio): Verifica que tu CTR de clics en el enlace supere el 1.2% - 1.5%; si está más bajo, cambia los primeros 3 segundos del video.",
+          "Paso 3 (Cruzar clics contra Pagos Iniciados): Comprueba cuántas de cada 100 visitas al sitio tocan el botón de comprar dentro de tu página.",
+          "Paso 4 (Cruzar Pagos Iniciados contra Compras): Si muchos abren el checkout pero pocos terminan el pago, revisa tus medios de cobro y costos de envío."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Lectura Quirúrgica de Métricas: CPM, CTR Único, CPC, CPA y ROAS",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (No confundas \"CTR (Todos)\" con \"CTR de clics en el enlace saliente\": el primero cuenta también a quienes tocar...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (CPM (Costo por 1,000 impresiones): Mide cuán cara está la subasta en ese público.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Anuncio Ganador Salvado gracias a la Lectura de CTR vs. Checkout",
+          "scenario": "Un anunciante estaba por apagar su mejor video (que tenía 3.1% de CTR y clics a $0.15 USD) porque había gastado $60 USD con 0 ventas.",
+          "result": "Al leer las métricas notaron que había 42 pagos iniciados y 0 compras: descubrieron un botón roto en la pasarela móvil, lo arreglaron y el anuncio pasó a ROAS 4.8x."
         }
       },
       {
@@ -4445,14 +4445,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Un ROAS de 2.0x puede hacer rico a un creador de cursos digitales (con 90% de margen) y llevar a la quiebra a una tienda física (con 25% de margen). Tu ROAS de Equilibrio se calcula como: Break-Even ROAS = 1 / Margen de Contribución Porcentual.",
           "Cuando encuentras una campaña ganadora muy por encima de tu ROAS de equilibrio, para escalar el presupuesto verticalmente sin reiniciar la \"Fase de Aprendizaje\" del algoritmo debes aumentar el presupuesto de forma gradual (un 20% a 25% cada 48-72 horas) o duplicar hacia nuevos ángulos creativos (escalado horizontal).",
-          "En la práctica diaria dentro de Diseño & Marketing, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, si tu margen es del 50% (0.50), tu ROAS de equilibrio es 1 / 0.50 = 2.0x. Segundo, si tu margen en cursos digitales es del 80% (0.80), tu ROAS de equilibrio es 1 / 0.80 = 1.25x (todo lo superior a 1.25x es ganancia neta). Y tercero, vigila la métrica \"Frecuencia\": cuando supera 3.0 - 4.0 en público frío y el CPA empieza a subir, el anuncio entró en Fatiga Creativa.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Multiplicar de golpe el presupuesto diario de una campaña por 10 (de $20/día a $200/día en un minuto) rompe la optimización algorítmica y dispara el costo por compra. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Antes de subir el presupuesto de una campaña debes conocer con exactitud matemática tu ROAS de Equilibrio (Break-Even ROAS): cuánto necesitas facturar por cada $1 USD invertido en anuncios para no perder dinero.",
+          "En el cálculo del bloque práctico verás la fórmula directa (1 dividido tu margen decimal): con un margen del 40% tu equilibrio es 2.5x, y cuando un anuncio supera ese número durante 4 días seguidos puedes escalarlo subiendo un +20% cada 48h sin romper el algoritmo."
         ],
         "keyPoints": [
           "Si tu margen es del 50% (0.50), tu ROAS de equilibrio es 1 / 0.50 = 2.0x.",
           "Si tu margen en cursos digitales es del 80% (0.80), tu ROAS de equilibrio es 1 / 0.80 = 1.25x (todo lo superior a 1.25x es ganancia neta).",
           "Vigila la métrica \"Frecuencia\": cuando supera 3.0 - 4.0 en público frío y el CPA empieza a subir, el anuncio entró en Fatiga Creativa.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Subir el presupuesto de golpe de $20 a $200 USD en el mismo conjunto reinicia la fase de aprendizaje y dispara el costo por venta; escala siempre de a 20% o por duplicación."
         ],
         "code": "Cálculo de ROAS de Equilibrio (Break-Even ROAS):\n- Producto de $50 USD con $10 USD de costo variable -> Margen = $40 USD (80% = 0.80).\n- ROAS de Equilibrio = 1 / 0.80 = 1.25x.\n- Si tu campaña logra ROAS 3.0x: Por cada $100 en anuncios facturas $300 -> Te quedan $140 USD limpios de ganancia.",
         "warning": "⚠️ Multiplicar de golpe el presupuesto diario de una campaña por 10 (de $20/día a $200/día en un minuto) rompe la optimización algorítmica y dispara el costo por compra.",
@@ -4467,15 +4467,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 2
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Si tu margen es del 50% (0.50), tu ROAS de equilibrio es 1 / 0.50 = 2.0x.",
-          "Paso 3 (Validación y Control de Calidad): Si tu margen en cursos digitales es del 80% (0.80), tu ROAS de equilibrio es 1 / 0.80 = 1.25x (todo lo superior a 1.25x es ganancia neta).",
-          "Paso 4 (Puesta en Marcha y Medición): Vigila la métrica \"Frecuencia\": cuando supera 3.0 - 4.0 en público frío y el CPA empieza a subir, el anuncio entró en Fatiga Creativa."
+          "Paso 1 (Calcular tu Break-Even ROAS): Divide 1 entre tu porcentaje decimal de margen de contribución (ej. 1 / 0.50 de margen = ROAS mínimo de 2.0x).",
+          "Paso 2 (Pausar lo que no tracciona): Apaga los anuncios que hayan gastado más de 1.5 veces tu costo objetivo por compra sin generar ventas.",
+          "Paso 3 (Escalar verticalmente con suavidad): A los conjuntos que superen tu ROAS objetivo por 3-4 días, súbeles el presupuesto un +20% cada 48 a 72 horas.",
+          "Paso 4 (Refrescar ángulos creativos): Crea nuevas variaciones de los primeros 3 segundos de tu video ganador para mantener el ROAS estable al escalar."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Cálculo de ROAS de Equilibrio (Break-Even ROAS) y Escalado sin Romper el Algoritmo",
-          "scenario": "Un equipo que trabajaba en Diseño & Marketing cometía frecuentemente el error de ignorar esta regla (Multiplicar de golpe el presupuesto diario de una campaña por 10 (de $20/día a $200/día en un minuto) rompe la...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Si tu margen es del 50% (0.50), tu ROAS de equilibrio es 1 / 0.50 = 2.0x.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Escalado Rentable de $30/día a $250/día sin Perder Margen",
+          "scenario": "Cada vez que tenían un buen día de ventas duplicaban el presupuesto de golpe a la mañana siguiente, haciendo que el ROAS se desplomara por debajo de 1.2x.",
+          "result": "Calcularon su ROAS de equilibrio en 1.8x y aplicaron escalado progresivo del +20% cada 48h junto con variaciones de gancho, sosteniendo un ROAS de 3.6x a $250 USD/día."
         }
       },
       {
@@ -4635,14 +4635,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "En negocios digitales de alto ticket (mentorías, agencias, software B2B), el embudo comercial se divide en dos roles especializados: el Appointment Setter (que gestiona las bandejas de entrada de Instagram, WhatsApp o LinkedIn para detectar oportunidades y agendar llamadas calificadas) y el Closer (que conduce la reunión de diagnóstico y cierra el pago).",
           "Un Setter profesional jamás envía un link de pago ni explica todo el programa por texto: aplica el filtro B-A-N-T (Budget / Presupuesto, Authority / Poder de decisión, Need / Necesidad real, Timing / Urgencia) en 4 a 6 mensajes conversacionales para llenar el calendario solo con prospectos calificados.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, regla de oro del chat: Haz 1 sola pregunta abierta por mensaje (los bloques largos de texto matan la respuesta). Segundo, flujo de 4 pasos: 1) Abrir contexto por su interacción -> 2) Situación actual -> 3) Meta deseada y obstáculo -> 4) Propuesta de llamada de 15 min. Y tercero, descalifica con elegancia a quien no tiene el problema o no busca resolverlo ahora para no saturar la agenda del Closer.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Enviar el enlace de Calendly en el primer mensaje sin haber diagnosticado ninguna necesidad tiene una tasa de inasistencia (No-Show) superior al 70%. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El trabajo de un Appointment Setter por Instagram o WhatsApp no es mandar testamentos de 15 líneas ni pegar el enlace de pago en el primer mensaje: es iniciar una charla humana de 4 mensajes cortos para filtrar si la persona califica y agendarla.",
+          "En la secuencia real del bloque práctico verás cómo cada mensaje termina con una sola pregunta sencilla de responder: primero abrimos contexto por su interacción, luego preguntamos situación actual, después su meta y recién en el paso 4 ofrecemos la llamada."
         ],
         "keyPoints": [
           "Regla de oro del chat: Haz 1 sola pregunta abierta por mensaje (los bloques largos de texto matan la respuesta).",
           "Flujo de 4 pasos: 1) Abrir contexto por su interacción -> 2) Situación actual -> 3) Meta deseada y obstáculo -> 4) Propuesta de llamada de 15 min.",
           "Descalifica con elegancia a quien no tiene el problema o no busca resolverlo ahora para no saturar la agenda del Closer.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Ofrecer siempre dos opciones concretas de horario (\"¿Te queda mejor hoy a las 16h o mañana a las 11h?\") duplica la velocidad con la que el prospecto confirma su turno."
         ],
         "code": "Secuencia de Chat de un Setter Profesional (Instagram / WhatsApp):\n1. [Apertura]: \"¡Hola Diego! Vi que descargaste la guía de automatización. ¿La buscabas para aplicarla en tu propio negocio o para clientes?\"\n2. [Dolor]: \"Entiendo, hoy en tu agencia ¿cuántas horas por semana se les van en reportes manuales?\"\n3. [Impacto]: \"Uf, 15 hs semanales es muchísimo. ¿Qué te frenó hasta ahora de automatizarlo?\"\n4. [Transición a Llamada]: \"Justo armamos ese flujo para otras agencias. ¿Te queda bien mañana a las 15h o las 17h para verlo en 15 min por Zoom?\"",
         "warning": "⚠️ Enviar el enlace de Calendly en el primer mensaje sin haber diagnosticado ninguna necesidad tiene una tasa de inasistencia (No-Show) superior al 70%.",
@@ -4657,15 +4657,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Regla de oro del chat: Haz 1 sola pregunta abierta por mensaje (los bloques largos de texto matan la respuesta).",
-          "Paso 3 (Validación y Control de Calidad): Flujo de 4 pasos: 1) Abrir contexto por su interacción -> 2) Situación actual -> 3) Meta deseada y obstáculo -> 4) Propuesta de llamada de 15 min.",
-          "Paso 4 (Puesta en Marcha y Medición): Descalifica con elegancia a quien no tiene el problema o no busca resolverlo ahora para no saturar la agenda del Closer."
+          "Paso 1 (Abrir por un disparador real): Saluda mencionando el reel que comentó, la historia que votó o la guía que acaba de descargar.",
+          "Paso 2 (Hacer 1 pregunta de situación actual): Envía un mensaje corto de 2 líneas preguntando cómo está manejando hoy ese tema en su negocio o carrera.",
+          "Paso 3 (Detectar el obstáculo y la meta): Pregunta qué le gustaría lograr en los próximos 90 días y qué siente que lo está frenando hoy.",
+          "Paso 4 (Proponer la llamada con doble alternativa): Si tiene el problema y busca resolverlo, ofrécele dos horarios puntuales para una llamada de 15 minutos."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: El Rol del Appointment Setter y Calificación por Chat (Método BANT)",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Enviar el enlace de Calendly en el primer mensaje sin haber diagnosticado ninguna necesidad tiene una tasa de ...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Regla de oro del chat: Haz 1 sola pregunta abierta por mensaje (los bloques largos de texto matan la respuesta).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Academia High-Ticket que Triplicó sus Llamadas Agendadas por Instagram",
+          "scenario": "Respondían a los interesados pegando un párrafo largo con el temario, el precio y el link de Calendly en el primer mensaje; solo el 2% agendaba.",
+          "result": "Adoptaron la secuencia de 4 pasos de 1 pregunta por vez con doble opción horaria, subiendo la tasa de conversión de chat a llamada agendada al 16.5%."
         }
       },
       {
@@ -4674,14 +4674,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Quien hace las preguntas tiene el control de la conversación. Si al empezar la llamada el prospecto dice \"Contame rápido qué hacen y cuánto sale\", y tú empiezas a recitar características durante 20 minutos, perdiste el marco de autoridad y te convertiste en un vendedor desesperado.",
           "En los primeros 90 segundos el Closer establece el \"Marco de la Llamada\" (Call Frame): explica que primero le hará unas preguntas para entender su escenario exacto y ver si realmente califica para la solución, y al final, si hace sentido para ambos, verán los detalles de implementación.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, divide la llamada de 30 min en: 70% Diagnóstico profundo del cliente y solo 30% Presentación y Cierre. Segundo, identifica la \"Brecha\" (The Gap): la distancia entre su Situación Actual (Punto A) y su Meta a 90 días (Punto B). Y tercero, si no hay brecha ni urgencia, no hay venta de alto ticket.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca presentes tu oferta antes de que el prospecto haya admitido que su método actual no le está funcionando y que necesita resolverlo ahora. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Quien domina la llamada es quien hace las preguntas, no quien habla sin parar. Si empiezas la videollamada diciendo \"¿Qué querías saber?\", el cliente te preguntará el precio en el minuto 2 sin haber entendido el valor de lo que haces.",
+          "Observa en el guion de los primeros 60 segundos del bloque práctico cómo el Closer toma el control amablemente desde el saludo (Framing) y dedica el 70% de la reunión a abrir \"La Brecha\" entre el Punto A actual del cliente y su Punto B deseado."
         ],
         "keyPoints": [
           "Divide la llamada de 30 min en: 70% Diagnóstico profundo del cliente y solo 30% Presentación y Cierre.",
           "Identifica la \"Brecha\" (The Gap): la distancia entre su Situación Actual (Punto A) y su Meta a 90 días (Punto B).",
           "Si no hay brecha ni urgencia, no hay venta de alto ticket.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Antes de explicar tu programa o servicio, resume en voz alta el dolor y la meta que te contó el cliente y pregúntale: \"¿Lo resumí bien?\"."
         ],
         "code": "Guion de Establecimiento de Marco (Primeros 60 segundos):\n\"Genial Martín. Para aprovechar al máximo estos 25 minutos, primero quiero hacerte unas preguntas sobre cómo están manejando hoy su adquisición y dónde sienten el cuello de botella.\nCon eso claro, si veo que realmente podemos ayudarlos a llegar a [Meta], te muestro paso a paso cómo funciona el sistema y vemos cómo avanzar. ¿Te parece bien?\"",
         "warning": "⚠️ Nunca presentes tu oferta antes de que el prospecto haya admitido que su método actual no le está funcionando y que necesita resolverlo ahora.",
@@ -4696,15 +4696,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Divide la llamada de 30 min en: 70% Diagnóstico profundo del cliente y solo 30% Presentación y Cierre.",
-          "Paso 3 (Validación y Control de Calidad): Identifica la \"Brecha\" (The Gap): la distancia entre su Situación Actual (Punto A) y su Meta a 90 días (Punto B).",
-          "Paso 4 (Puesta en Marcha y Medición): Si no hay brecha ni urgencia, no hay venta de alto ticket."
+          "Paso 1 (Establecer el Marco en el minuto 1): Explica con calidez que primero le harás unas preguntas para ver si realmente puedes ayudarlo y al final verán los detalles.",
+          "Paso 2 (Profundizar en el Punto A actual): Indaga qué ha intentado hasta ahora, por qué no le funcionó y cuánto le cuesta seguir así cada mes.",
+          "Paso 3 (Clarificar el Punto B a 90 días): Haz que describa qué resultado concreto e ideal quiere alcanzar y por qué es prioritario hacerlo ahora.",
+          "Paso 4 (Presentar los 3 pilares de tu solución): Muestra únicamente cómo tu método lo lleva del Punto A al Punto B sin abrumarlo con tecnicismos."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Estructura de la Llamada Consultiva y Establecimiento del Marco (Framing)",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Nunca presentes tu oferta antes de que el prospecto haya admitido que su método actual no le está funcionando ...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Divide la llamada de 30 min en: 70% Diagnóstico profundo del cliente y solo 30% Presentación y Cierre.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Equipo Comercial que Subió su Tasa de Cierre del 14% al 31%",
+          "scenario": "Los vendedores compartían pantalla en el minuto 3 y pasaban 25 minutos leyendo diapositivas técnicas mientras el prospecto miraba en silencio.",
+          "result": "Reestructuraron la llamada en 70% diagnóstico de la Brecha y 30% presentación en 3 pilares, duplicando los cierres en el primer mes."
         }
       },
       {
@@ -4713,14 +4713,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Cuando al final de una llamada el cliente dice \"Suena muy bien, déjame pensarlo y te aviso la semana que viene\", el 95% de las veces NO es una objeción real: es una \"Cortina de Humo\" educada para terminar la llamada sin decirte qué es lo que realmente le genera miedo o duda.",
           "Un Closer profesional no presiona con agresividad ni tampoco dice \"Dale, avísame\": empatiza, valida y aísla la objeción real preguntando con calma qué parte específica del sistema o de la inversión le genera incertidumbre.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, las 3 objeciones reales detrás del \"lo quiero pensar\": 1) Dinero / Flujo de caja, 2) Desconfianza en si le funcionará a él, 3) Necesita consultarlo con un socio/pareja. Segundo, si el problema es Flujo de Caja (quiere hacerlo pero no tiene los $1,500 hoy juntos), se resuelve con estructura de pagos (ej. 2 o 3 cuotas), no bajando el valor. Y tercero, si el problema es Confianza en el método, se resuelve mostrando la garantía o un caso idéntico al suyo.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Si intentas rebatir el precio cuando en realidad la duda del cliente era técnica (o viceversa), solo aumentarás su resistencia. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando al final de una llamada el cliente te dice \"Está buenísimo, déjame pensarlo y te aviso la semana que viene\", en el 90% de los casos no va a pensar nada: es una frase automática de cortesía para cortar la llamada sin decirte qué duda real tiene.",
+          "En el guion palabra por palabra del bloque práctico verás cómo desarmar esa cortina de humo sin presionar ni discutir: validamos su respuesta con calma y aislamos si la duda real está en cómo funciona el método o en cómo acomodar los números."
         ],
         "keyPoints": [
           "Las 3 objeciones reales detrás del \"lo quiero pensar\": 1) Dinero / Flujo de caja, 2) Desconfianza en si le funcionará a él, 3) Necesita consultarlo con un socio/pareja.",
           "Si el problema es Flujo de Caja (quiere hacerlo pero no tiene los $1,500 hoy juntos), se resuelve con estructura de pagos (ej. 2 o 3 cuotas), no bajando el valor.",
           "Si el problema es Confianza en el método, se resuelve mostrando la garantía o un caso idéntico al suyo.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Si el cliente confía al 100% en tu solución pero no tiene todo el efectivo junto hoy, resuélvelo ofreciendo un plan en 2 o 3 cuotas en lugar de regalar tu trabajo."
         ],
         "code": "Cómo Desactivar la Cortina de Humo \"Lo tengo que pensar\":\n\"Totalmente entendible, Diego, las buenas decisiones se toman con claridad.\nSuele pasar que cuando alguien me dice que quiere pensarlo, en realidad es por una de dos cosas:\no bien tiene alguna duda sobre si el sistema se adapta a su caso técnico, o bien es un tema de cómo acomodar los números de la inversión hoy.\nSiendo 100% sinceros entre nosotros, ¿cuál de las dos sientes que pesa más ahora?\"",
         "warning": "⚠️ Si intentas rebatir el precio cuando en realidad la duda del cliente era técnica (o viceversa), solo aumentarás su resistencia.",
@@ -4735,15 +4735,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Las 3 objeciones reales detrás del \"lo quiero pensar\": 1) Dinero / Flujo de caja, 2) Desconfianza en si le funcionará a él, 3) Necesita consultarlo con un socio/pareja.",
-          "Paso 3 (Validación y Control de Calidad): Si el problema es Flujo de Caja (quiere hacerlo pero no tiene los $1,500 hoy juntos), se resuelve con estructura de pagos (ej. 2 o 3 cuotas), no bajando el valor.",
-          "Paso 4 (Puesta en Marcha y Medición): Si el problema es Confianza en el método, se resuelve mostrando la garantía o un caso idéntico al suyo."
+          "Paso 1 (Bajar la guardia con empatía): Responde con tranquilidad: \"Por supuesto, es súper importante que tomes una decisión seguro...\".",
+          "Paso 2 (Aislar si el método le hace sentido): Pregunta de 1 a 10 qué tan convencido siente que este sistema es lo que necesita para llegar a su meta.",
+          "Paso 3 (Identificar la objeción verdadera): Si dice 9 o 10, pregúntale con naturalidad qué le falta para que sea un 10 o si el tema pasa por organizar el pago.",
+          "Paso 4 (Resolver la traba puntual en vivo): Si es una duda de confianza, muestra la garantía y un caso igual al suyo; si es flujo de caja, ofrece el plan en cuotas."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Cortinas de Humo vs. Objeciones Reales (\"Lo tengo que pensar\")",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Si intentas rebatir el precio cuando en realidad la duda del cliente era técnica (o viceversa), solo aumentará...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Las 3 objeciones reales detrás del \"lo quiero pensar\": 1) Dinero / Flujo de caja, 2) Desconfianza en si le funcionará a él, 3) Necesita consultarlo con un socio/pareja.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Consultora B2B que Recuperó 4 de cada 10 Ventas que Decían \"Lo voy a pensar\"",
+          "scenario": "Cada vez que un prospecto decía \"lo pienso y te escribo\", el vendedor respondía \"Dale, te mando el PDF por WhatsApp\" y nunca más volvía a saber de él.",
+          "result": "Al aplicar la pregunta de aislamiento en vivo durante la misma llamada, resolvieron las dudas de pago en el acto y sumaron un +38% de cierres."
         }
       },
       {
@@ -4752,14 +4752,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El 50% de las ventas de alto ticket se cierra en la llamada #1 y el otro 50% se cierra en el seguimiento (Follow-Up) durante los 7 a 14 días posteriores. Sin embargo, hacer seguimiento escribiendo \"¿Hola, pudiste ver lo nuestro?\" posiciona al vendedor como necesitado y destruye la autoridad.",
           "El \"Seguimiento de Valor\" consiste en contactar aportando un recurso útil nuevo (un caso de estudio de su mismo rubro, una respuesta a la duda que planteó en la llamada o una invitación a un taller en vivo) manteniendo viva la conversación sin rogar.",
-          "En la práctica diaria dentro de Finanzas, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, kPIs de un Setter: Conversaciones iniciadas -> Tasa de Agenda (>10-15%) -> Show-Up Rate / Asistencia (>75%). Segundo, kPIs de un Closer: Llamadas asistidas -> Tasa de Cierre (Close Rate saludable: 25% a 35%) -> Cash Collected (efectivo cobrado hoy). Y tercero, para subir el Show-Up Rate: envía confirmación en WhatsApp + un video corto de 60s antes de la llamada.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Un calendario lleno de llamadas donde solo asiste el 30% (Show-Up Rate bajo) quema al equipo; confirma siempre por WhatsApp 4 horas antes de cada reunión. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "La mitad de las ventas de alto ticket se cierran en el seguimiento (Follow-Up) de los primeros 7 días posteriores a la llamada, pero escribir \"¿Pudiste verlo?\" o \"¿Alguna novedad?\" solo genera que te claven el visto.",
+          "En la comparativa del bloque práctico verás la diferencia entre un seguimiento vacío que persigue al cliente y un Seguimiento de Valor que le aporta un caso de éxito idéntico al suyo y le da un motivo real para tomar acción hoy."
         ],
         "keyPoints": [
           "KPIs de un Setter: Conversaciones iniciadas -> Tasa de Agenda (>10-15%) -> Show-Up Rate / Asistencia (>75%).",
           "KPIs de un Closer: Llamadas asistidas -> Tasa de Cierre (Close Rate saludable: 25% a 35%) -> Cash Collected (efectivo cobrado hoy).",
           "Para subir el Show-Up Rate: envía confirmación en WhatsApp + un video corto de 60s antes de la llamada.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Enviar un audio o video selfie de 45 segundos por WhatsApp dos horas antes de la llamada agendada sube la asistencia (Show-Up Rate) por encima del 80%."
         ],
         "code": "Ejemplo de Seguimiento de Valor (Día 3 post-llamada) vs. Seguimiento Vacío:\n❌ Vacío: \"Hola Martín, ¿cómo vas? ¿Lo pudiste pensar?\"\n✅ De Valor: \"Hola Martín, hoy terminamos de conectar para otro estudio contable el módulo de lectura automática de facturas del que hablamos el martes (les bajó el tiempo de carga un 80%). Te dejo captura de cómo quedó por si te sirve de referencia.\"",
         "warning": "⚠️ Un calendario lleno de llamadas donde solo asiste el 30% (Show-Up Rate bajo) quema al equipo; confirma siempre por WhatsApp 4 horas antes de cada reunión.",
@@ -4774,15 +4774,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): KPIs de un Setter: Conversaciones iniciadas -> Tasa de Agenda (>10-15%) -> Show-Up Rate / Asistencia (>75%).",
-          "Paso 3 (Validación y Control de Calidad): KPIs de un Closer: Llamadas asistidas -> Tasa de Cierre (Close Rate saludable: 25% a 35%) -> Cash Collected (efectivo cobrado hoy).",
-          "Paso 4 (Puesta en Marcha y Medición): Para subir el Show-Up Rate: envía confirmación en WhatsApp + un video corto de 60s antes de la llamada."
+          "Paso 1 (Asegurar la asistencia antes de la llamada): Envía por WhatsApp un recordatorio cordial con un video corto de 45s saludando al prospecto por su nombre.",
+          "Paso 2 (Enviar resumen claro a las 2 horas post-llamada): Si quedó pendiente de confirmar con un socio, mándale un resumen de 5 puntos con el retorno calculado.",
+          "Paso 3 (Hacer Seguimiento de Valor en el Día 3): Comparte el caso real de otro cliente que tenía exactamente su misma duda y cómo le fue en su primera semana.",
+          "Paso 4 (Medir tus 3 métricas diarias en planilla): Registra cada día tu Show-Up Rate (>75%), tu Close Rate (25-35%) y el Cash Collected real."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Seguimiento de Valor (Follow-Up) y KPIs de un Equipo Comercial",
-          "scenario": "Un equipo que trabajaba en Finanzas cometía frecuentemente el error de ignorar esta regla (Un calendario lleno de llamadas donde solo asiste el 30% (Show-Up Rate bajo) quema al equipo; confirma siempre...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (KPIs de un Setter: Conversaciones iniciadas -> Tasa de Agenda (>10-15%) -> Show-Up Rate / Asistencia (>75%).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Equipo de Closers que Subió la Asistencia a Llamadas del 48% al 84%",
+          "scenario": "La mitad de las personas que agendaban en Calendly se olvidaban de conectarse al Zoom, haciendo perder horas muertas a los vendedores todos los días.",
+          "result": "Implementaron la confirmación por WhatsApp con video corto previo y la secuencia de seguimiento de valor, elevando la asistencia al 84%."
         }
       },
       {
@@ -4942,14 +4942,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "El 85% de las empresas remotas de Estados Unidos y Europa filtra los currículums con software ATS (Applicant Tracking Systems) antes de que los vea un humano. Si tu CV está diseñado en Canva con dos columnas, barras de porcentaje de habilidades (\"Python 80%\") y fotos, el parser del ATS leerá las líneas mezcladas y te descartará automáticamente.",
           "Además, en el mercado anglosajón no se listan \"tareas pasivas\" (\"Responsible for writing code\"), sino \"Logros Cuantificados con Verbos de Acción\" usando la fórmula de Google (XYZ): \"Logré [X resultado] medido por [Y métrica] mediante la implementación de [Z tecnología/acción]\".",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, diseño ATS-Friendly: 1 sola columna limpia, sin fotos ni tablas gráficas, exportado en PDF con texto seleccionable. Segundo, usa verbos de impacto en pasado: Engineered, Automated, Reduced, Scaled, Spearheaded. Y tercero, configura tu perfil de LinkedIn en inglés con palabras clave exactas del puesto en el Headline.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: En currículums para EE.UU., Reino Unido y Canadá NUNCA incluyas foto de rostro, fecha de nacimiento, DNI ni estado civil (las empresas los descartan por leyes anti-discriminación laboral). Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando envías tu currículum a una empresa de Estados Unidos, Canadá o Europa, el primer filtro no lo hace una persona: lo hace un software lector llamado ATS. Si tu CV tiene dos columnas, íconos, foto de perfil o barras de porcentaje, el sistema lo lee mezclado y lo descarta.",
+          "En la fórmula XYZ de Google del bloque práctico verás cómo transformar una frase pasiva (\"Encargado de hacer reportes\") en un logro de alto impacto en inglés (\"Automated weekly reporting using Python, reducing manual work by 85%\") que los reclutadores aman."
         ],
         "keyPoints": [
           "Diseño ATS-Friendly: 1 sola columna limpia, sin fotos ni tablas gráficas, exportado en PDF con texto seleccionable.",
           "Usa verbos de impacto en pasado: Engineered, Automated, Reduced, Scaled, Spearheaded.",
           "Configura tu perfil de LinkedIn en inglés con palabras clave exactas del puesto en el Headline.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Coloca exactamente el título del puesto que buscas en inglés en el encabezado de tu LinkedIn (Headline) para aparecer primero cuando los reclutadores filtran candidatos."
         ],
         "code": "Transformación de Bullet Point para CV Internacional (Fórmula XYZ):\n❌ Débil (Orientado a tareas):\n\"Worked on the backend API and fixed database queries.\"\n\n✅ Alto Impacto (Orientado a resultados medibles):\n\"Optimized PostgreSQL queries and implemented Redis caching, reducing average API response time by 62% (from 480ms to 180ms) for +50k daily users.\"",
         "warning": "⚠️ En currículums para EE.UU., Reino Unido y Canadá NUNCA incluyas foto de rostro, fecha de nacimiento, DNI ni estado civil (las empresas los descartan por leyes anti-discriminación laboral).",
@@ -4964,15 +4964,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Diseño ATS-Friendly: 1 sola columna limpia, sin fotos ni tablas gráficas, exportado en PDF con texto seleccionable.",
-          "Paso 3 (Validación y Control de Calidad): Usa verbos de impacto en pasado: Engineered, Automated, Reduced, Scaled, Spearheaded.",
-          "Paso 4 (Puesta en Marcha y Medición): Configura tu perfil de LinkedIn en inglés con palabras clave exactas del puesto en el Headline."
+          "Paso 1 (Pasar a plantilla Harvard de 1 columna): Abre un Google Docs limpio en una sola columna sin fotos, sin tablas ocultas ni gráficos de colores.",
+          "Paso 2 (Quitar datos personales prohibidos en EE.UU.): Elimina foto de rostro, fecha de nacimiento, estado civil y documento de identidad (solo deja nombre, email, LinkedIn y país).",
+          "Paso 3 (Reescribir tu experiencia con la fórmula XYZ): Empieza cada viñeta con un verbo de acción en pasado (Automated, Built, Increased) + métrica % + herramienta.",
+          "Paso 4 (Sincronizar tu perfil de LinkedIn en inglés): Actualiza tu titular, sección About y habilidades con las palabras clave exactas de las ofertas remotas."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 1: CV en Formato Harvard/ATS y Optimización de LinkedIn en Inglés",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (En currículums para EE.UU., Reino Unido y Canadá NUNCA incluyas foto de rostro, fecha de nacimiento, DNI ni es...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 1 (Diseño ATS-Friendly: 1 sola columna limpia, sin fotos ni tablas gráficas, exportado en PDF con texto seleccionable.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Analista que Pasó de 0 Respuestas a 5 Entrevistas Internacionales en 2 Semanas",
+          "scenario": "Un profesional postulaba a decenas de avisos remotos con un CV colorido de dos columnas hecho en Canva con su foto y recibía rechazos automáticos en horas.",
+          "result": "Migró al formato ATS de 1 columna en inglés aplicando la fórmula XYZ con porcentajes, recibiendo 5 invitaciones a entrevista en los siguientes 14 días."
         }
       },
       {
@@ -4981,14 +4981,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "No necesitas tener acento nativo ni vocabulario literario para aprobar entrevistas remotas en dólares; necesitas estructura y claridad. Cuando el entrevistador pregunta \"Tell me about a time you faced a difficult technical problem or deadline\", los candidatos sin preparación divagan y se traban con la gramática.",
           "El estándar de Amazon, Google y startups de Silicon Valley es responder en 90 segundos siguiendo las 4 etapas S-T-A-R: Situation (Contexto en 1 frase), Task (Cuál era tu misión/desafío), Action (Qué hiciste TÚ específicamente) y Result (Qué impacto numérico lograste).",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, prepara y memoriza 5 historias comodín en formato STAR antes de la entrevista (un bug crítico, un desacuerdo técnico, un plazo ajustado, una automatización y un logro de liderazgo). Segundo, en la etapa \"Action\", habla en primera persona (\"I designed...\", \"I debugged...\") en lugar de diluir tu aporte diciendo solo \"We\". Y tercero, cierra siempre con la etapa \"Result\" dando un dato concreto.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: No memorices párrafos palabra por palabra como un robot; memoriza los 4 puntos clave (S-T-A-R) de tus 5 historias para sonar natural y seguro. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "El secreto para aprobar entrevistas en inglés sin trabarte ni quedarte en blanco no es tener vocabulario de diccionario: es llevar preparadas de antemano 5 historias reales de tu trabajo estructuradas con las 4 letras del método S-T-A-R.",
+          "Observa en el guion de 90 segundos del bloque práctico cómo dedicamos apenas 2 frases a explicar la Situación y la Tarea, y concentramos toda la fuerza en las acciones concretas en primera persona (\"I created...\", \"I automated...\") y el resultado numérico final."
         ],
         "keyPoints": [
           "Prepara y memoriza 5 historias comodín en formato STAR antes de la entrevista (un bug crítico, un desacuerdo técnico, un plazo ajustado, una automatización y un logro de liderazgo).",
           "En la etapa \"Action\", habla en primera persona (\"I designed...\", \"I debugged...\") en lugar de diluir tu aporte diciendo solo \"We\".",
           "Cierra siempre con la etapa \"Result\" dando un dato concreto.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Practica tus 5 historias S-T-A-R grabándote en notas de voz de 90 segundos: notarás que las mismas 5 anécdotas sirven para responder casi cualquier pregunta de entrevista."
         ],
         "code": "Estructura S-T-A-R Lista para Usar en Entrevistas (90 segundos):\n- [S - Situation]: \"In my previous project, our checkout webhook was failing under high traffic peaks.\"\n- [T - Task]: \"My goal was to eliminate lost orders before the Black Friday campaign.\"\n- [A - Action]: \"I implemented an asynchronous queue with retry logic and idempotency keys.\"\n- [R - Result]: \"As a result, we processed 100% of orders with zero downtime, saving ~$12,000 in revenue.\"",
         "warning": "⚠️ No memorices párrafos palabra por palabra como un robot; memoriza los 4 puntos clave (S-T-A-R) de tus 5 historias para sonar natural y seguro.",
@@ -5003,15 +5003,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Prepara y memoriza 5 historias comodín en formato STAR antes de la entrevista (un bug crítico, un desacuerdo técnico, un plazo ajustado, una automatización y un logro de liderazgo).",
-          "Paso 3 (Validación y Control de Calidad): En la etapa \"Action\", habla en primera persona (\"I designed...\", \"I debugged...\") en lugar de diluir tu aporte diciendo solo \"We\".",
-          "Paso 4 (Puesta en Marcha y Medición): Cierra siempre con la etapa \"Result\" dando un dato concreto."
+          "Paso 1 (Armar tu banco de 5 historias comodín): Escribe en un documento un logro de ahorro de tiempo, un error resuelto, un cliente difícil, un trabajo en equipo y algo que aprendiste rápido.",
+          "Paso 2 (Resumir Situation y Task en 20 segundos): Presenta el contexto en dos oraciones cortas sin irte por las ramas con detalles secundarios.",
+          "Paso 3 (Hablar en primera persona \"I...\" en Action): Explica qué hiciste tú exactamente paso a paso en lugar de decir siempre \"We did...\".",
+          "Paso 4 (Cerrar con un número en Result): Termina siempre contando cuánto tiempo ahorraste, cuánto subieron las ventas o cuántos errores se evitaron."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 2: Cómo Superar Entrevistas en Inglés con la Estructura S-T-A-R",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (No memorices párrafos palabra por palabra como un robot; memoriza los 4 puntos clave (S-T-A-R) de tus 5 histor...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 2 (Prepara y memoriza 5 historias comodín en formato STAR antes de la entrevista (un bug crítico, un desacuerdo técnico, un plazo ajustado, una automatización y un logro de liderazgo).), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Desarrollador con Inglés Intermedio Contratado por Startup de Austin ($3,800 USD/mes)",
+          "scenario": "Se ponía muy nervioso cuando le hacían preguntas abiertas como \"Tell me about a challenge you faced\" e improvisaba respuestas largas y confusas.",
+          "result": "Preparó su documento con 5 historias S-T-A-R de 90 segundos cada una, superó las 3 rondas de entrevistas con fluidez y firmó su primer contrato en dólares."
         }
       },
       {
@@ -5020,14 +5020,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Una vez contratado en un equipo internacional, el 80% de tu trabajo diario ocurre mediante comunicación asíncrona escrita (Slack, Jira, GitHub Pull Requests) y una reunión diaria de 10 minutos (Daily Standup).",
           "Los equipos de EE.UU. valoran la comunicación directa, concisa y proactiva: si tienes un bloqueo (Blocker), nunca esperes 3 días en silencio hasta la fecha de entrega; avisa temprano mostrando qué intentaste ya y qué necesitas para destrabarte.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, fórmula Daily Standup (45s): 1) What I completed yesterday, 2) What I am focusing on today, 3) Any blockers. Segundo, regla \"No Hello\" en Slack: Nunca escribas solo \"Hi\" y esperes 2 horas a que respondan; escribe el saludo junto con el contexto completo y tu pregunta en un solo mensaje. Y tercero, usa verbos modales corteses pero directos en revisiones de código (\"Could we extract this into a helper to avoid duplication?\").",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Quedarse callado cuando no entendiste un requerimiento por vergüenza a preguntar en inglés es la causa #1 de despido en el primer mes remoto. Parafrasea siempre: \"Just to make sure we are aligned, do you mean X or Y?\". Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Una vez que entras a trabajar en un equipo remoto en dólares, el 90% de tu comunicación diaria ocurre por escrito en Slack o en reuniones breves de 15 minutos por la mañana (Daily Standup) donde cada persona habla menos de 1 minuto.",
+          "En la plantilla del bloque práctico verás cómo aplicar la regla de oro del trabajo remoto (\"No Hello\"): en lugar de mandar un \"Hi!\" suelto y hacer perder tiempo a tu compañero, envías en un solo mensaje ordenado el saludo, el contexto, qué probaste y tu pregunta puntual."
         ],
         "keyPoints": [
           "Fórmula Daily Standup (45s): 1) What I completed yesterday, 2) What I am focusing on today, 3) Any blockers.",
           "Regla \"No Hello\" en Slack: Nunca escribas solo \"Hi\" y esperes 2 horas a que respondan; escribe el saludo junto con el contexto completo y tu pregunta en un solo mensaje.",
           "Usa verbos modales corteses pero directos en revisiones de código (\"Could we extract this into a helper to avoid duplication?\").",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "Tener a mano en un bloc de notas las 3 frases del Daily Standup (\"Yesterday I completed... / Today I am focusing on... / No blockers\") te quita toda la presión cada mañana."
         ],
         "code": "Comunicación Asíncrona Profesional en Slack (Regla \"No Hello\"):\n❌ Mal hábito:\n\"Hi Sarah\" (y esperar a que conteste para recién decirle qué necesitas).\n\n✅ Estándar Remoto Senior:\n\"Hi Sarah! Quick update on the Stripe webhook (#PR-142): I finished the signature validation, but I need the staging API secret to run the integration tests. Could you share it in 1Password when you have a moment? Thanks!\"",
         "warning": "⚠️ Quedarse callado cuando no entendiste un requerimiento por vergüenza a preguntar en inglés es la causa #1 de despido en el primer mes remoto. Parafrasea siempre: \"Just to make sure we are aligned, do you mean X or Y?\".",
@@ -5042,15 +5042,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Fórmula Daily Standup (45s): 1) What I completed yesterday, 2) What I am focusing on today, 3) Any blockers.",
-          "Paso 3 (Validación y Control de Calidad): Regla \"No Hello\" en Slack: Nunca escribas solo \"Hi\" y esperes 2 horas a que respondan; escribe el saludo junto con el contexto completo y tu pregunta en un solo mensaje.",
-          "Paso 4 (Puesta en Marcha y Medición): Usa verbos modales corteses pero directos en revisiones de código (\"Could we extract this into a helper to avoid duplication?\")."
+          "Paso 1 (Preparar tus 3 líneas antes de la reunión diaria): Anota 5 minutos antes qué terminaste ayer, qué harás hoy y si necesitas ayuda con algún bloqueo.",
+          "Paso 2 (Aplicar la regla No Hello en Slack): Escribe siempre tu consulta completa en un único mensaje con viñetas claras.",
+          "Paso 3 (Mostrar iniciativa antes de pedir ayuda): Incluye siempre la frase \"I have already tried X and Y\" para demostrar profesionalismo.",
+          "Paso 4 (Confirmar acuerdos por escrito): Después de cualquier llamada rápida, deja un resumen de 3 líneas en el canal (\"Quick recap of what we agreed...\")."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 3: Comunicación Asíncrona en Equipos Remotos (Daily Standups, Slack y PRs)",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Quedarse callado cuando no entendiste un requerimiento por vergüenza a preguntar en inglés es la causa #1 de d...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 3 (Fórmula Daily Standup (45s): 1) What I completed yesterday, 2) What I am focusing on today, 3) Any blockers.), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: Diseñadora Remota Ascendida a Líder de Equipo por su Comunicación Asíncrona",
+          "scenario": "Al principio le daba miedo hablar en las reuniones diarias y cuando se trababa con una tarea perdía todo el día callada por vergüenza a preguntar en inglés.",
+          "result": "Empezó a usar el guion de 45 segundos para el Standup y la estructura \"No Hello\" en Slack, destacándose como la integrante más clara y confiable del equipo."
         }
       },
       {
@@ -5059,14 +5059,14 @@ const DEFAULT_SKILLS = [
         "paragraphs": [
           "Las empresas de EE.UU. contratan talento en Latinoamérica y España principalmente bajo la figura de \"Independent Contractor\" (prestador de servicios independiente) a través de plataformas como Deel, Remote o Plane, firmando el formulario W-8BEN (que certifica que no resides fiscalmente en EE.UU. y evita retenciones allí).",
           "En la negociación salarial, nunca des un número único cerrado ni aceptes la primera oferta sin preguntar si hay flexibilidad: investiga el rango del puesto, expresa entusiasmo por el rol y ancla tu expectativa con un rango cuyo piso sea tu número objetivo.",
-          "En la práctica diaria dentro de Programación, aplicar este conocimiento significa seguir tres reglas operativas concretas: primero, si cuando te preguntan \"¿Cuál es tu expectativa salarial?\" aún no conoces las responsabilidades completas, pregunta primero: \"What is the approved budget range for this role?\". Segundo, si tu objetivo es ganar $3,500 USD/mes, presenta un rango de \"$3,500 to $4,200 USD/month depending on responsibilities and PTO\". Y tercero, negocia también beneficios Contractor: días libres pagos (Paid Time Off / PTO), bono de equipamiento y revisiones semestrales.",
-          "Además, los profesionales experimentados prestan especial atención a un detalle crítico donde suele fallar la mayoría: Nunca mientas sobre ofertas falsas para presionar; argumenta siempre tu contraoferta desde el valor técnico que aportarás en los primeros 90 días y haz que sea fácil decirte que sí. Analiza con detenimiento el bloque práctico que tienes a continuación, observa cómo se conectan cada una de sus partes y úsalo como plantilla base en tus propios proyectos."
+          "Cuando una empresa extranjera te contrata desde Latinoamérica o España bajo modalidad Contractor independiente, firmarás el formulario W-8BEN: un documento simple de 1 página que certifica que vives fuera de EE.UU. para que te transfieran el 100% de tu sueldo bruto.",
+          "Además, en el guion de negociación del bloque práctico verás las frases exactas en inglés para agradecer una oferta inicial de por ejemplo $3,000 USD/mes y pedir profesionalmente un ajuste de +15% ($3,450 USD/mes) sin poner en riesgo tu contratación."
         ],
         "keyPoints": [
           "Si cuando te preguntan \"¿Cuál es tu expectativa salarial?\" aún no conoces las responsabilidades completas, pregunta primero: \"What is the approved budget range for this role?\".",
           "Si tu objetivo es ganar $3,500 USD/mes, presenta un rango de \"$3,500 to $4,200 USD/month depending on responsibilities and PTO\".",
           "Negocia también beneficios Contractor: días libres pagos (Paid Time Off / PTO), bono de equipamiento y revisiones semestrales.",
-          "Verifica siempre el ejemplo práctico de este módulo antes de responder la comprobación obligatoria de avance."
+          "En Estados Unidos y Europa está bien visto negociar con cortesía: el 85% de las empresas deja un margen de entre 10% y 20% extra aprobado para cerrar al candidato elegido."
         ],
         "code": "Guion en Inglés para Negociar un +15% sobre la Oferta Inicial:\n\"Thank you so much for the offer! I'm really excited about the team and the technical challenges we discussed.\nBased on my experience automating these workflows and the market range for this role, I was targeting closer to $3,800 USD/month.\nIf we can bridge the gap to $3,600 USD/month with 15 days of PTO, I would be thrilled to sign the contract today.\"",
         "warning": "⚠️ Nunca mientas sobre ofertas falsas para presionar; argumenta siempre tu contraoferta desde el valor técnico que aportarás en los primeros 90 días y haz que sea fácil decirte que sí.",
@@ -5081,15 +5081,15 @@ const DEFAULT_SKILLS = [
           "correctIndex": 1
         },
         "stepByStep": [
-          "Paso 1 (Análisis y Preparación): Identifica los datos o elementos de entrada antes de ejecutar cualquier cambio sobre el sistema o campaña.",
-          "Paso 2 (Implementación Estructurada): Si cuando te preguntan \"¿Cuál es tu expectativa salarial?\" aún no conoces las responsabilidades completas, pregunta primero: \"What is the approved budget range for this role?\".",
-          "Paso 3 (Validación y Control de Calidad): Si tu objetivo es ganar $3,500 USD/mes, presenta un rango de \"$3,500 to $4,200 USD/month depending on responsibilities and PTO\".",
-          "Paso 4 (Puesta en Marcha y Medición): Negocia también beneficios Contractor: días libres pagos (Paid Time Off / PTO), bono de equipamiento y revisiones semestrales."
+          "Paso 1 (Averiguar el presupuesto antes de dar un número): Cuando te pregunten tu expectativa en la primera llamada, consulta primero: \"What is the approved budget range for this role?\".",
+          "Paso 2 (Dar siempre un rango en vez de una cifra fija): Responde con una banda salarial (ej. \"$3,200 to $3,800 USD/month depending on responsibilities and PTO\").",
+          "Paso 3 (Enviar el guion de contraoferta del +15%): Al recibir la propuesta escrita, agradece con entusiasmo y usa la plantilla para solicitar el ajuste al tope de tu rango.",
+          "Paso 4 (Completar el formulario W-8BEN y configurar tu cobro): Firma el W-8BEN con tus datos locales para recibir transferencias en USD en tu cuenta."
         ],
         "caseStudy": {
-          "title": "Caso Práctico Aplicado — Módulo 4: Modalidad Contractor (Formulario W-8BEN) y Negociación de Sueldo en USD",
-          "scenario": "Un equipo que trabajaba en Programación cometía frecuentemente el error de ignorar esta regla (Nunca mientas sobre ofertas falsas para presionar; argumenta siempre tu contraoferta desde el valor técnico qu...), lo que generaba fallos y pérdida de tiempo todas las semanas.",
-          "result": "Al implementar la estructura paso a paso de este Módulo 4 (Si cuando te preguntan \"¿Cuál es tu expectativa salarial?\" aún no conoces las responsabilidades completas, pregunta primero: \"What is the approved budget range for this role?\".), lograron automatizar y blindar el proceso con resultados medibles desde la primera semana."
+          "title": "Caso Real: +$5,400 USD Extra al Año con un Correo de Negociación de 5 Líneas",
+          "scenario": "Un especialista en soporte técnico recibió una oferta remota de $2,500 USD/mes y estaba por aceptarla en el acto por temor a que se la retiraran.",
+          "result": "Envió la plantilla de negociación agradeciendo la oferta y proponiendo $2,950 USD/mes: la empresa aprobó el aumento en 2 horas, sumando $5,400 USD más por año."
         }
       },
       {
@@ -5228,12 +5228,15 @@ const DEFAULT_SKILLS = [
   }
 ];
 
-// Normalizador pedagógico para que todos los 84 módulos sean 100% claros desde cero absoluto y sin textos truncados
+// Normalizador pedagógico para que todos los 102 módulos sean 100% claros desde cero absoluto y sin textos truncados
 function normalizeBeginnerFriendlyLessons(skillsList) {
   if (!Array.isArray(skillsList)) return;
 
   const firstStepByCourse = {
     'py-automation': 'Paso 1 (Preparar tu cuaderno gratis): Abre Google Colab (colab.research.google.com) o tu editor de código y ten listo tu archivo de datos de prueba.',
+    'ai-agents-pro': 'Paso 1 (Preparar tu espacio en ChatGPT o Claude): Abre chatgpt.com o claude.ai en una conversación nueva y ten a mano el texto o caso real que vas a procesar.',
+    'fin-crypto-invest': 'Paso 1 (Abrir tu planilla de control): Abre Google Sheets o una nota limpia y anota tu ingreso mensual neto real junto con tus gastos fijos del mes.',
+    'ux-growth-convert': 'Paso 1 (Abrir la pantalla a optimizar): Abre en el navegador la página web, tienda o diseño de Figma que quieres analizar tanto en vista de computadora como de celular.',
     'fullstack-apis-sql': 'Paso 1 (Preparar tu entorno de base de datos/servidor): Abre tu editor SQL en Supabase.com o tu archivo de servidor en Visual Studio Code.',
     'secret-saas-masterclass': 'Paso 1 (Definir el problema rentable): Anota en una hoja el dolor principal que hoy le hace perder tiempo o dinero a tu cliente ideal.',
     'cybersec-ethical-web': 'Paso 1 (Inspeccionar el punto de entrada): Abre tu aplicación web en el navegador con F12 (DevTools) y localiza dónde ingresan datos los usuarios.',
@@ -8383,7 +8386,19 @@ const DOMESTIKA_IMAGES = {
   aiChatgpt: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjGRJP3hLDcLV9n1IeHDBVe8-1MkmbGuIxkZIYH4gvbIhwX744ppC5RDrLARsMQ79JjAOejBM0DYLq4s-OKhF8o67nPIWsRFI2xgUheh1pjA_UlDbVu4wB-GMgtP7HPVMDjQcnpv6sWxqeUrqs1X1dZIRPx6qukj9jxT0PxSPUIFxF3Qx57jGEkcG4VBmJaUbnGjzyRGaZtPKsW8bphyF-dEdCgQBZw2xBzyJGghul',
   webStreamlit: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDnC30cevi5ntF6_p_Gr_Nhjj5Jt2cN0uOo094MiB5UWpMZPbS5OyeRsqcn6PcKRW-WVLZWXCUc7Gs-qT94n3_hGVpjyW4bL4vIt1S9ZnKu0QJnPNEUUPYWfEy9Gk3uTZTfAkDo0lVoYmgjpZjDwL-eW8wEELfm1yF1OEq9uo3rIvoXuntOG9Y95msQEe3VftMBeEdYtpYOn0UwGp4Yy0LzFRgHI6TEzg39s5HjqqnD',
   whatsappBot: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBkxN22FPnYhvMzCFXyL_p0wDTsABkXeM8I4BrdrTRvftVsu9usWCKROnR427qxyvF1k-WpGp77XzCwz78lcn2hsUbxj_b1q8dAAupbvnCXQL5ZKbTs96ry4ORnARKRfMKCbXH5gLgAgRouehTZVWkeZuKnDBZsJzQVeFeYAYKoU7W8-QiYqdZfK1K25NPV1h2zDNLo2zUF5cziTNWHYQEYom1sHZ0KAwB2oZSEs377',
-  vipVault: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBKJshLK1x0TXRvjgWTQQBVeEP_NJ5Qag6Bh70fVKuKDAmWA5t7TkBL01mnWGLj2GBjzXfiBqcfAxigeiAw49JqZzUav2WRf_E7hIJvWxVJREGMwjnuAsrYQ1r7F6Toske-Kk1UITjM2K5x4hp98G6k-K74ChLjuSzRvs2s6Wd7nCwNX6-VkSM5OWZr3Xkkn78wFeyfQCJi0q6iJY17ElzzWvbgDCANTOibb2p-Jsyo'
+  vipVault: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBKJshLK1x0TXRvjgWTQQBVeEP_NJ5Qag6Bh70fVKuKDAmWA5t7TkBL01mnWGLj2GBjzXfiBqcfAxigeiAw49JqZzUav2WRf_E7hIJvWxVJREGMwjnuAsrYQ1r7F6Toske-Kk1UITjM2K5x4hp98G6k-K74ChLjuSzRvs2s6Wd7nCwNX6-VkSM5OWZr3Xkkn78wFeyfQCJi0q6iJY17ElzzWvbgDCANTOibb2p-Jsyo',
+  finCrypto: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=900&q=80',
+  uxGrowth: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=900&q=80',
+  secretSaas: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80',
+  cybersec: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=900&q=80',
+  aiRag: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=900&q=80',
+  jsReact: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=900&q=80',
+  finPricing: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=80',
+  copywriting: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80',
+  viralVideo: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=900&q=80',
+  metaAds: 'https://images.unsplash.com/photo-1533750516457-a7f992034fec?auto=format&fit=crop&w=900&q=80',
+  closerSales: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=900&q=80',
+  englishRemote: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=80'
 };
 
 const COURSE_EDITORIAL_META = {
@@ -8411,29 +8426,113 @@ const COURSE_EDITORIAL_META = {
     coverIcon: '🤖',
     coverGradient: 'linear-gradient(135deg, #b41f00 0%, #d946ef 60%, #006874 100%)'
   },
+  'fin-crypto-invest': {
+    instructor: 'Sofía Altamirano',
+    role: 'Asesora Patrimonial & Estratega de Inversión',
+    rating: '4.9',
+    reviews: '1,390',
+    students: '5,740',
+    badge: '🔥 MÁS VENDIDO',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.finCrypto,
+    coverIcon: '📈',
+    coverGradient: 'linear-gradient(135deg, #007D8A 0%, #10b981 60%, #0f172a 100%)'
+  },
+  'ux-growth-convert': {
+    instructor: 'Valeria Montes',
+    role: 'Directora de Producto UI/UX & CRO',
+    rating: '4.9',
+    reviews: '1,120',
+    students: '4,980',
+    badge: 'DESTACADO',
+    badgeType: 'teal',
+    imageUrl: DOMESTIKA_IMAGES.uxGrowth,
+    coverIcon: '🎨',
+    coverGradient: 'linear-gradient(135deg, #E60050 0%, #9333ea 60%, #1e1b4b 100%)'
+  },
   'fullstack-apis-sql': {
     instructor: 'David Mendoza',
     role: 'Full-Stack Software Architect',
     rating: '5.0',
-    reviews: '420',
-    students: '3,100',
-    badge: 'NUEVO',
+    reviews: '890',
+    students: '4,320',
+    badge: 'DESTACADO',
     badgeType: 'teal',
     imageUrl: DOMESTIKA_IMAGES.webStreamlit,
     coverIcon: '💻',
     coverGradient: 'linear-gradient(135deg, #006874 0%, #0057c0 60%, #1b1b1d 100%)'
   },
-  'nocode-n8n-whatsapp': {
-    instructor: 'Camila Ortiz',
-    role: 'Automatizadora No-Code & AI',
-    rating: '4.8',
-    reviews: '980',
-    students: '4,890',
+  'secret-saas-masterclass': {
+    instructor: 'Elena Rostova',
+    role: 'Creadora de Micro-SaaS Rentables',
+    rating: '5.0',
+    reviews: '295',
+    students: '1,180',
+    badge: '👑 BÓVEDA EXCLUSIVA VIP',
+    badgeType: 'vip',
+    imageUrl: DOMESTIKA_IMAGES.secretSaas,
+    coverIcon: '🚀',
+    coverGradient: 'linear-gradient(135deg, #1b1b1d 0%, #3e0500 55%, #E60050 100%)'
+  },
+  'cybersec-ethical-web': {
+    instructor: 'Héctor Salgado',
+    role: 'Lead Pentester & SecOps Architect',
+    rating: '5.0',
+    reviews: '760',
+    students: '3,640',
+    badge: 'ALTA DEMANDA',
+    badgeType: 'teal',
+    imageUrl: DOMESTIKA_IMAGES.cybersec,
+    coverIcon: '🛡️',
+    coverGradient: 'linear-gradient(135deg, #0f172a 0%, #0284c7 60%, #006874 100%)'
+  },
+  'ai-rag-embeddings': {
+    instructor: 'Dr. Nicolás Krämer',
+    role: 'AI Systems & Vector DB Architect',
+    rating: '5.0',
+    reviews: '680',
+    students: '3,290',
+    badge: 'NUEVO',
+    badgeType: 'teal',
+    imageUrl: DOMESTIKA_IMAGES.aiRag,
+    coverIcon: '🧠',
+    coverGradient: 'linear-gradient(135deg, #4f46e5 0%, #9333ea 60%, #0f172a 100%)'
+  },
+  'js-react-modern': {
+    instructor: 'Tomás Villalba',
+    role: 'Principal Frontend & React Engineer',
+    rating: '4.9',
+    reviews: '1,260',
+    students: '5,410',
+    badge: '🔥 MÁS VENDIDO',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.jsReact,
+    coverIcon: '⚡',
+    coverGradient: 'linear-gradient(135deg, #0284c7 0%, #2563eb 60%, #0f172a 100%)'
+  },
+  'fin-b2b-pricing': {
+    instructor: 'Martín Echagüe',
+    role: 'Director de Pricing B2B & Unit Economics',
+    rating: '4.9',
+    reviews: '830',
+    students: '3,890',
+    badge: 'DESTACADO',
+    badgeType: 'teal',
+    imageUrl: DOMESTIKA_IMAGES.finPricing,
+    coverIcon: '💰',
+    coverGradient: 'linear-gradient(135deg, #059669 0%, #006874 60%, #0f172a 100%)'
+  },
+  'mkt-copywriting-funnels': {
+    instructor: 'Clara Benítez',
+    role: 'Direct Response Copywriter & Funnel Strategist',
+    rating: '4.9',
+    reviews: '1,050',
+    students: '4,720',
     badge: 'TENDENCIA',
     badgeType: 'red',
-    imageUrl: DOMESTIKA_IMAGES.whatsappBot,
-    coverIcon: '💬',
-    coverGradient: 'linear-gradient(135deg, #007D8A 0%, #10b981 60%, #004f57 100%)'
+    imageUrl: DOMESTIKA_IMAGES.copywriting,
+    coverIcon: '✍️',
+    coverGradient: 'linear-gradient(135deg, #b41f00 0%, #ea580c 60%, #1e293b 100%)'
   },
   'secret-high-ticket-agency': {
     instructor: 'Lucas Vance',
@@ -8447,17 +8546,65 @@ const COURSE_EDITORIAL_META = {
     coverIcon: '👑',
     coverGradient: 'linear-gradient(135deg, #1b1b1d 0%, #3e0500 55%, #b41f00 100%)'
   },
-  'secret-saas-masterclass': {
-    instructor: 'Elena Rostova',
-    role: 'Creadora de Micro-SaaS Rentables',
+  'nocode-n8n-whatsapp': {
+    instructor: 'Camila Ortiz',
+    role: 'Automatizadora No-Code & AI',
+    rating: '4.9',
+    reviews: '1,190',
+    students: '5,180',
+    badge: 'TENDENCIA',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.whatsappBot,
+    coverIcon: '💬',
+    coverGradient: 'linear-gradient(135deg, #007D8A 0%, #10b981 60%, #004f57 100%)'
+  },
+  'viral-video-retention': {
+    instructor: 'Gael Santoro',
+    role: 'Productor de Video Viral & Retención',
+    rating: '4.9',
+    reviews: '1,470',
+    students: '6,050',
+    badge: '🔥 MÁS VENDIDO',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.viralVideo,
+    coverIcon: '🎬',
+    coverGradient: 'linear-gradient(135deg, #E60050 0%, #f43f5e 60%, #1e1b4b 100%)'
+  },
+  'meta-ads-roas': {
+    instructor: 'Julián Ferraro',
+    role: 'Senior Media Buyer & Performance Lead',
+    rating: '4.9',
+    reviews: '1,310',
+    students: '5,630',
+    badge: 'TENDENCIA',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.metaAds,
+    coverIcon: '📣',
+    coverGradient: 'linear-gradient(135deg, #2563eb 0%, #e11d48 60%, #0f172a 100%)'
+  },
+  'closer-high-ticket-sales': {
+    instructor: 'Rodrigo Alarcón',
+    role: 'Director Comercial & Closer High-Ticket B2B',
     rating: '5.0',
-    reviews: '295',
-    students: '1,180',
-    badge: '👑 BÓVEDA EXCLUSIVA VIP',
-    badgeType: 'vip',
-    imageUrl: DOMESTIKA_IMAGES.vipVault,
-    coverIcon: '🚀',
-    coverGradient: 'linear-gradient(135deg, #1b1b1d 0%, #3e0500 55%, #E60050 100%)'
+    reviews: '970',
+    students: '4,460',
+    badge: 'ALTA DEMANDA',
+    badgeType: 'red',
+    imageUrl: DOMESTIKA_IMAGES.closerSales,
+    coverIcon: '🤝',
+    coverGradient: 'linear-gradient(135deg, #b45309 0%, #e12a00 60%, #0f172a 100%)'
+  },
+  'english-remote-tech': {
+    instructor: 'Hannah Miller',
+    role: 'Tech Recruiter en EE.UU. & Remote Career Coach',
+    rating: '5.0',
+    reviews: '1,580',
+    students: '6,820',
+    badge: '🔥 MÁS VENDIDO',
+    badgeType: 'teal',
+    imageUrl: DOMESTIKA_IMAGES.englishRemote,
+    coverIcon: '🌎',
+    coverGradient: 'linear-gradient(135deg, #006874 0%, #0284c7 60%, #1e293b 100%)'
   }
 };
 
@@ -8906,7 +9053,7 @@ window.handlePlanCTA = function (planKey) {
       tier: 'monthly',
       badge: '🔥 PLAN MÁS ELEGIDO • ACCESO TOTAL',
       title: 'Pase VIP PRO Mensual',
-      description: 'Desbloquea los 14 cursos completos al instante y habilita los Puntos Exclusivos VIP (👑 VP).',
+      description: 'Desbloquea los 17 cursos del catálogo y habilita los Puntos Exclusivos VIP (👑 VP).',
       priceUSD: 49.00,
       bonusText: '🎁 Bono inmediato: +120 VP Exclusivos + 300 PTS de bienvenida'
     });
@@ -9360,6 +9507,9 @@ function buildBeginnerZeroIntroHtml(lesson, skill, moduleIdx) {
   const cleanTitle = (lesson.heading || `Módulo ${moduleIdx + 1}`).replace(/^Módulo \d+:\s*/i, '');
   const analogiesByCourse = {
     'py-automation': 'Imagina que tienes un asistente invisible en tu computadora: en lugar de que tú abras 50 archivos de Excel, copies y pegues celdas durante 3 horas, le escribes una receta de 5 líneas en Python y tu computadora hace todo el trabajo sucio en 2 segundos sin equivocarse.',
+    'ai-agents-pro': 'Usar ChatGPT sin estructura es como pedirle a un chef "hazme algo rico": te dará cualquier cosa genérica. Aquí aprenderás a darle la receta exacta (Rol, Contexto, Reglas y Formato) para que te entregue resultados de nivel experto al primer intento.',
+    'fin-crypto-invest': 'Administrar tu dinero e invertir no requiere ser millonario ni adivinar la bolsa: funciona como un sistema de tuberías automáticas donde una parte de tu sueldo se separa sola el día que cobras y crece mes a mes gracias al interés compuesto.',
+    'ux-growth-convert': 'Una página web bonita que no vende es como un local de lujo con la puerta cerrada con llave. Aquí aprenderás cómo guiar los ojos y el clic del visitante para eliminar dudas y multiplicar la cantidad de personas que compran.',
     'fullstack-apis-sql': 'Piensa en un restaurante: la pantalla que ve el usuario (Frontend) es el menú, la base de datos SQL es la despensa donde se guarda todo con llave, y la API es el camarero que lleva el pedido de la mesa a la cocina y vuelve con el plato exacto.',
     'secret-saas-masterclass': 'Crear un Micro-SaaS es como construir una pequeña herramienta automática en internet (por ejemplo, un generador de presupuestos o recordatorios por WhatsApp) y alquilarla a cientos de negocios por una cuota mensual en dólares.',
     'cybersec-ethical-web': 'La seguridad web funciona igual que las cerraduras de un banco: nunca dejas que alguien entre a la bóveda solo porque dice llamarse "el dueño". Aquí aprenderás a poner guardias automáticos que revisan cada dato antes de dejarlo pasar.',
@@ -9528,7 +9678,7 @@ function renderModalStep() {
             🏷️ Comprar Resto del Curso por $${currentSkill.priceUSD.toFixed(2)} USD (Precio Especial)
           </button>
           <button type="button" class="btn-secondary" onclick="document.getElementById('lesson-modal').classList.remove('open'); handlePlanCTA('monthly');">
-            👑 O desbloquear los 14 cursos con Pase VIP PRO ($49.00 USD/mes)
+            👑 O desbloquear los 17 cursos con Pase VIP PRO ($49.00 USD/mes)
           </button>
         </div>
       </div>
@@ -10765,7 +10915,7 @@ const FOOTER_INFO_CONTENT = {
         <h4>2. ¿Puedo empezar sin tarjeta de crédito?</h4>
         <p style="color:var(--text-muted); margin-bottom:14px;">¡Sí! Al hacer clic en el botón del Hero recibes tus primeros <strong>+50 PTS</strong> y puedes comenzar a estudiar en el aula interactiva al instante.</p>
         <h4>3. ¿Por qué el Pase VIP PRO conviene más que comprar cursos por separado?</h4>
-        <p style="color:var(--text-muted);">Con el <strong>Pase VIP PRO ($49 USD/mes)</strong> desbloqueas los 14 cursos completos al instante, recibes un multiplicador x1.5 de PTS y habilitas la ganancia de Puntos Exclusivos VIP (VP).</p>
+        <p style="color:var(--text-muted);">Con el <strong>Pase VIP PRO ($49 USD/mes)</strong> desbloqueas el catálogo de 17 cursos (102 módulos prácticos), recibes un multiplicador x1.5 de PTS y habilitas la ganancia de Puntos Exclusivos VIP (VP).</p>
       </div>
     `
   },
@@ -10874,7 +11024,7 @@ window.toggleZeroCoursesSimulation = function () {
   showToast(
     simulateZeroCourses
       ? '⏳ Simulación activada: 0 cursos activos. Los botones de planes ahora abren la Lista de Espera.'
-      : '✅ Catálogo restaurado: 14 cursos completos activos y listos para comprar.'
+      : '✅ Catálogo restaurado: 17 cursos completos activos y listos para cursar.'
   );
 };
 
@@ -12173,7 +12323,7 @@ window.grantFullAdminSuperpowers = function (silent = false) {
   renderHeaderAndStats();
   renderSkillsGrid();
   if (!silent) {
-    showToast('⚡ ¡Superpoderes de Admin activados! 99.999 PTS, 99.999 VP, VIP PRO y los 14 cursos + cofres 100% desbloqueados.');
+    showToast('⚡ ¡Superpoderes de Admin activados! 99.999 PTS, 99.999 VP, VIP PRO y los 17 cursos + cofres 100% desbloqueados.');
   }
 };
 
