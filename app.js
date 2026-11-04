@@ -6412,19 +6412,19 @@ function renderHeaderAndStats() {
     }
   } else {
     if (headerAuthBtn) {
-      headerAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
-      headerAuthBtn.onclick = () => openAuthModal('login');
+      headerAuthBtn.textContent = '✨ Crear Cuenta / Iniciar Sesión';
+      headerAuthBtn.onclick = () => openAuthModal('register');
     }
     if (mobileTopAuthBtn) {
-      mobileTopAuthBtn.textContent = '🔐 Iniciar Sesión / Registrarse';
-      mobileTopAuthBtn.onclick = () => openAuthModal('login');
+      mobileTopAuthBtn.textContent = '✨ Crear Cuenta / Entrar';
+      mobileTopAuthBtn.onclick = () => openAuthModal('register');
     }
     if (mobileAvatarBtn) {
-      mobileAvatarBtn.onclick = () => openAuthModal('login');
-      mobileAvatarBtn.title = 'Iniciar Sesión o Registrarse';
+      mobileAvatarBtn.onclick = () => openAuthModal('register');
+      mobileAvatarBtn.title = 'Crear Cuenta o Iniciar Sesión';
     }
     if (mobileAvatarTag) {
-      mobileAvatarTag.textContent = vipActive ? 'VIP' : 'ENTRAR';
+      mobileAvatarTag.textContent = vipActive ? 'VIP' : 'CREAR';
     }
   }
 
@@ -8683,6 +8683,9 @@ function getCourseCoverVisual(skill) {
 }
 
 window.viewCourseDetails = function (skillId) {
+  if (!requireUserAccountForAction('ver el curso y comenzar a estudiar', () => window.viewCourseDetails(skillId))) {
+    return;
+  }
   const skill = getAllSkills().find(s => s.id === skillId);
   if (!skill) return;
   if (hasAccessToCourse(skill) || skill.isTrialCourse) {
@@ -8970,6 +8973,9 @@ function renderSkillsGrid() {
 
 // Compra de un curso individual -> Abre el Modal de Checkout (o Lista de Espera si hay 0 cursos)
 window.buyCourse = function (skillId) {
+  if (!requireUserAccountForAction('comprar o desbloquear este curso en tu cuenta', () => window.buyCourse(skillId))) {
+    return;
+  }
   if (getActiveCoursesCount() === 0) {
     openWaitlistModal('Curso Completo Individual');
     return;
@@ -8996,6 +9002,9 @@ window.buyCourse = function (skillId) {
 };
 
 window.handleVipQuickButton = function () {
+  if (!requireUserAccountForAction('activar tu membresía VIP PRO', () => window.handleVipQuickButton())) {
+    return;
+  }
   if (state.isProMember) {
     switchAppTab('rewards');
     showToast('👑 Ya eres miembro VIP PRO activo. Aquí puedes canjear tus Puntos Exclusivos VIP (VP).');
@@ -9006,6 +9015,9 @@ window.handleVipQuickButton = function () {
 
 // Función unificada de los botones de Planes ("Curso Individual", "Pase VIP PRO", "Pase VIP Founder")
 window.handlePlanCTA = function (planKey) {
+  if (!requireUserAccountForAction('elegir y pagar tu plan en SkillVault', () => window.handlePlanCTA(planKey))) {
+    return;
+  }
   const planNames = {
     individual: 'Curso Completo Individual',
     monthly: 'Pase VIP PRO Mensual',
@@ -9357,6 +9369,9 @@ function shuffleQuestionOptions(qObj, avoidIndex = null) {
 // 7. PROTECCIÓN DE CURSOS DE PAGO Y 3. GUARDADO AUTOMÁTICO DE PROGRESO
 // ==========================================================================
 window.openSkillModal = function (skillId, requestedStepIdx = null) {
+  if (!requireUserAccountForAction('entrar al curso y guardar tu progreso en la nube', () => window.openSkillModal(skillId, requestedStepIdx))) {
+    return;
+  }
   checkAndSyncSubscriptionExpiry(true);
   const baseSkill = getAllSkills().find(s => s.id === skillId);
   if (!baseSkill) {
@@ -10186,6 +10201,9 @@ function renderRewardsVault() {
 
 // Canjear recompensa Exclusiva VIP usando `VP` con protección transaccional
 window.redeemVIPReward = function (rewardId) {
+  if (!requireUserAccountForAction('canjear recompensas de la Bóveda Élite VIP', () => window.redeemVIPReward(rewardId))) {
+    return;
+  }
   if (isRedeemingRewardLock) {
     showToast('⏳ Procesando canje anterior, espera un momento...');
     return;
@@ -10241,6 +10259,9 @@ window.redeemVIPReward = function (rewardId) {
 
 // Canjear recompensa Estándar usando `PTS` con protección transaccional
 window.redeemStandardReward = function (rewardId) {
+  if (!requireUserAccountForAction('canjear recompensas de la Bóveda con tus puntos PTS', () => window.redeemStandardReward(rewardId))) {
+    return;
+  }
   if (isRedeemingRewardLock) {
     showToast('⏳ Procesando canje anterior, espera un momento...');
     return;
@@ -10867,6 +10888,9 @@ window.toggleAdminMode = function () {
 // MEJORA 2: GANCHO GRATUITO DEL HERO (+50 PTS CON IDEMPOTENCIA)
 // ==========================================================================
 window.startFreeTrialModule = function () {
+  if (!requireUserAccountForAction('empezar tu primera misión y reclamar tus +50 PTS gratis', () => window.startFreeTrialModule())) {
+    return;
+  }
   const freeSkillId = 'py-automation';
   const userEmail = (state.userAccount && state.userAccount.email) || 'invitado@skillvault.local';
 
@@ -10999,6 +11023,14 @@ window.switchAppTab = function (tabName) {
     return;
   }
 
+  if (
+    !isUserAuthenticated() &&
+    (tabName === 'profile' || tabName === 'settings' || tabName === 'certificates' || tabName === 'rewards')
+  ) {
+    requireUserAccountForAction('acceder a tu cuenta, diplomas y bóveda de recompensas', () => window.switchAppTab(tabName));
+    return;
+  }
+
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tabName);
   });
@@ -11029,6 +11061,9 @@ window.toggleZeroCoursesSimulation = function () {
 };
 
 window.openWaitlistModal = function (planOrContext = 'SkillVault Academy') {
+  if (!requireUserAccountForAction('unirte a la lista de espera', () => window.openWaitlistModal(planOrContext))) {
+    return;
+  }
   const planSpan = document.getElementById('waitlist-plan-name');
   if (planSpan) planSpan.textContent = planOrContext;
   if (state.userAccount) {
@@ -11151,7 +11186,38 @@ function applyUserProfileToState(accountRecord) {
   renderSkillsGrid();
 }
 
-window.openAuthModal = function (initialMode = 'login') {
+let pendingPostAuthCallback = null;
+
+function isUserAuthenticated() {
+  if (isAdminModeActive || devControlsVisible) return true;
+  return Boolean(state.userAccount && state.userAccount.email);
+}
+
+function requireUserAccountForAction(reasonText = 'continuar', pendingCallback = null) {
+  if (isUserAuthenticated()) return true;
+  pendingPostAuthCallback = typeof pendingCallback === 'function' ? pendingCallback : null;
+  window.openAuthModal('register');
+  showAuthFeedback(
+    `✨ <strong>Crea tu cuenta gratis</strong> (o inicia sesión arriba si ya tienes una) para ${reasonText}.`,
+    'success'
+  );
+  showToast(`✨ Crea tu cuenta gratis para ${reasonText}.`);
+  return false;
+}
+
+function executePendingPostAuthAction() {
+  if (typeof pendingPostAuthCallback === 'function') {
+    const fn = pendingPostAuthCallback;
+    pendingPostAuthCallback = null;
+    setTimeout(() => {
+      try {
+        fn();
+      } catch (e) { }
+    }, 180);
+  }
+}
+
+window.openAuthModal = function (initialMode = 'register') {
   const modal = document.getElementById('auth-modal');
   if (modal) modal.classList.add('open');
   window.switchAuthMode(initialMode);
@@ -11396,6 +11462,9 @@ window.handleSimulatedEmailAction = function (url) {
 };
 
 window.openMailboxModal = function () {
+  if (!requireUserAccountForAction('ver tu bandeja de notificaciones y correos', () => window.openMailboxModal())) {
+    return;
+  }
   const listEl =
     document.getElementById('mailbox-messages-list') ||
     document.getElementById('mailbox-emails-list');
@@ -11946,6 +12015,7 @@ window.handleGoogleCredentialResponse = async function (response) {
     await syncAccountToCloud(db[email]);
     closeAuthModal();
     showToast(`🎉 ¡Cuenta oficial de Google (${email}) conectada y sincronizada en la nube!`);
+    executePendingPostAuthAction();
   } else {
     db[email].emailVerified = true;
     saveUsersDB(db);
@@ -11953,6 +12023,7 @@ window.handleGoogleCredentialResponse = async function (response) {
     await syncAccountToCloud(db[email]);
     closeAuthModal();
     showToast(`👋 ¡Hola de nuevo, ${db[email].name}! Se recuperó tu progreso y tus ${state.points} PTS.`);
+    executePendingPostAuthAction();
   }
 };
 
@@ -12030,6 +12101,7 @@ window.handleGoogleAuth = async function () {
   await syncAccountToCloud(db[savedGoogle.email]);
   closeAuthModal();
   showToast('🛡️ ¡Sesión iniciada y sincronizada en la nube con Google OAuth!');
+  executePendingPostAuthAction();
 };
 
 window.closeGoogleOAuthModal = function () { };
@@ -12498,6 +12570,9 @@ function updateCheckoutGatewayLiveBox() {
 let pendingCheckoutConfig = null;
 
 window.openCheckoutModal = function (config) {
+  if (!requireUserAccountForAction('realizar tu pago y activar tu acceso al instante', () => window.openCheckoutModal(config))) {
+    return;
+  }
   pendingCheckoutConfig = config;
   document.getElementById('checkout-item-badge').textContent = config.badge || 'RESUMEN DEL PEDIDO';
   document.getElementById('checkout-item-title').textContent = config.title;
@@ -13101,6 +13176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             authForm.reset();
             closeAuthModal();
             showToast(`👋 ¡Cuenta recuperada en este dispositivo, ${db[email].name}! Se sincronizaron tus ${state.points} PTS y tu progreso.`);
+            executePendingPostAuthAction();
             return;
           }
           showAuthFeedback('⚠️ Este correo ya está registrado. Toca "Iniciar Sesión" arriba e ingresa tu contraseña, o usa "¿Olvidaste tu contraseña?".', 'error');
@@ -13168,6 +13244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authForm.reset();
         closeAuthModal();
         showToast(`✨ ¡Cuenta creada y sincronizada en la nube, ${newAccount.name}!`);
+        executePendingPostAuthAction();
         return;
       }
 
@@ -13278,6 +13355,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authForm.reset();
         closeAuthModal();
         showToast(`🔑 ¡Contraseña restablecida con éxito! Sesión iniciada como ${db[targetEmail].name}.`);
+        executePendingPostAuthAction();
         return;
       }
 
@@ -13309,6 +13387,7 @@ document.addEventListener('DOMContentLoaded', () => {
       authForm.reset();
       closeAuthModal();
       showToast(`👋 ¡Bienvenido de nuevo, ${existingAccount.name}! Se sincronizaron tus ${state.points} PTS y tu progreso.`);
+      executePendingPostAuthAction();
     });
   }
 
@@ -13317,6 +13396,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (supportForm) {
     supportForm.addEventListener('submit', e => {
       e.preventDefault();
+      if (!requireUserAccountForAction('enviar una consulta al Centro de Ayuda')) {
+        return;
+      }
       const feedbackEl = document.getElementById('support-form-feedback');
       const hpValue = (document.getElementById('support-website-hp')?.value || '').trim();
 
@@ -13449,6 +13531,7 @@ document.addEventListener('DOMContentLoaded', () => {
         googleForm.reset();
         closeGoogleOAuthModal();
         showToast(`✅ ¡Conectado con tu cuenta de Google (${existing.email})!`);
+        executePendingPostAuthAction();
       } else {
         const fallbackName = email.split('@')[0].replace(/[._-]/g, ' ');
         const finalName = rawName || fallbackName.charAt(0).toUpperCase() + fallbackName.slice(1);
@@ -13480,6 +13563,7 @@ document.addEventListener('DOMContentLoaded', () => {
         googleForm.reset();
         closeGoogleOAuthModal();
         showToast(`🎉 ¡Cuenta de Google (${email}) vinculada y verificada con éxito! +50 PTS acreditados.`);
+        executePendingPostAuthAction();
       }
     });
   }
@@ -14530,4 +14614,4 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => { });
   });
-}     
+}       
