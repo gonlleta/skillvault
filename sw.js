@@ -1,4 +1,4 @@
-const CACHE_NAME = 'skillvault-pwa-v30';
+const CACHE_NAME = 'skillvault-pwa-v31';
 const CORE_ASSETS = [
   '/',
   '/index.html',

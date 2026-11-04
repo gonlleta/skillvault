@@ -6,8 +6,8 @@ const DEFAULT_SKILLS = [
     "id": "py-automation",
     "title": "Python desde Cero: Automatiza tu Trabajo Diario y Ahorra Horas en la PC",
     "category": "Programación",
-    "priceUSD": 12900,
-    "originalPriceUSD": 24900,
+    "priceUSD": 19900,
+    "originalPriceUSD": 39900,
     "isTrialCourse": true,
     "trialModulesCount": 3,
     "pointsReward": 225,
@@ -316,7 +316,7 @@ const DEFAULT_SKILLS = [
     "id": "ai-agents-pro",
     "title": "Domina ChatGPT y la Inteligencia Artificial: Haz que la IA Trabaje para Ti",
     "category": "Inteligencia Artificial",
-    "priceUSD": 29900,
+    "priceUSD": 42900,
     "pointsReward": 390,
     "vipPointsReward": 128,
     "xp": 480,
@@ -623,7 +623,7 @@ const DEFAULT_SKILLS = [
     "id": "fin-crypto-invest",
     "title": "Finanzas Personales e Inversión Inteligente: Multiplica tus Ahorros desde Cero",
     "category": "Finanzas",
-    "priceUSD": 24900,
+    "priceUSD": 34900,
     "pointsReward": 330,
     "vipPointsReward": 105,
     "xp": 420,
@@ -930,7 +930,7 @@ const DEFAULT_SKILLS = [
     "id": "ux-growth-convert",
     "title": "Diseño de Páginas Web que Venden: Convierte Visitantes en Clientes Reales",
     "category": "Diseño & Marketing",
-    "priceUSD": 29900,
+    "priceUSD": 42900,
     "pointsReward": 465,
     "vipPointsReward": 143,
     "xp": 525,
@@ -1237,7 +1237,7 @@ const DEFAULT_SKILLS = [
     "id": "fullstack-apis-sql",
     "title": "Crea Aplicaciones Web Completas: Bases de Datos, Usuarios y Servidores",
     "category": "Programación",
-    "priceUSD": 36900,
+    "priceUSD": 54900,
     "pointsReward": 435,
     "vipPointsReward": 135,
     "xp": 510,
@@ -1852,7 +1852,7 @@ const DEFAULT_SKILLS = [
     "id": "cybersec-ethical-web",
     "title": "Ciberseguridad y Hacking Ético: Protege Páginas Web y Datos de Ataques Reales",
     "category": "Programación",
-    "priceUSD": 39900,
+    "priceUSD": 59900,
     "pointsReward": 450,
     "vipPointsReward": 143,
     "xp": 540,
@@ -2159,7 +2159,7 @@ const DEFAULT_SKILLS = [
     "id": "ai-rag-embeddings",
     "title": "Entrena a la IA con tus Propios Documentos: Crea Chatbots Expertos en tu Negocio",
     "category": "Inteligencia Artificial",
-    "priceUSD": 39900,
+    "priceUSD": 59900,
     "pointsReward": 495,
     "vipPointsReward": 158,
     "xp": 585,
@@ -2466,7 +2466,7 @@ const DEFAULT_SKILLS = [
     "id": "js-react-modern",
     "title": "JavaScript Moderno y Profesional: Crea Sitios Web Rápidos, Dinámicos e Interactivos",
     "category": "Programación",
-    "priceUSD": 34900,
+    "priceUSD": 49900,
     "pointsReward": 405,
     "vipPointsReward": 128,
     "xp": 495,
@@ -2773,7 +2773,7 @@ const DEFAULT_SKILLS = [
     "id": "fin-b2b-pricing",
     "title": "Cómo Poner Precios y Calcular Ganancias: Haz que tu Negocio Sea Siempre Rentable",
     "category": "Finanzas",
-    "priceUSD": 29900,
+    "priceUSD": 42900,
     "pointsReward": 390,
     "vipPointsReward": 120,
     "xp": 465,
@@ -3080,7 +3080,7 @@ const DEFAULT_SKILLS = [
     "id": "mkt-copywriting-funnels",
     "title": "Escritura Persuasiva (Copywriting): Cómo Escribir Textos que Convencen y Venden",
     "category": "Diseño & Marketing",
-    "priceUSD": 27900,
+    "priceUSD": 38900,
     "pointsReward": 375,
     "vipPointsReward": 120,
     "xp": 450,
@@ -3695,7 +3695,7 @@ const DEFAULT_SKILLS = [
     "id": "nocode-n8n-whatsapp",
     "title": "Crea Bots de WhatsApp con IA y Automatiza Negocios Sin Saber Programar",
     "category": "Inteligencia Artificial",
-    "priceUSD": 34900,
+    "priceUSD": 49900,
     "pointsReward": 435,
     "vipPointsReward": 135,
     "xp": 525,
@@ -4002,7 +4002,7 @@ const DEFAULT_SKILLS = [
     "id": "viral-video-retention",
     "title": "Edición de Videos Virales para TikTok, Reels y Shorts: Multiplica tus Vistas",
     "category": "Diseño & Marketing",
-    "priceUSD": 27900,
+    "priceUSD": 38900,
     "pointsReward": 390,
     "vipPointsReward": 120,
     "xp": 465,
@@ -4309,7 +4309,7 @@ const DEFAULT_SKILLS = [
     "id": "meta-ads-roas",
     "title": "Publicidad en Instagram, Facebook y TikTok Ads: Consigue Clientes Todos los Días",
     "category": "Diseño & Marketing",
-    "priceUSD": 36900,
+    "priceUSD": 54900,
     "pointsReward": 450,
     "vipPointsReward": 143,
     "xp": 540,
@@ -4616,7 +4616,7 @@ const DEFAULT_SKILLS = [
     "id": "closer-high-ticket-sales",
     "title": "Ventas por Chat y Llamada (Closer & Setter): Cierra Clientes de Alto Valor",
     "category": "Finanzas",
-    "priceUSD": 34900,
+    "priceUSD": 49900,
     "pointsReward": 420,
     "vipPointsReward": 128,
     "xp": 495,
@@ -4923,7 +4923,7 @@ const DEFAULT_SKILLS = [
     "id": "english-remote-tech",
     "title": "Inglés Práctico para Trabajar Remoto y Cobrar en Dólares desde Casa",
     "category": "Programación",
-    "priceUSD": 24900,
+    "priceUSD": 34900,
     "pointsReward": 360,
     "vipPointsReward": 113,
     "xp": 435,
@@ -6462,7 +6462,7 @@ function renderHeaderAndStats() {
     }
   } else {
     if (buyIndivBtn) {
-      buyIndivBtn.textContent = '💳 Comprar Curso Individual (Desde $12.900 ARS)';
+      buyIndivBtn.textContent = '💳 Comprar Curso Individual (Desde $19.900 ARS)';
       buyIndivBtn.disabled = false;
     }
     if (buyProBtn) {
@@ -6470,7 +6470,7 @@ function renderHeaderAndStats() {
         buyProBtn.textContent = '👑 Membresía VIP PRO Activa (Ganas Puntos Exclusivos VP)';
         buyProBtn.disabled = true;
       } else {
-        buyProBtn.textContent = '👑 Hacerse VIP PRO — $49.000 ARS / mes';
+        buyProBtn.textContent = '👑 Hacerse VIP PRO — $69.000 ARS / mes';
         buyProBtn.disabled = false;
       }
     }
@@ -6479,7 +6479,7 @@ function renderHeaderAndStats() {
         buyFounderBtn.textContent = '👑 Cuenta VIP Activa (Todos los Cursos Desbloqueados)';
         buyFounderBtn.disabled = true;
       } else {
-        buyFounderBtn.textContent = '💎 Activar VIP Founder Anual — $129.000 ARS';
+        buyFounderBtn.textContent = '💎 Activar VIP Founder Anual — $189.000 ARS';
         buyFounderBtn.disabled = false;
       }
     }
@@ -9002,7 +9002,7 @@ window.buyCourse = function (skillId) {
       : `CURSO INDIVIDUAL • ${skill.category.toUpperCase()}`,
     title: skill.title,
     description: isTrialOffer
-      ? `Ya tienes acceso gratis hasta la mitad (Módulos 1 al ${trialLimit}). Desbloquea por completo los Módulos ${trialLimit + 1} al ${skill.lessons.length} y el Examen Final al precio más bajo de toda la academia (antes ${formatARS(skill.originalPriceUSD || 24900)}).`
+      ? `Ya tienes acceso gratis hasta la mitad (Módulos 1 al ${trialLimit}). Desbloquea por completo los Módulos ${trialLimit + 1} al ${skill.lessons.length} y el Examen Final al precio más bajo de toda la academia (antes ${formatARS(skill.originalPriceUSD || 39900)}).`
       : `Acceso ilimitado a los ${skill.lessons.length} módulos prácticos y examen final.`,
     priceUSD: skill.priceUSD,
     bonusText: `💎 Suma +${skill.pointsReward} PTS al aprobar el examen final`
@@ -9046,7 +9046,7 @@ window.handlePlanCTA = function (planKey) {
       badge: 'CUENTA ESTÁNDAR • PAGO POR CURSO',
       title: `Curso Individual: ${firstLocked.title}`,
       description: 'Acceso permanente a los 6 módulos prácticos, casos de estudio y glosario.',
-      priceUSD: firstLocked.priceUSD || 24900,
+      priceUSD: firstLocked.priceUSD || 39900,
       bonusText: `💎 Suma +${firstLocked.pointsReward || 250} PTS al completar el curso`
     });
     return;
@@ -9064,7 +9064,7 @@ window.handlePlanCTA = function (planKey) {
       badge: '💎 ACCESO TOTAL ANUAL + BONO MÁXIMO VP',
       title: 'Pase VIP Founder (1 Año Completo)',
       description: 'Todos los cursos actuales y futuros desbloqueados por 12 meses + multiplicador x1.5.',
-      priceUSD: 129000,
+      priceUSD: 189000,
       bonusText: '🚀 Bono inmediato: +350 VP Exclusivos + 800 PTS de bienvenida'
     });
   } else {
@@ -9074,7 +9074,7 @@ window.handlePlanCTA = function (planKey) {
       badge: '🔥 PLAN MÁS ELEGIDO • ACCESO TOTAL',
       title: 'Pase VIP PRO Mensual',
       description: 'Desbloquea los 17 cursos del catálogo y habilita los Puntos Exclusivos VIP (👑 VP).',
-      priceUSD: 49000,
+      priceUSD: 69000,
       bonusText: '🎁 Bono inmediato: +120 VP Exclusivos + 300 PTS de bienvenida'
     });
   }
@@ -9105,7 +9105,7 @@ function completeVipMembershipPurchase(tier = 'monthly', gateway = 'PayPal') {
   }
   const isAnnual = tier === 'annual' || tier === 'founder';
   const normalizedTier = isAnnual ? 'annual' : 'monthly';
-  const price = isAnnual ? 129000 : 49000;
+  const price = isAnnual ? 189000 : 69000;
   const bonusPts = isAnnual ? 800 : 300;
   const bonusVp = isAnnual ? 350 : 120;
   const planLabel = isAnnual ? 'Pase VIP Founder Anual' : 'Pase VIP PRO Mensual';
@@ -9685,7 +9685,7 @@ function renderModalStep() {
         </div>
         <h4>Desbloquea la segunda mitad + Examen Final con precio especial de bienvenida</h4>
         <p style="font-size: 14px; color: var(--text-main); line-height: 1.6; margin-bottom: 14px;">
-          Acabas de superar la mitad gratuita de este curso. Para continuar con los <strong>Módulos ${trialLimit + 1} al ${currentSkill.lessons.length} y el Examen Final</strong>, tienes un descuento único por haber llegado hasta aquí: cómpralo completo por <strong>solo ${formatARS(currentSkill.priceUSD)}</strong> (en vez de <s style="opacity:0.75;">${formatARS(currentSkill.originalPriceUSD || 24900)}</s>, siendo <strong>más barato que todos los demás cursos</strong>).
+          Acabas de superar la mitad gratuita de este curso. Para continuar con los <strong>Módulos ${trialLimit + 1} al ${currentSkill.lessons.length} y el Examen Final</strong>, tienes un descuento único por haber llegado hasta aquí: cómpralo completo por <strong>solo ${formatARS(currentSkill.priceUSD)}</strong> (en vez de <s style="opacity:0.75;">${formatARS(currentSkill.originalPriceUSD || 39900)}</s>, siendo <strong>más barato que todos los demás cursos</strong>).
         </p>
 
         <div class="lesson-keypoints" style="margin-bottom: 16px;">
@@ -9701,7 +9701,7 @@ function renderModalStep() {
             🏷️ Comprar Resto del Curso por ${formatARS(currentSkill.priceUSD)} (Precio Especial)
           </button>
           <button type="button" class="btn-secondary" onclick="document.getElementById('lesson-modal').classList.remove('open'); handlePlanCTA('monthly');">
-            👑 O desbloquear los 17 cursos con Pase VIP PRO ($49.000 ARS/mes)
+            👑 O desbloquear los 17 cursos con Pase VIP PRO ($69.000 ARS/mes)
           </button>
         </div>
       </div>
@@ -10947,7 +10947,7 @@ const FOOTER_INFO_CONTENT = {
         <h4>2. ¿Puedo empezar sin tarjeta de crédito?</h4>
         <p style="color:var(--text-muted); margin-bottom:14px;">¡Sí! Al hacer clic en el botón del Hero recibes tus primeros <strong>+50 PTS</strong> y puedes comenzar a estudiar en el aula interactiva al instante.</p>
         <h4>3. ¿Por qué el Pase VIP PRO conviene más que comprar cursos por separado?</h4>
-        <p style="color:var(--text-muted);">Con el <strong>Pase VIP PRO ($49.000 ARS/mes)</strong> desbloqueas el catálogo de 17 cursos (102 módulos prácticos), recibes un multiplicador x1.5 de PTS y habilitas la ganancia de Puntos Exclusivos VIP (VP).</p>
+        <p style="color:var(--text-muted);">Con el <strong>Pase VIP PRO ($69.000 ARS/mes)</strong> desbloqueas el catálogo de 17 cursos (102 módulos prácticos), recibes un multiplicador x1.5 de PTS y habilitas la ganancia de Puntos Exclusivos VIP (VP).</p>
       </div>
     `
   },
