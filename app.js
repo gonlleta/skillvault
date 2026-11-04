@@ -4882,350 +4882,350 @@ const DEFAULT_SKILLS = [
             "Porque el Closer no conoce las características de su propio producto.",
             "Porque a través de preguntas dirigidas el cliente verbaliza sus propios cuellos de botella, cuantifica su pérdida actual y se convence con sus propios argumentos de la urgencia de cambiar.",
             "Para gastar los minutos de la videollamada sin mostrar el precio.",
-            "Porque está prohibido usar presentaciones visuales en llamadas B2B."
+      "Porque está prohibido usar presentaciones visuales en llamadas B2B."
           ],
-          "correctIndex": 1
+"correctIndex": 1
         },
-        {
-          "question": "3. Si un prospecto está 100% convencido de que tu programa es la solución ideal y quiere empezar hoy, pero genuinamente no tiene el 100% del monto en su tarjeta en un solo pago, ¿qué tipo de objeción es y cómo se resuelve?",
-          "options": [
-            "Es una objeción de desconfianza técnica y se resuelve enviándole un PDF.",
-            "Es una objeción logística de flujo de caja (liquidez) y se resuelve ofreciendo un plan de pagos desdoblado (ej. 2 o 3 cuotas) sin devaluar el producto.",
-            "Es una cortina de humo falsa y hay que colgarle la llamada.",
-            "Se resuelve regalándole el servicio completo sin cobrarle nada."
-          ],
-          "correctIndex": 1
-        },
-        {
-          "question": "4. ¿Qué acción concreta previa a la reunión tiene mayor impacto para elevar el `Show-Up Rate` (porcentaje de asistencia a las llamadas agendadas) por encima del 80%?",
-          "options": [
-            "No enviarle ningún mensaje desde que agenda hasta el día de la llamada para no molestarlo.",
-            "Ocultar el enlace de Zoom hasta 10 minutos después de la hora pactada.",
-            "Calificar bien en el chat antes de dar el link, enviar un activo de valor corto (caso de éxito de 90s) y pedir confirmación activa por WhatsApp unas horas antes de la sesión.",
-            "Agendar la llamada para dentro de 45 días."
-          ],
-          "correctIndex": 2
-        },
-        {
-          "question": "5. ¿Cuál es el proceso completo que domina un Closer y Setter profesional de alto rendimiento?",
-          "options": [
-            "Calificar por chat con el método BANT, asegurar +80% de asistencia con confirmación previa, liderar la llamada consultiva cuantificando el costo de inacción, aislar la objeción real, hacer seguimiento de valor y trabajar con empresas de tráfico activo",
-            "Enviar links de pago en frío por chat sin hacer preguntas, no confirmar las llamadas y cortar el teléfono apenas el cliente tiene una duda",
-            "Hablar el 95% del tiempo en la llamada recitando características técnicas sin escuchar qué necesita el cliente",
-            "Hacer descuentos del 70% en el primer minuto de charla para rogar que compren"
-          ],
-          "correctIndex": 0
-        }
+{
+  "question": "3. Si un prospecto está 100% convencido de que tu programa es la solución ideal y quiere empezar hoy, pero genuinamente no tiene el 100% del monto en su tarjeta en un solo pago, ¿qué tipo de objeción es y cómo se resuelve?",
+    "options": [
+      "Es una objeción de desconfianza técnica y se resuelve enviándole un PDF.",
+      "Es una objeción logística de flujo de caja (liquidez) y se resuelve ofreciendo un plan de pagos desdoblado (ej. 2 o 3 cuotas) sin devaluar el producto.",
+      "Es una cortina de humo falsa y hay que colgarle la llamada.",
+      "Se resuelve regalándole el servicio completo sin cobrarle nada."
+    ],
+      "correctIndex": 1
+},
+{
+  "question": "4. ¿Qué acción concreta previa a la reunión tiene mayor impacto para elevar el `Show-Up Rate` (porcentaje de asistencia a las llamadas agendadas) por encima del 80%?",
+    "options": [
+      "No enviarle ningún mensaje desde que agenda hasta el día de la llamada para no molestarlo.",
+      "Ocultar el enlace de Zoom hasta 10 minutos después de la hora pactada.",
+      "Calificar bien en el chat antes de dar el link, enviar un activo de valor corto (caso de éxito de 90s) y pedir confirmación activa por WhatsApp unas horas antes de la sesión.",
+      "Agendar la llamada para dentro de 45 días."
+    ],
+      "correctIndex": 2
+},
+{
+  "question": "5. ¿Cuál es el proceso completo que domina un Closer y Setter profesional de alto rendimiento?",
+    "options": [
+      "Calificar por chat con el método BANT, asegurar +80% de asistencia con confirmación previa, liderar la llamada consultiva cuantificando el costo de inacción, aislar la objeción real, hacer seguimiento de valor y trabajar con empresas de tráfico activo",
+      "Enviar links de pago en frío por chat sin hacer preguntas, no confirmar las llamadas y cortar el teléfono apenas el cliente tiene una duda",
+      "Hablar el 95% del tiempo en la llamada recitando características técnicas sin escuchar qué necesita el cliente",
+      "Hacer descuentos del 70% en el primer minuto de charla para rogar que compren"
+    ],
+      "correctIndex": 0
+}
       ]
     }
   },
-  {
-    "id": "english-remote-tech",
+{
+  "id": "english-remote-tech",
     "title": "Inglés Práctico para Trabajar Remoto y Cobrar en Dólares desde Casa",
-    "category": "Programación",
-    "priceUSD": 34900,
-    "pointsReward": 360,
-    "vipPointsReward": 113,
-    "xp": 435,
-    "duration": 450,
-    "secretCourse": false,
-    "description": "No necesitas hablar inglés perfecto como un nativo para conseguir un empleo o clientes en Estados Unidos y Europa que te paguen en dólares. En este curso aprenderás el inglés práctico y las estrategias exactas para armar tu currículum internacional, superar entrevistas laborales y desenvolverte en el día a día.",
-    "bioHighlights": [
-      "Cómo armar tu CV y LinkedIn en inglés para pasar los filtros de empresas extranjeras.",
-      "Estructura simple para responder con fluidez las preguntas clásicas de toda entrevista.",
-      "Frases clave para reuniones, mensajes de trabajo y para negociar un mejor sueldo en USD."
-    ],
-    "lessons": [
+      "category": "Programación",
+        "priceUSD": 34900,
+          "pointsReward": 360,
+            "vipPointsReward": 113,
+              "xp": 435,
+                "duration": 450,
+                  "secretCourse": false,
+                    "description": "No necesitas hablar inglés perfecto como un nativo para conseguir un empleo o clientes en Estados Unidos y Europa que te paguen en dólares. En este curso aprenderás el inglés práctico y las estrategias exactas para armar tu currículum internacional, superar entrevistas laborales y desenvolverte en el día a día.",
+                      "bioHighlights": [
+                        "Cómo armar tu CV y LinkedIn en inglés para pasar los filtros de empresas extranjeras.",
+                        "Estructura simple para responder con fluidez las preguntas clásicas de toda entrevista.",
+                        "Frases clave para reuniones, mensajes de trabajo y para negociar un mejor sueldo en USD."
+                      ],
+                        "lessons": [
+                          {
+                            "heading": "Módulo 1: CV en Formato Harvard/ATS y Optimización de LinkedIn en Inglés",
+                            "readTime": "1h 15m de estudio + práctica guiada",
+                            "paragraphs": [
+                              "El 85% de las empresas remotas de Estados Unidos y Europa filtra los currículums con software ATS (Applicant Tracking Systems) antes de que los vea un humano. Si tu CV está diseñado en Canva con dos columnas, barras de porcentaje de habilidades (\"Python 80%\") y fotos, el parser del ATS leerá las líneas mezcladas y te descartará automáticamente.",
+                              "Además, en el mercado anglosajón no se listan \"tareas pasivas\" (\"Responsible for writing code\"), sino \"Logros Cuantificados con Verbos de Acción\" usando la fórmula de Google (XYZ): \"Logré [X resultado] medido por [Y métrica] mediante la implementación de [Z tecnología/acción]\".",
+                              "Cuando envías tu currículum a una empresa de Estados Unidos, Canadá o Europa, el primer filtro no lo hace una persona: lo hace un software lector llamado ATS. Si tu CV tiene dos columnas, íconos, foto de perfil o barras de porcentaje, el sistema lo lee mezclado y lo descarta.",
+                              "En la fórmula XYZ de Google del bloque práctico verás cómo transformar una frase pasiva (\"Encargado de hacer reportes\") en un logro de alto impacto en inglés (\"Automated weekly reporting using Python, reducing manual work by 85%\") que los reclutadores aman."
+                            ],
+                            "keyPoints": [
+                              "Diseño ATS-Friendly: 1 sola columna limpia, sin fotos ni tablas gráficas, exportado en PDF con texto seleccionable.",
+                              "Usa verbos de impacto en pasado: Engineered, Automated, Reduced, Scaled, Spearheaded.",
+                              "Configura tu perfil de LinkedIn en inglés con palabras clave exactas del puesto en el Headline.",
+                              "Coloca exactamente el título del puesto que buscas en inglés en el encabezado de tu LinkedIn (Headline) para aparecer primero cuando los reclutadores filtran candidatos."
+                            ],
+                            "code": "Transformación de Bullet Point para CV Internacional (Fórmula XYZ):\n❌ Débil (Orientado a tareas):\n\"Worked on the backend API and fixed database queries.\"\n\n✅ Alto Impacto (Orientado a resultados medibles):\n\"Optimized PostgreSQL queries and implemented Redis caching, reducing average API response time by 62% (from 480ms to 180ms) for +50k daily users.\"",
+                            "warning": "⚠️ En currículums para EE.UU., Reino Unido y Canadá NUNCA incluyas foto de rostro, fecha de nacimiento, DNI ni estado civil (las empresas los descartan por leyes anti-discriminación laboral).",
+                            "checkpoint": {
+                              "question": "¿Por qué las empresas de Estados Unidos suelen descartar automáticamente los currículums diseñados con múltiples columnas gráficas, barras de porcentaje e imagen de perfil?",
+                              "options": [
+                                "Porque los reclutadores estadounidenses solo aceptan currículums impresos en papel por correo postal.",
+                                "Porque los sistemas de filtrado automático (ATS) fallan al parsear tablas/columnas complejas, las barras subjetivas no aportan evidencia técnica y las fotos violan las políticas corporativas anti-sesgo (EEOC).",
+                                "Porque el idioma inglés no permite usar verbos en tiempo pasado.",
+                                "Porque el formato PDF está bloqueado en los servidores de recursos humanos."
+                              ],
+                              "correctIndex": 1
+                            },
+                            "stepByStep": [
+                              "Paso 1 (Pasar a plantilla Harvard de 1 columna): Abre un Google Docs limpio en una sola columna sin fotos, sin tablas ocultas ni gráficos de colores.",
+                              "Paso 2 (Quitar datos personales prohibidos en EE.UU.): Elimina foto de rostro, fecha de nacimiento, estado civil y documento de identidad (solo deja nombre, email, LinkedIn y país).",
+                              "Paso 3 (Reescribir tu experiencia con la fórmula XYZ): Empieza cada viñeta con un verbo de acción en pasado (Automated, Built, Increased) + métrica % + herramienta.",
+                              "Paso 4 (Sincronizar tu perfil de LinkedIn en inglés): Actualiza tu titular, sección About y habilidades con las palabras clave exactas de las ofertas remotas."
+                            ],
+                            "caseStudy": {
+                              "title": "Caso Real: Analista que Pasó de 0 Respuestas a 5 Entrevistas Internacionales en 2 Semanas",
+                              "scenario": "Un profesional postulaba a decenas de avisos remotos con un CV colorido de dos columnas hecho en Canva con su foto y recibía rechazos automáticos en horas.",
+                              "result": "Migró al formato ATS de 1 columna en inglés aplicando la fórmula XYZ con porcentajes, recibiendo 5 invitaciones a entrevista en los siguientes 14 días."
+                            }
+                          },
+                          {
+                            "heading": "Módulo 2: Cómo Superar Entrevistas en Inglés con la Estructura S-T-A-R",
+                            "readTime": "1h 25m de teoría y laboratorio",
+                            "paragraphs": [
+                              "No necesitas tener acento nativo ni vocabulario literario para aprobar entrevistas remotas en dólares; necesitas estructura y claridad. Cuando el entrevistador pregunta \"Tell me about a time you faced a difficult technical problem or deadline\", los candidatos sin preparación divagan y se traban con la gramática.",
+                              "El estándar de Amazon, Google y startups de Silicon Valley es responder en 90 segundos siguiendo las 4 etapas S-T-A-R: Situation (Contexto en 1 frase), Task (Cuál era tu misión/desafío), Action (Qué hiciste TÚ específicamente) y Result (Qué impacto numérico lograste).",
+                              "El secreto para aprobar entrevistas en inglés sin trabarte ni quedarte en blanco no es tener vocabulario de diccionario: es llevar preparadas de antemano 5 historias reales de tu trabajo estructuradas con las 4 letras del método S-T-A-R.",
+                              "Observa en el guion de 90 segundos del bloque práctico cómo dedicamos apenas 2 frases a explicar la Situación y la Tarea, y concentramos toda la fuerza en las acciones concretas en primera persona (\"I created...\", \"I automated...\") y el resultado numérico final."
+                            ],
+                            "keyPoints": [
+                              "Prepara y memoriza 5 historias comodín en formato STAR antes de la entrevista (un bug crítico, un desacuerdo técnico, un plazo ajustado, una automatización y un logro de liderazgo).",
+                              "En la etapa \"Action\", habla en primera persona (\"I designed...\", \"I debugged...\") en lugar de diluir tu aporte diciendo solo \"We\".",
+                              "Cierra siempre con la etapa \"Result\" dando un dato concreto.",
+                              "Practica tus 5 historias S-T-A-R grabándote en notas de voz de 90 segundos: notarás que las mismas 5 anécdotas sirven para responder casi cualquier pregunta de entrevista."
+                            ],
+                            "code": "Estructura S-T-A-R Lista para Usar en Entrevistas (90 segundos):\n- [S - Situation]: \"In my previous project, our checkout webhook was failing under high traffic peaks.\"\n- [T - Task]: \"My goal was to eliminate lost orders before the Black Friday campaign.\"\n- [A - Action]: \"I implemented an asynchronous queue with retry logic and idempotency keys.\"\n- [R - Result]: \"As a result, we processed 100% of orders with zero downtime, saving ~$12,000 in revenue.\"",
+                            "warning": "⚠️ No memorices párrafos palabra por palabra como un robot; memoriza los 4 puntos clave (S-T-A-R) de tus 5 historias para sonar natural y seguro.",
+                            "checkpoint": {
+                              "question": "Al responder una pregunta conductual (\"Tell me about a time...\") con el método `S-T-A-R`, ¿en cuál de las 4 letras debes concentrar el 60% del tiempo de tu respuesta y hablar en primera persona (`\"I...\"`)?",
+                              "options": [
+                                "En Situation, describiendo durante 5 minutos la historia de la empresa anterior.",
+                                "En Action y Result, detallando las decisiones técnicas concretas que tomaste tú y el impacto medible obtenido.",
+                                "En pedir disculpas por tu nivel de inglés antes de empezar a hablar.",
+                                "En hablar únicamente en tercera persona sobre lo que hicieron otros departamentos."
+                              ],
+                              "correctIndex": 1
+                            },
+                            "stepByStep": [
+                              "Paso 1 (Armar tu banco de 5 historias comodín): Escribe en un documento un logro de ahorro de tiempo, un error resuelto, un cliente difícil, un trabajo en equipo y algo que aprendiste rápido.",
+                              "Paso 2 (Resumir Situation y Task en 20 segundos): Presenta el contexto en dos oraciones cortas sin irte por las ramas con detalles secundarios.",
+                              "Paso 3 (Hablar en primera persona \"I...\" en Action): Explica qué hiciste tú exactamente paso a paso en lugar de decir siempre \"We did...\".",
+                              "Paso 4 (Cerrar con un número en Result): Termina siempre contando cuánto tiempo ahorraste, cuánto subieron las ventas o cuántos errores se evitaron."
+                            ],
+                            "caseStudy": {
+                              "title": "Caso Real: Desarrollador con Inglés Intermedio Contratado por Startup de Austin ($3,800 USD/mes)",
+                              "scenario": "Se ponía muy nervioso cuando le hacían preguntas abiertas como \"Tell me about a challenge you faced\" e improvisaba respuestas largas y confusas.",
+                              "result": "Preparó su documento con 5 historias S-T-A-R de 90 segundos cada una, superó las 3 rondas de entrevistas con fluidez y firmó su primer contrato en dólares."
+                            }
+                          },
+                          {
+                            "heading": "Módulo 3: Comunicación Asíncrona en Equipos Remotos (Daily Standups, Slack y PRs)",
+                            "readTime": "1h 15m de estudio + práctica guiada",
+                            "paragraphs": [
+                              "Una vez contratado en un equipo internacional, el 80% de tu trabajo diario ocurre mediante comunicación asíncrona escrita (Slack, Jira, GitHub Pull Requests) y una reunión diaria de 10 minutos (Daily Standup).",
+                              "Los equipos de EE.UU. valoran la comunicación directa, concisa y proactiva: si tienes un bloqueo (Blocker), nunca esperes 3 días en silencio hasta la fecha de entrega; avisa temprano mostrando qué intentaste ya y qué necesitas para destrabarte.",
+                              "Una vez que entras a trabajar en un equipo remoto en dólares, el 90% de tu comunicación diaria ocurre por escrito en Slack o en reuniones breves de 15 minutos por la mañana (Daily Standup) donde cada persona habla menos de 1 minuto.",
+                              "En la plantilla del bloque práctico verás cómo aplicar la regla de oro del trabajo remoto (\"No Hello\"): en lugar de mandar un \"Hi!\" suelto y hacer perder tiempo a tu compañero, envías en un solo mensaje ordenado el saludo, el contexto, qué probaste y tu pregunta puntual."
+                            ],
+                            "keyPoints": [
+                              "Fórmula Daily Standup (45s): 1) What I completed yesterday, 2) What I am focusing on today, 3) Any blockers.",
+                              "Regla \"No Hello\" en Slack: Nunca escribas solo \"Hi\" y esperes 2 horas a que respondan; escribe el saludo junto con el contexto completo y tu pregunta en un solo mensaje.",
+                              "Usa verbos modales corteses pero directos en revisiones de código (\"Could we extract this into a helper to avoid duplication?\").",
+                              "Tener a mano en un bloc de notas las 3 frases del Daily Standup (\"Yesterday I completed... / Today I am focusing on... / No blockers\") te quita toda la presión cada mañana."
+                            ],
+                            "code": "Comunicación Asíncrona Profesional en Slack (Regla \"No Hello\"):\n❌ Mal hábito:\n\"Hi Sarah\" (y esperar a que conteste para recién decirle qué necesitas).\n\n✅ Estándar Remoto Senior:\n\"Hi Sarah! Quick update on the Stripe webhook (#PR-142): I finished the signature validation, but I need the staging API secret to run the integration tests. Could you share it in 1Password when you have a moment? Thanks!\"",
+                            "warning": "⚠️ Quedarse callado cuando no entendiste un requerimiento por vergüenza a preguntar en inglés es la causa #1 de despido en el primer mes remoto. Parafrasea siempre: \"Just to make sure we are aligned, do you mean X or Y?\".",
+                            "checkpoint": {
+                              "question": "¿En qué consiste la regla de etiqueta remota conocida como \"No Hello\" en herramientas asíncronas como Slack o Teams?",
+                              "options": [
+                                "En que está prohibido saludar a los compañeros de trabajo.",
+                                "En enviar en un único mensaje completo el saludo, el contexto del tema, lo que ya probaste y la pregunta concreta, en vez de enviar solo \"Hello\" y dejar a la otra persona esperando en suspenso.",
+                                "En comunicarse únicamente mediante llamadas de video sin previo aviso.",
+                                "En responder todos los mensajes con un solo emoji."
+                              ],
+                              "correctIndex": 1
+                            },
+                            "stepByStep": [
+                              "Paso 1 (Preparar tus 3 líneas antes de la reunión diaria): Anota 5 minutos antes qué terminaste ayer, qué harás hoy y si necesitas ayuda con algún bloqueo.",
+                              "Paso 2 (Aplicar la regla No Hello en Slack): Escribe siempre tu consulta completa en un único mensaje con viñetas claras.",
+                              "Paso 3 (Mostrar iniciativa antes de pedir ayuda): Incluye siempre la frase \"I have already tried X and Y\" para demostrar profesionalismo.",
+                              "Paso 4 (Confirmar acuerdos por escrito): Después de cualquier llamada rápida, deja un resumen de 3 líneas en el canal (\"Quick recap of what we agreed...\")."
+                            ],
+                            "caseStudy": {
+                              "title": "Caso Real: Diseñadora Remota Ascendida a Líder de Equipo por su Comunicación Asíncrona",
+                              "scenario": "Al principio le daba miedo hablar en las reuniones diarias y cuando se trababa con una tarea perdía todo el día callada por vergüenza a preguntar en inglés.",
+                              "result": "Empezó a usar el guion de 45 segundos para el Standup y la estructura \"No Hello\" en Slack, destacándose como la integrante más clara y confiable del equipo."
+                            }
+                          },
+                          {
+                            "heading": "Módulo 4: Modalidad Contractor (Formulario W-8BEN) y Negociación de Sueldo en USD",
+                            "readTime": "1h 25m de teoría y laboratorio",
+                            "paragraphs": [
+                              "Las empresas de EE.UU. contratan talento en Latinoamérica y España principalmente bajo la figura de \"Independent Contractor\" (prestador de servicios independiente) a través de plataformas como Deel, Remote o Plane, firmando el formulario W-8BEN (que certifica que no resides fiscalmente en EE.UU. y evita retenciones allí).",
+                              "En la negociación salarial, nunca des un número único cerrado ni aceptes la primera oferta sin preguntar si hay flexibilidad: investiga el rango del puesto, expresa entusiasmo por el rol y ancla tu expectativa con un rango cuyo piso sea tu número objetivo.",
+                              "Cuando una empresa extranjera te contrata desde Latinoamérica o España bajo modalidad Contractor independiente, firmarás el formulario W-8BEN: un documento simple de 1 página que certifica que vives fuera de EE.UU. para que te transfieran el 100% de tu sueldo bruto.",
+                              "Además, en el guion de negociación del bloque práctico verás las frases exactas en inglés para agradecer una oferta inicial de por ejemplo $3,000 USD/mes y pedir profesionalmente un ajuste de +15% ($3,450 USD/mes) sin poner en riesgo tu contratación."
+                            ],
+                            "keyPoints": [
+                              "Si cuando te preguntan \"¿Cuál es tu expectativa salarial?\" aún no conoces las responsabilidades completas, pregunta primero: \"What is the approved budget range for this role?\".",
+                              "Si tu objetivo es ganar $3,500 USD/mes, presenta un rango de \"$3,500 to $4,200 USD/month depending on responsibilities and PTO\".",
+                              "Negocia también beneficios Contractor: días libres pagos (Paid Time Off / PTO), bono de equipamiento y revisiones semestrales.",
+                              "En Estados Unidos y Europa está bien visto negociar con cortesía: el 85% de las empresas deja un margen de entre 10% y 20% extra aprobado para cerrar al candidato elegido."
+                            ],
+                            "code": "Guion en Inglés para Negociar un +15% sobre la Oferta Inicial:\n\"Thank you so much for the offer! I'm really excited about the team and the technical challenges we discussed.\nBased on my experience automating these workflows and the market range for this role, I was targeting closer to $3,800 USD/month.\nIf we can bridge the gap to $3,600 USD/month with 15 days of PTO, I would be thrilled to sign the contract today.\"",
+                            "warning": "⚠️ Nunca mientas sobre ofertas falsas para presionar; argumenta siempre tu contraoferta desde el valor técnico que aportarás en los primeros 90 días y haz que sea fácil decirte que sí.",
+                            "checkpoint": {
+                              "question": "¿Para qué sirve el formulario `W-8BEN` que firman los profesionales remotos (Contractors) fuera de Estados Unidos al ser contratados por una empresa estadounidense?",
+                              "options": [
+                                "Es una visa de residencia permanente para mudarse a California.",
+                                "Declara formalmente que el profesional es extranjero no residente en EE.UU. y realiza su trabajo desde el exterior, eximiendo a la empresa estadounidense de aplicarle la retención del 30% del IRS sobre sus pagos.",
+                                "Sirve para abrir una hipoteca inmobiliaria en dólares.",
+                                "Obliga al trabajador a pagar impuestos dobles dentro de Estados Unidos."
+                              ],
+                              "correctIndex": 1
+                            },
+                            "stepByStep": [
+                              "Paso 1 (Averiguar el presupuesto antes de dar un número): Cuando te pregunten tu expectativa en la primera llamada, consulta primero: \"What is the approved budget range for this role?\".",
+                              "Paso 2 (Dar siempre un rango en vez de una cifra fija): Responde con una banda salarial (ej. \"$3,200 to $3,800 USD/month depending on responsibilities and PTO\").",
+                              "Paso 3 (Enviar el guion de contraoferta del +15%): Al recibir la propuesta escrita, agradece con entusiasmo y usa la plantilla para solicitar el ajuste al tope de tu rango.",
+                              "Paso 4 (Completar el formulario W-8BEN y configurar tu cobro): Firma el W-8BEN con tus datos locales para recibir transferencias en USD en tu cuenta."
+                            ],
+                            "caseStudy": {
+                              "title": "Caso Real: +$5,400 USD Extra al Año con un Correo de Negociación de 5 Líneas",
+                              "scenario": "Un especialista en soporte técnico recibió una oferta remota de $2,500 USD/mes y estaba por aceptarla en el acto por temor a que se la retiraran.",
+                              "result": "Envió la plantilla de negociación agradeciendo la oferta y proponiendo $2,950 USD/mes: la empresa aprobó el aumento en 2 horas, sumando $5,400 USD más por año."
+                            }
+                          },
+                          {
+                            "heading": "Módulo 5: Cómo Encontrar Ofertas Ocultas en USD (LinkedIn Inbound, Wellfound y Cold Outreach)",
+                            "readTime": "1h 20m de estudio + estrategia de búsqueda internacional",
+                            "paragraphs": [
+                              "Si buscas trabajo remoto únicamente entrando a las ofertas más famosas de LinkedIn que dicen *\"1.500 solicitantes\"*, estás compitiendo en el lugar más saturado del mercado. Los profesionales que consiguen contratos en dólares en pocas semanas utilizan el **Canal Inbound y Contacto Directo con Fundadores (Outreach)**.",
+                              "Primero, configuras el buscador interno de LinkedIn a tu favor: los reclutadores de Estados Unidos y Europa buscan candidatos escribiendo palabras clave exactas en inglés llamadas **Boolean Searches** (por ejemplo: `\"React Developer\" AND \"Remote\" AND \"TypeScript\"`). Si esas palabras exactas están en tu **Headline (Titular)** y en la sección **About** de tu perfil, apareces en la primera página de sus búsquedas y **ellos te escriben a ti**.",
+                              "Segundo, utilizas portales especializados en startups que contratan en remoto en Latinoamérica y España pagando en USD —como **Wellfound (ex AngelList), RemoteOK, WeWorkRemotely y Y Combinator Jobs**— donde hablas directo con el fundador o líder del área sin pasar por tres filtros de recursos humanos.",
+                              "Y tercero, por cada vacante a la que postulas, le envías un mensaje corto de 4 líneas en inglés por LinkedIn al Hiring Manager adjuntando una muestra concreta de tu trabajo: esa simple acción multiplica por 5 tus respuestas de entrevista."
+                            ],
+                            "stepByStep": [
+                              "Paso 1 (Titular Optimizado para Buscadores): Escribe tu titular de LinkedIn en inglés con Rol + Especialidad + Palabras Clave + Valor (nunca pongas \"Buscando empleo\").",
+                              "Paso 2 (Activación Silenciosa de Reclutadores): Activa la función \"Open to Work\" visible SOLO para reclutadores seleccionando ubicaciones remotas en EE.UU., Reino Unido y Canadá.",
+                              "Paso 3 (Postulación en Portales de Startups): Crea tu perfil en inglés en Wellfound.com y filtra ofertas con la etiqueta \"Remote - Worldwide / LATAM / Europe\".",
+                              "Paso 4 (Mensaje Directo al Líder del Equipo): Cada vez que apliques a una oferta, envía un mensaje breve en inglés a quien lidera ese equipo mostrando un proyecto o logro real."
+                            ],
+                            "caseStudy": {
+                              "title": "Caso Real: Programador que Pasó de Enviar 100 CVs sin Respuesta a Recibir 4 Entrevistas en 10 Días",
+                              "scenario": "Tenía su perfil de LinkedIn en español y solo hacía clic en \"Solicitud sencilla\" en ofertas con más de 1.000 postulantes.",
+                              "result": "Tradujo su perfil con palabras clave ATS en inglés y envió mensajes directos cortos a 15 fundadores en Wellfound: consiguió 4 entrevistas y firmó por $3,400 USD/mes."
+                            },
+                            "keyPoints": [
+                              "Tu titular (Headline) de LinkedIn es el factor #1 que usa el buscador de los reclutadores internacionales para encontrarte.",
+                              "En portales de startups como Wellfound postulas directo ante quien toma la decisión de contratar.",
+                              "Enviar un mensaje directo de 4 líneas en inglés al Hiring Manager te separa inmediatamente del 98% de los candidatos pasivos.",
+                              "Configura tu perfil de LinkedIn en dos idiomas (Inglés como principal) para aparecer en búsquedas globales."
+                            ],
+                            "code": "Plantilla de Mensaje Directo en Inglés al Reclutador / Hiring Manager (Alta Respuesta):\n\n\"Hi [First Name],\nI just applied for the [Role Name] position at [Company Name], and wanted to reach out directly.\nIn my previous role, I helped [logro concreto, ej: automate reporting pipelines / increase conversion rates by 28%] using [2 habilidades clave del puesto].\nI put together a quick 2-minute overview / portfolio showing how I approach [problema que busca resolver la empresa]: [Link].\nWould love to chat briefly this week if my background aligns with what the team needs!\nBest regards,\n[Your Name]\"",
+                            "warning": "⚠️ Nunca escribas un mensaje largo de 5 párrafos contando toda tu vida ni empieces diciendo \"Please give me an opportunity\": sé breve, profesional y muestra cómo ayudas al equipo.",
+                            "checkpoint": {
+                              "question": "¿Por qué combinar un perfil de LinkedIn optimizado con palabras clave en inglés junto con un mensaje corto directo al Hiring Manager multiplica tus entrevistas remotas?",
+                              "options": [
+                                "Porque las palabras clave hacen que los reclutadores te encuentren en sus búsquedas automáticas, y el mensaje directo con una muestra de trabajo te destaca frente a cientos de CVs anónimos",
+                                "Porque LinkedIn borra las cuentas que no mandan 500 mensajes por hora",
+                                "Porque evita tener que hablar en inglés durante la entrevista laboral",
+                                "Porque obliga a la empresa a contratarte sin mirar tu experiencia"
+                              ],
+                              "correctIndex": 0
+                            }
+                          },
+                          {
+                            "heading": "Módulo 6: Cómo Cobrar en Dólares desde Casa, Facturación Internacional (Invoice) y Superar los Primeros 90 Días",
+                            "readTime": "1h 25m de estudio + guía de cobros internacionales",
+                            "paragraphs": [
+                              "¡Felicitaciones, firmaste tu contrato remoto en dólares! Ahora llega la parte práctica que nadie te explica en la escuela: **¿cómo le envías tu factura mensual (Invoice) a la empresa en Estados Unidos o Europa, a través de qué plataformas recibes los dólares y cómo te aseguras de brillar en tus primeros 90 días?**",
+                              "Cuando trabajas como Contractor internacional, las empresas no te piden una factura compleja en español: a fin de mes les envías un documento PDF estándar de 1 página en inglés llamado **Commercial Invoice** (que incluye tus datos, los datos de la empresa, el número de factura `INV-001`, el concepto *\"Professional Services - Month\"* y el monto en USD) o bien el pago se procesa automáticamente mediante plataformas globales como **Deel, Remote.com, Payoneer, Wise o Parallax**.",
+                              "Además, para que ese contrato en dólares dure años y te den aumentos cada 6 o 12 meses, el secreto en el trabajo remoto no es estar conectado 14 horas en silencio, sino la **Visibilidad Proactiva (Over-Communication)**: avisar temprano si algo te traba, cumplir tus entregas antes de la fecha límite y dejar siempre claro en qué estás avanzando.",
+                              "En este módulo final tienes la plantilla exacta de Invoice en inglés y el plan de 30-60-90 días para convertirte en el miembro más valorado de cualquier equipo internacional."
+                            ],
+                            "stepByStep": [
+                              "Paso 1 (Configuración de Cobro Global): Abre y verifica tu cuenta en la plataforma que use la empresa (Deel, Wise, Payoneer) y completa tu formulario digital W-8BEN en 2 minutos.",
+                              "Paso 2 (Emisión de Invoice Mensual): Si la empresa paga por transferencia directa (ACH/Wire), envía tu PDF de Invoice en inglés 3 días hábiles antes de fin de mes.",
+                              "Paso 3 (Plan de los Primeros 30 Días): En tu primer mes, enfócate en lograr una \"Victoria Rápida\" (Quick Win) resolviendo y entregando una tarea visible con calidad impecable.",
+                              "Paso 4 (Revisión de los 6 Meses): Documenta en una lista privada cada logro numérico que consigas mes a mes para respaldar tu pedido de aumento salarial al cumplir 6 o 12 meses."
+                            ],
+                            "caseStudy": {
+                              "title": "Caso Real: Analista de Marketing que Pasó de $700 USD Locales a $2,600 USD/Mes con una Agencia de Austin (EE.UU.)",
+                              "scenario": "Tenía un inglés intermedio (B2) pero le daba miedo postular porque no sabía cómo eran las entrevistas ni cómo se cobraba desde Latinoamérica.",
+                              "result": "Preparó sus 5 historias STAR, negoció un rango de $2,600 USD como Contractor a través de Deel y a los 6 meses recibió un aumento a $3,100 USD por su comunicación proactiva."
+                            },
+                            "keyPoints": [
+                              "Plataformas como Deel generan automáticamente el contrato Contractor, el formulario W-8BEN y el recibo de pago mensual en USD.",
+                              "En trabajo remoto la confianza se gana con comunicación clara: nunca desaparezcas un día entero sin avisar el estado de tu tarea.",
+                              "Anota tus logros medibles cada mes para llegar con datos concretos a tu revisión de aumento salarial.",
+                              "No necesitas acento nativo: necesitas claridad, vocabulario profesional del puesto y confiabilidad en las entregas."
+                            ],
+                            "code": "Plantilla Estándar de Factura Internacional (Invoice) en Inglés para Clientes en EE.UU./Europa:\n=============================================================================================\nINVOICE #INV-2026-001\nDate: October 30, 2026 | Due Date: November 05, 2026\n\nFROM (Contractor):                         BILL TO (Client):\n[Your Full Name]                           [Company Legal Name]\n[Your Address & Country]                   [Company Address, USA / EU]\nEmail: [your.email@domain.com]             Tax ID / EIN: [Client ID]\n\nDESCRIPTION OF SERVICES                                  QTY      RATE (USD)     TOTAL (USD)\n---------------------------------------------------------------------------------------------\nRemote [Software / Marketing / Design] Services          1        $2,800.00      $2,800.00\nPeriod: October 1 - October 31, 2026\n---------------------------------------------------------------------------------------------\n                                                                  TOTAL DUE:     $2,800.00 USD\n\nPAYMENT DETAILS (ACH / Wire Transfer):\nBank Name: [Your USD Receiving Account / Deel / Wise / Payoneer]\nRouting Number (ABA): [XXXXXXXXX] | Account Number: [XXXXXXXXXXXX]",
+                            "warning": "⚠️ El error número 1 que hace perder un trabajo remoto en el primer mes no es un error técnico: es quedarse trabado 3 días en silencio por vergüenza a preguntar en inglés. Aplica siempre la regla de los 45 minutos y avisa con una pregunta clara.",
+                            "checkpoint": {
+                              "question": "Al trabajar en remoto para una empresa del exterior cobrando en dólares como Contractor, ¿cuál es la clave administrativa y de trabajo diario para asegurar estabilidad y aumentos?",
+                              "options": [
+                                "Firmar el formulario W-8BEN / gestionar cobros por plataformas globales (como Deel) o Invoice en inglés, mantener comunicación asíncrona proactiva sin quedarse trabado en silencio y documentar tus logros medibles",
+                                "Trabajar en secreto sin avisar tus avances en el chat hasta fin de año",
+                                "Enviarle a la empresa de Estados Unidos una carta escrita a mano por correo postal para cobrar",
+                                "Quedarse callado durante una semana entera cuando no entiendes una instrucción"
+                              ],
+                              "correctIndex": 0
+                            }
+                          }
+                        ],
+                          "quiz": {
+    "questions": [
       {
-        "heading": "Módulo 1: CV en Formato Harvard/ATS y Optimización de LinkedIn en Inglés",
-        "readTime": "1h 15m de estudio + práctica guiada",
-        "paragraphs": [
-          "El 85% de las empresas remotas de Estados Unidos y Europa filtra los currículums con software ATS (Applicant Tracking Systems) antes de que los vea un humano. Si tu CV está diseñado en Canva con dos columnas, barras de porcentaje de habilidades (\"Python 80%\") y fotos, el parser del ATS leerá las líneas mezcladas y te descartará automáticamente.",
-          "Además, en el mercado anglosajón no se listan \"tareas pasivas\" (\"Responsible for writing code\"), sino \"Logros Cuantificados con Verbos de Acción\" usando la fórmula de Google (XYZ): \"Logré [X resultado] medido por [Y métrica] mediante la implementación de [Z tecnología/acción]\".",
-          "Cuando envías tu currículum a una empresa de Estados Unidos, Canadá o Europa, el primer filtro no lo hace una persona: lo hace un software lector llamado ATS. Si tu CV tiene dos columnas, íconos, foto de perfil o barras de porcentaje, el sistema lo lee mezclado y lo descarta.",
-          "En la fórmula XYZ de Google del bloque práctico verás cómo transformar una frase pasiva (\"Encargado de hacer reportes\") en un logro de alto impacto en inglés (\"Automated weekly reporting using Python, reducing manual work by 85%\") que los reclutadores aman."
+        "question": "1. Según la fórmula `XYZ` de Google para redactar puntos de experiencia en un CV en inglés, ¿cuál de estas opciones es la más efectiva?",
+        "options": [
+          "\"I was in charge of coding in JavaScript and attending meetings.\"",
+          "\"Hardworking developer with 100% passion for technology.\"",
+          "\"Automated the client onboarding pipeline using Python and n8n, reducing manual processing time by 75% (saving 20 hours/week).\"",
+          "\"Knowledge of HTML, CSS, SQL and Microsoft Word.\""
         ],
-        "keyPoints": [
-          "Diseño ATS-Friendly: 1 sola columna limpia, sin fotos ni tablas gráficas, exportado en PDF con texto seleccionable.",
-          "Usa verbos de impacto en pasado: Engineered, Automated, Reduced, Scaled, Spearheaded.",
-          "Configura tu perfil de LinkedIn en inglés con palabras clave exactas del puesto en el Headline.",
-          "Coloca exactamente el título del puesto que buscas en inglés en el encabezado de tu LinkedIn (Headline) para aparecer primero cuando los reclutadores filtran candidatos."
-        ],
-        "code": "Transformación de Bullet Point para CV Internacional (Fórmula XYZ):\n❌ Débil (Orientado a tareas):\n\"Worked on the backend API and fixed database queries.\"\n\n✅ Alto Impacto (Orientado a resultados medibles):\n\"Optimized PostgreSQL queries and implemented Redis caching, reducing average API response time by 62% (from 480ms to 180ms) for +50k daily users.\"",
-        "warning": "⚠️ En currículums para EE.UU., Reino Unido y Canadá NUNCA incluyas foto de rostro, fecha de nacimiento, DNI ni estado civil (las empresas los descartan por leyes anti-discriminación laboral).",
-        "checkpoint": {
-          "question": "¿Por qué las empresas de Estados Unidos suelen descartar automáticamente los currículums diseñados con múltiples columnas gráficas, barras de porcentaje e imagen de perfil?",
-          "options": [
-            "Porque los reclutadores estadounidenses solo aceptan currículums impresos en papel por correo postal.",
-            "Porque los sistemas de filtrado automático (ATS) fallan al parsear tablas/columnas complejas, las barras subjetivas no aportan evidencia técnica y las fotos violan las políticas corporativas anti-sesgo (EEOC).",
-            "Porque el idioma inglés no permite usar verbos en tiempo pasado.",
-            "Porque el formato PDF está bloqueado en los servidores de recursos humanos."
-          ],
-          "correctIndex": 1
-        },
-        "stepByStep": [
-          "Paso 1 (Pasar a plantilla Harvard de 1 columna): Abre un Google Docs limpio en una sola columna sin fotos, sin tablas ocultas ni gráficos de colores.",
-          "Paso 2 (Quitar datos personales prohibidos en EE.UU.): Elimina foto de rostro, fecha de nacimiento, estado civil y documento de identidad (solo deja nombre, email, LinkedIn y país).",
-          "Paso 3 (Reescribir tu experiencia con la fórmula XYZ): Empieza cada viñeta con un verbo de acción en pasado (Automated, Built, Increased) + métrica % + herramienta.",
-          "Paso 4 (Sincronizar tu perfil de LinkedIn en inglés): Actualiza tu titular, sección About y habilidades con las palabras clave exactas de las ofertas remotas."
-        ],
-        "caseStudy": {
-          "title": "Caso Real: Analista que Pasó de 0 Respuestas a 5 Entrevistas Internacionales en 2 Semanas",
-          "scenario": "Un profesional postulaba a decenas de avisos remotos con un CV colorido de dos columnas hecho en Canva con su foto y recibía rechazos automáticos en horas.",
-          "result": "Migró al formato ATS de 1 columna en inglés aplicando la fórmula XYZ con porcentajes, recibiendo 5 invitaciones a entrevista en los siguientes 14 días."
-        }
+        "correctIndex": 2
       },
       {
-        "heading": "Módulo 2: Cómo Superar Entrevistas en Inglés con la Estructura S-T-A-R",
-        "readTime": "1h 25m de teoría y laboratorio",
-        "paragraphs": [
-          "No necesitas tener acento nativo ni vocabulario literario para aprobar entrevistas remotas en dólares; necesitas estructura y claridad. Cuando el entrevistador pregunta \"Tell me about a time you faced a difficult technical problem or deadline\", los candidatos sin preparación divagan y se traban con la gramática.",
-          "El estándar de Amazon, Google y startups de Silicon Valley es responder en 90 segundos siguiendo las 4 etapas S-T-A-R: Situation (Contexto en 1 frase), Task (Cuál era tu misión/desafío), Action (Qué hiciste TÚ específicamente) y Result (Qué impacto numérico lograste).",
-          "El secreto para aprobar entrevistas en inglés sin trabarte ni quedarte en blanco no es tener vocabulario de diccionario: es llevar preparadas de antemano 5 historias reales de tu trabajo estructuradas con las 4 letras del método S-T-A-R.",
-          "Observa en el guion de 90 segundos del bloque práctico cómo dedicamos apenas 2 frases a explicar la Situación y la Tarea, y concentramos toda la fuerza en las acciones concretas en primera persona (\"I created...\", \"I automated...\") y el resultado numérico final."
+        "question": "2. ¿Qué debes hacer en una entrevista en inglés si no comprendiste bien una pregunta técnica o el entrevistador habló muy rápido?",
+        "options": [
+          "Responder cualquier cosa al azar esperando adivinar qué preguntó.",
+          "Quedarte en silencio absoluto hasta que cambie de pregunta.",
+          "Pedir aclaración con naturalidad profesional parafraseando lo que entendiste: \"Could you clarify if you are referring to X, or would you like me to focus on Y?\".",
+          "Cortar la videollamada fingiendo que se cayó internet."
         ],
-        "keyPoints": [
-          "Prepara y memoriza 5 historias comodín en formato STAR antes de la entrevista (un bug crítico, un desacuerdo técnico, un plazo ajustado, una automatización y un logro de liderazgo).",
-          "En la etapa \"Action\", habla en primera persona (\"I designed...\", \"I debugged...\") en lugar de diluir tu aporte diciendo solo \"We\".",
-          "Cierra siempre con la etapa \"Result\" dando un dato concreto.",
-          "Practica tus 5 historias S-T-A-R grabándote en notas de voz de 90 segundos: notarás que las mismas 5 anécdotas sirven para responder casi cualquier pregunta de entrevista."
-        ],
-        "code": "Estructura S-T-A-R Lista para Usar en Entrevistas (90 segundos):\n- [S - Situation]: \"In my previous project, our checkout webhook was failing under high traffic peaks.\"\n- [T - Task]: \"My goal was to eliminate lost orders before the Black Friday campaign.\"\n- [A - Action]: \"I implemented an asynchronous queue with retry logic and idempotency keys.\"\n- [R - Result]: \"As a result, we processed 100% of orders with zero downtime, saving ~$12,000 in revenue.\"",
-        "warning": "⚠️ No memorices párrafos palabra por palabra como un robot; memoriza los 4 puntos clave (S-T-A-R) de tus 5 historias para sonar natural y seguro.",
-        "checkpoint": {
-          "question": "Al responder una pregunta conductual (\"Tell me about a time...\") con el método `S-T-A-R`, ¿en cuál de las 4 letras debes concentrar el 60% del tiempo de tu respuesta y hablar en primera persona (`\"I...\"`)?",
-          "options": [
-            "En Situation, describiendo durante 5 minutos la historia de la empresa anterior.",
-            "En Action y Result, detallando las decisiones técnicas concretas que tomaste tú y el impacto medible obtenido.",
-            "En pedir disculpas por tu nivel de inglés antes de empezar a hablar.",
-            "En hablar únicamente en tercera persona sobre lo que hicieron otros departamentos."
-          ],
-          "correctIndex": 1
-        },
-        "stepByStep": [
-          "Paso 1 (Armar tu banco de 5 historias comodín): Escribe en un documento un logro de ahorro de tiempo, un error resuelto, un cliente difícil, un trabajo en equipo y algo que aprendiste rápido.",
-          "Paso 2 (Resumir Situation y Task en 20 segundos): Presenta el contexto en dos oraciones cortas sin irte por las ramas con detalles secundarios.",
-          "Paso 3 (Hablar en primera persona \"I...\" en Action): Explica qué hiciste tú exactamente paso a paso en lugar de decir siempre \"We did...\".",
-          "Paso 4 (Cerrar con un número en Result): Termina siempre contando cuánto tiempo ahorraste, cuánto subieron las ventas o cuántos errores se evitaron."
-        ],
-        "caseStudy": {
-          "title": "Caso Real: Desarrollador con Inglés Intermedio Contratado por Startup de Austin ($3,800 USD/mes)",
-          "scenario": "Se ponía muy nervioso cuando le hacían preguntas abiertas como \"Tell me about a challenge you faced\" e improvisaba respuestas largas y confusas.",
-          "result": "Preparó su documento con 5 historias S-T-A-R de 90 segundos cada una, superó las 3 rondas de entrevistas con fluidez y firmó su primer contrato en dólares."
-        }
+        "correctIndex": 2
       },
       {
-        "heading": "Módulo 3: Comunicación Asíncrona en Equipos Remotos (Daily Standups, Slack y PRs)",
-        "readTime": "1h 15m de estudio + práctica guiada",
-        "paragraphs": [
-          "Una vez contratado en un equipo internacional, el 80% de tu trabajo diario ocurre mediante comunicación asíncrona escrita (Slack, Jira, GitHub Pull Requests) y una reunión diaria de 10 minutos (Daily Standup).",
-          "Los equipos de EE.UU. valoran la comunicación directa, concisa y proactiva: si tienes un bloqueo (Blocker), nunca esperes 3 días en silencio hasta la fecha de entrega; avisa temprano mostrando qué intentaste ya y qué necesitas para destrabarte.",
-          "Una vez que entras a trabajar en un equipo remoto en dólares, el 90% de tu comunicación diaria ocurre por escrito en Slack o en reuniones breves de 15 minutos por la mañana (Daily Standup) donde cada persona habla menos de 1 minuto.",
-          "En la plantilla del bloque práctico verás cómo aplicar la regla de oro del trabajo remoto (\"No Hello\"): en lugar de mandar un \"Hi!\" suelto y hacer perder tiempo a tu compañero, envías en un solo mensaje ordenado el saludo, el contexto, qué probaste y tu pregunta puntual."
+        "question": "3. ¿Cuáles son las 3 preguntas breves que estructuran una actualización diaria (`Daily Standup`) efectiva en un equipo ágil remoto?",
+        "options": [
+          "Dónde naciste, qué estudiaste y cuáles son tus metas a 10 años.",
+          "Qué completaste ayer, en qué te enfocarás hoy y si tienes algún bloqueo técnico o de negocio (Blocker) que requiera ayuda.",
+          "Cuánto cobras por mes, cuántos días de vacaciones tienes y qué hora es en tu país.",
+          "Leer línea por línea todo el código que escribiste durante las últimas 8 horas."
         ],
-        "keyPoints": [
-          "Fórmula Daily Standup (45s): 1) What I completed yesterday, 2) What I am focusing on today, 3) Any blockers.",
-          "Regla \"No Hello\" en Slack: Nunca escribas solo \"Hi\" y esperes 2 horas a que respondan; escribe el saludo junto con el contexto completo y tu pregunta en un solo mensaje.",
-          "Usa verbos modales corteses pero directos en revisiones de código (\"Could we extract this into a helper to avoid duplication?\").",
-          "Tener a mano en un bloc de notas las 3 frases del Daily Standup (\"Yesterday I completed... / Today I am focusing on... / No blockers\") te quita toda la presión cada mañana."
-        ],
-        "code": "Comunicación Asíncrona Profesional en Slack (Regla \"No Hello\"):\n❌ Mal hábito:\n\"Hi Sarah\" (y esperar a que conteste para recién decirle qué necesitas).\n\n✅ Estándar Remoto Senior:\n\"Hi Sarah! Quick update on the Stripe webhook (#PR-142): I finished the signature validation, but I need the staging API secret to run the integration tests. Could you share it in 1Password when you have a moment? Thanks!\"",
-        "warning": "⚠️ Quedarse callado cuando no entendiste un requerimiento por vergüenza a preguntar en inglés es la causa #1 de despido en el primer mes remoto. Parafrasea siempre: \"Just to make sure we are aligned, do you mean X or Y?\".",
-        "checkpoint": {
-          "question": "¿En qué consiste la regla de etiqueta remota conocida como \"No Hello\" en herramientas asíncronas como Slack o Teams?",
-          "options": [
-            "En que está prohibido saludar a los compañeros de trabajo.",
-            "En enviar en un único mensaje completo el saludo, el contexto del tema, lo que ya probaste y la pregunta concreta, en vez de enviar solo \"Hello\" y dejar a la otra persona esperando en suspenso.",
-            "En comunicarse únicamente mediante llamadas de video sin previo aviso.",
-            "En responder todos los mensajes con un solo emoji."
-          ],
-          "correctIndex": 1
-        },
-        "stepByStep": [
-          "Paso 1 (Preparar tus 3 líneas antes de la reunión diaria): Anota 5 minutos antes qué terminaste ayer, qué harás hoy y si necesitas ayuda con algún bloqueo.",
-          "Paso 2 (Aplicar la regla No Hello en Slack): Escribe siempre tu consulta completa en un único mensaje con viñetas claras.",
-          "Paso 3 (Mostrar iniciativa antes de pedir ayuda): Incluye siempre la frase \"I have already tried X and Y\" para demostrar profesionalismo.",
-          "Paso 4 (Confirmar acuerdos por escrito): Después de cualquier llamada rápida, deja un resumen de 3 líneas en el canal (\"Quick recap of what we agreed...\")."
-        ],
-        "caseStudy": {
-          "title": "Caso Real: Diseñadora Remota Ascendida a Líder de Equipo por su Comunicación Asíncrona",
-          "scenario": "Al principio le daba miedo hablar en las reuniones diarias y cuando se trababa con una tarea perdía todo el día callada por vergüenza a preguntar en inglés.",
-          "result": "Empezó a usar el guion de 45 segundos para el Standup y la estructura \"No Hello\" en Slack, destacándose como la integrante más clara y confiable del equipo."
-        }
+        "correctIndex": 1
       },
       {
-        "heading": "Módulo 4: Modalidad Contractor (Formulario W-8BEN) y Negociación de Sueldo en USD",
-        "readTime": "1h 25m de teoría y laboratorio",
-        "paragraphs": [
-          "Las empresas de EE.UU. contratan talento en Latinoamérica y España principalmente bajo la figura de \"Independent Contractor\" (prestador de servicios independiente) a través de plataformas como Deel, Remote o Plane, firmando el formulario W-8BEN (que certifica que no resides fiscalmente en EE.UU. y evita retenciones allí).",
-          "En la negociación salarial, nunca des un número único cerrado ni aceptes la primera oferta sin preguntar si hay flexibilidad: investiga el rango del puesto, expresa entusiasmo por el rol y ancla tu expectativa con un rango cuyo piso sea tu número objetivo.",
-          "Cuando una empresa extranjera te contrata desde Latinoamérica o España bajo modalidad Contractor independiente, firmarás el formulario W-8BEN: un documento simple de 1 página que certifica que vives fuera de EE.UU. para que te transfieran el 100% de tu sueldo bruto.",
-          "Además, en el guion de negociación del bloque práctico verás las frases exactas en inglés para agradecer una oferta inicial de por ejemplo $3,000 USD/mes y pedir profesionalmente un ajuste de +15% ($3,450 USD/mes) sin poner en riesgo tu contratación."
+        "question": "4. Cuando un reclutador te pregunta en la primera llamada \"¿What are your salary expectations?\" antes de explicarte el alcance del puesto, ¿cuál es la estrategia de negociación recomendada?",
+        "options": [
+          "Decir el número más bajo posible por miedo a quedar descartado.",
+          "Negarte a hablar de dinero hasta después de haber trabajado 3 meses gratis.",
+          "Preguntar primero cuál es la banda presupuestaria asignada para la posición (\"Could you share the budgeted range for this role?\") o dar un rango bien investigado cuyo piso sea tu objetivo real.",
+          "Exigir el triple del valor de mercado sin justificación técnica."
         ],
-        "keyPoints": [
-          "Si cuando te preguntan \"¿Cuál es tu expectativa salarial?\" aún no conoces las responsabilidades completas, pregunta primero: \"What is the approved budget range for this role?\".",
-          "Si tu objetivo es ganar $3,500 USD/mes, presenta un rango de \"$3,500 to $4,200 USD/month depending on responsibilities and PTO\".",
-          "Negocia también beneficios Contractor: días libres pagos (Paid Time Off / PTO), bono de equipamiento y revisiones semestrales.",
-          "En Estados Unidos y Europa está bien visto negociar con cortesía: el 85% de las empresas deja un margen de entre 10% y 20% extra aprobado para cerrar al candidato elegido."
-        ],
-        "code": "Guion en Inglés para Negociar un +15% sobre la Oferta Inicial:\n\"Thank you so much for the offer! I'm really excited about the team and the technical challenges we discussed.\nBased on my experience automating these workflows and the market range for this role, I was targeting closer to $3,800 USD/month.\nIf we can bridge the gap to $3,600 USD/month with 15 days of PTO, I would be thrilled to sign the contract today.\"",
-        "warning": "⚠️ Nunca mientas sobre ofertas falsas para presionar; argumenta siempre tu contraoferta desde el valor técnico que aportarás en los primeros 90 días y haz que sea fácil decirte que sí.",
-        "checkpoint": {
-          "question": "¿Para qué sirve el formulario `W-8BEN` que firman los profesionales remotos (Contractors) fuera de Estados Unidos al ser contratados por una empresa estadounidense?",
-          "options": [
-            "Es una visa de residencia permanente para mudarse a California.",
-            "Declara formalmente que el profesional es extranjero no residente en EE.UU. y realiza su trabajo desde el exterior, eximiendo a la empresa estadounidense de aplicarle la retención del 30% del IRS sobre sus pagos.",
-            "Sirve para abrir una hipoteca inmobiliaria en dólares.",
-            "Obliga al trabajador a pagar impuestos dobles dentro de Estados Unidos."
-          ],
-          "correctIndex": 1
-        },
-        "stepByStep": [
-          "Paso 1 (Averiguar el presupuesto antes de dar un número): Cuando te pregunten tu expectativa en la primera llamada, consulta primero: \"What is the approved budget range for this role?\".",
-          "Paso 2 (Dar siempre un rango en vez de una cifra fija): Responde con una banda salarial (ej. \"$3,200 to $3,800 USD/month depending on responsibilities and PTO\").",
-          "Paso 3 (Enviar el guion de contraoferta del +15%): Al recibir la propuesta escrita, agradece con entusiasmo y usa la plantilla para solicitar el ajuste al tope de tu rango.",
-          "Paso 4 (Completar el formulario W-8BEN y configurar tu cobro): Firma el W-8BEN con tus datos locales para recibir transferencias en USD en tu cuenta."
-        ],
-        "caseStudy": {
-          "title": "Caso Real: +$5,400 USD Extra al Año con un Correo de Negociación de 5 Líneas",
-          "scenario": "Un especialista en soporte técnico recibió una oferta remota de $2,500 USD/mes y estaba por aceptarla en el acto por temor a que se la retiraran.",
-          "result": "Envió la plantilla de negociación agradeciendo la oferta y proponiendo $2,950 USD/mes: la empresa aprobó el aumento en 2 horas, sumando $5,400 USD más por año."
-        }
+        "correctIndex": 2
       },
       {
-        "heading": "Módulo 5: Cómo Encontrar Ofertas Ocultas en USD (LinkedIn Inbound, Wellfound y Cold Outreach)",
-        "readTime": "1h 20m de estudio + estrategia de búsqueda internacional",
-        "paragraphs": [
-          "Si buscas trabajo remoto únicamente entrando a las ofertas más famosas de LinkedIn que dicen *\"1.500 solicitantes\"*, estás compitiendo en el lugar más saturado del mercado. Los profesionales que consiguen contratos en dólares en pocas semanas utilizan el **Canal Inbound y Contacto Directo con Fundadores (Outreach)**.",
-          "Primero, configuras el buscador interno de LinkedIn a tu favor: los reclutadores de Estados Unidos y Europa buscan candidatos escribiendo palabras clave exactas en inglés llamadas **Boolean Searches** (por ejemplo: `\"React Developer\" AND \"Remote\" AND \"TypeScript\"`). Si esas palabras exactas están en tu **Headline (Titular)** y en la sección **About** de tu perfil, apareces en la primera página de sus búsquedas y **ellos te escriben a ti**.",
-          "Segundo, utilizas portales especializados en startups que contratan en remoto en Latinoamérica y España pagando en USD —como **Wellfound (ex AngelList), RemoteOK, WeWorkRemotely y Y Combinator Jobs**— donde hablas directo con el fundador o líder del área sin pasar por tres filtros de recursos humanos.",
-          "Y tercero, por cada vacante a la que postulas, le envías un mensaje corto de 4 líneas en inglés por LinkedIn al Hiring Manager adjuntando una muestra concreta de tu trabajo: esa simple acción multiplica por 5 tus respuestas de entrevista."
+        "question": "5. ¿Cuál es la hoja de ruta completa para conseguir, negociar y mantener un empleo remoto en dólares trabajando desde casa?",
+        "options": [
+          "Crear un CV formato Harvard/ATS con logros cuantificados (fórmula XYZ), preparar historias con el método STAR, contactar directo a líderes de equipo, negociar un rango en USD como Contractor (W-8BEN) y mantener comunicación asíncrona proactiva",
+          "Usar un CV de Canva con fotos y barras de porcentaje, responder con monosílabos en la entrevista y pedir que la empresa adivine tu sueldo",
+          "Esperar a tener acento británico nativo perfecto antes de enviar tu primer currículum",
+          "No dar actualizaciones en los canales de equipo y desaparecer cuando tienes una duda técnica"
         ],
-        "stepByStep": [
-          "Paso 1 (Titular Optimizado para Buscadores): Escribe tu titular de LinkedIn en inglés con Rol + Especialidad + Palabras Clave + Valor (nunca pongas \"Buscando empleo\").",
-          "Paso 2 (Activación Silenciosa de Reclutadores): Activa la función \"Open to Work\" visible SOLO para reclutadores seleccionando ubicaciones remotas en EE.UU., Reino Unido y Canadá.",
-          "Paso 3 (Postulación en Portales de Startups): Crea tu perfil en inglés en Wellfound.com y filtra ofertas con la etiqueta \"Remote - Worldwide / LATAM / Europe\".",
-          "Paso 4 (Mensaje Directo al Líder del Equipo): Cada vez que apliques a una oferta, envía un mensaje breve en inglés a quien lidera ese equipo mostrando un proyecto o logro real."
-        ],
-        "caseStudy": {
-          "title": "Caso Real: Programador que Pasó de Enviar 100 CVs sin Respuesta a Recibir 4 Entrevistas en 10 Días",
-          "scenario": "Tenía su perfil de LinkedIn en español y solo hacía clic en \"Solicitud sencilla\" en ofertas con más de 1.000 postulantes.",
-          "result": "Tradujo su perfil con palabras clave ATS en inglés y envió mensajes directos cortos a 15 fundadores en Wellfound: consiguió 4 entrevistas y firmó por $3,400 USD/mes."
-        },
-        "keyPoints": [
-          "Tu titular (Headline) de LinkedIn es el factor #1 que usa el buscador de los reclutadores internacionales para encontrarte.",
-          "En portales de startups como Wellfound postulas directo ante quien toma la decisión de contratar.",
-          "Enviar un mensaje directo de 4 líneas en inglés al Hiring Manager te separa inmediatamente del 98% de los candidatos pasivos.",
-          "Configura tu perfil de LinkedIn en dos idiomas (Inglés como principal) para aparecer en búsquedas globales."
-        ],
-        "code": "Plantilla de Mensaje Directo en Inglés al Reclutador / Hiring Manager (Alta Respuesta):\n\n\"Hi [First Name],\nI just applied for the [Role Name] position at [Company Name], and wanted to reach out directly.\nIn my previous role, I helped [logro concreto, ej: automate reporting pipelines / increase conversion rates by 28%] using [2 habilidades clave del puesto].\nI put together a quick 2-minute overview / portfolio showing how I approach [problema que busca resolver la empresa]: [Link].\nWould love to chat briefly this week if my background aligns with what the team needs!\nBest regards,\n[Your Name]\"",
-        "warning": "⚠️ Nunca escribas un mensaje largo de 5 párrafos contando toda tu vida ni empieces diciendo \"Please give me an opportunity\": sé breve, profesional y muestra cómo ayudas al equipo.",
-        "checkpoint": {
-          "question": "¿Por qué combinar un perfil de LinkedIn optimizado con palabras clave en inglés junto con un mensaje corto directo al Hiring Manager multiplica tus entrevistas remotas?",
-          "options": [
-            "Porque las palabras clave hacen que los reclutadores te encuentren en sus búsquedas automáticas, y el mensaje directo con una muestra de trabajo te destaca frente a cientos de CVs anónimos",
-            "Porque LinkedIn borra las cuentas que no mandan 500 mensajes por hora",
-            "Porque evita tener que hablar en inglés durante la entrevista laboral",
-            "Porque obliga a la empresa a contratarte sin mirar tu experiencia"
-          ],
-          "correctIndex": 0
-        }
-      },
-      {
-        "heading": "Módulo 6: Cómo Cobrar en Dólares desde Casa, Facturación Internacional (Invoice) y Superar los Primeros 90 Días",
-        "readTime": "1h 25m de estudio + guía de cobros internacionales",
-        "paragraphs": [
-          "¡Felicitaciones, firmaste tu contrato remoto en dólares! Ahora llega la parte práctica que nadie te explica en la escuela: **¿cómo le envías tu factura mensual (Invoice) a la empresa en Estados Unidos o Europa, a través de qué plataformas recibes los dólares y cómo te aseguras de brillar en tus primeros 90 días?**",
-          "Cuando trabajas como Contractor internacional, las empresas no te piden una factura compleja en español: a fin de mes les envías un documento PDF estándar de 1 página en inglés llamado **Commercial Invoice** (que incluye tus datos, los datos de la empresa, el número de factura `INV-001`, el concepto *\"Professional Services - Month\"* y el monto en USD) o bien el pago se procesa automáticamente mediante plataformas globales como **Deel, Remote.com, Payoneer, Wise o Parallax**.",
-          "Además, para que ese contrato en dólares dure años y te den aumentos cada 6 o 12 meses, el secreto en el trabajo remoto no es estar conectado 14 horas en silencio, sino la **Visibilidad Proactiva (Over-Communication)**: avisar temprano si algo te traba, cumplir tus entregas antes de la fecha límite y dejar siempre claro en qué estás avanzando.",
-          "En este módulo final tienes la plantilla exacta de Invoice en inglés y el plan de 30-60-90 días para convertirte en el miembro más valorado de cualquier equipo internacional."
-        ],
-        "stepByStep": [
-          "Paso 1 (Configuración de Cobro Global): Abre y verifica tu cuenta en la plataforma que use la empresa (Deel, Wise, Payoneer) y completa tu formulario digital W-8BEN en 2 minutos.",
-          "Paso 2 (Emisión de Invoice Mensual): Si la empresa paga por transferencia directa (ACH/Wire), envía tu PDF de Invoice en inglés 3 días hábiles antes de fin de mes.",
-          "Paso 3 (Plan de los Primeros 30 Días): En tu primer mes, enfócate en lograr una \"Victoria Rápida\" (Quick Win) resolviendo y entregando una tarea visible con calidad impecable.",
-          "Paso 4 (Revisión de los 6 Meses): Documenta en una lista privada cada logro numérico que consigas mes a mes para respaldar tu pedido de aumento salarial al cumplir 6 o 12 meses."
-        ],
-        "caseStudy": {
-          "title": "Caso Real: Analista de Marketing que Pasó de $700 USD Locales a $2,600 USD/Mes con una Agencia de Austin (EE.UU.)",
-          "scenario": "Tenía un inglés intermedio (B2) pero le daba miedo postular porque no sabía cómo eran las entrevistas ni cómo se cobraba desde Latinoamérica.",
-          "result": "Preparó sus 5 historias STAR, negoció un rango de $2,600 USD como Contractor a través de Deel y a los 6 meses recibió un aumento a $3,100 USD por su comunicación proactiva."
-        },
-        "keyPoints": [
-          "Plataformas como Deel generan automáticamente el contrato Contractor, el formulario W-8BEN y el recibo de pago mensual en USD.",
-          "En trabajo remoto la confianza se gana con comunicación clara: nunca desaparezcas un día entero sin avisar el estado de tu tarea.",
-          "Anota tus logros medibles cada mes para llegar con datos concretos a tu revisión de aumento salarial.",
-          "No necesitas acento nativo: necesitas claridad, vocabulario profesional del puesto y confiabilidad en las entregas."
-        ],
-        "code": "Plantilla Estándar de Factura Internacional (Invoice) en Inglés para Clientes en EE.UU./Europa:\n=============================================================================================\nINVOICE #INV-2026-001\nDate: October 30, 2026 | Due Date: November 05, 2026\n\nFROM (Contractor):                         BILL TO (Client):\n[Your Full Name]                           [Company Legal Name]\n[Your Address & Country]                   [Company Address, USA / EU]\nEmail: [your.email@domain.com]             Tax ID / EIN: [Client ID]\n\nDESCRIPTION OF SERVICES                                  QTY      RATE (USD)     TOTAL (USD)\n---------------------------------------------------------------------------------------------\nRemote [Software / Marketing / Design] Services          1        $2,800.00      $2,800.00\nPeriod: October 1 - October 31, 2026\n---------------------------------------------------------------------------------------------\n                                                                  TOTAL DUE:     $2,800.00 USD\n\nPAYMENT DETAILS (ACH / Wire Transfer):\nBank Name: [Your USD Receiving Account / Deel / Wise / Payoneer]\nRouting Number (ABA): [XXXXXXXXX] | Account Number: [XXXXXXXXXXXX]",
-        "warning": "⚠️ El error número 1 que hace perder un trabajo remoto en el primer mes no es un error técnico: es quedarse trabado 3 días en silencio por vergüenza a preguntar en inglés. Aplica siempre la regla de los 45 minutos y avisa con una pregunta clara.",
-        "checkpoint": {
-          "question": "Al trabajar en remoto para una empresa del exterior cobrando en dólares como Contractor, ¿cuál es la clave administrativa y de trabajo diario para asegurar estabilidad y aumentos?",
-          "options": [
-            "Firmar el formulario W-8BEN / gestionar cobros por plataformas globales (como Deel) o Invoice en inglés, mantener comunicación asíncrona proactiva sin quedarse trabado en silencio y documentar tus logros medibles",
-            "Trabajar en secreto sin avisar tus avances en el chat hasta fin de año",
-            "Enviarle a la empresa de Estados Unidos una carta escrita a mano por correo postal para cobrar",
-            "Quedarse callado durante una semana entera cuando no entiendes una instrucción"
-          ],
-          "correctIndex": 0
-        }
+        "correctIndex": 0
       }
-    ],
-    "quiz": {
-      "questions": [
-        {
-          "question": "1. Según la fórmula `XYZ` de Google para redactar puntos de experiencia en un CV en inglés, ¿cuál de estas opciones es la más efectiva?",
-          "options": [
-            "\"I was in charge of coding in JavaScript and attending meetings.\"",
-            "\"Hardworking developer with 100% passion for technology.\"",
-            "\"Automated the client onboarding pipeline using Python and n8n, reducing manual processing time by 75% (saving 20 hours/week).\"",
-            "\"Knowledge of HTML, CSS, SQL and Microsoft Word.\""
-          ],
-          "correctIndex": 2
-        },
-        {
-          "question": "2. ¿Qué debes hacer en una entrevista en inglés si no comprendiste bien una pregunta técnica o el entrevistador habló muy rápido?",
-          "options": [
-            "Responder cualquier cosa al azar esperando adivinar qué preguntó.",
-            "Quedarte en silencio absoluto hasta que cambie de pregunta.",
-            "Pedir aclaración con naturalidad profesional parafraseando lo que entendiste: \"Could you clarify if you are referring to X, or would you like me to focus on Y?\".",
-            "Cortar la videollamada fingiendo que se cayó internet."
-          ],
-          "correctIndex": 2
-        },
-        {
-          "question": "3. ¿Cuáles son las 3 preguntas breves que estructuran una actualización diaria (`Daily Standup`) efectiva en un equipo ágil remoto?",
-          "options": [
-            "Dónde naciste, qué estudiaste y cuáles son tus metas a 10 años.",
-            "Qué completaste ayer, en qué te enfocarás hoy y si tienes algún bloqueo técnico o de negocio (Blocker) que requiera ayuda.",
-            "Cuánto cobras por mes, cuántos días de vacaciones tienes y qué hora es en tu país.",
-            "Leer línea por línea todo el código que escribiste durante las últimas 8 horas."
-          ],
-          "correctIndex": 1
-        },
-        {
-          "question": "4. Cuando un reclutador te pregunta en la primera llamada \"¿What are your salary expectations?\" antes de explicarte el alcance del puesto, ¿cuál es la estrategia de negociación recomendada?",
-          "options": [
-            "Decir el número más bajo posible por miedo a quedar descartado.",
-            "Negarte a hablar de dinero hasta después de haber trabajado 3 meses gratis.",
-            "Preguntar primero cuál es la banda presupuestaria asignada para la posición (\"Could you share the budgeted range for this role?\") o dar un rango bien investigado cuyo piso sea tu objetivo real.",
-            "Exigir el triple del valor de mercado sin justificación técnica."
-          ],
-          "correctIndex": 2
-        },
-        {
-          "question": "5. ¿Cuál es la hoja de ruta completa para conseguir, negociar y mantener un empleo remoto en dólares trabajando desde casa?",
-          "options": [
-            "Crear un CV formato Harvard/ATS con logros cuantificados (fórmula XYZ), preparar historias con el método STAR, contactar directo a líderes de equipo, negociar un rango en USD como Contractor (W-8BEN) y mantener comunicación asíncrona proactiva",
-            "Usar un CV de Canva con fotos y barras de porcentaje, responder con monosílabos en la entrevista y pedir que la empresa adivine tu sueldo",
-            "Esperar a tener acento británico nativo perfecto antes de enviar tu primer currículum",
-            "No dar actualizaciones en los canales de equipo y desaparecer cuando tienes una duda técnica"
-          ],
-          "correctIndex": 0
-        }
-      ]
-    }
+    ]
   }
+}
 ];
 
 // Normalizador pedagógico para que todos los 102 módulos sean 100% claros desde cero absoluto y sin textos truncados
