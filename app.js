@@ -6,8 +6,8 @@ const DEFAULT_SKILLS = [
     "id": "py-automation",
     "title": "Python desde Cero: Automatiza tu Trabajo Diario y Ahorra Horas en la PC",
     "category": "Programación",
-    "priceUSD": 12.99,
-    "originalPriceUSD": 24.99,
+    "priceUSD": 12900,
+    "originalPriceUSD": 24900,
     "isTrialCourse": true,
     "trialModulesCount": 3,
     "pointsReward": 225,
@@ -316,7 +316,7 @@ const DEFAULT_SKILLS = [
     "id": "ai-agents-pro",
     "title": "Domina ChatGPT y la Inteligencia Artificial: Haz que la IA Trabaje para Ti",
     "category": "Inteligencia Artificial",
-    "priceUSD": 29.99,
+    "priceUSD": 29900,
     "pointsReward": 390,
     "vipPointsReward": 128,
     "xp": 480,
@@ -623,7 +623,7 @@ const DEFAULT_SKILLS = [
     "id": "fin-crypto-invest",
     "title": "Finanzas Personales e Inversión Inteligente: Multiplica tus Ahorros desde Cero",
     "category": "Finanzas",
-    "priceUSD": 24.99,
+    "priceUSD": 24900,
     "pointsReward": 330,
     "vipPointsReward": 105,
     "xp": 420,
@@ -930,7 +930,7 @@ const DEFAULT_SKILLS = [
     "id": "ux-growth-convert",
     "title": "Diseño de Páginas Web que Venden: Convierte Visitantes en Clientes Reales",
     "category": "Diseño & Marketing",
-    "priceUSD": 29.99,
+    "priceUSD": 29900,
     "pointsReward": 465,
     "vipPointsReward": 143,
     "xp": 525,
@@ -1237,7 +1237,7 @@ const DEFAULT_SKILLS = [
     "id": "fullstack-apis-sql",
     "title": "Crea Aplicaciones Web Completas: Bases de Datos, Usuarios y Servidores",
     "category": "Programación",
-    "priceUSD": 36.99,
+    "priceUSD": 36900,
     "pointsReward": 435,
     "vipPointsReward": 135,
     "xp": 510,
@@ -1852,7 +1852,7 @@ const DEFAULT_SKILLS = [
     "id": "cybersec-ethical-web",
     "title": "Ciberseguridad y Hacking Ético: Protege Páginas Web y Datos de Ataques Reales",
     "category": "Programación",
-    "priceUSD": 39.99,
+    "priceUSD": 39900,
     "pointsReward": 450,
     "vipPointsReward": 143,
     "xp": 540,
@@ -2159,7 +2159,7 @@ const DEFAULT_SKILLS = [
     "id": "ai-rag-embeddings",
     "title": "Entrena a la IA con tus Propios Documentos: Crea Chatbots Expertos en tu Negocio",
     "category": "Inteligencia Artificial",
-    "priceUSD": 39.99,
+    "priceUSD": 39900,
     "pointsReward": 495,
     "vipPointsReward": 158,
     "xp": 585,
@@ -2466,7 +2466,7 @@ const DEFAULT_SKILLS = [
     "id": "js-react-modern",
     "title": "JavaScript Moderno y Profesional: Crea Sitios Web Rápidos, Dinámicos e Interactivos",
     "category": "Programación",
-    "priceUSD": 34.99,
+    "priceUSD": 34900,
     "pointsReward": 405,
     "vipPointsReward": 128,
     "xp": 495,
@@ -2773,7 +2773,7 @@ const DEFAULT_SKILLS = [
     "id": "fin-b2b-pricing",
     "title": "Cómo Poner Precios y Calcular Ganancias: Haz que tu Negocio Sea Siempre Rentable",
     "category": "Finanzas",
-    "priceUSD": 29.99,
+    "priceUSD": 29900,
     "pointsReward": 390,
     "vipPointsReward": 120,
     "xp": 465,
@@ -3080,7 +3080,7 @@ const DEFAULT_SKILLS = [
     "id": "mkt-copywriting-funnels",
     "title": "Escritura Persuasiva (Copywriting): Cómo Escribir Textos que Convencen y Venden",
     "category": "Diseño & Marketing",
-    "priceUSD": 27.99,
+    "priceUSD": 27900,
     "pointsReward": 375,
     "vipPointsReward": 120,
     "xp": 450,
@@ -3695,7 +3695,7 @@ const DEFAULT_SKILLS = [
     "id": "nocode-n8n-whatsapp",
     "title": "Crea Bots de WhatsApp con IA y Automatiza Negocios Sin Saber Programar",
     "category": "Inteligencia Artificial",
-    "priceUSD": 34.99,
+    "priceUSD": 34900,
     "pointsReward": 435,
     "vipPointsReward": 135,
     "xp": 525,
@@ -4002,7 +4002,7 @@ const DEFAULT_SKILLS = [
     "id": "viral-video-retention",
     "title": "Edición de Videos Virales para TikTok, Reels y Shorts: Multiplica tus Vistas",
     "category": "Diseño & Marketing",
-    "priceUSD": 27.99,
+    "priceUSD": 27900,
     "pointsReward": 390,
     "vipPointsReward": 120,
     "xp": 465,
@@ -4309,7 +4309,7 @@ const DEFAULT_SKILLS = [
     "id": "meta-ads-roas",
     "title": "Publicidad en Instagram, Facebook y TikTok Ads: Consigue Clientes Todos los Días",
     "category": "Diseño & Marketing",
-    "priceUSD": 36.99,
+    "priceUSD": 36900,
     "pointsReward": 450,
     "vipPointsReward": 143,
     "xp": 540,
@@ -4616,7 +4616,7 @@ const DEFAULT_SKILLS = [
     "id": "closer-high-ticket-sales",
     "title": "Ventas por Chat y Llamada (Closer & Setter): Cierra Clientes de Alto Valor",
     "category": "Finanzas",
-    "priceUSD": 34.99,
+    "priceUSD": 34900,
     "pointsReward": 420,
     "vipPointsReward": 128,
     "xp": 495,
@@ -4923,7 +4923,7 @@ const DEFAULT_SKILLS = [
     "id": "english-remote-tech",
     "title": "Inglés Práctico para Trabajar Remoto y Cobrar en Dólares desde Casa",
     "category": "Programación",
-    "priceUSD": 24.99,
+    "priceUSD": 24900,
     "pointsReward": 360,
     "vipPointsReward": 113,
     "xp": 435,
@@ -6171,6 +6171,14 @@ function getLevelInfo() {
   return { level, xpInLevel, nextXp: 500, rankTitle };
 }
 
+// Formateador de precios en Pesos Argentinos (ARS)
+function formatARS(amount, includeCurrency = true) {
+  let num = Number(amount) || 0;
+  if (num > 0 && num < 1000) num = Math.round(num * 1000);
+  const formatted = '$' + Math.round(num).toLocaleString('es-AR');
+  return includeCurrency ? `${formatted} ARS` : formatted;
+}
+
 // Protección estricta de permisos de acceso a cursos pagos y exclusivos VIP
 function hasAccessToCourse(skill) {
   if (!skill) return false;
@@ -6454,7 +6462,7 @@ function renderHeaderAndStats() {
     }
   } else {
     if (buyIndivBtn) {
-      buyIndivBtn.textContent = '💳 Comprar Curso Individual (Desde $12.99 USD)';
+      buyIndivBtn.textContent = '💳 Comprar Curso Individual (Desde $12.900 ARS)';
       buyIndivBtn.disabled = false;
     }
     if (buyProBtn) {
@@ -6462,7 +6470,7 @@ function renderHeaderAndStats() {
         buyProBtn.textContent = '👑 Membresía VIP PRO Activa (Ganas Puntos Exclusivos VP)';
         buyProBtn.disabled = true;
       } else {
-        buyProBtn.textContent = '👑 Hacerse VIP PRO — $49.00 USD / mes';
+        buyProBtn.textContent = '👑 Hacerse VIP PRO — $49.000 ARS / mes';
         buyProBtn.disabled = false;
       }
     }
@@ -6471,7 +6479,7 @@ function renderHeaderAndStats() {
         buyFounderBtn.textContent = '👑 Cuenta VIP Activa (Todos los Cursos Desbloqueados)';
         buyFounderBtn.disabled = true;
       } else {
-        buyFounderBtn.textContent = '💎 Activar VIP Founder Anual — $129.00 USD';
+        buyFounderBtn.textContent = '💎 Activar VIP Founder Anual — $129.000 ARS';
         buyFounderBtn.disabled = false;
       }
     }
@@ -6625,7 +6633,7 @@ function renderFeaturedSkill() {
                </button>`
         : `<button type="button" class="btn-domestika-primary" onclick="buyCourse('${nextSkill.id}')">
                  <span class="material-symbols-outlined" style="font-size: 20px;">play_circle</span>
-                 <span>Desbloquear Curso Completo ($${nextSkill.priceUSD.toFixed(2)} USD)</span>
+                 <span>Desbloquear Curso Completo (${formatARS(nextSkill.priceUSD)})</span>
                </button>`
     }
         <button type="button" class="btn-card-vip-upsell" onclick="openCourseQuizModal(true)">
@@ -8797,7 +8805,7 @@ function renderSkillsGrid() {
       const doneModulesCount = completed ? skill.lessons.length : savedPassed.length;
       const pct = Math.min(100, Math.round((doneModulesCount / skill.lessons.length) * 100));
       const cover = getCourseCoverVisual(skill);
-      const origPrice = skill.originalPriceUSD || Number((skill.priceUSD * 2.6).toFixed(2));
+      const origPrice = skill.originalPriceUSD || Math.round(skill.priceUSD * 2.6);
       const discountPct = skill.priceUSD > 0 ? Math.round((1 - skill.priceUSD / origPrice) * 100) : 100;
 
       const savedQuiz = typeof getSavedQuizResult === 'function' ? getSavedQuizResult() : null;
@@ -8919,10 +8927,10 @@ function renderSkillsGrid() {
               <div class="domestika-pricing-row">
                 <div class="domestika-price-cluster">
                   ${unlocked || trialHalf
-          ? `<span class="domestika-price-current">${unlocked ? '🔓 Desbloqueado' : `$${skill.priceUSD.toFixed(2)} USD`}</span>
+          ? `<span class="domestika-price-current">${unlocked ? '🔓 Desbloqueado' : formatARS(skill.priceUSD)}</span>
                        ${trialHalf && !unlocked ? `<span class="domestika-discount-pill">MITAD GRATIS</span>` : ''}`
-          : `<span class="domestika-price-current">$${skill.priceUSD.toFixed(2)} USD</span>
-                       <span class="domestika-price-old">$${origPrice.toFixed(2)}</span>
+          : `<span class="domestika-price-current">${formatARS(skill.priceUSD)}</span>
+                       <span class="domestika-price-old">${formatARS(origPrice, false)}</span>
                        <span class="domestika-discount-pill">-${discountPct}%</span>`
         }
                 </div>
@@ -8994,7 +9002,7 @@ window.buyCourse = function (skillId) {
       : `CURSO INDIVIDUAL • ${skill.category.toUpperCase()}`,
     title: skill.title,
     description: isTrialOffer
-      ? `Ya tienes acceso gratis hasta la mitad (Módulos 1 al ${trialLimit}). Desbloquea por completo los Módulos ${trialLimit + 1} al ${skill.lessons.length} y el Examen Final al precio más bajo de toda la academia (antes $${(skill.originalPriceUSD || 24.99).toFixed(2)} USD).`
+      ? `Ya tienes acceso gratis hasta la mitad (Módulos 1 al ${trialLimit}). Desbloquea por completo los Módulos ${trialLimit + 1} al ${skill.lessons.length} y el Examen Final al precio más bajo de toda la academia (antes ${formatARS(skill.originalPriceUSD || 24900)}).`
       : `Acceso ilimitado a los ${skill.lessons.length} módulos prácticos y examen final.`,
     priceUSD: skill.priceUSD,
     bonusText: `💎 Suma +${skill.pointsReward} PTS al aprobar el examen final`
@@ -9038,7 +9046,7 @@ window.handlePlanCTA = function (planKey) {
       badge: 'CUENTA ESTÁNDAR • PAGO POR CURSO',
       title: `Curso Individual: ${firstLocked.title}`,
       description: 'Acceso permanente a los 6 módulos prácticos, casos de estudio y glosario.',
-      priceUSD: firstLocked.priceUSD || 24.99,
+      priceUSD: firstLocked.priceUSD || 24900,
       bonusText: `💎 Suma +${firstLocked.pointsReward || 250} PTS al completar el curso`
     });
     return;
@@ -9056,7 +9064,7 @@ window.handlePlanCTA = function (planKey) {
       badge: '💎 ACCESO TOTAL ANUAL + BONO MÁXIMO VP',
       title: 'Pase VIP Founder (1 Año Completo)',
       description: 'Todos los cursos actuales y futuros desbloqueados por 12 meses + multiplicador x1.5.',
-      priceUSD: 129.00,
+      priceUSD: 129000,
       bonusText: '🚀 Bono inmediato: +350 VP Exclusivos + 800 PTS de bienvenida'
     });
   } else {
@@ -9066,7 +9074,7 @@ window.handlePlanCTA = function (planKey) {
       badge: '🔥 PLAN MÁS ELEGIDO • ACCESO TOTAL',
       title: 'Pase VIP PRO Mensual',
       description: 'Desbloquea los 17 cursos del catálogo y habilita los Puntos Exclusivos VIP (👑 VP).',
-      priceUSD: 49.00,
+      priceUSD: 49000,
       bonusText: '🎁 Bono inmediato: +120 VP Exclusivos + 300 PTS de bienvenida'
     });
   }
@@ -9097,7 +9105,7 @@ function completeVipMembershipPurchase(tier = 'monthly', gateway = 'PayPal') {
   }
   const isAnnual = tier === 'annual' || tier === 'founder';
   const normalizedTier = isAnnual ? 'annual' : 'monthly';
-  const price = isAnnual ? 129.00 : 49.00;
+  const price = isAnnual ? 129000 : 49000;
   const bonusPts = isAnnual ? 800 : 300;
   const bonusVp = isAnnual ? 350 : 120;
   const planLabel = isAnnual ? 'Pase VIP Founder Anual' : 'Pase VIP PRO Mensual';
@@ -9129,7 +9137,7 @@ function completeVipMembershipPurchase(tier = 'monthly', gateway = 'PayPal') {
       tier: normalizedTier,
       planName: planLabel,
       priceUSD: price,
-      currency: 'USD',
+      currency: 'ARS',
       paymentMethod: gateway,
       status: 'active',
       startedAt: new Date(nowMs).toISOString(),
@@ -9157,7 +9165,7 @@ function completeVipMembershipPurchase(tier = 'monthly', gateway = 'PayPal') {
       itemId: 'vip_' + normalizedTier,
       title: planLabel,
       amount: price,
-      currency: 'USD',
+      currency: 'ARS',
       paymentMethod: gateway,
       status: 'approved',
       date: new Date(nowMs).toISOString()
@@ -9183,7 +9191,7 @@ function completeVipMembershipPurchase(tier = 'monthly', gateway = 'PayPal') {
           <p>Tu suscripción <strong>${planLabel}</strong> ha sido activada correctamente.</p>
           <ul>
             <li><strong>Comprobante:</strong> ${invoiceNum} (${orderNum})</li>
-            <li><strong>Importe:</strong> $${price.toFixed(2)} USD vía ${gateway}</li>
+            <li><strong>Importe:</strong> ${formatARS(price)} vía ${gateway}</li>
             <li><strong>Próxima renovación:</strong> ${new Date(periodEndIso).toLocaleDateString('es-ES')}</li>
           </ul>
         `,
@@ -9253,7 +9261,7 @@ function completeIndividualCoursePurchase(skillId, gateway = 'PayPal') {
       itemId: skill.id,
       title: `Curso Completo: ${skill.title}`,
       amount: skill.priceUSD,
-      currency: 'USD',
+      currency: 'ARS',
       paymentMethod: gateway,
       status: 'approved',
       date: new Date(nowMs).toISOString()
@@ -9279,7 +9287,7 @@ function completeIndividualCoursePurchase(skillId, gateway = 'PayPal') {
           <p>Confirmamos tu compra vitalicia del curso <strong>${skill.title}</strong>.</p>
           <ul>
             <li><strong>Comprobante:</strong> ${invoiceNum} (${orderNum})</li>
-            <li><strong>Importe:</strong> $${skill.priceUSD.toFixed(2)} USD vía ${gateway}</li>
+            <li><strong>Importe:</strong> ${formatARS(skill.priceUSD)} vía ${gateway}</li>
             <li><strong>Condición:</strong> Acceso vitalicio permanente (independiente de suscripciones VIP)</li>
           </ul>
         `,
@@ -9677,11 +9685,11 @@ function renderModalStep() {
         </div>
         <h4>Desbloquea la segunda mitad + Examen Final con precio especial de bienvenida</h4>
         <p style="font-size: 14px; color: var(--text-main); line-height: 1.6; margin-bottom: 14px;">
-          Acabas de superar la mitad gratuita de este curso. Para continuar con los <strong>Módulos ${trialLimit + 1} al ${currentSkill.lessons.length} y el Examen Final</strong>, tienes un descuento único por haber llegado hasta aquí: cómpralo completo por <strong>solo $${currentSkill.priceUSD.toFixed(2)} USD</strong> (en vez de <s style="opacity:0.75;">$${(currentSkill.originalPriceUSD || 24.99).toFixed(2)} USD</s>, siendo <strong>más barato que todos los demás cursos</strong>).
+          Acabas de superar la mitad gratuita de este curso. Para continuar con los <strong>Módulos ${trialLimit + 1} al ${currentSkill.lessons.length} y el Examen Final</strong>, tienes un descuento único por haber llegado hasta aquí: cómpralo completo por <strong>solo ${formatARS(currentSkill.priceUSD)}</strong> (en vez de <s style="opacity:0.75;">${formatARS(currentSkill.originalPriceUSD || 24900)}</s>, siendo <strong>más barato que todos los demás cursos</strong>).
         </p>
 
         <div class="lesson-keypoints" style="margin-bottom: 16px;">
-          <h5>🔓 Qué desbloqueas al instante por $${currentSkill.priceUSD.toFixed(2)} USD:</h5>
+          <h5>🔓 Qué desbloqueas al instante por ${formatARS(currentSkill.priceUSD)}:</h5>
           <ul>
             ${lockedModulesList}
             <li><strong>🎯 Examen Final Integrador</strong> + Acreditación de <strong>+${finalPoints} PTS</strong> y Diploma Oficial 100%</li>
@@ -9690,10 +9698,10 @@ function renderModalStep() {
 
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:16px;">
           <button type="button" class="btn-primary-full gold-vip-cta" onclick="buyTrialCourseFromModal('${currentSkill.id}')">
-            🏷️ Comprar Resto del Curso por $${currentSkill.priceUSD.toFixed(2)} USD (Precio Especial)
+            🏷️ Comprar Resto del Curso por ${formatARS(currentSkill.priceUSD)} (Precio Especial)
           </button>
           <button type="button" class="btn-secondary" onclick="document.getElementById('lesson-modal').classList.remove('open'); handlePlanCTA('monthly');">
-            👑 O desbloquear los 17 cursos con Pase VIP PRO ($49.00 USD/mes)
+            👑 O desbloquear los 17 cursos con Pase VIP PRO ($49.000 ARS/mes)
           </button>
         </div>
       </div>
@@ -9702,7 +9710,7 @@ function renderModalStep() {
     footer.innerHTML = `
       <button class="btn-secondary" onclick="jumpToModalStep(${trialLimit - 1})">⬅ Volver al Módulo ${trialLimit}</button>
       <button class="btn-primary-full" style="max-width: 340px;" onclick="buyTrialCourseFromModal('${currentSkill.id}')">
-        🔓 Desbloquear Curso Completo por $${currentSkill.priceUSD.toFixed(2)} USD
+        🔓 Desbloquear Curso Completo por ${formatARS(currentSkill.priceUSD)}
       </button>
     `;
     return;
@@ -10398,7 +10406,7 @@ window.openCancelSubscriptionModal = function () {
   const summaryEl = document.getElementById('cancel-sub-summary-text');
   const keepUntilEl = document.getElementById('cancel-sub-keep-until');
   if (summaryEl) {
-    summaryEl.textContent = `Estás por cancelar la renovación automática de tu ${sub.planName} ($${Number(sub.priceUSD || 49).toFixed(2)} USD vía ${sub.paymentMethod || 'PayPal'}).`;
+    summaryEl.textContent = `Estás por cancelar la renovación automática de tu ${sub.planName} (${formatARS(sub.priceUSD || 49000)} vía ${sub.paymentMethod || 'MercadoPago'}).`;
   }
   if (keepUntilEl) {
     keepUntilEl.textContent = endStr;
@@ -10496,15 +10504,15 @@ window.openReceiptModal = function (purchaseId) {
       <div style="background:#f6f3f5; border:1px solid #e4e2e4; border-radius:10px; padding:12px; margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:13.5px;">
           <strong style="color:#1b1b1d;">${p.title}</strong>
-          <strong style="color:#007D8A;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
+          <strong style="color:#007D8A;">${formatARS(p.amount)}</strong>
         </div>
         <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">
           Tipo de operación: ${p.itemType === 'subscription' ? 'Suscripción VIP con acceso total' : 'Licencia vitalicia de curso individual'}
         </div>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; padding-top:8px; border-top:1px solid var(--border);">
-        <span>Total Abonado (${p.currency || 'USD'}):</span>
-        <strong style="font-size:17px; color:#1b1b1d;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
+        <span>Total Abonado (ARS):</span>
+        <strong style="font-size:17px; color:#1b1b1d;">${formatARS(p.amount)}</strong>
       </div>
     </div>
   `;
@@ -10640,7 +10648,7 @@ function renderStudentProfileAndSettings() {
             </div>
             <div class="subscription-meta-item">
               <span>Precio del plan</span>
-              <strong>$${Number(sub.priceUSD || 49).toFixed(2)} ${sub.currency || 'USD'}</strong>
+              <strong>${formatARS(sub.priceUSD || 49000)}</strong>
             </div>
             <div class="subscription-meta-item">
               <span>${isCancelledPendingEnd ? 'Conservas beneficios VIP hasta' : 'Próxima fecha de renovación'}</span>
@@ -10748,7 +10756,7 @@ function renderStudentProfileAndSettings() {
                   </div>
                   <div class="purchase-item-actions">
                     <span class="status-badge ${st.cls}">${st.label}</span>
-                    <strong style="font-size:15px; color:#1b1b1d;">$${Number(p.amount).toFixed(2)} ${p.currency || 'USD'}</strong>
+                    <strong style="font-size:15px; color:#1b1b1d;">${formatARS(p.amount)}</strong>
                     <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="openReceiptModal('${p.id}')">
                       🧾 Ver Comprobante / Factura
                     </button>
@@ -10939,7 +10947,7 @@ const FOOTER_INFO_CONTENT = {
         <h4>2. ¿Puedo empezar sin tarjeta de crédito?</h4>
         <p style="color:var(--text-muted); margin-bottom:14px;">¡Sí! Al hacer clic en el botón del Hero recibes tus primeros <strong>+50 PTS</strong> y puedes comenzar a estudiar en el aula interactiva al instante.</p>
         <h4>3. ¿Por qué el Pase VIP PRO conviene más que comprar cursos por separado?</h4>
-        <p style="color:var(--text-muted);">Con el <strong>Pase VIP PRO ($49 USD/mes)</strong> desbloqueas el catálogo de 17 cursos (102 módulos prácticos), recibes un multiplicador x1.5 de PTS y habilitas la ganancia de Puntos Exclusivos VIP (VP).</p>
+        <p style="color:var(--text-muted);">Con el <strong>Pase VIP PRO ($49.000 ARS/mes)</strong> desbloqueas el catálogo de 17 cursos (102 módulos prácticos), recibes un multiplicador x1.5 de PTS y habilitas la ganancia de Puntos Exclusivos VIP (VP).</p>
       </div>
     `
   },
@@ -12495,13 +12503,12 @@ function buildRealPaymentUrl(gateway, priceUSD) {
     const itemName = (pendingCheckoutConfig && pendingCheckoutConfig.title) || 'SkillVault Academy VIP';
     const returnUrl = 'https://skillvault-umber.vercel.app/?pago_exitoso=vip_pro';
     const cancelUrl = 'https://skillvault-umber.vercel.app/';
+    const paypalUsdVal = priceUSD >= 1000 ? (priceUSD / 1000).toFixed(2) : priceUSD.toFixed(2);
 
     if (base.includes('@') && !base.startsWith('http')) {
       return `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${encodeURIComponent(
         base
-      )}&item_name=${encodeURIComponent(itemName)}&amount=${priceUSD.toFixed(
-        2
-      )}&currency_code=USD&no_shipping=1&return=${encodeURIComponent(
+      )}&item_name=${encodeURIComponent(itemName)}&amount=${paypalUsdVal}&currency_code=USD&no_shipping=1&return=${encodeURIComponent(
         returnUrl
       )}&cancel_return=${encodeURIComponent(cancelUrl)}`;
     }
@@ -12510,7 +12517,7 @@ function buildRealPaymentUrl(gateway, priceUSD) {
     if (!url.startsWith('http')) {
       url = `https://www.paypal.com/paypalme/${url.replace(/^@/, '')}`;
     }
-    return `${url.replace(/\/$/, '')}/${priceUSD.toFixed(2)}USD`;
+    return `${url.replace(/\/$/, '')}/${paypalUsdVal}USD`;
   }
   return '';
 }
@@ -12522,7 +12529,7 @@ function updateCheckoutGatewayLiveBox() {
   if (!box || !pendingCheckoutConfig) return;
 
   const selectedGatewayEl = document.querySelector('input[name="checkout-gateway"]:checked');
-  const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'PayPal Express Checkout';
+  const gateway = selectedGatewayEl ? selectedGatewayEl.value : 'MercadoPago / Alias (gonlletaa)';
   const cfg = loadPaymentConfig();
   const payBtn = document.getElementById('checkout-pay-now-btn');
 
@@ -12538,7 +12545,7 @@ function updateCheckoutGatewayLiveBox() {
     box.style.display = 'block';
     box.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:6px;">
-        <strong>🏦 Transferencia a MercadoPago / Alias Oficial</strong>
+        <strong>🏦 Transferencia en Pesos a MercadoPago / Alias Oficial</strong>
         <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; background:rgba(0,0,0,0.28); padding:8px 10px; border-radius:8px;">
           <span>Alias: <strong style="color:#34d399; font-size:13.5px;">${alias}</strong></span>
           <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="copyOwnerAlias('${alias}')">📋 Copiar Alias</button>
@@ -12547,7 +12554,7 @@ function updateCheckoutGatewayLiveBox() {
     `;
     if (mpReceiptSection) mpReceiptSection.style.display = 'block';
     if (payBtn) {
-      payBtn.textContent = `🤖 Verificar Comprobante y Activar ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+      payBtn.textContent = `🤖 Verificar Comprobante y Activar (${formatARS(pendingCheckoutConfig.priceUSD)})`;
     }
     return;
   }
@@ -12556,14 +12563,14 @@ function updateCheckoutGatewayLiveBox() {
 
   if (gateway.includes('PayPal') && cfg.paypal) {
     box.style.display = 'block';
-    box.innerHTML = `<strong>🅿️ Checkout oficial de PayPal (${cfg.paypal})</strong><br/><span style="color:var(--text-muted);">Se abrirá PayPal con el monto exacto de $${pendingCheckoutConfig.priceUSD.toFixed(2)} USD.</span>`;
-    if (payBtn) payBtn.textContent = `🅿️ Pagar con PayPal ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+    box.innerHTML = `<strong>🅿️ Checkout oficial de PayPal (${cfg.paypal})</strong><br/><span style="color:var(--text-muted);">Importe equivalente a ${formatARS(pendingCheckoutConfig.priceUSD)}.</span>`;
+    if (payBtn) payBtn.textContent = `🅿️ Pagar con PayPal (${formatARS(pendingCheckoutConfig.priceUSD)})`;
     return;
   }
 
   box.style.display = 'none';
   if (payBtn) {
-    payBtn.textContent = `🔒 Pagar ahora ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+    payBtn.textContent = `🔒 Pagar ahora (${formatARS(pendingCheckoutConfig.priceUSD)})`;
   }
 }
 
@@ -12577,10 +12584,10 @@ window.openCheckoutModal = function (config) {
   document.getElementById('checkout-item-badge').textContent = config.badge || 'RESUMEN DEL PEDIDO';
   document.getElementById('checkout-item-title').textContent = config.title;
   document.getElementById('checkout-item-desc').textContent = config.description;
-  document.getElementById('checkout-item-price').textContent = `$${config.priceUSD.toFixed(2)}`;
+  document.getElementById('checkout-item-price').textContent = formatARS(config.priceUSD);
   document.getElementById('checkout-item-bonus').innerHTML = config.bonusText || '🎁 Acceso inmediato al confirmar';
-  document.getElementById('checkout-total-amount').textContent = `$${config.priceUSD.toFixed(2)} USD`;
-  document.getElementById('checkout-pay-now-btn').textContent = `🔒 Pagar ahora ($${config.priceUSD.toFixed(2)} USD)`;
+  document.getElementById('checkout-total-amount').textContent = formatARS(config.priceUSD);
+  document.getElementById('checkout-pay-now-btn').textContent = `🔒 Pagar ahora (${formatARS(config.priceUSD)})`;
 
   const opInput = document.getElementById('checkout-mp-op-number');
   const fileInput = document.getElementById('checkout-mp-receipt-file');
@@ -13622,7 +13629,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (payBtn) {
           payBtn.disabled = false;
-          payBtn.textContent = `🤖 Verificar Comprobante y Activar ($${pendingCheckoutConfig.priceUSD.toFixed(2)} USD)`;
+          payBtn.textContent = `🤖 Verificar Comprobante y Activar (${formatARS(pendingCheckoutConfig.priceUSD)})`;
         }
 
         if (!verification.ok) {
@@ -14407,7 +14414,7 @@ window.renderQuizResultView = function (resultObj) {
 
       <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px;">
         <button type="button" class="btn-primary-full" style="flex: 1.4; min-width: 210px;" onclick="launchRecommendedCourseFromQuiz('${top1.id}', 'start')">
-          ${unlocked1 || trialHalf1 ? '🚀 Empezar este Curso Ahora' : `🔓 Ver / Desbloquear Curso ($${top1.priceUSD.toFixed(2)} USD)`}
+          ${unlocked1 || trialHalf1 ? '🚀 Empezar este Curso Ahora' : `🔓 Ver / Desbloquear Curso (${formatARS(top1.priceUSD)})`}
         </button>
         <button type="button" class="btn-secondary" style="flex: 1; min-width: 150px;" onclick="launchRecommendedCourseFromQuiz('${top1.id}', 'details')">
           🔎 Ver Temario y Módulos
