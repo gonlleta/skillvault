@@ -14682,6 +14682,24 @@ function openMobileHomeScreenGuideModal(mode) {
   const hostAndPath = `${window.location.host}${window.location.pathname}`;
   const chromeIntentUrl = `intent://${hostAndPath}?source=pwa#Intent;scheme=https;package=com.android.chrome;end`;
 
+  if (mode === 'already-installed') {
+    bodyEl.innerHTML = `
+      <h2 id="pwa-modal-title" style="font-size:19px; color:#1b1b1d; margin-bottom:8px;">✅ ¡SkillVault ya está instalada en tu Celu!</h2>
+      <p style="font-size:13.5px; color:#5e3f39; line-height:1.5; margin-bottom:14px;">
+        Tu teléfono detecta que la App oficial de <strong>SkillVault</strong> ya fue instalada anteriormente.
+      </p>
+      <a href="/?source=pwa" target="_blank" rel="noopener" class="btn-primary-full" style="display:flex; align-items:center; justify-content:center; text-decoration:none; margin-bottom:12px; padding:13px 16px; font-weight:800;">
+        🚀 Abrir App SkillVault Ahora
+      </a>
+      <div style="background:#f6f3f5; border:1px solid #dcd9dc; border-radius:12px; padding:12px; margin-bottom:14px; font-size:12.5px; color:#5e3f39; line-height:1.5;">
+        💡 En el escritorio de tu celular, desliza el dedo de abajo hacia arriba (Cajón de todas tus aplicaciones), escribe <strong>SkillVault</strong> y mantenla apretada para ponerla en tu primera pantalla.
+      </div>
+      <button type="button" class="btn-secondary" style="width:100%;" onclick="closePwaInstallModal()">Cerrar</button>
+    `;
+    modal.classList.add('open');
+    return;
+  }
+
   if (mode === 'installing-android') {
     bodyEl.innerHTML = `
       <h2 id="pwa-modal-title" style="font-size:19px; color:#1b1b1d; margin-bottom:8px;">⏳ ¡Instalando SkillVault en tu Celular!</h2>
@@ -14762,19 +14780,14 @@ window.triggerPwaInstall = async function () {
     return;
   }
 
-  let promptEvent = window.__deferredPwaPrompt || deferredPwaPrompt;
   const ua = navigator.userAgent || '';
   const isMobilePhone =
     /android|iphone|ipad|ipod|mobile/i.test(ua) ||
     document.body.classList.contains('device-mobile') ||
     window.innerWidth <= 960;
 
-  // Si en Android el Service Worker recién está terminando de activarse, esperar un instante por beforeinstallprompt
-  if (!promptEvent && isMobilePhone && /android/i.test(ua)) {
-    await new Promise(resolve => setTimeout(resolve, 550));
-    promptEvent = window.__deferredPwaPrompt || deferredPwaPrompt;
-  }
-
+  // 1. Si el evento nativo de instalación ya está listo, dispararlo SINCRÓNICAMENTE en el primer milisegundo del toque
+  let promptEvent = window.__deferredPwaPrompt || deferredPwaPrompt;
   if (promptEvent) {
     try {
       promptEvent.prompt();
@@ -14782,12 +14795,10 @@ window.triggerPwaInstall = async function () {
       deferredPwaPrompt = null;
       window.__deferredPwaPrompt = null;
       if (outcome === 'accepted') {
+        showToast('📲 ¡Instalando SkillVault en tu pantalla de inicio!');
         if (isMobilePhone) {
-          openMobileHomeScreenGuideModal('installing-android');
-        } else {
-          showToast('📲 ¡Instalando SkillVault directamente en tu dispositivo!');
+          setTimeout(() => openMobileHomeScreenGuideModal('installing-android'), 1200);
         }
-        return;
       }
       return;
     } catch (err) {
@@ -14796,7 +14807,62 @@ window.triggerPwaInstall = async function () {
     }
   }
 
-  // En celulares NUNCA descargar un archivo .html (porque va a "Descargas" y no crea ícono en Pantalla de Inicio)
+  // 2. En Android, si este fue el PRIMER toque en la página, Chrome dispara beforeinstallprompt milisegundos después del clic:
+  //    lo capturamos al vuelo dentro de la ventana de activación del usuario y lanzamos el instalador nativo directo.
+  if (isMobilePhone && /android/i.test(ua)) {
+    const dynamicEvent = await new Promise(resolve => {
+      let settled = false;
+      const onPrompt = e => {
+        if (settled) return;
+        settled = true;
+        e.preventDefault();
+        deferredPwaPrompt = e;
+        window.__deferredPwaPrompt = e;
+        window.removeEventListener('beforeinstallprompt', onPrompt);
+        resolve(e);
+      };
+      window.addEventListener('beforeinstallprompt', onPrompt);
+      setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          window.removeEventListener('beforeinstallprompt', onPrompt);
+          resolve(window.__deferredPwaPrompt || deferredPwaPrompt || null);
+        }
+      }, 2000);
+    });
+
+    if (dynamicEvent) {
+      try {
+        dynamicEvent.prompt();
+        const { outcome } = await dynamicEvent.userChoice;
+        deferredPwaPrompt = null;
+        window.__deferredPwaPrompt = null;
+        if (outcome === 'accepted') {
+          showToast('📲 ¡Instalando SkillVault en tu pantalla de inicio!');
+          setTimeout(() => openMobileHomeScreenGuideModal('installing-android'), 1200);
+        }
+        return;
+      } catch (err) {
+        deferredPwaPrompt = null;
+        window.__deferredPwaPrompt = null;
+      }
+    }
+
+    // 3. Verificar si el teléfono Android YA tiene la WebAPK de SkillVault instalada
+    if (typeof navigator.getInstalledRelatedApps === 'function') {
+      try {
+        const installedApps = await navigator.getInstalledRelatedApps();
+        if (Array.isArray(installedApps) && installedApps.length > 0) {
+          openMobileHomeScreenGuideModal('already-installed');
+          return;
+        }
+      } catch (err) {
+        // Ignorar si el navegador no soporta getInstalledRelatedApps
+      }
+    }
+  }
+
+  // 4. En iPhone (iOS) o navegadores que bloquean beforeinstallprompt
   if (isMobilePhone) {
     openMobileHomeScreenGuideModal('guide');
     return;

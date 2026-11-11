@@ -1,5 +1,5 @@
 {
-  "id": "com.skillvault.app",
+  "id": "/?source=pwa",
   "name": "SkillVault — Academia Interactiva & Club VIP",
   "short_name": "SkillVault",
   "description": "Aprende automatización, IA, programación y finanzas superando misiones prácticas y ganando puntos canjeables por recompensas reales.",
@@ -13,6 +13,12 @@
   "dir": "ltr",
   "lang": "es",
   "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://skillvault-umber.vercel.app/manifest.json"
+    }
+  ],
   "launch_handler": {
     "client_mode": ["navigate-existing", "auto"]
   },
@@ -50,6 +56,13 @@
     }
   ],
   "screenshots": [
+    {
+      "src": "/screenshot-mobile-portrait.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Catálogo interactivo de cursos y misiones en SkillVault"
+    },
     {
       "src": "/screenshot-mobile.png",
       "sizes": "1200x630",
