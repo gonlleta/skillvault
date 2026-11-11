@@ -14670,6 +14670,89 @@ window.addEventListener('appinstalled', () => {
   showToast('✅ ¡SkillVault ya quedó instalada en la pantalla de tu celular!');
 });
 
+function openMobileHomeScreenGuideModal(mode) {
+  const modal = document.getElementById('pwa-install-modal');
+  const bodyEl = document.getElementById('pwa-install-modal-dynamic-body');
+  if (!modal || !bodyEl) return;
+
+  const ua = navigator.userAgent || '';
+  const isIOS = /iphone|ipad|ipod/i.test(ua);
+  const isAndroid = /android/i.test(ua);
+  const isInAppBrowser = /Instagram|FBAN|FBAV|WhatsApp|TikTok|BytedanceWebview|Line\//i.test(ua);
+  const hostAndPath = `${window.location.host}${window.location.pathname}`;
+  const chromeIntentUrl = `intent://${hostAndPath}?source=pwa#Intent;scheme=https;package=com.android.chrome;end`;
+
+  if (mode === 'installing-android') {
+    bodyEl.innerHTML = `
+      <h2 id="pwa-modal-title" style="font-size:19px; color:#1b1b1d; margin-bottom:8px;">⏳ ¡Instalando SkillVault en tu Celular!</h2>
+      <p style="font-size:13.5px; color:#5e3f39; line-height:1.5; margin-bottom:14px;">
+        Android tarda entre <strong>5 y 12 segundos</strong> en crear el ícono oficial. Si no lo ves en tu primera pantalla:
+      </p>
+      <div style="background:#fff8f6; border:1.5px solid rgba(240,45,0,0.3); border-radius:12px; padding:13px; margin-bottom:14px; font-size:13px; color:#1b1b1d; line-height:1.55;">
+        <strong>1️⃣ Revisa el Cajón de Aplicaciones:</strong> desliza hacia arriba en el escritorio de tu celu (donde están todas tus apps) y busca <strong>SkillVault</strong>. Mantenlo apretado para moverlo a tu pantalla principal.<br/><br/>
+        <strong>2️⃣ Revisa la última página a la derecha</strong> de tu pantalla de inicio.
+      </div>
+      <button type="button" class="btn-primary-full" onclick="closePwaInstallModal()">¡Listo, entendido!</button>
+    `;
+    modal.classList.add('open');
+    return;
+  }
+
+  if (isInAppBrowser) {
+    bodyEl.innerHTML = `
+      <h2 id="pwa-modal-title" style="font-size:19px; color:#1b1b1d; margin-bottom:8px;">🌐 Ábrelo en ${isIOS ? 'Safari' : 'Chrome'} para Fijar el Ícono</h2>
+      <p style="font-size:13.5px; color:#5e3f39; line-height:1.5; margin-bottom:14px;">
+        Estás dentro del navegador interno de WhatsApp/Instagram, que no permite poner íconos en la Pantalla de Inicio.
+      </p>
+      ${isAndroid
+        ? `<a href="${chromeIntentUrl}" class="btn-primary-full" style="display:flex; align-items:center; justify-content:center; text-decoration:none; margin-bottom:10px; padding:13px 16px; font-weight:800;">
+             🚀 Abrir directo en Google Chrome
+           </a>`
+        : `<div style="background:#fff8f6; border:1.5px solid rgba(240,45,0,0.3); border-radius:12px; padding:13px; margin-bottom:14px; font-size:13px; color:#1b1b1d; line-height:1.55;">
+             1️⃣ Toca los <strong>3 puntitos (•••)</strong> o el ícono de navegador en la esquina.<br/>
+             2️⃣ Elige <strong>"Abrir en Safari"</strong> y luego toca <strong>Compartir (⬆️) → Agregar a inicio</strong>.
+           </div>`
+      }
+      <button type="button" class="btn-secondary" style="width:100%;" onclick="closePwaInstallModal()">Cerrar</button>
+    `;
+    modal.classList.add('open');
+    return;
+  }
+
+  if (isIOS) {
+    bodyEl.innerHTML = `
+      <h2 id="pwa-modal-title" style="font-size:19px; color:#1b1b1d; margin-bottom:8px;">🍎 Poner SkillVault en tu Pantalla de Inicio</h2>
+      <p style="font-size:13.5px; color:#5e3f39; line-height:1.5; margin-bottom:14px;">
+        En iPhone, los archivos descargados van a la carpeta "Archivos" y no a la pantalla principal. Haz estos 2 toques para crear el ícono de la App:
+      </p>
+      <div style="background:#fff8f6; border:1.5px solid rgba(240,45,0,0.3); border-radius:12px; padding:14px; margin-bottom:16px; font-size:13.5px; color:#1b1b1d; line-height:1.6;">
+        <strong>1.</strong> Toca el botón <strong>Compartir (⬆️)</strong> en la barra de Safari (abajo en el centro o arriba a la derecha).<br/>
+        <strong>2.</strong> Desliza la lista hacia abajo y toca <strong>"Agregar a inicio" (➕)</strong> → <strong>Agregar</strong>.
+      </div>
+      <button type="button" class="btn-primary-full" onclick="closePwaInstallModal()">¡Entendido!</button>
+    `;
+    modal.classList.add('open');
+    return;
+  }
+
+  bodyEl.innerHTML = `
+    <h2 id="pwa-modal-title" style="font-size:19px; color:#1b1b1d; margin-bottom:8px;">📲 Fijar Ícono en tu Pantalla de Inicio</h2>
+    <p style="font-size:13.5px; color:#5e3f39; line-height:1.5; margin-bottom:12px;">
+      Para que el ícono rojo de <strong>SkillVault</strong> quede directo en la pantalla principal de tu celular:
+    </p>
+    <div style="background:#fff8f6; border:1.5px solid rgba(240,45,0,0.32); border-radius:12px; padding:13px; margin-bottom:12px; font-size:13px; color:#1b1b1d; line-height:1.55;">
+      <strong>👉 Paso directo en Chrome / Android:</strong><br/>
+      1. Toca los <strong>3 puntitos (⋮)</strong> arriba a la derecha del navegador.<br/>
+      2. Toca <strong>"Agregar a la pantalla principal"</strong> o <strong>"Instalar aplicación"</strong> y confirma en <strong>Instalar / Agregar</strong>.
+    </div>
+    <div style="background:#f6f3f5; border:1px solid #dcd9dc; border-radius:12px; padding:12px; margin-bottom:16px; font-size:12.5px; color:#5e3f39; line-height:1.5;">
+      💡 <strong>¿Ya tocaste "Instalar" recién?</strong> En Samsung, Xiaomi y Motorola la app se guarda en el <strong>Cajón de todas las aplicaciones</strong> (desliza el dedo hacia arriba en el escritorio de tu celu y busca <strong>SkillVault</strong>, o en los 3 puntitos <strong>⋮</strong> verás <strong>"Abrir SkillVault"</strong>).
+    </div>
+    <button type="button" class="btn-primary-full" onclick="closePwaInstallModal()">¡Entendido!</button>
+  `;
+  modal.classList.add('open');
+}
+
 window.triggerPwaInstall = async function () {
   const modal = document.getElementById('pwa-install-modal');
   if (modal) modal.classList.remove('open');
@@ -14679,7 +14762,19 @@ window.triggerPwaInstall = async function () {
     return;
   }
 
-  const promptEvent = window.__deferredPwaPrompt || deferredPwaPrompt;
+  let promptEvent = window.__deferredPwaPrompt || deferredPwaPrompt;
+  const ua = navigator.userAgent || '';
+  const isMobilePhone =
+    /android|iphone|ipad|ipod|mobile/i.test(ua) ||
+    document.body.classList.contains('device-mobile') ||
+    window.innerWidth <= 960;
+
+  // Si en Android el Service Worker recién está terminando de activarse, esperar un instante por beforeinstallprompt
+  if (!promptEvent && isMobilePhone && /android/i.test(ua)) {
+    await new Promise(resolve => setTimeout(resolve, 550));
+    promptEvent = window.__deferredPwaPrompt || deferredPwaPrompt;
+  }
+
   if (promptEvent) {
     try {
       promptEvent.prompt();
@@ -14687,22 +14782,28 @@ window.triggerPwaInstall = async function () {
       deferredPwaPrompt = null;
       window.__deferredPwaPrompt = null;
       if (outcome === 'accepted') {
-        showToast('📲 ¡Instalando SkillVault directamente en tu celular!');
+        if (isMobilePhone) {
+          openMobileHomeScreenGuideModal('installing-android');
+        } else {
+          showToast('📲 ¡Instalando SkillVault directamente en tu dispositivo!');
+        }
         return;
       }
+      return;
     } catch (err) {
       deferredPwaPrompt = null;
       window.__deferredPwaPrompt = null;
     }
   }
 
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent || '');
-  downloadSkillVaultDirectApp();
-  if (isIOS) {
-    showToast('📥 Acceso descargado • En iPhone también puedes tocar Compartir (⬆️) → "Agregar a inicio"');
-  } else {
-    showToast('📥 ¡Descargando SkillVault App directamente en tu dispositivo!');
+  // En celulares NUNCA descargar un archivo .html (porque va a "Descargas" y no crea ícono en Pantalla de Inicio)
+  if (isMobilePhone) {
+    openMobileHomeScreenGuideModal('guide');
+    return;
   }
+
+  downloadSkillVaultDirectApp();
+  showToast('📥 ¡Descargando SkillVault App directamente en tu PC!');
 };
 
 document.addEventListener('DOMContentLoaded', syncPwaInstallElementsVisibility);

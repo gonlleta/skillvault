@@ -1,4 +1,4 @@
-const CACHE_NAME = 'skillvault-pwa-v33';
+const CACHE_NAME = 'skillvault-pwa-v34';
 const CORE_ASSETS = [
   '/',
   '/index.html',
@@ -35,6 +35,8 @@ self.addEventListener('activate', event => {
 // Estrategia Network-First para recibir siempre la última versión de Vercel y respaldo offline
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith(self.location.origin)) return;
+
   event.respondWith(
     fetch(event.request)
       .then(response => {
@@ -46,7 +48,9 @@ self.addEventListener('fetch', event => {
         }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() =>
+        caches.match(event.request).then(cached => cached || caches.match('/index.html'))
+      )
   );
 });
 
