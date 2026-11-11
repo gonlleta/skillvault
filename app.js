@@ -10576,6 +10576,8 @@ function renderStudentProfileAndSettings() {
           <span class="inst-stat-pill">⚡ ${state.xp} XP</span>
         </div>
         <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #e4e2e4; display: flex; flex-wrap: wrap; gap: 10px;">
+          <button type="button" class="btn-mobile-app-download pwa-install-trigger-el" style="flex: 1; min-width: 170px;" onclick="triggerPwaInstall()">📲 Descargar en el Celu</button>
+          <button type="button" class="btn-secondary" style="flex: 1; min-width: 170px; padding: 11px 16px; font-size: 13px; font-weight: 700;" onclick="switchAppTab('settings')">⚙️ Configuración y Voz</button>
           ${state.userAccount
         ? `<button type="button" class="btn-secondary" style="flex: 1; min-width: 170px; padding: 11px 16px; font-size: 13.5px; font-weight: 800; color: #b41f00; border-color: rgba(240, 45, 0, 0.4); background: #fff5f2;" onclick="logoutUser()">🚪 Cerrar Sesión</button>
                <button type="button" class="btn-secondary" style="flex: 1; min-width: 170px; padding: 11px 16px; font-size: 13px; font-weight: 700;" onclick="openMailboxModal()">📬 Bandeja de Notificaciones</button>`
@@ -10618,6 +10620,10 @@ function renderStudentProfileAndSettings() {
         </div>
       </article>
     `;
+  }
+
+  if (typeof syncPwaInstallElementsVisibility === 'function') {
+    syncPwaInstallElementsVisibility();
   }
 
   // 5. Renderizar sección "Mi suscripción"
@@ -14643,9 +14649,35 @@ function downloadSkillVaultDirectApp() {
   }, 500);
 }
 
+function isRunningStandalonePwa() {
+  return (
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+    window.navigator.standalone === true
+  );
+}
+
+function syncPwaInstallElementsVisibility() {
+  const installed = isRunningStandalonePwa();
+  document.querySelectorAll('.pwa-install-trigger-el').forEach(el => {
+    el.style.display = installed ? 'none' : '';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  deferredPwaPrompt = null;
+  window.__deferredPwaPrompt = null;
+  syncPwaInstallElementsVisibility();
+  showToast('✅ ¡SkillVault ya quedó instalada en la pantalla de tu celular!');
+});
+
 window.triggerPwaInstall = async function () {
   const modal = document.getElementById('pwa-install-modal');
   if (modal) modal.classList.remove('open');
+
+  if (isRunningStandalonePwa()) {
+    showToast('✅ ¡Ya estás usando la App de SkillVault instalada en tu celular!');
+    return;
+  }
 
   const promptEvent = window.__deferredPwaPrompt || deferredPwaPrompt;
   if (promptEvent) {
@@ -14655,7 +14687,7 @@ window.triggerPwaInstall = async function () {
       deferredPwaPrompt = null;
       window.__deferredPwaPrompt = null;
       if (outcome === 'accepted') {
-        showToast('📲 ¡Instalando SkillVault directamente en tu dispositivo!');
+        showToast('📲 ¡Instalando SkillVault directamente en tu celular!');
         return;
       }
     } catch (err) {
@@ -14664,9 +14696,16 @@ window.triggerPwaInstall = async function () {
     }
   }
 
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent || '');
   downloadSkillVaultDirectApp();
-  showToast('📥 ¡Descargando SkillVault App directamente en tu dispositivo!');
+  if (isIOS) {
+    showToast('📥 Acceso descargado • En iPhone también puedes tocar Compartir (⬆️) → "Agregar a inicio"');
+  } else {
+    showToast('📥 ¡Descargando SkillVault App directamente en tu dispositivo!');
+  }
 };
+
+document.addEventListener('DOMContentLoaded', syncPwaInstallElementsVisibility);
 
 window.closePwaInstallModal = function () {
   const modal = document.getElementById('pwa-install-modal');

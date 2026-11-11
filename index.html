@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="SkillVault" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <link rel="manifest" href="/manifest.json?v=20261101y" />
+  <link rel="manifest" href="/manifest.json?v=20261111a" />
   <link rel="icon" type="image/svg+xml" href="/icon.svg?v=20261101y" />
   <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=20261101y" />
   <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png?v=20261101y" />
@@ -34,7 +34,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261108a" />
+  <link rel="stylesheet" href="styles.css?v=20261111a" />
   <script>
     window.__deferredPwaPrompt = null;
     window.addEventListener('beforeinstallprompt', function (e) {
@@ -42,7 +42,7 @@
       window.__deferredPwaPrompt = e;
     });
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(function () {});
+      navigator.serviceWorker.register('/sw.js').catch(function () { });
     }
   </script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -242,6 +242,11 @@
             <span class="brand-tag" style="font-size: 9px; letter-spacing: 0.12em;">MASTERY</span>
           </div>
           <div class="mobile-header-icons">
+            <button type="button" class="icon-circle-btn pwa-install-trigger-el"
+              aria-label="Descargar App en el celular" title="Descargar App en el celular"
+              onclick="triggerPwaInstall()">
+              <span class="material-symbols-outlined" style="color: #F02D00;">install_mobile</span>
+            </button>
             <button type="button" class="icon-circle-btn" aria-label="Buscar cursos"
               onclick="document.getElementById('search-input')?.focus()">
               <span class="material-symbols-outlined">search</span>
@@ -389,8 +394,28 @@
                 onclick="document.querySelector('[data-tab=plans]').click()">
                 👑 Ver Pase VIP PRO
               </button>
+              <button type="button" class="btn-hero-explore pwa-install-trigger-el" onclick="triggerPwaInstall()">
+                📲 Descargar App en el Celu
+              </button>
             </div>
           </div>
+        </div>
+
+        <!-- Acceso directo visible en celular y PC para instalar/descargar la App desde la página de cursos -->
+        <div class="mobile-app-download-strip pwa-install-trigger-el" id="mobile-courses-app-banner" role="region"
+          aria-label="Descargar aplicación móvil de SkillVault">
+          <div class="mobile-app-download-info">
+            <div class="mobile-app-download-icon-box" aria-hidden="true">
+              <span class="material-symbols-outlined">install_mobile</span>
+            </div>
+            <div>
+              <strong>📲 Descargar SkillVault en tu Celular</strong>
+              <span>Accede directo a tus cursos, misiones y puntos a pantalla completa desde tu inicio.</span>
+            </div>
+          </div>
+          <button type="button" class="btn-mobile-app-download" onclick="triggerPwaInstall()">
+            📲 Descargar en el Celu
+          </button>
         </div>
 
         <!-- Aviso de Verificación de Correo Pendiente (si aplica) -->
@@ -444,7 +469,8 @@
             <div class="plus-showcase-header">
               <span class="plus-showcase-kicker">👑 EXPERIENCIA ACADÉMICA ILIMITADA</span>
               <h2>Elige tu Pase VIP y Desbloquea Todo</h2>
-              <p>Acceso instantáneo a todos los cursos completos (valorados en +$650.000 ARS) más recompensas multiplicadas.
+              <p>Acceso instantáneo a todos los cursos completos (valorados en +$650.000 ARS) más recompensas
+                multiplicadas.
               </p>
             </div>
 
@@ -735,8 +761,10 @@
         <div class="section-header">
           <div>
             <h2>👑 Planes y Precios — Desbloquea Todos los Cursos Completos y Puntos VIP</h2>
-            <p>Cada curso completo (7.5h a 12h de formación práctica) cuesta entre <strong>$19.900 y $59.900 ARS</strong>
-              por separado (valor total del catálogo: <strong>+$650.000 ARS</strong>). Con el <strong>Pase VIP PRO</strong>
+            <p>Cada curso completo (7.5h a 12h de formación práctica) cuesta entre <strong>$19.900 y $59.900
+                ARS</strong>
+              por separado (valor total del catálogo: <strong>+$650.000 ARS</strong>). Con el <strong>Pase VIP
+                PRO</strong>
               desbloqueas absolutamente todos los cursos completos al instante.</p>
           </div>
         </div>
@@ -806,12 +834,15 @@
 
       <!-- VISTA 4: CURSOS COMPLETOS, HERRAMIENTAS Y ACCESOS VIP -->
       <section class="tab-view" id="view-certificates">
-        <div class="section-header">
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
           <div>
             <h2>🎓 Mis Cursos Completos (100% Finalizados)</h2>
             <p>Cada vez que superas los 6 módulos prácticos y apruebas el examen final al 100%, queda registrado aquí tu
               curso completo.</p>
           </div>
+          <button type="button" class="btn-mobile-app-download pwa-install-trigger-el" onclick="triggerPwaInstall()">
+            📲 Descargar en el Celu
+          </button>
         </div>
         <div class="unlocked-list" id="completed-diplomas-list" style="margin-bottom: 36px;"></div>
 
@@ -1656,7 +1687,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=20261108a"></script>
+  <script src="app.js?v=20261111a"></script>
 </body>
 
 </html>

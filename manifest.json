@@ -52,14 +52,7 @@
   "screenshots": [
     {
       "src": "/screenshot-mobile.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Catálogo interactivo de cursos y misiones en SkillVault"
-    },
-    {
-      "src": "/screenshot-mobile.png",
-      "sizes": "1080x1920",
+      "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Academia Interactiva SkillVault"

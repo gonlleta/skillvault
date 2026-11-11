@@ -6742,6 +6742,92 @@ body.device-mobile .hero-banner {
   box-shadow: none !important;
 }
 
+/* Barra / Tarjeta de Descarga Directa de App en Celular (Página de Cursos) */
+.mobile-app-download-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: linear-gradient(135deg, #fff8f6 0%, #ffffff 100%);
+  border: 1.5px solid rgba(240, 45, 0, 0.28);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(240, 45, 0, 0.06);
+}
+
+.mobile-app-download-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.mobile-app-download-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #ffdad3;
+  color: #b41f00;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mobile-app-download-info strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: #1b1b1d;
+  margin-bottom: 2px;
+}
+
+.mobile-app-download-info span {
+  display: block;
+  font-size: 12px;
+  color: #5e3f39;
+  line-height: 1.35;
+}
+
+.btn-mobile-app-download {
+  background: #F02D00;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.15s ease, background 0.15s ease;
+  box-shadow: 0 3px 10px rgba(240, 45, 0, 0.22);
+}
+
+.btn-mobile-app-download:hover {
+  background: #d82800;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .mobile-app-download-strip {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 13px 14px;
+    gap: 10px;
+  }
+
+  .btn-mobile-app-download {
+    width: 100%;
+    min-height: 44px;
+    font-size: 13.5px;
+  }
+}
+
 /* Respeto estricto de Preferencias de Movimiento Reducido (WCAG 2.3.3) */
 @media (prefers-reduced-motion: reduce) {
   *,
